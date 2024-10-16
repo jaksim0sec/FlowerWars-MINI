@@ -1,0 +1,422 @@
+<head>
+    <title>개나리워즈:MINI ► β</title>
+    <link rel="shortcut icon" href="https://ifh.cc/g/69rynC.png">
+</head>
+
+<body>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .object {
+            position: absolute;
+        }
+
+        #ingame_world {
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            position: relative;
+            background-color: #e6e6e6;
+        }
+
+        #ingame_world_board {
+            width: auto;
+            height: auto;
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            background-color: transparent;
+        }
+
+        .tile {
+            width: 98px;
+            height: 98px;
+            margin: 1px;
+            background-color: #F1EBE6;
+            border-radius: 15px;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: inset 0px 0px 10px #CBB39B80;
+            transition: all 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+        }
+
+        .tile:hover {
+            transform: scale(0.95);
+            filter: brightness(0.98);
+            box-shadow: inset 0px 0px 10px #CBB39B;
+        }
+
+        .tile-updated {
+            filter: brightness(0.95);
+            transform: scale(0.95);
+            transition: all 0.3s ease;
+        }
+
+        .tile-updated-end {
+            filter: none;
+            transform: none;
+            transition: all 0.3s ease;
+        }
+
+        .tile.edge-top {
+            margin-top: 0;
+        }
+
+        .tile.edge-left {
+            margin-left: 0;
+        }
+
+        .tile.edge-bottom {
+            margin-bottom: 0;
+        }
+
+        .tile.edge-right {
+            margin-right: 0;
+        }
+
+        .char {
+            width: 55px;
+            /*height: 90px;*/
+            transform-origin: bottom;
+            margin-bottom: 49px;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes jump {
+            0% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-100px);
+                animation-timing-function: ease-out;
+            }
+            50%{transform: translateY(-100px);}
+            100% {
+                transform: translateY(0);
+                animation-timing-function: ease-in;
+            }
+            
+        }
+        
+        @keyframes shake {
+            0% {
+                transform: rotate(-5deg) translateY(-2px);
+            }
+
+            25% {
+                transform: rotate(10deg) translateY(2px);
+            }
+
+            75% {
+                transform: rotate(-5deg) translateY(-2px);
+            }
+            100% {
+                transform: rotate(0deg)translateY(-2px);
+            }
+        }
+
+        .fixed-window {
+            padding: 2%;
+            position: absolute;
+            border-radius: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.5);
+            color: #fff;
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fixed-window:hover {
+            transform: scale(1.05);
+            border-radius: 5px;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .fixed-score-window {
+            padding: 1%;
+            position: absolute;
+            border-radius: 50px;
+            background-color: rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.5);
+            top: 2%;
+            width: 50px;
+            height: 50px;
+            align-items: center;
+            justify-content: center;
+            display: flex;
+            font-size: 30px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .button {
+            padding: 10px 20px;
+            background-color: #ff5722;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            font-size: 14px;
+        }
+
+        .button:hover {
+            background-color: #e64a19;
+            transform: scale(1.05);
+        }
+    </style>
+
+    <div id="ingame_world" class="object">
+        <div id="ingame_world_board" class="object"></div>
+        <div id="ingame_world_menu">
+            <div class="fixed-window" id="status" style="bottom: 2%; left: 1%; min-width: 25%; min-height: 20%;">
+                <button class="button"
+                    onclick="오브젝트이동(게임현황.char.개나리용사1,'left')">디버그</button>
+            </div>
+            <div class="fixed-score-window" id="enemy-status" style="left: 1%;border-top-right-radius: 10px;">
+                0
+            </div>
+            <div class="fixed-score-window" id="my-status" style="right: 1%;border-bottom-left-radius: 10px;">
+                0
+            </div>
+        </div>
+    </div>
+
+    <script>
+// Add your JS functions here
+    </script>
+
+
+    <script>
+        //데이터 
+        const 캐릭터이미지URL = 
+        {
+            개나리용사: `https://ifh.cc/g/Zp3tjP.png`,
+            테스트:``
+        }
+        const 캐릭터특징설정 = {개나리용사:{체력:3},테스트:{체력:3},적군기지:{체력:3},아군기지:{체력:3},}
+        // 선언
+
+
+        //초기object 정의형식 = [x , y , 고유이름 , 타입, 종족, 팀, 체력]
+        //후기object 정의형식 = 고유이름 : {고유이름, 타입, 종족, 팀 , 체력 , x, y}
+        let 게임현황 = {
+            map: [12, 5], object:
+                [{x: 1, y: 3, 고유이름 : '적군기지', 타입 : 'obj' , 종족 : '적군기지', 팀 : null},
+                 {x: 12, y: 3, 고유이름 : '아군기지', 타입 : 'obj' , 종족 : '아군기지' , 팀 : null},
+                 {x: 11, y: 3, 고유이름 : '개나리용사1', 타입 : 'cha' , 종족 : '개나리용사' , 팀 : '아군'},
+                 {x: 2, y: 3, 고유이름 : '테스터1', 타입 : 'cha' , 종족 : '테스트' , 팀 : '적군'}
+                ],
+            board: [], char: []
+        };
+        let SYsetting = {eff: 3};
+        let SYmouse = {x: 0, y: 0};
+        let SYboardDrag = {
+            isDragging: false,
+            startX: 0,
+            startY: 0,
+            initialX: 0,
+            initialY: 0
+        };
+
+        // 정의함수
+        function HTML(name) {return document.querySelector(name);}
+
+        // 기본함수  
+        document.addEventListener('mousemove', (event) => {
+            SYmouse.x = event.clientX;
+            SYmouse.y = event.clientY;
+            //보드판 드래그
+            if (SYboardDrag.isDragging) {
+                const dx = event.clientX - SYboardDrag.startX;
+                const dy = event.clientY - SYboardDrag.startY;
+                const board = HTML("#ingame_world_board");
+                board.style.left = (SYboardDrag.initialX + dx) + 'px';
+                board.style.top = (SYboardDrag.initialY + dy) + 'px';
+            }
+        });
+
+        document.addEventListener('mousedown', (event) => {
+            //보드판 드래그
+            SYboardDrag.isDragging = true;
+            SYboardDrag.startX = event.clientX;
+            SYboardDrag.startY = event.clientY;
+            const board = HTML("#ingame_world_board");
+            SYboardDrag.initialX = parseInt(board.style.left || 0);
+            SYboardDrag.initialY = parseInt(board.style.top || 0);
+        });
+
+        document.addEventListener('mouseup', () => {
+            SYboardDrag.isDragging = false;
+        });
+
+        // 인게임 함수
+        function 보드판생성(w, h) {
+            const board = HTML("#ingame_world_board");
+            board.innerHTML = "";
+            const boardWidth = w * 100 - 2;
+            const boardHeight = h * 100 - 2;
+            const initialLeft = Math.floor((window.innerWidth - boardWidth) / 2);
+            const initialTop = Math.floor((window.innerHeight - boardHeight) / 2);
+            board.style.left = `${initialLeft}px`;
+            board.style.top = `${initialTop}px`;
+
+            for (let hh = 0; hh < h; hh++) {
+                const row = document.createElement("div");
+                row.style.display = "flex";
+                row.style.width = `${boardWidth}px`;
+
+                for (let ww = 0; ww < w; ww++) {
+                    const tile = document.createElement("div");
+                    tile.className = "tile";
+                    tile.id = `tile_${ww + 1}_${hh + 1}`;
+                    if (hh === 0) tile.classList.add("edge-top");
+                    if (ww === 0) tile.classList.add("edge-left");
+                    if (hh === h - 1) tile.classList.add("edge-bottom");
+                    if (ww === w - 1) tile.classList.add("edge-right");
+                    게임현황.board[hh * w + ww] = "";
+                    row.appendChild(tile);
+                }
+                board.appendChild(row);
+            }
+            //console.log(게임현황.board);
+        }
+
+        function 오브젝트관리(list) {
+            //console.log(list);
+
+            for (let i = 0; i < list.length; i++) {
+                const 대상타일 = HTML(`#tile_${list[i].x}_${list[i].y}`);
+                //console.log(list[i]);
+                //console.log(list[i].html);
+                //if (list[i].html){console.log('고라니')}
+                
+                //console.log(list[i].x)
+                //console.log(`#tile_${list[i].x}_${list[i].y}`)
+                let 대상타일요소 = 대상타일.innerHTML;
+                const 설정요소 = list[i];
+
+                // 수동 html 수정
+                if ('html' in 설정요소) {
+                    //console.log('수동설정')
+                    대상타일.innerHTML = 설정요소.html;
+                } else { // 자동 html 생성
+                    if (설정요소.타입 === 'obj') {
+                        대상타일요소 = `<img src="${캐릭터이미지URL[설정요소.종족]}" id="${설정요소.고유이름}" class="object" alt="${설정요소.고유이름}">`;
+                    } 
+                    else if (설정요소.타입 === 'cha') {
+                        대상타일요소 = `
+                            <img src="${캐릭터이미지URL[설정요소.종족]}" id="${설정요소.고유이름}" class="char" alt="${설정요소.고유이름}">
+                            <div style="position:absolute;bottom:10px;">${"◆".repeat(캐릭터특징설정[설정요소.종족].체력)}</div>
+                        `;
+                    };
+                    대상타일.innerHTML = 대상타일요소;
+                    //console.log(설정요소.고유이름)
+                    // 후기 object 정의 형식: [고유이름, 타입, 종족, 팀, 체력, x, y]
+                    let j;
+                    for (j = 0; j < 게임현황.char.length; j++) {
+                        if (게임현황.char[j].고유이름 === 설정요소.고유이름) {
+                            break;
+                        }
+                    }
+                    if (j === 게임현황.char.length) { // 원하는 항목이 없을 때
+                        //console.log(설정요소.종족)
+                        게임현황.char[설정요소.고유이름] = {
+                            고유이름: 설정요소.고유이름,
+                            타입: 설정요소.타입,
+                            종족: 설정요소.종족,
+                            팀: 설정요소.팀,
+                            체력: 캐릭터특징설정[설정요소.종족].체력,
+                            x: 설정요소.x,
+                            y: 설정요소.y
+                        };
+                    } else {
+                        게임현황.char[j].x = 설정요소.x;
+                        게임현황.char[j].y = 설정요소.y;
+                    }
+                }
+                게임현황.board[설정요소.x + (설정요소.y - 1) * 게임현황.map[0]] = 대상타일요소;
+
+                // 타일 업데이트 효과
+                대상타일.classList.add("tile-updated");
+                setTimeout(() => {
+                    대상타일.classList.remove("tile-updated");
+                    대상타일.classList.add("tile-updated-end");
+                    setTimeout(() => {
+                        대상타일.classList.remove("tile-updated-end");
+                    }, 300);
+                }, 300);
+            }
+        }
+
+
+        function 주변계산(x, y, 방향) {
+            if (방향 === 'left') {return [x - 1, y];}
+            else if (방향 === 'right') {return [x + 1, y];}
+            else if (방향 === 'down') {return [x, y + 1];}
+            else if (방향 === 'up') {return [x, y - 1];}
+            else if (방향 === '+') {return [[x - 1, y], [x + 1, y], [x, y + 1], [x, y - 1]];}
+            else if (방향 === '*') {return [[x - 1, y + 1], [x + 1, y - 1], [x + 1, y + 1], [x - 1, y - 1]];}
+        }
+
+        function 오브젝트이동(대상, 방향) {
+            const 이동위치 = 주변계산(대상.x, 대상.y, 방향);
+            오브젝트관리([{x: 이동위치[0], y: 이동위치[1], 고유이름: 대상.고유이름, 타입: 대상.타입, 종족: 대상.종족, 팀: 대상.팀, 체력: 대상.체력}]);
+            //console.log('전진이후')
+            //원래자리초기화
+            오브젝트관리([{x: 대상.x, y: 대상.y, html: ''}]) 
+        }
+
+        function goAround(대상, 행동) {
+            if (행동 === 'walk') {
+                const charId = `char_${대상[4]}`;
+                const charElement = HTML(`#${charId}`);
+                console.log(charId)
+
+                if (대상[2] === '아군') {
+                    if (게임현황.board[대상[3][0] - 1 + (대상[3][1] - 1) * 게임현황.map[0]] === "") {
+                        오브젝트이동(대상, 'left');
+                    } else {
+                        charElement.style.animation = "jump 0.5s"; 
+                        charElement.addEventListener('animationend', () => {
+                            charElement.style.animation = "";
+                        }, { once: true });
+                    }
+                } else {
+                    if (게임현황.board[대상[3][0] + 1 + (대상[3][1] - 1) * 게임현황.map[0]] === "") {
+                        오브젝트이동(대상, 'right');
+                    } else {
+                        charElement.style.animation = "jump 0.5s"; 
+                        charElement.addEventListener('animationend', () => {
+                            charElement.style.animation = "";
+                        }, { once: true });
+                    }
+                }
+            }
+        }
+
+
+        // 인게임
+        async function 게임초기설정(){ 
+        보드판생성(게임현황.map[0], 게임현황.map[1]);
+        오브젝트관리(게임현황.object);
+        };
+        게임초기설정();
+    </script>
+</body>
