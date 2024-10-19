@@ -135,11 +135,13 @@
 
         @keyframes 죽음아군 {
             0% { transform: rotate(0deg) translateY(0); opacity: 1; }
+            50% { transform: rotate(90deg) translateY(10); opacity: 1; }
             100% { transform: rotate(90deg) translateY(10px); opacity: 0; }
         }
 
         @keyframes 죽음적군 {
             0% { transform: rotate(0deg) translateY(0); opacity: 1; }
+            50% { transform: rotate(-90deg) translateY(10); opacity: 1; }
             100% { transform: rotate(-90deg) translateY(10px); opacity: 0; }
         }
         .fixed-window {
@@ -197,6 +199,36 @@
             background-color: #e64a19;
             transform: scale(1.05);
         }
+      .particle {
+        position: absolute;
+        border-radius: 5px;
+        pointer-events: none;
+        opacity: 1;
+        transition: opacity 0.8s ease;
+        width: 5px;
+        height: 5px;
+        background-color: rgba(255, 255, 255, 0.8);
+        animation: explosion 1s
+          /*cubic-bezier(0.68, -0.55, 0.27, 1.55);*/
+      }
+
+          @keyframes explosion {
+            0% {
+              transform: translate(0, 0) scale(1) rotate(0deg);
+              opacity: 1;
+            }
+
+            50% {
+              transform: translate(var(--offsetX), var(--offsetY)) scale(1.2) rotate(180deg);
+              opacity: 0.7;
+            }
+
+            100% {
+              transform: translate(calc(var(--offsetX) * 1.5), calc(var(--offsetY) * 1.5)) scale(0.5) rotate(360deg);
+              opacity: 0;
+            }
+          }
+
     </style>
 
     <div id="ingame_world" class="object">
@@ -227,9 +259,10 @@
             테스트: {아군: ``, 적군: ''},
             적군기지: ``,
             아군기지: ``,
+            개나리폭탄병: {아군:`https://ifh.cc/g/ZlTzJF.png`, 적군: 'https://ifh.cc/g/sKYtLq.png'}
 
         }
-        const 캐릭터특징설정 = {개나리용사: {체력: 3,공격력:2}, 테스트: {체력: 3,공격력:2}, 적군기지: {체력: 3,공격력:2}, 아군기지: {체력: 3,공격력:2}, }
+        const 캐릭터특징설정 = {개나리용사: {체력: 3,공격력:1}, 테스트: {체력: 3,공격력:2}, 적군기지: {체력: 3,공격력:2}, 아군기지: {체력: 3,공격력:2}, 개나리폭탄병: {체력: 1,공격력:5},}
         // 선언
 
 
@@ -239,12 +272,13 @@
             맵크기: [12, 5], object:
                 [{x: 1, y: 3, 고유이름: '적군기지', 타입: 'obj', 종족: '적군기지', 팀: null},
                 {x: 12, y: 3, 고유이름: '아군기지', 타입: 'obj', 종족: '아군기지', 팀: null},
-                {x: 11, y: 3, 고유이름: '개나리용사1', 타입: 'chaw', 종족: '개나리용사', 팀: '아군'},
-                {x: 2, y: 3, 고유이름: '개나리용사2', 타입: 'chaw', 종족: '개나리용사', 팀: '적군'},
-                {x: 12, y: 2, 고유이름: '개나리용사3', 타입: 'chaw', 종족: '개나리용사', 팀: '아군'},
-                {x: 1, y: 2, 고유이름: '개나리용사4', 타입: 'chaw', 종족: '개나리용사', 팀: '적군'},
+                {x: 11, y: 3, 고유이름: '개나리용사1', 타입: 'cha', 종족: '개나리폭탄병', 팀: '아군'},
+                {x: 2, y: 3, 고유이름: '개나리용사2', 타입: 'cha', 종족: '개나리폭탄병', 팀: '적군'},
+                {x: 9, y: 3, 고유이름: '개나리용사3', 타입: 'chaw', 종족: '개나리용사', 팀: '아군'},
+                {x: 4, y: 3, 고유이름: '개나리용사4', 타입: 'chaw', 종족: '개나리용사', 팀: '적군'},
                 {x: 12, y: 4, 고유이름: '개나리용사5', 타입: 'chaw', 종족: '개나리용사', 팀: '아군'},
-                {x: 1, y: 4, 고유이름: '개나리용사6', 타입: 'chaw', 종족: '개나리용사', 팀: '적군'},
+                {x: 2, y: 4, 고유이름: '개나리용사6', 타입: 'cha', 종족: '개나리폭탄병', 팀: '적군'},
+                {x: 11, y: 4, 고유이름: '개나리용사7', 타입: 'cha', 종족: '개나리폭탄병', 팀: '아군'}
                 ],
             board: [], 캐릭터: [], 뎀판: []
         };
@@ -290,6 +324,49 @@
         });
 
         // 인게임 함수
+        function 폭발(x, y) {
+          const colors = ['#ff4500', '#ff8c00', '#ffd700', '#ffa500', '#ff6347'];
+          const numParticles = 20;
+          const explosionRadius = 150;
+
+          const fireworkContainer = document.createElement('div');
+          fireworkContainer.style.position = 'absolute';
+          fireworkContainer.style.top = 0;
+          fireworkContainer.style.left = 0;
+          document.body.appendChild(fireworkContainer);
+
+          for (let i = 0; i < numParticles; i++) {
+            const particle = document.createElement('div');
+            const size = Math.random() * 10 + 5;
+            const color = colors[Math.floor(Math.random() * colors.length)];
+
+            const angle = Math.random() * 2 * Math.PI;
+            const distance = Math.random() * explosionRadius;
+            const offsetX = distance * Math.cos(angle);
+            const offsetY = distance * Math.sin(angle);
+
+            particle.className = 'particle';
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.backgroundColor = color;
+            particle.style.left = `${x - size / 2}px`;
+            particle.style.top = `${y - size / 2}px`;
+            particle.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+            particle.style.setProperty('--offsetX', `${offsetX}px`);
+            particle.style.setProperty('--offsetY', `${offsetY}px`);
+            particle.style.animation = 'explosion 1s forwards';
+
+            fireworkContainer.appendChild(particle);
+
+            particle.addEventListener('animationend', () => {
+              particle.remove();
+              if (fireworkContainer.children.length === 0) {
+                fireworkContainer.remove();
+              }
+            });
+          }
+        }
+      
         //console.log(게임현황)
         function 보드판생성(w, h) {
             const board = HTML("#ingame_world_board");
@@ -444,12 +521,14 @@
                                 오브젝트이동(설정요소, 'left');
                             } else {
                                 HTML(`#${설정요소.고유이름}`).style.animation = 'jump 0.2s ease-in-out';
-                                HTML(`#w_${설정요소.고유이름}`).style.transform = 'rotate(-130deg)';
+                                if(설정요소.타입=='chaw'){
+                                HTML(`#w_${설정요소.고유이름}`).style.transform = 'rotate(-130deg)';}
                                 게임현황.뎀판[설정요소.x - 1 + (설정요소.y - 1) * 게임현황.맵크기[0]] = [설정요소.팀, -1*(캐릭터특징설정[설정요소.종족].공격력)];
                                 setTimeout(() => {
                                     if (HTML(`#${설정요소.고유이름}`)) {
                                         HTML(`#${설정요소.고유이름}`).style.animation = '';
-                                        HTML(`#w_${설정요소.고유이름}`).style.transform = 'rotate(-45deg)';
+                                      if(설정요소.타입=='chaw'){
+                                        HTML(`#w_${설정요소.고유이름}`).style.transform = 'rotate(-45deg)';}
                                     }
                                 }, 500);
                             }
@@ -458,12 +537,14 @@
                                 오브젝트이동(설정요소, 'right');
                             } else {
                                 HTML(`#${설정요소.고유이름}`).style.animation = 'jump 0.5s ease-in-out';
-                                HTML(`#w_${설정요소.고유이름}`).style.transform = 'rotate(130deg) scaleX(-1)';
+                              if(설정요소.타입=='chaw'){
+                                HTML(`#w_${설정요소.고유이름}`).style.transform = 'rotate(130deg) scaleX(-1)';}
                                 게임현황.뎀판[설정요소.x + 1 + (설정요소.y - 1) * 게임현황.맵크기[0]] = [설정요소.팀, -1*(캐릭터특징설정[설정요소.종족].공격력)];
                                 setTimeout(() => {
                                     if (HTML(`#${설정요소.고유이름}`)) {
                                         HTML(`#${설정요소.고유이름}`).style.animation = '';
-                                        HTML(`#w_${설정요소.고유이름}`).style.transform = 'rotate(45deg) scaleX(-1)';
+                                      if(설정요소.타입=='chaw'){
+                                        HTML(`#w_${설정요소.고유이름}`).style.transform = 'rotate(45deg) scaleX(-1)';}
                                     }
                                 }, 500);
                             }
@@ -477,19 +558,21 @@
                         //console.log(설정요소.고유이름 +'/'+ 게임현황.뎀판[설정요소.x + (설정요소.y - 1) * 게임현황.맵크기[0]])
                         console.log()
                         if (게임현황.뎀판[설정요소.x + (설정요소.y - 1) * 게임현황.맵크기[0]][1] !== 0) {
-                            if(!(게임현황.뎀판[설정요소.x + (설정요소.y - 1) * 게임현황.맵크기[0]][0] == 설정요소.팀))
+                            if(!(게임현황.뎀판[설정요소.x + (설정요소.y - 1) * 게임현황.맵크기[0]][0] === 설정요소.팀))
                             {
                                 게임현황.캐릭터[설정요소.고유이름].체력 += 게임현황.뎀판[설정요소.x + (설정요소.y - 1) * 게임현황.맵크기[0]][1];
                             }
                             if(게임현황.캐릭터[설정요소.고유이름].체력 < 0){게임현황.캐릭터[설정요소.고유이름].체력 = 0; 설정요소.체력=0;}
                             HTML(`#체력바_${설정요소.고유이름}`).innerHTML = "◆".repeat(설정요소.체력);
-                            게임현황.뎀판[설정요소.x + (설정요소.y - 1) * 게임현황.맵크기[0]] = 0;
+                            게임현황.뎀판[설정요소.x + (설정요소.y - 1) * 게임현황.맵크기[0]] = ['',0];
                             //console.log(설정요소.고유이름 + '..' + 설정요소.체력)
                             if (설정요소.체력 === 0) {
                                 delete 게임현황.캐릭터[설정요소.고유이름];
                                 HTML(`#${설정요소.고유이름}`).style.animation = '';
                                 HTML(`#${설정요소.고유이름}`).style.animation = `죽음${설정요소.팀} 0.5s ease-in`;
-                                HTML(`#w_${설정요소.고유이름}`).style.opacity = '0';
+                              if(설정요소.종족=='개나리폭탄병'){폭발(HTML(`#${설정요소.고유이름}`).getBoundingClientRect().left,HTML(`#${설정요소.고유이름}`).getBoundingClientRect().top)}
+                              if(설정요소.타입=='chaw'){
+                                HTML(`#w_${설정요소.고유이름}`).style.opacity = '0';}
                                 setTimeout(() => {
                                     HTML(`#tile_${설정요소.x}_${설정요소.y}`).innerHTML = '';
                                     게임현황.board[설정요소.x + (설정요소.y - 1) * 게임현황.맵크기[0]] = '';
