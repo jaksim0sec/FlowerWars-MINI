@@ -84,7 +84,7 @@
             margin-right: 0;
         }
 
-        .char {
+        .캐릭터 {
             width: 55px;
             /*height: 90px;*/
             transform-origin: bottom;
@@ -92,22 +92,28 @@
             animation: shake 0.5s ease-in-out;
         }
 
+        .w {transition: all 0.3s ease;}
         @keyframes jump {
             0% {
                 transform: translateY(0);
             }
+
             40% {
-                transform: translateY(-100px);
+                transform: translateY(-10px);
                 animation-timing-function: ease-out;
             }
-            50%{transform: translateY(-100px);}
+
+            50% {
+                transform: translateY(-10px);
+            }
+
             100% {
                 transform: translateY(0);
                 animation-timing-function: ease-in;
             }
-            
+
         }
-        
+
         @keyframes shake {
             0% {
                 transform: rotate(-5deg) translateY(-2px);
@@ -120,8 +126,9 @@
             75% {
                 transform: rotate(-5deg) translateY(-2px);
             }
+
             100% {
-                transform: rotate(0deg)translateY(-2px);
+                transform: rotate(0deg)translateY(0px);
             }
         }
 
@@ -186,8 +193,7 @@
         <div id="ingame_world_board" class="object"></div>
         <div id="ingame_world_menu">
             <div class="fixed-window" id="status" style="bottom: 2%; left: 1%; min-width: 25%; min-height: 20%;">
-                <button class="button"
-                    onclick="오브젝트이동(게임현황.char.개나리용사1,'left')">디버그</button>
+                <button class="button" onclick="행동계산(게임현황.캐릭터,'모두')">디버그</button>
             </div>
             <div class="fixed-score-window" id="enemy-status" style="left: 1%;border-top-right-radius: 10px;">
                 0
@@ -205,12 +211,15 @@
 
     <script>
         //데이터 
-        const 캐릭터이미지URL = 
+        const 캐릭터이미지URL =
         {
-            개나리용사: `https://ifh.cc/g/Zp3tjP.png`,
-            테스트:``
+            개나리용사: {cha: {아군: `https://ifh.cc/g/Zp3tjP.png`, 적군: 'https://ifh.cc/g/G22rfc.png'}, w: 'https://ifh.cc/g/HjCVzp.png'},
+            테스트: {아군: ``, 적군: ''},
+            적군기지: ``,
+            아군기지: ``,
+
         }
-        const 캐릭터특징설정 = {개나리용사:{체력:3},테스트:{체력:3},적군기지:{체력:3},아군기지:{체력:3},}
+        const 캐릭터특징설정 = {개나리용사: {체력: 3}, 테스트: {체력: 3}, 적군기지: {체력: 3}, 아군기지: {체력: 3}, }
         // 선언
 
 
@@ -218,12 +227,12 @@
         //후기object 정의형식 = 고유이름 : {고유이름, 타입, 종족, 팀 , 체력 , x, y}
         let 게임현황 = {
             map: [12, 5], object:
-                [{x: 1, y: 3, 고유이름 : '적군기지', 타입 : 'obj' , 종족 : '적군기지', 팀 : null},
-                 {x: 12, y: 3, 고유이름 : '아군기지', 타입 : 'obj' , 종족 : '아군기지' , 팀 : null},
-                 {x: 11, y: 3, 고유이름 : '개나리용사1', 타입 : 'cha' , 종족 : '개나리용사' , 팀 : '아군'},
-                 {x: 2, y: 3, 고유이름 : '테스터1', 타입 : 'cha' , 종족 : '테스트' , 팀 : '적군'}
+                [{x: 1, y: 3, 고유이름: '적군기지', 타입: 'obj', 종족: '적군기지', 팀: null},
+                {x: 12, y: 3, 고유이름: '아군기지', 타입: 'obj', 종족: '아군기지', 팀: null},
+                {x: 11, y: 3, 고유이름: '개나리용사1', 타입: 'chaw', 종족: '개나리용사', 팀: '아군'},
+                {x: 2, y: 3, 고유이름: '테스터1', 타입: 'chaw', 종족: '개나리용사', 팀: '적군'}
                 ],
-            board: [], char: []
+            board: [], 캐릭터: []
         };
         let SYsetting = {eff: 3};
         let SYmouse = {x: 0, y: 0};
@@ -267,6 +276,7 @@
         });
 
         // 인게임 함수
+        console.log(게임현황)
         function 보드판생성(w, h) {
             const board = HTML("#ingame_world_board");
             board.innerHTML = "";
@@ -306,7 +316,7 @@
                 //console.log(list[i]);
                 //console.log(list[i].html);
                 //if (list[i].html){console.log('고라니')}
-                
+
                 //console.log(list[i].x)
                 //console.log(`#tile_${list[i].x}_${list[i].y}`)
                 let 대상타일요소 = 대상타일.innerHTML;
@@ -317,27 +327,47 @@
                     //console.log('수동설정')
                     대상타일.innerHTML = 설정요소.html;
                 } else { // 자동 html 생성
+                    //console.log(캐릭터이미지URL[설정요소.종족] + '/' + 설정요소.종족)
+                    //console.log(설정요소.고유이름 +'/'+설정요소.팀)
+                    //console.log(설정요소.고유이름 + '/' + 설정요소.팀)
                     if (설정요소.타입 === 'obj') {
                         대상타일요소 = `<img src="${캐릭터이미지URL[설정요소.종족]}" id="${설정요소.고유이름}" class="object" alt="${설정요소.고유이름}">`;
-                    } 
+                    }
                     else if (설정요소.타입 === 'cha') {
                         대상타일요소 = `
-                            <img src="${캐릭터이미지URL[설정요소.종족]}" id="${설정요소.고유이름}" class="char" alt="${설정요소.고유이름}">
+                            <img src="${캐릭터이미지URL[설정요소.종족][설정요소.팀]}" id="${설정요소.고유이름}" class="캐릭터" alt="${설정요소.고유이름}">
                             <div style="position:absolute;bottom:10px;">${"◆".repeat(캐릭터특징설정[설정요소.종족].체력)}</div>
                         `;
+                    }
+                    else if (설정요소.타입 === 'chaw') {
+                        if (설정요소.팀 === "아군") {
+                            //console.log(설정요소.고유이름 + '/' + 설정요소.팀)
+                            대상타일요소 = `
+                            <img src="${캐릭터이미지URL[설정요소.종족].cha[설정요소.팀]}" id="${설정요소.고유이름}" class="캐릭터" alt="${설정요소.고유이름}" style = "position:absolute;">
+                            <div style="position:absolute;bottom:10px;">${"◆".repeat(캐릭터특징설정[설정요소.종족].체력)}</div>
+                            <img src="${캐릭터이미지URL[설정요소.종족].w}" style = "position:absolute;left:5px;width:30px;bottom:35px;transform:rotate(-45deg);" id="w_${설정요소.고유이름}" class = "w"/>
+                        `;
+                        }
+                        else {
+                            대상타일요소 = `
+                            <img src="${캐릭터이미지URL[설정요소.종족].cha[설정요소.팀]}" id="${설정요소.고유이름}" class="캐릭터" alt="${설정요소.고유이름}" style = "position:absolute;">
+                                <div style="position:absolute;bottom:10px;">${"◆".repeat(캐릭터특징설정[설정요소.종족].체력)}</div>
+                                <img src="${캐릭터이미지URL[설정요소.종족].w}" style = "position:absolute;right:5px;width:30px;bottom:35px;transform:rotate(45deg) scaleX(-1);" id="w_${설정요소.고유이름}" class = "w"/>
+                            `;
+                        }
                     };
                     대상타일.innerHTML = 대상타일요소;
                     //console.log(설정요소.고유이름)
                     // 후기 object 정의 형식: [고유이름, 타입, 종족, 팀, 체력, x, y]
                     let j;
-                    for (j = 0; j < 게임현황.char.length; j++) {
-                        if (게임현황.char[j].고유이름 === 설정요소.고유이름) {
+                    for (j = 0; j < 게임현황.캐릭터.length; j++) {
+                        if (게임현황.캐릭터[j].고유이름 === 설정요소.고유이름) {
                             break;
                         }
                     }
-                    if (j === 게임현황.char.length) { // 원하는 항목이 없을 때
+                    if (j === 게임현황.캐릭터.length) { // 원하는 항목이 없을 때
                         //console.log(설정요소.종족)
-                        게임현황.char[설정요소.고유이름] = {
+                        게임현황.캐릭터[설정요소.고유이름] = {
                             고유이름: 설정요소.고유이름,
                             타입: 설정요소.타입,
                             종족: 설정요소.종족,
@@ -347,8 +377,8 @@
                             y: 설정요소.y
                         };
                     } else {
-                        게임현황.char[j].x = 설정요소.x;
-                        게임현황.char[j].y = 설정요소.y;
+                        게임현황.캐릭터[j].x = 설정요소.x;
+                        게임현황.캐릭터[j].y = 설정요소.y;
                     }
                 }
                 게임현황.board[설정요소.x + (설정요소.y - 1) * 게임현황.map[0]] = 대상타일요소;
@@ -380,42 +410,51 @@
             오브젝트관리([{x: 이동위치[0], y: 이동위치[1], 고유이름: 대상.고유이름, 타입: 대상.타입, 종족: 대상.종족, 팀: 대상.팀, 체력: 대상.체력}]);
             //console.log('전진이후')
             //원래자리초기화
-            오브젝트관리([{x: 대상.x, y: 대상.y, html: ''}]) 
+            오브젝트관리([{x: 대상.x, y: 대상.y, html: ''}])
         }
 
-        function goAround(대상, 행동) {
-            if (행동 === 'walk') {
-                const charId = `char_${대상[4]}`;
-                const charElement = HTML(`#${charId}`);
-                console.log(charId)
-
-                if (대상[2] === '아군') {
-                    if (게임현황.board[대상[3][0] - 1 + (대상[3][1] - 1) * 게임현황.map[0]] === "") {
-                        오브젝트이동(대상, 'left');
-                    } else {
-                        charElement.style.animation = "jump 0.5s"; 
-                        charElement.addEventListener('animationend', () => {
-                            charElement.style.animation = "";
-                        }, { once: true });
-                    }
-                } else {
-                    if (게임현황.board[대상[3][0] + 1 + (대상[3][1] - 1) * 게임현황.map[0]] === "") {
-                        오브젝트이동(대상, 'right');
-                    } else {
-                        charElement.style.animation = "jump 0.5s"; 
-                        charElement.addEventListener('animationend', () => {
-                            charElement.style.animation = "";
-                        }, { once: true });
+        function 행동계산(대상, 팀) {
+            //console.log(대상)
+            if (팀 == '모두') {
+                for (var i = 0; i < Object.keys(대상).length; i++) {
+                    const 설정요소 = 대상[Object.keys(대상)[i]];
+                    //console.log(설정요소 + '/' + 설정요소.타입)
+                    if (설정요소.타입 !== 'obj') {
+                        if (설정요소.팀 == '아군') {
+                            if (게임현황.board[설정요소.x - 1 + (설정요소.y - 1) * 게임현황.map[0]] == 0) {오브젝트이동(설정요소, 'left')}
+                            else {
+                                HTML(`#${설정요소.고유이름}`).style.animation = 'jump 0.5s ease-in-out';
+                                HTML(`#w_${설정요소.고유이름}`).style.transform = 'rotate(-130deg)';
+                                setTimeout(() => {
+                                    HTML(`#${설정요소.고유이름}`).style.animation = '';
+                                    HTML(`#w_${설정요소.고유이름}`).style.transform = 'rotate(-45deg)';
+                                }, 500);
+                            };
+                        }
+                        else {
+                            if (게임현황.board[설정요소.x + 1 + (설정요소.y - 1) * 게임현황.map[0]] == 0) {오브젝트이동(설정요소, 'right')}
+                            else {
+                                HTML(`#${설정요소.고유이름}`).style.animation = 'jump 0.5s ease-in-out';
+                                HTML(`#w_${설정요소.고유이름}`).style.transform = 'rotate(130deg) scaleX(-1)';
+                                setTimeout(() => {
+                                    HTML(`#${설정요소.고유이름}`).style.animation = '';
+                                    HTML(`#w_${설정요소.고유이름}`).style.transform = 'rotate(45deg) scaleX(-1)';
+                                }, 500);
+                            };
+                        }
                     }
                 }
             }
         }
 
-
         // 인게임
-        async function 게임초기설정(){ 
-        보드판생성(게임현황.map[0], 게임현황.map[1]);
-        오브젝트관리(게임현황.object);
+        async function 게임초기설정() {
+            보드판생성(게임현황.map[0], 게임현황.map[1]);
+            오브젝트관리(게임현황.object);
+            const 게임진행반복 = setInterval(() => {
+                행동계산(게임현황.캐릭터, '모두');
+            }, 1500);
+            
         };
         게임초기설정();
     </script>
