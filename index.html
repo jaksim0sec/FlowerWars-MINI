@@ -29,6 +29,8 @@
             overflow: hidden;
             position: relative;
             background-color: #e6e6e6;
+            display: flex;
+            justify-content: center;
         }
 
         #ingame_world_board {
@@ -196,24 +198,6 @@
             background-color: rgba(0, 0, 0, 0.7);
         }
 
-        .fixed-score-window {
-            padding: 1%;
-            position: absolute;
-            border-radius: 50px;
-            background-color: rgba(0, 0, 0, 0.5);
-            transition: all 0.3s ease;
-            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.5);
-            top: 2%;
-            width: 50px;
-            height: 50px;
-            align-items: center;
-            justify-content: center;
-            display: flex;
-            font-size: 30px;
-            font-weight: bold;
-            color: #fff;
-        }
-
         .button {
             padding: 10px 20px;
             background-color: #ff5722;
@@ -286,6 +270,47 @@
         .char_title {
             transition: all 1s ease;
         }
+
+        #score_board {
+            width: 40%;
+            height: 40px;
+            position: absolute;
+            top: 20px;
+            display: flex;
+            box-shadow: 4px 4px 5px #00000050;
+            border-radius: 50px;
+        }
+
+        #score_board div {
+            height: 100%;
+            transition: all 0.3s ease-in-out;
+            color: white;
+            display: flex;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            }
+
+        #score_적군 {
+            background-color: #D1612C;
+            width: 50%;
+            border-top-left-radius: 50px;
+            border-bottom-left-radius: 50px;
+            justify-content: right;
+            padding-right:10px;
+            flex-grow: 0;
+            flex-basis: 50%; 
+        }
+
+        #score_아군 {
+            background-color: #4244CC;
+            flex-grow: 1;
+            flex-basis: 50%;
+            border-top-right-radius: 50px;
+            border-bottom-right-radius: 50px;
+            justify-content: left;
+            padding-left:10px;
+        }
     </style>
 
     <div id="ingame_world" class="object">
@@ -296,12 +321,10 @@
                     onclick="오브젝트관리([{x: 2, y: 2, 고유이름: `개나리용사${counter}`, 타입: 'cha', 종족: '개나리폭탄병', 팀: '적군'}]); counter ++;오브젝트관리([{x: 2, y: 4, 고유이름: `개나리용사${counter}`, 타입: 'chaw', 종족: '개나리용사', 팀: '적군'}]); counter ++;오브젝트관리([{x: 11, y: 3, 고유이름: `개나리용사${counter}`, 타입: 'chaw', 종족: '개나리용사', 팀: '아군'}]); counter ++;오브젝트관리([{x: 10, y: 3, 고유이름: `개나리용사${counter}`, 타입: 'chaw', 종족: '개나리용사', 팀: '아군'}]); counter ++;">디버그생성</button>
                 <button onclick="행동계산(게임현황.캐릭터, '모두');">디버그</button>
             </div>
-            <div class="fixed-score-window" id="enemy-status" style="left: 1%;border-top-right-radius: 10px;">
-                0
-            </div>
-            <div class="fixed-score-window" id="my-status" style="right: 1%;border-bottom-left-radius: 10px;">
-                0
-            </div>
+        </div>
+        <div id="score_board">
+            <div id="score_적군">50</div>
+            <div id="score_아군">50</div>
         </div>
     </div>
 
@@ -318,7 +341,7 @@
             개나리폭탄병: {아군: `https://ifh.cc/g/ZlTzJF.png`, 적군: 'https://ifh.cc/g/sKYtLq.png'}
 
         }
-        const 캐릭터특징설정 = {개나리용사: {체력: 4, 공격력: 1},적군기지: {체력: 5, 공격력: 0}, 아군기지: {체력: 5, 공격력: 0}, 개나리폭탄병: {체력: 1, 공격력: 5}, }
+        const 캐릭터특징설정 = {개나리용사: {체력: 4, 공격력: 1}, 적군기지: {체력: 7, 공격력: 0}, 아군기지: {체력: 7, 공격력: 0}, 개나리폭탄병: {체력: 1, 공격력: 5}, }
         // 선언
 
 
@@ -330,18 +353,18 @@
                 {x: 12, y: 3, 고유이름: '아군기지', 타입: 'obj', 종족: '아군기지', 팀: '아군'},
                 {x: 11, y: 2, 고유이름: '개나리용사1', 타입: 'chaw', 종족: '개나리용사', 팀: '아군'},
                 {x: 11, y: 3, 고유이름: '개나리용사2', 타입: 'chaw', 종족: '개나리용사', 팀: '아군'},
-                {x: 11, y: 4, 고유이름: '개나리용사3', 타입: 'chaw', 종족: '개나리용사', 팀: '아군'},
+                {x: 11, y: 4, 고유이름: '개나리용사3', 타입: 'cha', 종족: '개나리폭탄병', 팀: '아군'},
                 {x: 2, y: 3, 고유이름: '개나리용사4', 타입: 'cha', 종족: '개나리폭탄병', 팀: '적군'},
                 {x: 3, y: 4, 고유이름: '개나리용사5', 타입: 'cha', 종족: '개나리폭탄병', 팀: '적군'},
                 {x: 2, y: 5, 고유이름: '개나리용사6', 타입: 'chaw', 종족: '개나리용사', 팀: '적군'},
-                {x: 2, y: 2, 고유이름: '개나리용사7', 타입: 'chaw', 종족: '개나리용사', 팀: '적군'},
+                {x: 2, y: 2, 고유이름: '개나리용사7', 타입: 'cha', 종족: '개나리폭탄병', 팀: '적군'},
                 {x: 2, y: 1, 고유이름: '개나리용사8', 타입: 'cha', 종족: '개나리폭탄병', 팀: '적군'},
                 {x: 11, y: 5, 고유이름: '개나리용사9', 타입: 'chaw', 종족: '개나리용사', 팀: '아군'},
                 {x: 11, y: 1, 고유이름: '개나리용사10', 타입: 'chaw', 종족: '개나리용사', 팀: '아군'},
                 {x: 2, y: 4, 고유이름: '개나리용사11', 타입: 'cha', 종족: '개나리폭탄병', 팀: '적군'},
                 {x: 10, y: 2, 고유이름: '개나리용사12', 타입: 'chaw', 종족: '개나리용사', 팀: '아군'},
                 ],
-            board: [], 캐릭터: [], 뎀판: []
+            board: [], 캐릭터: [], 뎀판: [], 점수: {적군: 2, 아군: 2}, 웨이브 : 1
         };
         let SYsetting = {eff: 3};
         let SYmouse = {x: 0, y: 0};
@@ -487,12 +510,11 @@
                     //console.log(설정요소.고유이름 + '/' + 설정요소.팀)
                     if (!설정요소.체력) {설정요소.체력 = 캐릭터특징설정[설정요소.종족].체력}
                     if (설정요소.타입 === 'obj') {
-                        대상타일요소 = `<img src="${캐릭터이미지URL[설정요소.종족]}" id="${설정요소.고유이름}" class="object" alt="${설정요소.고유이름}"><div style="position:absolute;bottom:22px;color:${(설정요소.팀 == '적군') ? '#5F2308' : '#1D1E6A'}; font-size:13px;" id = "체력바_${설정요소.고유이름}">${"◆".repeat(설정요소.체력)}</div>`;
+                        대상타일요소 = `<img src="${캐릭터이미지URL[설정요소.종족]}" id="${설정요소.고유이름}" class="object" alt="${설정요소.고유이름}">`;
                     }
                     else if (설정요소.타입 === 'cha') {
                         대상타일요소 = `
                             <img src="${캐릭터이미지URL[설정요소.종족][설정요소.팀]}" id="${설정요소.고유이름}" class="캐릭터" alt="${설정요소.팀}">
-                            <div style="position:absolute;bottom:22px;color:${(설정요소.팀 == '적군') ? '#5F2308' : '#1D1E6A'}; font-size:13px;" id = "체력바_${설정요소.고유이름}">${"◆".repeat(설정요소.체력)}</div>
                         `;
                     }
                     else if (설정요소.타입 === 'chaw') {
@@ -500,20 +522,18 @@
                             //console.log(설정요소.고유이름 + '/' + 설정요소.팀)
                             대상타일요소 = `
                             <img src="${캐릭터이미지URL[설정요소.종족].cha[설정요소.팀]}" id="${설정요소.고유이름}" class="캐릭터" alt="${설정요소.팀}" style = "position:absolute;">
-                            <div style="position:absolute;bottom:22px;color:${(설정요소.팀 == '적군') ? '#5F2308' : '#1D1E6A'}; font-size:13px;" id = "체력바_${설정요소.고유이름}">${"◆".repeat(설정요소.체력)}</div>
                             <img src="${캐릭터이미지URL[설정요소.종족].w}" style = "position:absolute;left:5px;width:30px;bottom:45px;transform:rotate(-45deg);" id="w_${설정요소.고유이름}" class = "w"/>
                         `;
                         }
                         else {
                             대상타일요소 = `
                             <img src="${캐릭터이미지URL[설정요소.종족].cha[설정요소.팀]}" id="${설정요소.고유이름}" class="캐릭터" alt="${설정요소.팀}" style = "position:absolute;">
-                                <div style="position:absolute;bottom:22px;color:${(설정요소.팀 == '적군') ? '#5F2308' : '#1D1E6A'}; font-size:13px;" id = "체력바_${설정요소.고유이름}">${"◆".repeat(설정요소.체력)}</div>
                                 <img src="${캐릭터이미지URL[설정요소.종족].w}" style = "position:absolute;right:5px;width:30px;bottom:45px;transform:rotate(45deg) scaleX(-1);" id="w_${설정요소.고유이름}" class = "w"/>
                             `;
                         }
                     };
                     HTML(`#tile_${list[i].x}_${list[i].y}`).innerHTML = 대상타일요소;
-                    HTML(`#tile_${list[i].x}_${list[i].y}`).innerHTML += `<div id="title_${설정요소.고유이름}"  style = "position:absolute; bottom: 8px; font-weight:bold;font-size:12px;" class = "char_title">${설정요소.종족}</div>`;
+                    HTML(`#tile_${list[i].x}_${list[i].y}`).innerHTML += `<div id="title_${설정요소.고유이름}"  style = "position:absolute; bottom: 8px; font-weight:bold;font-size:12px;" class = "char_title">${설정요소.종족}</div><div style="position:absolute;bottom:22px;color:${(설정요소.팀 == '적군') ? '#5F2308' : '#1D1E6A'}; font-size:13px;" id = "체력바_${설정요소.고유이름}">${"◆".repeat(설정요소.체력)}</div>`;
                     //console.log(설정요소.고유이름)
                     // 후기 object 정의 형식: [고유이름, 타입, 종족, 팀, 체력, x, y]
                     //console.log('오브젝트관리 항목 ' + Object.keys(게임현황.캐릭터).length)
@@ -586,6 +606,9 @@
         async function 행동계산(대상, 팀) {
             if (팀 == '모두') {
                 //console.log("이전");
+                for (var h = 0; h < 게임현황.뎀판.length; h++) {
+                    게임현황.뎀판[h] = ['', 0];
+                }
                 for (var i = 0; i < Object.keys(대상).length; i++) {
                     const 설정요소 = 대상[Object.keys(대상)[i]];
                     //console.log(설정요소.x + '/' + 설정요소.y + '/' + 설정요소.고유이름)
@@ -632,7 +655,7 @@
                             else {
                                 //주변에 적이 없음
                                 오브젝트이동(설정요소, (설정요소.팀 == '아군') ? 'left' : 'right');
-                                if ((설정요소.x === 1 && 설정요소.팀 == '아군') || (설정요소.x === 12 && 설정요소.팀 == '적군')) //목적지 도달시
+                                if ((설정요소.x == 1 && 설정요소.팀 == '아군') || (설정요소.x == 12 && 설정요소.팀 == '적군')) //목적지 도달시
                                 {
                                     //점수획득시스템
                                     게임현황.뎀판[설정요소.x + (설정요소.y - 1) * 게임현황.맵크기[0]] = ['신', -1000];
@@ -644,8 +667,7 @@
                             if (!(게임현황.board[설정요소.x - ((설정요소.팀 == '아군') ? 1 : -1) + (설정요소.y - 1) * 게임현황.맵크기[0]]).includes(설정요소.팀)) {
                                 if (게임현황.board[설정요소.x - ((설정요소.팀 == '아군') ? 1 : -1) + (설정요소.y - 1) * 게임현황.맵크기[0]].includes('기지')) {//기지라면
                                     //점수획득시스템
-                                    HTML(`#${설정요소.고유이름}`).style.animation = `침입성공 0.5s ease-in`;
-                                    게임현황.뎀판[설정요소.x + (설정요소.y - 1) * 게임현황.맵크기[0]] = ['신', -1000];
+                                    if(게임현황.board[설정요소.x + (설정요소.y - 2) * 게임현황.맵크기[0]] === ''){오브젝트이동(설정요소, 'up');}
                                 }//공격모션과 처리
 
                                 HTML(`#${설정요소.고유이름}`).style.animation = 'jump 0.2s ease-in-out';
@@ -696,13 +718,17 @@
                                 delete 게임현황.캐릭터[설정요소.고유이름];
                                 //alert(HTML(`#${설정요소.고유이름}`).style.animation);
                                 if (설정요소.x === 12 || 설정요소.x === 1) {
+                                    게임현황.점수[설정요소.팀] += 24;
+                                    점수판설정();
                                     HTML(`#${설정요소.고유이름}`).style.animation = '침입성공 0.5s ease-in-out';
                                 }
                                 else if (!(HTML(`#${설정요소.고유이름}`).style.animation.includes('침입성공'))) {
+                                    게임현황.점수[(설정요소.팀=='아군')?'적군':'아군']+=4;
+                                    점수판설정();
                                     HTML(`#${설정요소.고유이름}`).style.animation = '';
                                     HTML(`#${설정요소.고유이름}`).style.animation = `죽음${설정요소.팀} 0.5s ease-in`;
                                 }
-                                console.log('죽음 / ' + 설정요소.고유이름);
+                                console.log('죽음 / ' + 설정요소.고유이름 +' '+설정요소.팀);
                                 if (설정요소.종족 == '개나리폭탄병') {폭발(HTML(`#${설정요소.고유이름}`).getBoundingClientRect().left, HTML(`#${설정요소.고유이름}`).getBoundingClientRect().top)}
                                 if (설정요소.타입 == 'chaw') {
                                     HTML(`#w_${설정요소.고유이름}`).style.opacity = '0';
@@ -722,16 +748,71 @@
             }
         }
 
-
+        function 최대공약수(a, b) {
+            while (b !== 0) {
+                let temp = b;
+                b = a % b;
+                a = temp;
+            }
+            return a;
+        }
+        
+        function 점수판설정()
+        {
+            const 총점수 = 게임현황.점수.아군 + 게임현황.점수.적군;
+            HTML("#score_적군").style.width = `${(게임현황.점수.적군 / 총점수) * 100}%`;
+            HTML("#score_적군").style.flexBasis = `${(게임현황.점수.적군 / 총점수) * 100}%`;
+            HTML("#score_적군").innerHTML = `${((게임현황.점수.적군 / 총점수) * 100) | 0}`;
+            HTML("#score_아군").innerHTML = `${((게임현황.점수.아군 / 총점수) * 100) | 0}`;
+            console.log(게임현황.점수.아군 +'/'+ 게임현황.점수.적군)
+        }
         // 인게임
         async function 게임초기설정() {
             보드판생성(게임현황.맵크기[0], 게임현황.맵크기[1]);
-            오브젝트관리(게임현황.object);
-            const 게임진행반복 = setInterval(() => {
-                행동계산(게임현황.캐릭터, '모두');
-            }, 800);
 
-        };
+            while (게임현황.웨이브 < 2) {
+                오브젝트관리(게임현황.object);
+
+                // Promise로 wrap하여 setInterval이 완료될 때까지 대기
+                await new Promise((resolve) => {
+                    const 게임진행반복 = setInterval(() => {
+                        행동계산(게임현황.캐릭터, '모두');
+
+                        // 캐릭터가 두 개 남아있으면 반복 중단하고 resolve 호출
+                        if (Object.keys(게임현황.캐릭터).length === 2) {
+                            clearInterval(게임진행반복);
+                            resolve();
+                        }
+                    }, 800);
+                });
+
+                // interval이 완료된 후 웨이브 증가
+                let 점수공약수 = 최대공약수(게임현황.점수.적군, 게임현황.점수.아군);
+                게임현황.점수.적군 /= 점수공약수;
+                게임현황.점수.아군 /= 점수공약수;
+                점수판설정();
+
+                // 기지 체력 감소
+                게임현황.캐릭터.적군기지.체력 -= 게임현황.점수.적군;
+                게임현황.캐릭터.아군기지.체력 -= 게임현황.점수.아군;
+
+                // 체력 0 이하로는 안되도록 설정
+                if (게임현황.캐릭터.적군기지.체력 < 0) { 게임현황.캐릭터.적군기지.체력 = 0; }
+                if (게임현황.캐릭터.아군기지.체력 < 0) { 게임현황.캐릭터.아군기지.체력 = 0; }
+
+                HTML(`#체력바_아군기지`).innerHTML = "◆".repeat(게임현황.캐릭터.아군기지.체력);
+                HTML(`#체력바_적군기지`).innerHTML = "◆".repeat(게임현황.캐릭터.적군기지.체력);
+                console.log(게임현황.점수.아군 + '/' + 게임현황.점수.적군);
+
+                // 대기시간 추가: Promise로 setTimeout 사용
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // 웨이브 증가
+                게임현황.웨이브++;
+                // alert('웨이브 다음') // 필요 시 주석 해제
+            }
+        }
+
         게임초기설정();
     </script>
 </body>
