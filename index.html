@@ -48,24 +48,24 @@
             background-color: #DCD4CB;
             border-radius: 15px;
             position: relative;
-            box-shadow: inset -5px -5px 3.5px #CBB39B95;
-            transition: all 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: inset -5px -5px 4px #CBB39B95;
+            transition: all 0.5s ease, box-shadow 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
         .tile:hover {
-            transform: scale(1) translateY(-8px);
+            transform: scale(1) translateY(-12px);
             filter: brightness(1.02);
-            box-shadow: 0px 8px 10px #00000020, box-shadow: inset -5px -5px 3.5px #CBB39B95;
+            box-shadow: 0px 8px 10px #00000020, inset -5px -5px 6px #CBB39B99;
         }
 
 
         .tile-updated {
-            filter: brightness(0.95);
-            transform: scale(0.95);
-            transition: all 0.3s ease;
+            filter: brightness(0.9);
+            transform: scale(0.92);
+            transition: all 0.5s ease;
         }
 
         .tile-updated-end {
@@ -192,25 +192,43 @@
             justify-content: center;
         }
 
+        .fixed-window {
+            padding: 2%;
+            position: absolute;
+            border-radius: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.5);
+            color: #fff;
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
         .fixed-window:hover {
             transform: scale(1.05);
             border-radius: 5px;
             background-color: rgba(0, 0, 0, 0.7);
         }
 
-        .button {
+        button {
+            width: 120px;
             padding: 10px 20px;
-            background-color: #ff5722;
-            color: white;
+            margin: 10px;
             border: none;
-            border-radius: 5px;
+            border-radius: 15px;
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.3s ease;
             font-size: 14px;
+            color: white;
+            background-color: black;
+            font-weight: bold;
         }
 
         .button:hover {
-            background-color: #e64a19;
             transform: scale(1.05);
         }
 
@@ -277,7 +295,7 @@
             position: absolute;
             top: 20px;
             display: flex;
-            box-shadow: 4px 4px 5px #00000050;
+            /*box-shadow: insest 4px 4px 5px #938C85;*/
             border-radius: 50px;
         }
 
@@ -311,15 +329,18 @@
             justify-content: left;
             padding-left:10px;
         }
+
+        .waveAlert{}
     </style>
 
     <div id="ingame_world" class="object">
         <div id="ingame_world_board" class="object"></div>
         <div id="ingame_world_menu">
             <div class="fixed-window" id="status" style="bottom: 2%; left: 1%; min-width: 25%; min-height: 20%;">
+                테스팅용 메뉴
                 <button
-                    onclick="오브젝트관리([{x: 2, y: 2, 고유이름: `개나리용사${counter}`, 타입: 'cha', 종족: '개나리폭탄병', 팀: '적군'}]); counter ++;오브젝트관리([{x: 2, y: 4, 고유이름: `개나리용사${counter}`, 타입: 'chaw', 종족: '개나리용사', 팀: '적군'}]); counter ++;오브젝트관리([{x: 11, y: 3, 고유이름: `개나리용사${counter}`, 타입: 'chaw', 종족: '개나리용사', 팀: '아군'}]); counter ++;오브젝트관리([{x: 10, y: 3, 고유이름: `개나리용사${counter}`, 타입: 'chaw', 종족: '개나리용사', 팀: '아군'}]); counter ++;">디버그생성</button>
-                <button onclick="행동계산(게임현황.캐릭터, '모두');">디버그</button>
+                    onclick="오브젝트관리([{x: 2, y: 2, 고유이름: `개나리용사${counter}`, 타입: 'cha', 종족: '개나리폭탄병', 팀: '적군'}]); counter ++;오브젝트관리([{x: 2, y: 4, 고유이름: `개나리용사${counter}`, 타입: 'chaw', 종족: '개나리용사', 팀: '적군'}]); counter ++;오브젝트관리([{x: 11, y: 3, 고유이름: `개나리용사${counter}`, 타입: 'chaw', 종족: '개나리용사', 팀: '아군'}]); counter ++;오브젝트관리([{x: 10, y: 3, 고유이름: `개나리용사${counter}`, 타입: 'chaw', 종족: '개나리용사', 팀: '아군'}]); counter ++;">캐릭터생성</button>
+                <button onclick="행동계산(게임현황.캐릭터, '모두');">단일가속화</button>
             </div>
         </div>
         <div id="score_board">
@@ -498,6 +519,7 @@
 
                 //console.log(list[i].x)
                 //console.log(`#tile_${list[i].x}_${list[i].y}`)
+                //console.log('▶▶')
                 let 대상타일요소 = '';
                 const 설정요소 = list[i];
                 // 수동 html 수정
@@ -534,7 +556,7 @@
                     };
                     HTML(`#tile_${list[i].x}_${list[i].y}`).innerHTML = 대상타일요소;
                     HTML(`#tile_${list[i].x}_${list[i].y}`).innerHTML += `<div id="title_${설정요소.고유이름}"  style = "position:absolute; bottom: 8px; font-weight:bold;font-size:12px;" class = "char_title">${설정요소.종족}</div><div style="position:absolute;bottom:22px;color:${(설정요소.팀 == '적군') ? '#5F2308' : '#1D1E6A'}; font-size:13px;" id = "체력바_${설정요소.고유이름}">${"◆".repeat(설정요소.체력)}</div>`;
-                    //console.log(설정요소.고유이름)
+                    console.log(설정요소.고유이름+'/'+설정요소.체력)
                     // 후기 object 정의 형식: [고유이름, 타입, 종족, 팀, 체력, x, y]
                     //console.log('오브젝트관리 항목 ' + Object.keys(게임현황.캐릭터).length)
                     let j = 1;
@@ -764,7 +786,7 @@
             HTML("#score_적군").style.flexBasis = `${(게임현황.점수.적군 / 총점수) * 100}%`;
             HTML("#score_적군").innerHTML = `${((게임현황.점수.적군 / 총점수) * 100) | 0}`;
             HTML("#score_아군").innerHTML = `${((게임현황.점수.아군 / 총점수) * 100) | 0}`;
-            console.log(게임현황.점수.아군 +'/'+ 게임현황.점수.적군)
+            //console.log(게임현황.점수.아군 +'/'+ 게임현황.점수.적군)
         }
         // 인게임
         async function 게임초기설정() {
@@ -783,7 +805,7 @@
                             clearInterval(게임진행반복);
                             resolve();
                         }
-                    }, 800);
+                    }, 750);
                 });
 
                 // interval이 완료된 후 웨이브 증가
@@ -793,7 +815,7 @@
                 점수판설정();
                 if (게임현황.점수.적군 > 2 || 게임현황.점수.아군 > 2) 
                 { 
-                alert('단축')
+                //alert('단축')
                 게임현황.점수.적군 *= 0.6; 
                 게임현황.점수.아군 *= 0.6;
                 게임현황.점수.적군 = 게임현황.점수.적군 | 0;
@@ -807,17 +829,11 @@
                 // 체력 0 이하로는 안되도록 설정
                 if (게임현황.캐릭터.적군기지.체력 < 0) { 게임현황.캐릭터.적군기지.체력 = 0; }
                 if (게임현황.캐릭터.아군기지.체력 < 0) { 게임현황.캐릭터.아군기지.체력 = 0; }
-
-                HTML(`#체력바_아군기지`).innerHTML = "◆".repeat(게임현황.캐릭터.아군기지.체력);
-                HTML(`#체력바_적군기지`).innerHTML = "◆".repeat(게임현황.캐릭터.적군기지.체력);
-                console.log(게임현황.점수.아군 + '/' + 게임현황.점수.적군);
-
-                // 대기시간 추가: Promise로 setTimeout 사용
                 await new Promise(resolve => setTimeout(resolve, 1000));
-
-                // 웨이브 증가
+                //console.log(게임현황.캐릭터);
+                오브젝트관리([게임현황.캐릭터.아군기지,게임현황.캐릭터.적군기지]);
                 게임현황.웨이브++;
-                // alert('웨이브 다음') // 필요 시 주석 해제
+                // alert('웨이브 다음')
             }
         }
 
