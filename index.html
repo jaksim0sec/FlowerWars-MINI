@@ -45,7 +45,7 @@
             width: 98px;
             height: 98px;
             margin: 1px;
-            background-color: #DCD4CB;
+            background-color: #DDD1C3;
             border-radius: 15px;
             position: relative;
             box-shadow: inset -5px -5px 4px #CBB39B95;
@@ -64,8 +64,8 @@
 
         .tile-updated {
             filter: brightness(0.9);
-            transform: scale(0.92);
-            transition: all 0.5s ease;
+            transform: scale(0.95);
+            transition: all 0.4s ease;
         }
 
         .tile-updated-end {
@@ -97,10 +97,11 @@
             margin-bottom: 62px;
             transition: all 0.3s ease;
             animation: shake 0.5s ease-in-out;
+            /*filter: contrast(1.1);*/
         }
 
         .w {
-            transition: all 0.3s ease;
+            transition: all 0.5s ease;
         }
 
         @keyframes jump {
@@ -301,7 +302,7 @@
 
         #score_board div {
             height: 100%;
-            transition: all 0.3s ease-in-out;
+            transition: all 0.5s ease;
             color: white;
             display: flex;
             align-items: center;
@@ -337,7 +338,7 @@
         <div id="ingame_world_board" class="object"></div>
         <div id="ingame_world_menu">
             <div class="fixed-window" id="status" style="bottom: 2%; left: 1%; min-width: 25%; min-height: 20%;">
-                테스팅용 메뉴
+                [ 개발자 메뉴 ]
                 <button
                     onclick="오브젝트관리([{x: 2, y: 2, 고유이름: `개나리용사${counter}`, 타입: 'cha', 종족: '개나리폭탄병', 팀: '적군'}]); counter ++;오브젝트관리([{x: 2, y: 4, 고유이름: `개나리용사${counter}`, 타입: 'chaw', 종족: '개나리용사', 팀: '적군'}]); counter ++;오브젝트관리([{x: 11, y: 3, 고유이름: `개나리용사${counter}`, 타입: 'chaw', 종족: '개나리용사', 팀: '아군'}]); counter ++;오브젝트관리([{x: 10, y: 3, 고유이름: `개나리용사${counter}`, 타입: 'chaw', 종족: '개나리용사', 팀: '아군'}]); counter ++;">캐릭터생성</button>
                 <button onclick="행동계산(게임현황.캐릭터, '모두');">단일가속화</button>
@@ -362,7 +363,7 @@
             개나리폭탄병: {아군: `https://ifh.cc/g/ZlTzJF.png`, 적군: 'https://ifh.cc/g/sKYtLq.png'}
 
         }
-        const 캐릭터특징설정 = {개나리용사: {체력: 4, 공격력: 1}, 적군기지: {체력: 7, 공격력: 0}, 아군기지: {체력: 7, 공격력: 0}, 개나리폭탄병: {체력: 1, 공격력: 5}, }
+        const 캐릭터특징설정 = {개나리용사: {체력: 4, 공격력: 1}, 적군기지: {체력: 7, 공격력: 0}, 아군기지: {체력: 7, 공격력: 0}, 개나리폭탄병: {체력: 1, 공격력: 8}, }
         // 선언
 
 
@@ -375,8 +376,8 @@
                 {x: 11, y: 2, 고유이름: '개나리용사1', 타입: 'chaw', 종족: '개나리용사', 팀: '아군'},
                 {x: 11, y: 3, 고유이름: '개나리용사2', 타입: 'chaw', 종족: '개나리용사', 팀: '아군'},
                 {x: 11, y: 4, 고유이름: '개나리용사3', 타입: 'cha', 종족: '개나리폭탄병', 팀: '아군'},
-                {x: 2, y: 3, 고유이름: '개나리용사4', 타입: 'cha', 종족: '개나리폭탄병', 팀: '적군'},
-                {x: 3, y: 4, 고유이름: '개나리용사5', 타입: 'cha', 종족: '개나리폭탄병', 팀: '적군'},
+                {x: 2, y: 3, 고유이름: '개나리용사4', 타입: 'chaw', 종족: '개나리용사', 팀: '적군'},
+                {x: 3, y: 4, 고유이름: '개나리용사5', 타입: 'chaw', 종족: '개나리용사', 팀: '적군'},
                 {x: 2, y: 5, 고유이름: '개나리용사6', 타입: 'chaw', 종족: '개나리용사', 팀: '적군'},
                 {x: 2, y: 2, 고유이름: '개나리용사7', 타입: 'cha', 종족: '개나리폭탄병', 팀: '적군'},
                 {x: 2, y: 1, 고유이름: '개나리용사8', 타입: 'cha', 종족: '개나리폭탄병', 팀: '적군'},
@@ -384,6 +385,7 @@
                 {x: 11, y: 1, 고유이름: '개나리용사10', 타입: 'chaw', 종족: '개나리용사', 팀: '아군'},
                 {x: 2, y: 4, 고유이름: '개나리용사11', 타입: 'cha', 종족: '개나리폭탄병', 팀: '적군'},
                 {x: 10, y: 2, 고유이름: '개나리용사12', 타입: 'chaw', 종족: '개나리용사', 팀: '아군'},
+                {x: 9, y: 2, 고유이름: '개나리용사13', 타입: 'chaw', 종족: '개나리용사', 팀: '아군'},
                 ],
             board: [], 캐릭터: [], 뎀판: [], 점수: {적군: 2, 아군: 2}, 웨이브 : 1
         };
@@ -556,9 +558,9 @@
                     };
                     HTML(`#tile_${list[i].x}_${list[i].y}`).innerHTML = 대상타일요소;
                     HTML(`#tile_${list[i].x}_${list[i].y}`).innerHTML += `<div id="title_${설정요소.고유이름}"  style = "position:absolute; bottom: 8px; font-weight:bold;font-size:12px;" class = "char_title">${설정요소.종족}</div><div style="position:absolute;bottom:22px;color:${(설정요소.팀 == '적군') ? '#5F2308' : '#1D1E6A'}; font-size:13px;" id = "체력바_${설정요소.고유이름}">${"◆".repeat(설정요소.체력)}</div>`;
-                    console.log(설정요소.고유이름+'/'+설정요소.체력)
+                    /*console.log(설정요소.고유이름+'/'+설정요소.체력)
                     // 후기 object 정의 형식: [고유이름, 타입, 종족, 팀, 체력, x, y]
-                    //console.log('오브젝트관리 항목 ' + Object.keys(게임현황.캐릭터).length)
+                    //console.log('오브젝트관리 항목 ' + Object.keys(게임현황.캐릭터).length)*/
                     let j = 1;
                     for (j = 1; j - 1 < Object.keys(게임현황.캐릭터).length; j++) {
                         //console.log(설정요소.고유이름 + 'J:' + j);
@@ -598,8 +600,8 @@
                     대상타일.classList.add("tile-updated-end");
                     setTimeout(() => {
                         대상타일.classList.remove("tile-updated-end");
-                    }, 300);
-                }, 300);
+                    }, 450);
+                }, 450);
             }
             //console.log('▶오브젝트관리 끝')
         }
@@ -805,7 +807,7 @@
                             clearInterval(게임진행반복);
                             resolve();
                         }
-                    }, 750);
+                    }, 1000);
                 });
 
                 // interval이 완료된 후 웨이브 증가
@@ -816,8 +818,8 @@
                 if (게임현황.점수.적군 > 2 || 게임현황.점수.아군 > 2) 
                 { 
                 //alert('단축')
-                게임현황.점수.적군 *= 0.6; 
-                게임현황.점수.아군 *= 0.6;
+                게임현황.점수.적군 *= 1.5/Math.abs(5-게임현황.점수.아군-게임현황.점수.적군); 
+                게임현황.점수.아군 *= 1.5/Math.abs(5-게임현황.점수.아군-게임현황.점수.적군);
                 게임현황.점수.적군 = 게임현황.점수.적군 | 0;
                 게임현황.점수.아군 = 게임현황.점수.아군 | 0;
                 }
@@ -825,6 +827,7 @@
                 // 기지 체력 감소
                 게임현황.캐릭터.적군기지.체력 -= 게임현황.점수.아군;
                 게임현황.캐릭터.아군기지.체력 -= 게임현황.점수.적군;
+                console.log(게임현황.캐릭터.적군기지.체력)
 
                 // 체력 0 이하로는 안되도록 설정
                 if (게임현황.캐릭터.적군기지.체력 < 0) { 게임현황.캐릭터.적군기지.체력 = 0; }
