@@ -331,7 +331,73 @@
             padding-left: 10px;
         }
 
-        .waveAlert {}
+        .waveAlert {
+            opacity: 0;
+            width: 100%;
+            height: 30%;
+            background-color: #00000099;
+            color: white;
+            font-size: 55px;
+            font-weight: bold;
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            top: 50%;
+            right: 50%;
+            transform: translateY(-50%) /*rotate(45deg)*/ translateX(50%);
+            animation: waveAlert 2.5s ease;
+            backdrop-filter: blur(2px);
+        }
+
+        @keyframes waveAlert
+        {
+            0% {
+                opacity: 0;
+            }
+
+            30% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+
+        .winOrnot {
+            width: 100%;
+            height: 40%;
+            background-color: #00000099;
+            color: white;
+            font-size: 85px;
+            font-weight: bold;
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            top: 50%;
+            right: 50%;
+            transform: translateY(-50%) /*rotate(45deg)*/ translateX(50%);
+            animation: winOrnot 2.5s ease;
+            backdrop-filter: blur(2px);
+        }
+
+        @keyframes winOrnot
+        {
+            0% {
+                opacity: 0;
+            }
+
+            30% {
+                opacity: 0.5; 
+                filter: brightness(0.9);
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
     </style>
 
     <div id="ingame_world" class="object">
@@ -371,21 +437,24 @@
         //후기object 정의형식 = 고유이름 : {고유이름, 타입, 종족, 팀 , 체력 , x, y}
         let 게임현황 = {
             맵크기: [12, 5], object:
-                [{x: 1, y: 3, 고유이름: '적군기지', 타입: 'obj', 종족: '적군기지', 팀: '적군'},
-                 {x: 12, y: 3, 고유이름: '아군기지', 타입: 'obj', 종족: '아군기지', 팀: '아군'},
-                 {x: 11, y: 2, 고유이름: '개나리용사1', 타입: 'chaw', 종족: '개나리용사', 팀: '아군'},
-                 {x: 11, y: 3, 고유이름: '개나리용사2', 타입: 'chaw', 종족: '개나리용사', 팀: '아군'},
-                 {x: 11, y: 4, 고유이름: '개나리용사3', 타입: 'cha', 종족: '개나리폭탄병', 팀: '아군'},
-                 {x: 2, y: 3, 고유이름: '개나리용사4', 타입: 'chaw', 종족: '개나리용사', 팀: '적군'},
-                 {x: 3, y: 4, 고유이름: '개나리용사5', 타입: 'chaw', 종족: '개나리용사', 팀: '적군'},
-                 {x: 2, y: 5, 고유이름: '개나리용사6', 타입: 'chaw', 종족: '개나리용사', 팀: '적군'},
-                 {x: 2, y: 2, 고유이름: '개나리용사7', 타입: 'cha', 종족: '개나리폭탄병', 팀: '적군'},
-                 {x: 2, y: 1, 고유이름: '개나리용사8', 타입: 'cha', 종족: '개나리폭탄병', 팀: '적군'},
-                 {x: 11, y: 5, 고유이름: '개나리용사9', 타입: 'chaw', 종족: '개나리용사', 팀: '아군'},
-                 {x: 11, y: 1, 고유이름: '개나리용사10', 타입: 'chaw', 종족: '개나리용사', 팀: '아군'},
-                 {x: 2, y: 4, 고유이름: '개나리용사11', 타입: 'cha', 종족: '개나리폭탄병', 팀: '적군'},
-                 {x: 10, y: 2, 고유이름: '개나리용사12', 타입: 'chaw', 종족: '개나리용사', 팀: '아군'},
-                 {x: 9, y: 2, 고유이름: '개나리용사13', 타입: 'chaw', 종족: '개나리용사', 팀: '아군'},
+                [{x: 1, y: 3, 고유이름: '적군기지', 타입: 'obj', 종족: '적군기지', 팀: '적군', 체력: 캐릭터특징설정.적군기지.체력},
+                {x: 12, y: 3, 고유이름: '아군기지', 타입: 'obj', 종족: '아군기지', 팀: '아군', 체력: 캐릭터특징설정.아군기지.체력},
+                {x: 11, y: 2, 고유이름: '개나리용사1', 타입: 'chaw', 종족: '개나리용사', 팀: '아군'},
+                {x: 11, y: 3, 고유이름: '개나리용사2', 타입: 'chaw', 종족: '개나리용사', 팀: '아군'},
+                {x: 11, y: 4, 고유이름: '개나리용사3', 타입: 'cha', 종족: '개나리폭탄병', 팀: '아군'},
+                {x: 2, y: 3, 고유이름: '개나리용사4', 타입: 'chaw', 종족: '개나리용사', 팀: '적군'},
+                {x: 3, y: 4, 고유이름: '개나리용사5', 타입: 'chaw', 종족: '개나리용사', 팀: '적군'},
+                {x: 2, y: 5, 고유이름: '개나리용사6', 타입: 'chaw', 종족: '개나리용사', 팀: '적군'},
+                {x: 2, y: 2, 고유이름: '개나리용사7', 타입: 'cha', 종족: '개나리폭탄병', 팀: '적군'},
+                {x: 2, y: 1, 고유이름: '개나리용사8', 타입: 'cha', 종족: '개나리폭탄병', 팀: '적군'},
+                {x: 11, y: 5, 고유이름: '개나리용사9', 타입: 'chaw', 종족: '개나리용사', 팀: '아군'},
+                {x: 11, y: 1, 고유이름: '개나리용사10', 타입: 'chaw', 종족: '개나리용사', 팀: '아군'},
+                {x: 2, y: 4, 고유이름: '개나리용사11', 타입: 'cha', 종족: '개나리폭탄병', 팀: '적군'},
+                {x: 10, y: 2, 고유이름: '개나리용사12', 타입: 'chaw', 종족: '개나리용사', 팀: '아군'},
+                {x: 9, y: 2, 고유이름: '개나리용사13', 타입: 'chaw', 종족: '개나리용사', 팀: '아군'},
+                {x: 3, y: 2, 고유이름: '개나리용사14', 타입: 'chaw', 종족: '개나리용사', 팀: '적군'},
+                {x: 3, y: 5, 고유이름: '개나리용사15', 타입: 'chaw', 종족: '개나리용사', 팀: '적군'},
+                {x: 3, y: 1, 고유이름: '개나리용사16', 타입: 'chaw', 종족: '개나리용사', 팀: '적군'},
                 ],
             board: [], 캐릭터: [], 뎀판: [], 점수: {적군: 2, 아군: 2}, 웨이브: 1
         };
@@ -792,16 +861,15 @@
         // 인게임
         async function 게임초기설정() {
             보드판생성(게임현황.맵크기[0], 게임현황.맵크기[1]);
-
-            while (게임현황.웨이브 < 2) {
+            console.log(게임현황.object[0].체력 + '/' + 게임현황.object[1].체력)
+            while (게임현황.object[0].체력 > 0 && 게임현황.object[1].체력 > 0) {
+                HTML("#ingame_world").innerHTML += `<div class="waveAlert" id="waver">웨이브 ${게임현황.웨이브}</div>`;
+                await new Promise(resolve => setTimeout(resolve, 2490));
+                HTML("#ingame_world").innerHTML = HTML("#ingame_world").innerHTML.replace(`<div class="waveAlert" id="waver">웨이브 ${게임현황.웨이브}</div>`,"")
                 오브젝트관리(게임현황.object);
-
-                // Promise로 wrap하여 setInterval이 완료될 때까지 대기
                 await new Promise((resolve) => {
                     const 게임진행반복 = setInterval(() => {
                         행동계산(게임현황.캐릭터, '모두');
-
-                        // 캐릭터가 두 개 남아있으면 반복 중단하고 resolve 호출
                         if (Object.keys(게임현황.캐릭터).length === 2) {
                             clearInterval(게임진행반복);
                             resolve();
@@ -809,12 +877,12 @@
                     }, 1000);
                 });
 
-                // interval이 완료된 후 웨이브 증가
                 let 점수공약수 = 최대공약수(게임현황.점수.적군, 게임현황.점수.아군);
                 게임현황.점수.적군 /= 점수공약수;
                 게임현황.점수.아군 /= 점수공약수;
                 점수판설정();
-                if (게임현황.점수.적군 > 2 || 게임현황.점수.아군 > 2) {
+                let 이전점수 = {아군:게임현황.점수.아군,적군:게임현황.점수.적군};
+                if (게임현황.점수.적군 > 4 || 게임현황.점수.아군 > 4) {
                     //alert('단축')
                     //게임현황.점수.적군 *= 1.5/Math.abs(5-게임현황.점수.아군-게임현황.점수.적군); 
                     //게임현황.점수.아군 *= 1.5/Math.abs(5-게임현황.점수.아군-게임현황.점수.적군);
@@ -830,9 +898,18 @@
                     }
                     게임현황.점수.적군 = 게임현황.점수.적군 | 0;
                     게임현황.점수.아군 = 게임현황.점수.아군 | 0;
+                    if(게임현황.점수.아군==게임현황.점수.적군)
+                    {
+                        if(이전점수.아군 > 이전점수.적군)
+                        {
+                            게임현황.점수.적군++;
+                        }
+                        else if(이전점수.아군 < 이전점수.적군)
+                        {
+                            게임현황.점수.아군++;
+                        }
+                    }
                 }
-
-                // 기지 체력 감소
                 console.log(게임현황.캐릭터.적군기지.체력 - 게임현황.점수.적군)
                 게임현황.캐릭터.적군기지.체력 -= 게임현황.점수.적군;
                 게임현황.캐릭터.아군기지.체력 -= 게임현황.점수.아군;
@@ -843,9 +920,33 @@
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 //console.log(게임현황.캐릭터);
                 오브젝트관리([게임현황.캐릭터.아군기지, 게임현황.캐릭터.적군기지]);
+                await new Promise(resolve => setTimeout(resolve, 1000));
                 게임현황.웨이브++;
+                게임현황.점수 = {적군: 2, 아군: 2};
+                게임현황.object[0].체력 = 게임현황.캐릭터.적군기지.체력;
+                게임현황.object[1].체력 = 게임현황.캐릭터.아군기지.체력;
+                점수판설정();
                 // alert('웨이브 다음')
             }
+            //console.log('개새꺄')
+            if (게임현황.캐릭터.적군기지.체력 == 0 && 게임현황.캐릭터.아군기지.체력 > 0) {
+                if(게임현황.캐릭터.아군기지.체력-게임현황.캐릭터.적군기지.체력 > 3)
+                {HTML("#ingame_world").innerHTML += `<div class="winOrnot">압도적 대승🤩</div>`;}
+                else if(게임현황.캐릭터.아군기지.체력-게임현황.캐릭터.적군기지.체력 > 1 )
+                {HTML("#ingame_world").innerHTML += `<div class="winOrnot">평범한 승리🥳</div>`;}
+                else{HTML("#ingame_world").innerHTML += `<div class="winOrnot">아슬아슬한 승리😅</div>`;}
+            }
+            else if (게임현황.캐릭터.아군기지.체력 == 0 && 게임현황.캐릭터.적군기지.체력 > 0) {
+                if(게임현황.캐릭터.아군기지.체력-게임현황.캐릭터.적군기지.체력 < -3)
+                {HTML("#ingame_world").innerHTML += `<div class="winOrnot">처참한 대패😱</div>`;}
+                else if(게임현황.캐릭터.아군기지.체력-게임현황.캐릭터.적군기지.체력 < -1 )
+                {HTML("#ingame_world").innerHTML += `<div class="winOrnot">슬픈 패배😓</div>`;}
+                else{ HTML("#ingame_world").innerHTML += `<div class="winOrnot">아까운 패배😪</div>`;}
+            }
+            else if (게임현황.캐릭터.적군기지.체력 == 0 && 게임현황.캐릭터.아군기지.체력 == 0) {
+                HTML("#ingame_world").innerHTML += `<div class="winOrnot">동점😳</div>`;
+            }
+            else {alert('승부판정 오류발생')}
         }
 
         게임초기설정();
