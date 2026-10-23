@@ -1,0 +1,26 @@
+{
+  "projection": "2:1 diamond top surface (not a 3D block)",
+  "size": {
+    "width": 256,
+    "height": 144
+  },
+  "referenceAngleDegrees": {
+    "slope": 26.565,
+    "screenX": 45,
+    "cameraElevationApprox": 30
+  },
+  "grid": {
+    "x": "originX + (col - row) * (tileWidth/2)",
+    "y": "originY + (col + row) * (tileHeight/2)"
+  },
+  "tiles": {
+    "grass": "grass.webp",
+    "soil": "soil.webp"
+  },
+  "layers": {
+    "surface": 0,
+    "units": 1,
+    "decorations": 2
+  },
+  "notes": "Both sprites are original concept-art cutouts, aligned to one diamond. Side walls and scenery are separate layers; this prevents internal tile edges from becoming walls."
+}
