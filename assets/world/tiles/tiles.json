@@ -1,17 +1,14 @@
 {
-  "projection": "2:1 diamond top surface (not a 3D block)",
+  "projection": "2.5D diamond tiles from concept art (image bounds 256x144)",
   "size": {
     "width": 256,
     "height": 144
   },
-  "referenceAngleDegrees": {
-    "slope": 26.565,
-    "screenX": 45,
-    "cameraElevationApprox": 30
-  },
+  "imageAspectRatio": "16:9",
+  "edgeSlopeDegrees": 29.36,
   "grid": {
-    "x": "originX + (col - row) * (tileWidth/2)",
-    "y": "originY + (col + row) * (tileHeight/2)"
+    "x": "originX + (col - row) * 128",
+    "y": "originY + (col + row) * 72"
   },
   "tiles": {
     "grass": "grass.webp",
@@ -22,5 +19,5 @@
     "units": 1,
     "decorations": 2
   },
-  "notes": "Both sprites are original concept-art cutouts, aligned to one diamond. Side walls and scenery are separate layers; this prevents internal tile edges from becoming walls."
+  "notes": "These transparent sprites are top surfaces only. 29.36 degrees is the on-screen image edge angle (atan(72/128)), not an inferred real 3D camera angle. Sidewalls and decorations must be separate board-edge objects."
 }
