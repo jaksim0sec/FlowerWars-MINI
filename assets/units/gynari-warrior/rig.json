@@ -1,0 +1,155 @@
+{
+  "id": "gynari-warrior",
+  "version": 1,
+  "note": "Transparent cropped WebP assets; positions use 1000x1500 normalized rig coordinates. All assets initially arranged as a concept prototype, adjust visually in-game.",
+  "canvas": {
+    "width": 1000,
+    "height": 1500
+  },
+  "parts": {
+    "shadow": {
+      "asset": "shadow.webp",
+      "file_dimensions": [
+        300,
+        67
+      ],
+      "x": 200,
+      "y": 1252,
+      "w": 630,
+      "h": 141,
+      "z": 0,
+      "origin": [
+        0.5,
+        0.5
+      ]
+    },
+    "leg_back": {
+      "asset": "leg_back.webp",
+      "file_dimensions": [
+        135,
+        118
+      ],
+      "x": 405,
+      "y": 1130,
+      "w": 145,
+      "h": 127,
+      "z": 1,
+      "origin": [
+        0.5,
+        0.16
+      ]
+    },
+    "leg_front": {
+      "asset": "leg_front.webp",
+      "file_dimensions": [
+        132,
+        135
+      ],
+      "x": 554,
+      "y": 1125,
+      "w": 151,
+      "h": 154,
+      "z": 1,
+      "origin": [
+        0.5,
+        0.16
+      ]
+    },
+    "hand_back": {
+      "asset": "hand_back.webp",
+      "file_dimensions": [
+        134,
+        155
+      ],
+      "x": 190,
+      "y": 880,
+      "w": 192,
+      "h": 222,
+      "z": 4,
+      "origin": [
+        0.88,
+        0.08
+      ]
+    },
+    "body": {
+      "asset": "body.webp",
+      "file_dimensions": [
+        275,
+        265
+      ],
+      "x": 320,
+      "y": 801,
+      "w": 371,
+      "h": 358,
+      "z": 2,
+      "origin": [
+        0.5,
+        0.12
+      ]
+    },
+    "hand_front": {
+      "asset": "hand_front.webp",
+      "file_dimensions": [
+        136,
+        155
+      ],
+      "x": 644,
+      "y": 875,
+      "w": 176,
+      "h": 201,
+      "z": 4,
+      "origin": [
+        0.12,
+        0.08
+      ]
+    },
+    "basic_sword": {
+      "asset": "../../equipment/weapons/basic_sword.webp",
+      "file_dimensions": [
+        235,
+        218
+      ],
+      "x": 73,
+      "y": 738,
+      "w": 291,
+      "h": 271,
+      "z": 3,
+      "origin": [
+        0.77,
+        0.83
+      ]
+    },
+    "head": {
+      "asset": "head.webp",
+      "file_dimensions": [
+        280,
+        269
+      ],
+      "x": 289,
+      "y": 447,
+      "w": 435,
+      "h": 418,
+      "z": 6,
+      "origin": [
+        0.5,
+        0.8
+      ]
+    },
+    "head_deco": {
+      "asset": "head_deco.webp",
+      "file_dimensions": [
+        336,
+        264
+      ],
+      "x": 241,
+      "y": 323,
+      "w": 559,
+      "h": 440,
+      "z": 7,
+      "origin": [
+        0.5,
+        0.75
+      ]
+    }
+  }
+}
