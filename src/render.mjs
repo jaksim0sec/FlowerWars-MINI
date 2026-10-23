@@ -76,7 +76,29 @@ function part(ctx, art, name, rotation = 0, dy = 0) {
   ctx.save();
   ctx.translate(p.x + p.w * p.origin[0], p.y + p.h * p.origin[1] + dy);
   ctx.rotate(rotation);
+  if (p.clip) {
+    ctx.beginPath();
+    p.clip.forEach(([x, y], i) => {
+      const point = [(x - p.origin[0]) * p.w, (y - p.origin[1]) * p.h];
+      if (i) ctx.lineTo(...point); else ctx.moveTo(...point);
+    });
+    ctx.closePath(); ctx.clip();
+  }
   ctx.drawImage(art.parts[name], -p.w * p.origin[0], -p.h * p.origin[1], p.w, p.h);
+  ctx.restore();
+}
+
+function arm(ctx, art, name, rotation, weaponRotation = null) {
+  const p = art.rig.parts[name];
+  const shoulder = { x: p.x + p.w * p.origin[0], y: p.y + p.h * p.origin[1] };
+  ctx.save();
+  ctx.translate(shoulder.x, shoulder.y); ctx.rotate(rotation); ctx.translate(-shoulder.x, -shoulder.y);
+  if (weaponRotation !== null) {
+    const grip = { x: p.x + p.w * p.grip[0], y: p.y + p.h * p.grip[1] };
+    ctx.save(); ctx.translate(grip.x, grip.y); ctx.rotate(weaponRotation); ctx.translate(-grip.x, -grip.y);
+    part(ctx, art, 'basic_sword'); ctx.restore();
+  }
+  part(ctx, art, name);
   ctx.restore();
 }
 
@@ -94,39 +116,33 @@ export function drawWarrior(ctx, art, unit, time) {
   const attacking = unit.state === 'attack';
   const hit = unit.state === 'hit';
   const stride = Math.sin(time * 17);
-  const bob = walking ? -Math.abs(stride) * 18 : Math.sin(time * 2.5 + unit.id) * 7;
+  const bob = walking ? -Math.abs(stride) * 10 : Math.sin(time * 2.5 + unit.id) * 4;
   ctx.save();
   if (attacking && unit.attackVector) {
     const lunge = Math.sin(Math.min(1, unit.elapsed / .6) * Math.PI) * .12;
     ctx.translate(unit.attackVector.x * lunge, unit.attackVector.y * lunge);
   }
-  ctx.scale(unit.facing === 1 ? -0.115 : 0.115, 0.115);
-  ctx.translate(-530, -1279);
-  part(ctx, art, 'shadow', 0, -50);
+  ctx.scale(unit.facing === 1 ? -art.rig.scale : art.rig.scale, art.rig.scale);
+  ctx.translate(-art.rig.foot[0], -art.rig.foot[1]);
+  part(ctx, art, 'shadow');
   // Recoil the entire assembly; head and weapon remain attached to the body.
   if (hit) ctx.translate(Math.sin(unit.elapsed * 50) * (1 - unit.elapsed / .36) * 32, -Math.sin(unit.elapsed / .36 * Math.PI) * 20);
-  part(ctx, art, 'leg_back', walking ? stride * .28 : 0, walking ? -Math.max(0, stride) * 42 : 0);
-  part(ctx, art, 'leg_front', walking ? -stride * .28 : 0, walking ? -Math.max(0, -stride) * 42 : 0);
+  part(ctx, art, 'leg_back', walking ? stride * .16 : 0, walking ? -Math.max(0, stride) * 18 : 0);
+  part(ctx, art, 'leg_front', walking ? -stride * .16 : 0, walking ? -Math.max(0, -stride) * 18 : 0);
   ctx.translate(0, bob);
   if (attacking) ctx.translate(-Math.sin(unit.elapsed / .65 * Math.PI) * 15, 0);
+  // Both wrists hinge at the baked-in torso sleeves. The free hand tucks behind
+  // the tunic; the masked weapon hand stays in front so its palm covers the grip.
+  arm(ctx, art, 'hand_front', walking ? -stride * .055 : 0);
   part(ctx, art, 'body');
+  arm(ctx, art, 'hand_back', walking ? stride * .055 : attacking ? Math.sin(unit.elapsed / .65 * Math.PI) * .13 : 0,
+    attacking ? swordPose(unit.elapsed, unit.attackVector) : Math.sin(time * 2.5 + unit.id) * .015);
   ctx.save();
-  const grip = { x: 297, y: 963 };
-  // Wrist and separate weapon share one shoulder transformation. Sword has its
-  // own rotation at the grip, so its handle cannot detach from the wrist.
-  ctx.translate(340, 895);
-  ctx.rotate(walking ? stride * .045 : 0);
-  ctx.translate(-340, -895);
-  ctx.save(); ctx.translate(grip.x, grip.y);
-  ctx.rotate(attacking ? swordPose(unit.elapsed, unit.attackVector) : Math.sin(time * 2.5 + unit.id) * .025);
-  ctx.translate(-grip.x, -grip.y);
-  part(ctx, art, 'basic_sword');
-  ctx.restore();
-  part(ctx, art, 'hand_back');
-  ctx.restore();
-  part(ctx, art, 'hand_front', walking ? -stride * .06 : 0);
+  ctx.translate(...art.rig.neck); ctx.rotate(Math.sin(time * 2.5 + unit.id) * .006);
+  ctx.translate(-art.rig.neck[0], -art.rig.neck[1]);
   part(ctx, art, 'head');
   part(ctx, art, 'head_deco');
+  ctx.restore();
   ctx.restore();
 }
 

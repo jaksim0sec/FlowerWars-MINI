@@ -4,17 +4,19 @@ Transparent image layers cut from an original generated sprite sheet, prepared f
 
 ## Structure
 
-- `assets/units/gynari-warrior/`: head, head_deco, body without arms, two separate short cuffs/hands, alternate wrist poses, separate feet, shadow, and `rig.json`.
+- `assets/units/gynari-warrior/`: head, head_deco, torso with built-in yellow sleeves, separate wrist/hand sources, alternate wrist poses, separate feet, shadow, and `rig.json`.
 - `assets/equipment/weapons/basic_sword.webp`: standalone sword. Do **not** merge sword pixels into the hand asset.
-- `.png` are archival full-resolution crops, `.webp` are optimized game-use layers.
+- `.webp` files are the existing approved game-use layers; their pixels are unchanged.
 
 ## Rendering
 
 - Treat the **bottom of the feet** as the board cell pivot.
-- Use normalized coordinates from `rig.json` on a 1000×1500 artboard. Keep each layer in absolute position.
-- Change `font-size` on the containing unit to scale the whole rig (em coordinates).
-- CSS states `idle`, `walk`, `attack`, `hit` animate individual layers; JS owns board coords, collision, combat and state changes.
-- Move weapon and wrist independently, but keep their animation keyframes in sync around the grip anchor.
+- `rig.json` v2 defines part rectangles on a 1000×1500 artboard, a shared foot anchor and draw scale. Canvas assembly lives in `src/render.mjs`.
+- The torso already has yellow sleeves. Hand source images also contain a yellow sleeve: the normalized `clip` polygons keep only the cuff/palm so no duplicate shoulder is drawn.
+- `hand_back` and `hand_front` identify assembly roles; each role chooses the source image whose wrist points outward on that side.
+- Wrists rotate at their sleeve attachment. The separate sword rotates around the palm grip and inherits the same arm transformation. The face and leaf hair share one neck transformation.
+- Boots are partly covered by the tunic; walk rotation and lift keep their roots inside it. Shadow stays on the foot contact plane.
+- Runtime states `idle`, `walk`, `attack`, `hit` animate this rig; the board model owns positions and impact timing.
 - Render board tilt separately. Do **not** skew characters with the board.
 
-**Limitation:** This first-generation sheet uses independent cut assets and approximate assembly placements. It is not an animation-ready bone rig with tested pivots. Validate pose and seams in-browser before finalizing the rig.
+Validate both facings and enlarged idle/walk/attack/hit poses when changing these coordinates. `tests/rig.test.mjs` covers sleeve masks, shoulder/neck attachments, short boot overlap and sword grip continuity. There is no separate rear-view artwork.
