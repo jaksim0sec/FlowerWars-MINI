@@ -1,14 +1,8 @@
 {
-  "projection": "2.5D diamond tiles from concept art (image bounds 256x144)",
+  "projection": "isometric full block tile",
   "size": {
-    "width": 256,
-    "height": 144
-  },
-  "imageAspectRatio": "16:9",
-  "edgeSlopeDegrees": 29.36,
-  "grid": {
-    "x": "originX + (col - row) * 128",
-    "y": "originY + (col + row) * 72"
+    "width": 512,
+    "height": 384
   },
   "tiles": {
     "grass": "grass.webp",
@@ -19,5 +13,5 @@
     "units": 1,
     "decorations": 2
   },
-  "notes": "These transparent sprites are top surfaces only. 29.36 degrees is the on-screen image edge angle (atan(72/128)), not an inferred real 3D camera angle. Sidewalls and decorations must be separate board-edge objects."
+  "notes": "Full isometric blocks with visible sidewalls. Previous 256x144 surface-only projection metadata does not apply; update placement and overlap in renderer before using as repeating field tiles."
 }
