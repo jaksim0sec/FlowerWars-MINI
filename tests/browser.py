@@ -1,15 +1,14 @@
-"""Real pointer/touch acceptance checks. Run against `node server.mjs` on port 8000."""
+"""Real pointer/touch checks against any static host (BASE_URL)."""
 import os
 from playwright.sync_api import sync_playwright
 
 BASE = os.environ.get('BASE_URL', 'http://127.0.0.1:8000')
 
 def point(page, x, y):
-    size = page.viewport_size
-    scale = min((size['width'] - 48) / 1008, (size['height'] - 240) / 630, 1.1)
-    scale = max(.25, scale)
-    return (size['width']/2 + ((x-y)*72-72)*scale,
-            (size['height']-44)/2 + ((x+y)*42-263)*scale)
+    field = page.locator('#board').bounding_box()
+    scale = max(.15,min((field['width'] - 32) / 1008, (field['height'] - 32) / 694, 1.1))
+    return (field['x']+field['width']/2 + ((x-y)*72-72)*scale,
+            field['y']+field['height']/2 + ((x+y)*42-221)*scale)
 
 def cell(page, x, y, touch=False):
     p = point(page,x,y)

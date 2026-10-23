@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { Board, project, unproject, tileAt, zoomCamera } from '../src/model.mjs';
+import { Board, project, unproject, tileAt, zoomCamera, fitBoardCamera } from '../src/model.mjs';
 
 test('isometric projection and diamond picking respect cell boundaries', () => {
   assert.deepEqual(project(2, 1), { x: 72, y: 126 });
@@ -14,7 +14,18 @@ test('zoom preserves the world point underneath a cursor and clamps limits', () 
   const next = zoomCamera(camera, { x: 172, y: 122 }, 2);
   assert.deepEqual(next, { x: 28, y: 38, scale: 2 });
   assert.equal(zoomCamera(camera, { x: 0, y: 0 }, 999).scale, 2.4);
-  assert.equal(zoomCamera(camera, { x: 0, y: 0 }, 0.001).scale, 0.25);
+  assert.equal(zoomCamera(camera, { x: 0, y: 0 }, 0.001).scale, 0.15);
+});
+
+test('fit uses actual field dimensions including sidewalls and back-row heads', () => {
+  for (const [width,height] of [[375,494],[320,400],[844,170],[1280,700]]) {
+    const camera=fitBoardCamera(width,height,8,6);
+    // Hand-measured bounds of this board: x=-432..576, y=-126..568.
+    assert.ok(-432*camera.scale+camera.x >= 15.9);
+    assert.ok(576*camera.scale+camera.x <= width-15.9);
+    assert.ok(-126*camera.scale+camera.y >= 15.9);
+    assert.ok(568*camera.scale+camera.y <= height-15.9);
+  }
 });
 
 test('summon rejects occupied and outside cells without consuming ids', () => {

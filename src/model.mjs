@@ -18,10 +18,19 @@ export function tileAt(px, py, width, height) {
 }
 
 export function zoomCamera(camera, anchor, factor) {
-  const scale = Math.min(2.4, Math.max(0.25, camera.scale * factor));
+  const scale = Math.min(2.4, Math.max(0.15, camera.scale * factor));
   const ratio = scale / camera.scale;
   return { x: anchor.x - (anchor.x - camera.x) * ratio,
     y: anchor.y - (anchor.y - camera.y) * ratio, scale };
+}
+
+export function fitBoardCamera(width, height, columns = 8, rows = 6) {
+  const left = -rows * HALF_W, right = columns * HALF_W;
+  // Leave space above back-row units and below the outer stone sidewalls.
+  const top = -126, bottom = (columns + rows - 1) * HALF_H + 22;
+  const scale = Math.max(.15, Math.min((width - 32) / (right - left), (height - 32) / (bottom - top), 1.1));
+  return { x: width / 2 - (left + right) / 2 * scale,
+    y: height / 2 - (top + bottom) / 2 * scale, scale };
 }
 
 const key = (x, y) => `${x},${y}`;

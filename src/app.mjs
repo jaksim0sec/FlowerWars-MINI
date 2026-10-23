@@ -1,4 +1,4 @@
-import { Board, project, tileAt, zoomCamera } from './model.mjs';
+import { Board, project, tileAt, zoomCamera, fitBoardCamera } from './model.mjs';
 import { loadArtwork, render } from './render.mjs';
 
 const $ = id => document.getElementById(id);
@@ -8,6 +8,7 @@ const view = { selected: null, tile: null, hover: null, mode: 'move' };
 let camera = { x: 0, y: 0, scale: 1 };
 let width = 0, height = 0, dpr = 1, art = null;
 let lastFrame = 0, previousBusy = false, previousHits = 0;
+let fitted = true;
 const pointers = new Map();
 let origin = null, gestureMoved = false;
 
@@ -15,20 +16,21 @@ function text(id, value) { if ($(id).textContent !== value) $(id).textContent = 
 function notify(message) { text('notice', message); }
 
 function fit() {
-  const scale = Math.max(.25, Math.min((width - 48) / 1008, (height - 240) / 630, 1.1));
-  camera = { x: width / 2 - 72 * scale, y: (height - 44) / 2 - 263 * scale, scale };
+  camera = fitBoardCamera(width, height, board.width, board.height);
+  fitted = true;
   refresh();
 }
 
 function resize() {
   const rect = canvas.getBoundingClientRect();
   const first = !width;
+  const rotated = Math.abs(rect.width - width) > 80;
   camera.x += (rect.width - width) / 2;
   camera.y += (rect.height - height) / 2;
   width = rect.width; height = rect.height;
   dpr = Math.min(window.devicePixelRatio || 1, 2);
   canvas.width = Math.round(width * dpr); canvas.height = Math.round(height * dpr);
-  if (first) fit();
+  if (first || fitted || rotated) fit();
 }
 
 function seed() {
@@ -144,12 +146,13 @@ canvas.addEventListener('pointermove', event => {
     const after = [...pointers.values()];
     const oldCenter = midpoint(before), newCenter = midpoint(after);
     camera = zoomCamera(camera, oldCenter, distance(after) / Math.max(1, distance(before)));
+    fitted = false;
     camera.x += newCenter.x - oldCenter.x; camera.y += newCenter.y - oldCenter.y;
     gestureMoved = true;
   } else if (origin) {
     const dx = p.x - origin.x, dy = p.y - origin.y;
     if (Math.hypot(dx, dy) > 6) gestureMoved = true;
-    if (gestureMoved) { camera.x = origin.cameraX + dx; camera.y = origin.cameraY + dy; }
+    if (gestureMoved) { camera.x = origin.cameraX + dx; camera.y = origin.cameraY + dy; fitted = false; }
   }
   canvas.classList.toggle('dragging', gestureMoved);
   refresh();
@@ -172,6 +175,7 @@ canvas.addEventListener('wheel', event => {
   event.preventDefault();
   const delta = event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? height : 1);
   camera = zoomCamera(camera, local(event), Math.exp(-delta * .0015));
+  fitted = false;
   refresh();
 }, { passive: false });
 
@@ -201,8 +205,8 @@ $('terrain').addEventListener('click', () => {
   board.terrain[y][x] = board.terrain[y][x] === 'grass' ? 'soil' : 'grass';
   refresh(); notify('선택한 칸의 지형을 바꿨어요.');
 });
-$('zoom-in').addEventListener('click', () => { camera = zoomCamera(camera, { x: width / 2, y: height / 2 }, 1.2); refresh(); });
-$('zoom-out').addEventListener('click', () => { camera = zoomCamera(camera, { x: width / 2, y: height / 2 }, 1 / 1.2); refresh(); });
+$('zoom-in').addEventListener('click', () => { camera = zoomCamera(camera, { x: width / 2, y: height / 2 }, 1.2); fitted = false; refresh(); });
+$('zoom-out').addEventListener('click', () => { camera = zoomCamera(camera, { x: width / 2, y: height / 2 }, 1 / 1.2); fitted = false; refresh(); });
 $('fit').addEventListener('click', fit);
 new ResizeObserver(resize).observe(canvas);
 seed(); resize();
