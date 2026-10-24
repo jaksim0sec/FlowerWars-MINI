@@ -35,19 +35,19 @@ class RecordingCanvas {
 }
 const artwork = { rig, parts: Object.fromEntries(Object.keys(rig.parts).map(name => [name, name])) };
 
-test('rendered silhouette retains the earlier torso, arm and boot proportions', () => {
+test('rendered silhouette matches the motif with compact arms and short boots', () => {
   const ctx = new RecordingCanvas();
   drawWarrior(ctx, artwork, { id: 1, state: 'idle', facing: -1, elapsed: 0 }, 0);
   const width = name => {
     const a = ctx.point(name, 0, .5), b = ctx.point(name, 1, .5);
     return Math.hypot(b[0] - a[0], b[1] - a[1]);
   };
-  // The previous approved silhouette: a substantial tunic and full-size limbs,
-  // rather than a larger head above a shrunken torso and tiny wrists/boots.
-  for (const [name, min, max] of [['body', .84, .87], ['hand_back', .43, .45],
-    ['hand_front', .39, .42], ['leg_back', .32, .35], ['leg_front', .34, .36]]) {
+  // Reference proportions measured from the supplied motif, with a slightly
+  // smaller head and a compact cuff/palm rather than an oversized forward fist.
+  for (const [name, min, max] of [['body', .66, .72], ['hand_back', .35, .38],
+    ['hand_front', .32, .36], ['leg_back', .20, .24], ['leg_front', .19, .23]]) {
     const ratio = width(name) / width('head');
-    assert.ok(ratio >= min && ratio <= max, `${name}/head width ${ratio} changes the approved proportions`);
+    assert.ok(ratio >= min && ratio <= max, `${name}/head width ${ratio} changes the motif proportions`);
   }
 });
 
@@ -112,7 +112,7 @@ test('wrist roots meet the torso sleeve ends and the jaw meets the collar', () =
   for(const state of ['idle','walk','attack','hit']) for(const facing of [-1,1]) {
     const ctx=new RecordingCanvas();
     drawWarrior(ctx,artwork,{id:1,state,facing,elapsed:.3,attackVector:{x:facing*72,y:42}},.3);
-    for(const [hand,shoulder] of [['hand_back',[.145,.32]],['hand_front',[.84,.35]]]) {
+    for(const [hand,shoulder] of [['hand_back',[.11,.38]],['hand_front',[.88,.40]]]) {
       const root=ctx.point(hand,...rig.parts[hand].origin), sleeve=ctx.point('body',...shoulder);
       assert.ok(Math.hypot(root[0]-sleeve[0],root[1]-sleeve[1])<2,`${hand} detached at shoulder during ${state}`);
     }
@@ -127,4 +127,13 @@ test('foot shadow is centered on the board contact point, not below it', () => {
   const shadow = ctx.point('shadow', .5, .5);
   assert.ok(Math.abs(shadow[0]) < 3);
   assert.ok(Math.abs(shadow[1]) < 2, `shadow floats below feet at ${shadow[1]}`);
+});
+
+test('weapon arm passes behind the tunic and free cuff overlaps its front edge', () => {
+  const ctx = new RecordingCanvas();
+  drawWarrior(ctx, artwork, {id: 0, state: 'idle', facing: -1, elapsed: 0}, 0);
+  assert.ok(ctx.order.indexOf('hand_back') < ctx.order.indexOf('body'), 'weapon shoulder must tuck under the tunic');
+  assert.ok(ctx.order.indexOf('body') < ctx.order.indexOf('hand_front'), 'free cuff must overlap the tunic');
+  const palm = ctx.point('hand_back', .33, .75), edge = ctx.point('body', .1, .55);
+  assert.ok(palm[0] < edge[0] - 3, 'weapon fist must rest outside the chest');
 });

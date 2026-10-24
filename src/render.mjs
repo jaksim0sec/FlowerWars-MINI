@@ -75,7 +75,7 @@ function part(ctx, art, name, rotation = 0, dy = 0, clip = art.rig.parts[name].c
   const p = art.rig.parts[name];
   ctx.save();
   ctx.translate(p.x + p.w * p.origin[0], p.y + p.h * p.origin[1] + dy);
-  ctx.rotate(rotation);
+  ctx.rotate(rotation + (p.rotation || 0));
   if (clip) {
     ctx.beginPath();
     clip.forEach(([x, y], i) => {
@@ -90,12 +90,13 @@ function part(ctx, art, name, rotation = 0, dy = 0, clip = art.rig.parts[name].c
 
 function arm(ctx, art, name, rotation, weaponRotation = null) {
   const p = art.rig.parts[name];
+  rotation += p.rest_angle || 0;
   const shoulder = { x: p.x + p.w * p.origin[0], y: p.y + p.h * p.origin[1] };
   ctx.save();
   ctx.translate(shoulder.x, shoulder.y); ctx.rotate(rotation); ctx.translate(-shoulder.x, -shoulder.y);
   if (weaponRotation !== null) {
     const grip = { x: p.x + p.w * p.grip[0], y: p.y + p.h * p.grip[1] };
-    ctx.save(); ctx.translate(grip.x, grip.y); ctx.rotate(weaponRotation); ctx.translate(-grip.x, -grip.y);
+    ctx.save(); ctx.translate(grip.x, grip.y); ctx.rotate(weaponRotation + (art.rig.parts.basic_sword.rest_angle || 0)); ctx.translate(-grip.x, -grip.y);
     part(ctx, art, 'basic_sword'); ctx.restore();
   }
   part(ctx, art, name);
@@ -131,12 +132,11 @@ export function drawWarrior(ctx, art, unit, time) {
   part(ctx, art, 'leg_front', walking ? -stride * .16 : 0, walking ? -Math.max(0, -stride) * 18 : 0);
   ctx.translate(0, bob);
   if (attacking) ctx.translate(-Math.sin(unit.elapsed / .65 * Math.PI) * 15, 0);
-  // Both wrists hinge at the baked-in torso sleeves. The free hand tucks behind
-  // the tunic; the masked weapon hand stays in front so its palm covers the grip.
-  arm(ctx, art, 'hand_front', walking ? -stride * .055 : 0);
-  part(ctx, art, 'body');
+  // The weapon shoulder tucks behind the tunic; the free cuff rests in front.
   arm(ctx, art, 'hand_back', walking ? stride * .055 : attacking ? Math.sin(unit.elapsed / .65 * Math.PI) * .13 : 0,
     attacking ? swordPose(unit.elapsed, unit.attackVector) : Math.sin(time * 2.5 + unit.id) * .015);
+  part(ctx, art, 'body');
+  arm(ctx, art, 'hand_front', walking ? -stride * .055 : 0);
   ctx.save();
   ctx.translate(...art.rig.neck); ctx.rotate(Math.sin(time * 2.5 + unit.id) * .006);
   ctx.translate(-art.rig.neck[0], -art.rig.neck[1]);
