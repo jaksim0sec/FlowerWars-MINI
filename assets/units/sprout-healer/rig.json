@@ -1,0 +1,235 @@
+{
+  "id": "sprout-healer",
+  "version": 1,
+  "note": "Shares Gynari reference artboard, foot anchor and sprite roles. Torso contains sleeves; hand sprites contain only brown cuffs and palms. The recommended staff is separate equipment, never baked into body/hand.",
+  "canvas": {
+    "width": 1000,
+    "height": 1500
+  },
+  "foot": [
+    505,
+    1228
+  ],
+  "scale": 0.115,
+  "neck": [
+    514,
+    838
+  ],
+  "parts": {
+    "shadow": {
+      "asset": "shadow.webp",
+      "file_dimensions": [
+        300,
+        67
+      ],
+      "x": 190,
+      "y": 1157.5,
+      "w": 630,
+      "h": 141,
+      "origin": [
+        0.5,
+        0.5
+      ]
+    },
+    "leg_back": {
+      "asset": "leg_back.webp",
+      "file_dimensions": [
+        83,
+        77
+      ],
+      "x": 364,
+      "y": 1110,
+      "w": 115,
+      "h": 116,
+      "origin": [
+        0.5,
+        0.05
+      ]
+    },
+    "leg_front": {
+      "asset": "leg_front.webp",
+      "file_dimensions": [
+        76,
+        76
+      ],
+      "x": 565,
+      "y": 1113,
+      "w": 116,
+      "h": 114,
+      "origin": [
+        0.5,
+        0.05
+      ]
+    },
+    "body": {
+      "asset": "body.webp",
+      "file_dimensions": [
+        234,
+        188
+      ],
+      "x": 310,
+      "y": 805,
+      "w": 398,
+      "h": 338,
+      "origin": [
+        0.5,
+        0.12
+      ]
+    },
+    "hand_back": {
+      "asset": "hand_front.webp",
+      "file_dimensions": [
+        79,
+        67
+      ],
+      "x": 272,
+      "y": 956,
+      "w": 118,
+      "h": 100,
+      "origin": [
+        0.54,
+        0.38
+      ],
+      "grip": [
+        0.44,
+        0.8
+      ],
+      "rest_angle": 0.02
+    },
+    "hand_front": {
+      "asset": "hand_back.webp",
+      "file_dimensions": [
+        82,
+        68
+      ],
+      "x": 660,
+      "y": 960,
+      "w": 112,
+      "h": 101,
+      "origin": [
+        0.5,
+        0.4
+      ],
+      "rest_angle": 0
+    },
+    "head": {
+      "asset": "head.webp",
+      "file_dimensions": [
+        188,
+        184
+      ],
+      "x": 239,
+      "y": 313,
+      "w": 548,
+      "h": 535,
+      "origin": [
+        0.5,
+        0.95
+      ]
+    },
+    "head_deco": {
+      "asset": "head_deco.webp",
+      "file_dimensions": [
+        228,
+        177
+      ],
+      "x": 448,
+      "y": 310,
+      "w": 472,
+      "h": 394,
+      "origin": [
+        0.5,
+        0.7
+      ],
+      "front_clip": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    }
+  },
+  "equipment_anchor": {
+    "hand_back": {
+      "grip": [
+        0.44,
+        0.8
+      ],
+      "weapon_side": "left"
+    }
+  },
+  "recommended_equipment": {
+    "weapon": "sprout_staff",
+    "accessory": "sprout_satchel"
+  },
+  "optional_accessories": {
+    "sprout_staff": {
+      "asset": "../../equipment/weapons/sprout_staff.webp",
+      "file_dimensions": [
+        176,
+        220
+      ],
+      "x": 80,
+      "y": 631,
+      "w": 315,
+      "h": 470,
+      "origin": [
+        0.74,
+        0.78
+      ],
+      "role": "weapon",
+      "weapon_type": "staff"
+    },
+    "sprout_satchel": {
+      "asset": "../../equipment/accessories/sprout_satchel.webp",
+      "file_dimensions": [
+        160,
+        166
+      ],
+      "x": 607,
+      "y": 936,
+      "w": 215,
+      "h": 200,
+      "origin": [
+        0.4,
+        0.5
+      ],
+      "role": "accessory",
+      "draw_order": "behind_body"
+    }
+  },
+  "layer_order": [
+    "shadow",
+    "leg_back",
+    "leg_front",
+    "hand_back",
+    "body",
+    "hand_front",
+    "head_deco_back",
+    "head",
+    "head_deco_front"
+  ],
+  "animation_states": [
+    "idle",
+    "walk",
+    "attack",
+    "hit"
+  ],
+  "compatibility": {
+    "reference": "gynari-warrior/rig.json v5",
+    "requires_unit_type_rig_selection": true,
+    "weapon_is_equipment": true
+  }
+}
