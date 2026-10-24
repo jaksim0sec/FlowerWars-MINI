@@ -71,14 +71,14 @@ function diamond(ctx, x, y, fill, stroke = null, inset = 3) {
   if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = 2; ctx.stroke(); }
 }
 
-function part(ctx, art, name, rotation = 0, dy = 0) {
+function part(ctx, art, name, rotation = 0, dy = 0, clip = art.rig.parts[name].clip) {
   const p = art.rig.parts[name];
   ctx.save();
   ctx.translate(p.x + p.w * p.origin[0], p.y + p.h * p.origin[1] + dy);
   ctx.rotate(rotation);
-  if (p.clip) {
+  if (clip) {
     ctx.beginPath();
-    p.clip.forEach(([x, y], i) => {
+    clip.forEach(([x, y], i) => {
       const point = [(x - p.origin[0]) * p.w, (y - p.origin[1]) * p.h];
       if (i) ctx.lineTo(...point); else ctx.moveTo(...point);
     });
@@ -140,8 +140,11 @@ export function drawWarrior(ctx, art, unit, time) {
   ctx.save();
   ctx.translate(...art.rig.neck); ctx.rotate(Math.sin(time * 2.5 + unit.id) * .006);
   ctx.translate(-art.rig.neck[0], -art.rig.neck[1]);
-  part(ctx, art, 'head');
+  // The source includes rear petals/stem as well as the front leaf. Let the
+  // face occlude the rear pieces, then overlay only the leaf and its right tip.
   part(ctx, art, 'head_deco');
+  part(ctx, art, 'head');
+  part(ctx, art, 'head_deco', 0, 0, art.rig.parts.head_deco.front_clip);
   ctx.restore();
   ctx.restore();
 }

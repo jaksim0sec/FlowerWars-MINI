@@ -1,28 +1,20 @@
 {
   "id": "gynari-warrior",
-  "version": 2,
-  "note": "Assembly coordinates on a 1000x1500 artboard. The torso already contains sleeves. Wrist masks exclude the duplicate yellow sleeve in each hand source. Source images are unchanged.",
-  "canvas": { "width": 1000, "height": 1500 },
-  "foot": [530, 1308],
-  "scale": 0.125,
-  "neck": [520, 950],
+  "version": 3,
+  "note": "Original v1 part sizes restored. Only attachment positions, pivots and occlusion are corrected; approved source artwork is unchanged.",
+  "canvas": {"width": 1000, "height": 1500},
+  "foot": [530, 1248],
+  "scale": 0.115,
+  "neck": [512.9200000000001, 829.64],
   "parts": {
-    "shadow": { "asset": "shadow.webp", "file_dimensions": [300,67], "x": 270, "y": 1250, "w": 520, "h": 116, "origin": [0.5,0.5] },
-    "leg_back": { "asset": "leg_back.webp", "file_dimensions": [135,118], "x": 428, "y": 1217, "w": 104, "h": 91, "origin": [0.5,0.05] },
-    "leg_front": { "asset": "leg_front.webp", "file_dimensions": [132,135], "x": 548, "y": 1208, "w": 98, "h": 100, "origin": [0.5,0.05] },
-    "body": { "asset": "body.webp", "file_dimensions": [275,265], "x": 350, "y": 930, "w": 330, "h": 318, "origin": [0.5,0.12] },
-    "hand_back": {
-      "asset": "hand_front.webp", "file_dimensions": [136,155], "x": 330, "y": 975, "w": 115, "h": 131,
-      "origin": [0.58,0.47], "grip": [0.33,0.75],
-      "clip": [[0.3235,0.329],[0.831,0.619],[1,1],[0,1],[0,0.55]]
-    },
-    "hand_front": {
-      "asset": "hand_back.webp", "file_dimensions": [134,155], "x": 588, "y": 989, "w": 115, "h": 133,
-      "origin": [0.445,0.403],
-      "clip": [[0.2313,0.4968],[0.6567,0.3097],[1,0.62],[1,1],[0.2,1],[0,0.7]]
-    },
-    "basic_sword": { "asset": "../../equipment/weapons/basic_sword.webp", "file_dimensions": [235,218], "x": 172.95, "y": 885.27, "w": 260, "h": 241, "origin": [0.75,0.78] },
-    "head": { "asset": "head.webp", "file_dimensions": [280,269], "x": 292, "y": 516, "w": 460, "h": 442, "origin": [0.5,0.95] },
-    "head_deco": { "asset": "head_deco.webp", "file_dimensions": [336,264], "x": 255, "y": 414, "w": 530, "h": 416, "origin": [0.5,0.75] }
+    "shadow": {"asset": "shadow.webp", "file_dimensions": [300, 67], "x": 215, "y": 1177.5, "w": 630, "h": 141, "origin": [0.5, 0.5]},
+    "leg_back": {"asset": "leg_back.webp", "file_dimensions": [135, 118], "x": 405, "y": 1107, "w": 145, "h": 127, "origin": [0.5, 0.05]},
+    "leg_front": {"asset": "leg_front.webp", "file_dimensions": [132, 135], "x": 554, "y": 1094, "w": 151, "h": 154, "origin": [0.5, 0.05]},
+    "body": {"asset": "body.webp", "file_dimensions": [275, 265], "x": 320, "y": 801, "w": 371, "h": 358, "origin": [0.5, 0.12]},
+    "hand_back": {"asset": "hand_front.webp", "file_dimensions": [136, 155], "x": 262.43500000000006, "y": 811.2199999999999, "w": 192, "h": 222, "origin": [0.58, 0.47], "grip": [0.33, 0.75], "clip": [[0.3235, 0.329], [0.831, 0.619], [1, 1], [0, 1], [0, 0.55]]},
+    "hand_front": {"asset": "hand_back.webp", "file_dimensions": [134, 155], "x": 553.3199999999999, "y": 845.297, "w": 176, "h": 201, "origin": [0.445, 0.403], "clip": [[0.2313, 0.4968], [0.6567, 0.3097], [1, 0.62], [1, 1], [0.2, 1], [0, 0.7]]},
+    "basic_sword": {"asset": "../../equipment/weapons/basic_sword.webp", "file_dimensions": [235, 218], "x": 107.545, "y": 766.34, "w": 291, "h": 271, "origin": [0.75, 0.78]},
+    "head": {"asset": "head.webp", "file_dimensions": [280, 269], "x": 289, "y": 416, "w": 435, "h": 418, "origin": [0.5, 0.95]},
+    "head_deco": {"asset": "head_deco.webp", "file_dimensions": [336, 264], "x": 227, "y": 362, "w": 559, "h": 440, "origin": [0.5, 0.75], "front_clip": [[0.05, 0], [1, 0], [1, 1], [0.76, 1], [0.7, 0.85], [0.42, 0.73], [0.285, 0.55], [0.13, 0.32]]}
   }
 }

@@ -11,6 +11,7 @@ class RecordingCanvas {
   matrix = [1, 0, 0, 1, 0, 0];
   stack = [];
   draws = new Map();
+  order = [];
   clips = [];
   path = [];
   beginPath() { this.path = []; }
@@ -26,13 +27,29 @@ class RecordingCanvas {
     const [a0, b, c, d, x, y] = this.matrix, s = Math.sin(a), co = Math.cos(a);
     this.matrix = [a0 * co + c * s, b * co + d * s, c * co - a0 * s, d * co - b * s, x, y];
   }
-  drawImage(image, x, y, w, h) { this.draws.set(image, { matrix: [...this.matrix], x, y, w, h, clips:[...this.clips] }); }
+  drawImage(image, x, y, w, h) { this.order.push(image); this.draws.set(image, { matrix: [...this.matrix], x, y, w, h, clips:[...this.clips] }); }
   point(image, x, y) {
     const d = this.draws.get(image), m = d.matrix, px = d.x + x * d.w, py = d.y + y * d.h;
     return [m[0] * px + m[2] * py + m[4], m[1] * px + m[3] * py + m[5]];
   }
 }
 const artwork = { rig, parts: Object.fromEntries(Object.keys(rig.parts).map(name => [name, name])) };
+
+test('rendered silhouette retains the earlier torso, arm and boot proportions', () => {
+  const ctx = new RecordingCanvas();
+  drawWarrior(ctx, artwork, { id: 1, state: 'idle', facing: -1, elapsed: 0 }, 0);
+  const width = name => {
+    const a = ctx.point(name, 0, .5), b = ctx.point(name, 1, .5);
+    return Math.hypot(b[0] - a[0], b[1] - a[1]);
+  };
+  // The previous approved silhouette: a substantial tunic and full-size limbs,
+  // rather than a larger head above a shrunken torso and tiny wrists/boots.
+  for (const [name, min, max] of [['body', .84, .87], ['hand_back', .43, .45],
+    ['hand_front', .39, .42], ['leg_back', .32, .35], ['leg_front', .34, .36]]) {
+    const ratio = width(name) / width('head');
+    assert.ok(ratio >= min && ratio <= max, `${name}/head width ${ratio} changes the approved proportions`);
+  }
+});
 
 test('independent sword grip stays attached to the wrist through every pose and facing', () => {
   for (const facing of [-1, 1]) for (const state of ['idle', 'walk', 'attack', 'hit']) {
@@ -54,6 +71,18 @@ function contains(polygon, point) {
   }
   return inside;
 }
+
+test('rear ornament stays behind the face while the main leaf covers the crown', () => {
+  const ctx = new RecordingCanvas();
+  drawWarrior(ctx, artwork, { id: 0, state: 'idle', facing: -1, elapsed: 0 }, 0);
+  const head = ctx.order.indexOf('head');
+  assert.ok(ctx.order.indexOf('head_deco') < head, 'rear petal must be behind the face');
+  assert.ok(ctx.order.lastIndexOf('head_deco') > head, 'main leaf must cover the crown');
+  const clips = ctx.draws.get('head_deco').clips;
+  assert.ok(clips.some(p => !contains(p, ctx.point('head_deco', .2, .48))), 'rear stem must not paint over the face');
+  assert.ok(clips.some(p => !contains(p, ctx.point('head_deco', .26, .55))), 'stem edge must not protrude under the leaf');
+  assert.ok(clips.every(p => contains(p, ctx.point('head_deco', .6, .4))), 'main leaf must remain visible');
+});
 
 test('arms omit duplicate yellow shoulder caps while keeping the actual palms', () => {
   const ctx=new RecordingCanvas();
@@ -83,7 +112,7 @@ test('wrist roots meet the torso sleeve ends and the jaw meets the collar', () =
   for(const state of ['idle','walk','attack','hit']) for(const facing of [-1,1]) {
     const ctx=new RecordingCanvas();
     drawWarrior(ctx,artwork,{id:1,state,facing,elapsed:.3,attackVector:{x:facing*72,y:42}},.3);
-    for(const [hand,shoulder] of [['hand_back',[.145,.32]],['hand_front',[.88,.34]]]) {
+    for(const [hand,shoulder] of [['hand_back',[.145,.32]],['hand_front',[.84,.35]]]) {
       const root=ctx.point(hand,...rig.parts[hand].origin), sleeve=ctx.point('body',...shoulder);
       assert.ok(Math.hypot(root[0]-sleeve[0],root[1]-sleeve[1])<2,`${hand} detached at shoulder during ${state}`);
     }
