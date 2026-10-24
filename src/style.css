@@ -67,3 +67,11 @@ button:not(:disabled):active { transform: translateY(1px); }
   .camera-tools { flex-direction: row; bottom: 8px; right: max(10px, env(safe-area-inset-right)); border-radius: 14px; }
   .camera-tools button { width: 38px; height: 38px; } .tool-divider { width: 1px; height: 18px; } #zoom-value { padding: 0 2px; }
 }
+
+select {font:inherit;color:var(--ink);background:#fffaf0;border:1px solid var(--line);border-radius:8px;padding:8px;max-width:120px;}
+.chapter a {color:inherit;}
+@media(max-width:600px){.command-bar{grid-template-columns:1fr;}.actions{justify-content:flex-end;}.selection{min-height:25px;}.actions select{font-size:10px;max-width:100px;}.chapter{gap:5px;}}
+
+@media(max-width:600px){.command-bar{gap:3px;}.selection{min-height:19px;}.selection-icon{display:none;}.selection small{margin-top:0;}.actions button{height:36px;}.command-area{padding-top:5px;padding-bottom:max(6px,env(safe-area-inset-bottom));}}
+
+@media(max-width:600px){.command-bar{padding-top:3px;padding-bottom:3px;}}

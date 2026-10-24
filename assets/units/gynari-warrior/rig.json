@@ -1,20 +1,394 @@
 {
   "id": "gynari-warrior",
-  "version": 5,
+  "version": 6,
   "note": "Motif-based proportions and overlapping head ornament seam. Free wrist alpha is trimmed; original painted pixels are preserved.",
-  "canvas": {"width": 1000, "height": 1500},
-  "foot": [505, 1228],
+  "canvas": {
+    "width": 1000,
+    "height": 1500
+  },
+  "foot": [
+    505,
+    1228
+  ],
   "scale": 0.115,
-  "neck": [512.92, 829.64],
+  "neck": [
+    512.92,
+    829.64
+  ],
   "parts": {
-    "shadow": {"asset": "shadow.webp", "file_dimensions": [300, 67], "x": 190, "y": 1157.5, "w": 630, "h": 141, "origin": [0.5, 0.5]},
-    "leg_back": {"asset": "leg_back.webp", "file_dimensions": [135, 118], "x": 350, "y": 1120, "w": 115, "h": 100, "origin": [0.5, 0.05]},
-    "leg_front": {"asset": "leg_front.webp", "file_dimensions": [132, 135], "x": 563, "y": 1115, "w": 110, "h": 113, "origin": [0.5, 0.05]},
-    "body": {"asset": "body.webp", "file_dimensions": [275, 265], "x": 320, "y": 801, "w": 371, "h": 358, "origin": [0.5, 0.12]},
-    "hand_back": {"asset": "hand_front.webp", "file_dimensions": [136, 155], "x": 244.81, "y": 829.88, "w": 200, "h": 228, "origin": [0.58, 0.47], "grip": [0.33, 0.75], "rest_angle": 0.15, "clip": [[0.3235, 0.329], [0.831, 0.619], [1, 1], [0, 1], [0, 0.55]]},
-    "hand_front": {"asset": "hand_back.webp", "file_dimensions": [134, 155], "x": 553.98, "y": 837.2, "w": 185, "h": 214, "origin": [0.5, 0.5], "clip": [[0.28, 0.51], [0.62, 0.36], [0.69, 0.43], [1, 0.62], [1, 1], [0.2, 1], [0.31, 0.67]], "rest_angle": 0},
-    "basic_sword": {"asset": "../../equipment/weapons/basic_sword.webp", "file_dimensions": [235, 218], "x": 22.06, "y": 722.42, "w": 385, "h": 357, "origin": [0.75, 0.78], "rest_angle": 0.2},
-    "head": {"asset": "head.webp", "file_dimensions": [280, 269], "x": 238.92, "y": 308.9, "w": 548, "h": 526, "origin": [0.5, 0.95]},
-    "head_deco": {"asset": "head_deco.webp", "file_dimensions": [336, 264], "x": 212.5, "y": 259, "w": 655, "h": 515, "origin": [0.5, 0.75], "front_clip": [[0.05, 0], [1, 0], [1, 1], [0.76, 1], [0.7, 0.85], [0.42, 0.73], [0.285, 0.55], [0.13, 0.32]], "rotation": 0.183}
-  }
+    "shadow": {
+      "asset": "shadow.webp",
+      "file_dimensions": [
+        300,
+        67
+      ],
+      "x": 190,
+      "y": 1157.5,
+      "w": 630,
+      "h": 141,
+      "origin": [
+        0.5,
+        0.5
+      ]
+    },
+    "leg_back": {
+      "asset": "leg_back.webp",
+      "file_dimensions": [
+        135,
+        118
+      ],
+      "x": 350,
+      "y": 1120,
+      "w": 115,
+      "h": 100,
+      "origin": [
+        0.5,
+        0.05
+      ]
+    },
+    "leg_front": {
+      "asset": "leg_front.webp",
+      "file_dimensions": [
+        132,
+        135
+      ],
+      "x": 563,
+      "y": 1115,
+      "w": 110,
+      "h": 113,
+      "origin": [
+        0.5,
+        0.05
+      ]
+    },
+    "body": {
+      "asset": "body.webp",
+      "file_dimensions": [
+        275,
+        265
+      ],
+      "x": 320,
+      "y": 801,
+      "w": 371,
+      "h": 358,
+      "origin": [
+        0.5,
+        0.12
+      ]
+    },
+    "hand_back": {
+      "asset": "hand_front.webp",
+      "file_dimensions": [
+        136,
+        155
+      ],
+      "x": 244.81,
+      "y": 829.88,
+      "w": 200,
+      "h": 228,
+      "origin": [
+        0.58,
+        0.47
+      ],
+      "grip": [
+        0.33,
+        0.75
+      ],
+      "rest_angle": 0.15,
+      "clip": [
+        [
+          0.3235,
+          0.329
+        ],
+        [
+          0.831,
+          0.619
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          0.55
+        ]
+      ]
+    },
+    "hand_front": {
+      "asset": "hand_back.webp",
+      "file_dimensions": [
+        134,
+        155
+      ],
+      "x": 553.98,
+      "y": 837.2,
+      "w": 185,
+      "h": 214,
+      "origin": [
+        0.5,
+        0.5
+      ],
+      "clip": [
+        [
+          0.28,
+          0.51
+        ],
+        [
+          0.62,
+          0.36
+        ],
+        [
+          0.69,
+          0.43
+        ],
+        [
+          1,
+          0.62
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0.2,
+          1
+        ],
+        [
+          0.31,
+          0.67
+        ]
+      ],
+      "rest_angle": 0
+    },
+    "head": {
+      "asset": "head.webp",
+      "file_dimensions": [
+        280,
+        269
+      ],
+      "x": 238.92,
+      "y": 308.9,
+      "w": 548,
+      "h": 526,
+      "origin": [
+        0.5,
+        0.95
+      ]
+    },
+    "head_deco": {
+      "asset": "head_deco.webp",
+      "file_dimensions": [
+        336,
+        264
+      ],
+      "x": 212.5,
+      "y": 259,
+      "w": 655,
+      "h": 515,
+      "origin": [
+        0.5,
+        0.75
+      ],
+      "front_clip": [
+        [
+          0.05,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0.76,
+          1
+        ],
+        [
+          0.7,
+          0.85
+        ],
+        [
+          0.42,
+          0.73
+        ],
+        [
+          0.285,
+          0.55
+        ],
+        [
+          0.13,
+          0.32
+        ]
+      ],
+      "rotation": 0.183
+    }
+  },
+  "sockets": {
+    "left": {
+      "part": "hand_back",
+      "grip": [
+        0.33,
+        0.75
+      ],
+      "group": "leftArm"
+    },
+    "right": {
+      "part": "hand_front",
+      "grip": [
+        0.7,
+        0.77
+      ],
+      "group": "rightArm"
+    }
+  },
+  "twoHandedPoses": {
+    "hold": {
+      "primary": "left",
+      "nodes": {
+        "leftArm": {
+          "transforms": [
+            {
+              "pivot": [
+                360.81,
+                937.04
+              ],
+              "rotate": -0.35
+            }
+          ]
+        },
+        "rightArm": {
+          "transforms": [
+            {
+              "pivot": [
+                646.48,
+                944.2
+              ],
+              "rotate": 0.3
+            }
+          ]
+        }
+      }
+    }
+  },
+  "nodes": [
+    {
+      "part": "shadow"
+    },
+    {
+      "id": "recoil",
+      "transforms": [
+        {
+          "translate": [
+            "recoilX",
+            "recoilY"
+          ]
+        }
+      ],
+      "children": [
+        {
+          "part": "leg_back",
+          "rotation": "backLeg",
+          "dy": "backLift"
+        },
+        {
+          "part": "leg_front",
+          "rotation": "frontLeg",
+          "dy": "frontLift"
+        },
+        {
+          "id": "upper",
+          "transforms": [
+            {
+              "translate": [
+                "attackShift",
+                "bob"
+              ]
+            }
+          ],
+          "children": [
+            {
+              "id": "leftArm",
+              "transforms": [
+                {
+                  "pivot": [
+                    360.81,
+                    937.04
+                  ],
+                  "rotate": "leftArm"
+                }
+              ],
+              "children": [
+                {
+                  "socket": "left"
+                },
+                {
+                  "part": "hand_back"
+                }
+              ]
+            },
+            {
+              "part": "body"
+            },
+            {
+              "id": "rightArm",
+              "transforms": [
+                {
+                  "pivot": [
+                    646.48,
+                    944.2
+                  ],
+                  "rotate": "rightArm"
+                }
+              ],
+              "children": [
+                {
+                  "socket": "right"
+                },
+                {
+                  "part": "hand_front"
+                }
+              ]
+            },
+            {
+              "id": "neck",
+              "transforms": [
+                {
+                  "pivot": [
+                    512.92,
+                    829.64
+                  ],
+                  "rotate": "headTilt"
+                }
+              ],
+              "children": [
+                {
+                  "part": "head_deco"
+                },
+                {
+                  "part": "head"
+                },
+                {
+                  "part": "head_deco",
+                  "clip": "front_clip"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "animationProfile": "../../animations/humanoid.json",
+  "animations": {},
+  "worldTranslate": [
+    "lungeX",
+    "lungeY"
+  ]
 }

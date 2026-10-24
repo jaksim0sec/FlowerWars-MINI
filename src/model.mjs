@@ -59,9 +59,9 @@ export class Board {
       (u.x === x && u.y === y || u.path.some(p => p.x === x && p.y === y)));
   }
 
-  spawn(x, y) {
+  spawn(x, y, character = null) {
     if (!this.inside(x, y) || this.occupied(x, y)) return null;
-    const u = { id: this.nextId++, x, y, visualX: x, visualY: y,
+    const u = { character, id: this.nextId++, x, y, visualX: x, visualY: y,
       state: 'idle', elapsed: 0, facing: -1, path: [], target: null, hits: 0, impacted: false };
     this.units.push(u);
     return u;

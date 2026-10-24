@@ -1,3 +1,4 @@
+import {createCharacter,equip} from './characters/engine.mjs';
 import { Board, project, tileAt, zoomCamera, fitBoardCamera } from './model.mjs';
 import { loadArtwork, render } from './render.mjs';
 
@@ -33,10 +34,19 @@ function resize() {
   if (first || fitted || rotated) fit();
 }
 
+function newCharacter(id) {
+  if(!art) return null;
+  const instance=createCharacter(art.catalog,id);
+  // Demo UI chooses a loadout explicitly; the character factory stays unarmed.
+  const weapon=art.catalog.characters[id].recommendedWeapon;
+  if(weapon) equip(art.catalog,instance,weapon,'left');
+  return instance;
+}
+function unitName(unit) {return art?.catalog.characters[unit.character?.characterId]?.name || '개나리용사';}
 function seed() {
   board.reset();
-  board.spawn(2, 2);
-  const second = board.spawn(5, 3); second.facing = 1;
+  board.spawn(2, 2, newCharacter('gynari-warrior'));
+  const second = board.spawn(5, 3, newCharacter('sprout-healer')); second.facing = 1;
   view.selected = null; view.tile = null; view.hover = null; view.mode = 'move';
   previousBusy = false; previousHits = 0;
   refresh();
@@ -46,12 +56,13 @@ function refresh() {
   const unit = board.unit(view.selected);
   text('unit-count', `용사 ${board.units.length}`);
   text('zoom-value', `${Math.round(camera.scale * 100)}%`);
+  $('summon').setAttribute('aria-label',`${$('character-type').selectedOptions[0].textContent} 소환`);
   $('summon').setAttribute('aria-pressed', String(view.mode === 'summon'));
   $('attack').setAttribute('aria-pressed', String(view.mode === 'attack'));
   $('attack').disabled = !unit || board.busy;
   canvas.classList.toggle('summoning', view.mode === 'summon');
   if (unit) {
-    text('selection-name', `개나리용사 ${unit.id}`);
+    text('selection-name', `${unitName(unit)} ${unit.id}`);
     const action = { idle: '대기', walk: '이동 중', attack: '공격 중', hit: '피격' }[unit.state];
     text('selection-detail', `${unit.x + 1}, ${unit.y + 1} · ${action}${unit.hits ? ` · 피격 ${unit.hits}회` : ''}`);
   } else if (view.tile) {
@@ -68,7 +79,7 @@ function refresh() {
 function setMode(mode) {
   if (!art) return;
   view.mode = view.mode === mode ? 'move' : mode;
-  notify(view.mode === 'summon' ? '빈칸을 누르면 개나리용사가 찾아와요.' :
+  notify(view.mode === 'summon' ? `빈칸을 누르면 ${art.catalog.characters[$('character-type').value].name}가 찾아와요.` :
     view.mode === 'attack' ? '공격할 용사를 선택하세요. 멀리 있으면 걸어가서 공격해요.' :
       '용사를 선택하고 빈칸을 눌러 이동하세요.');
   refresh();
@@ -96,10 +107,10 @@ function activate(p, keyboardTile = null) {
   const target = keyboardTile ? board.at(tile.x, tile.y) : pickUnit(p) || (tile && board.at(tile.x, tile.y));
   if (view.mode === 'summon') {
     if (!tile) return;
-    const unit = board.spawn(tile.x, tile.y);
+    const unit = board.spawn(tile.x, tile.y,newCharacter($('character-type').value));
     if (!unit) { notify('다른 용사가 있거나 이동 중인 칸이에요. 빈칸을 선택하세요.'); return; }
     view.selected = unit.id; view.tile = tile; view.mode = 'move';
-    notify('개나리용사가 도착했어요. 빈칸을 누르면 걸어갑니다.');
+    notify(`${unitName(unit)}가 도착했어요. 빈칸을 누르면 걸어갑니다.`);
   } else if (target) {
     if (view.mode === 'attack' && view.selected !== target.id) {
       if (board.attack(view.selected, target.id)) {
@@ -186,7 +197,7 @@ canvas.addEventListener('keydown', event => {
     const [dx, dy] = directions[event.key], tile = view.tile || { x: 0, y: 0 };
     view.tile = { x: Math.min(board.width - 1, Math.max(0, tile.x + dx)), y: Math.min(board.height - 1, Math.max(0, tile.y + dy)) };
     const u = board.at(view.tile.x, view.tile.y);
-    notify(`${view.tile.x + 1}, ${view.tile.y + 1}번 칸${u ? ` · 개나리용사 ${u.id}` : ''}. Enter로 선택`);
+    notify(`${view.tile.x + 1}, ${view.tile.y + 1}번 칸${u ? ` · ${unitName(u)} ${u.id}` : ''}. Enter로 선택`);
     refresh();
   } else if (event.key === 'Enter' && view.tile) { event.preventDefault(); activate(null, view.tile); }
   else if (event.key.toLowerCase() === 's') setMode('summon');
@@ -196,6 +207,7 @@ canvas.addEventListener('keydown', event => {
   }
 });
 
+$('character-type').addEventListener('change',refresh);
 $('summon').addEventListener('click', () => setMode('summon'));
 $('attack').addEventListener('click', () => setMode('attack'));
 $('reset').addEventListener('click', () => { seed(); notify('처음의 두 용사로 돌아왔어요.'); });
@@ -212,7 +224,7 @@ new ResizeObserver(resize).observe(canvas);
 seed(); resize();
 
 loadArtwork().then(loaded => {
-  art = loaded;
+  art = loaded; seed();
   $('loading').hidden = true;
   notify('전장 준비 완료 · 용사를 선택하거나 빈칸에 소환해보세요.');
 }).catch(error => {
@@ -225,7 +237,7 @@ function frame(now) {
   if (art) {
     board.update(dt);
     const hits = board.units.reduce((n, u) => n + u.hits, 0);
-    if (hits > previousHits) notify('검이 명중했어요! 상대 용사가 충격에 반응합니다.');
+    if (hits > previousHits) notify('공격이 명중했어요! 상대 용사가 충격에 반응합니다.');
     else if (previousBusy && !board.busy) notify('동작 완료 · 다음 이동이나 공격을 선택하세요.');
     previousHits = hits; previousBusy = board.busy;
     refresh(); render(ctx, art, board, view, camera, width, height, dpr);

@@ -1,6 +1,6 @@
 {
   "id": "sprout-healer",
-  "version": 1,
+  "version": 2,
   "note": "Shares Gynari reference artboard, foot anchor and sprite roles. Torso contains sleeves; hand sprites contain only brown cuffs and palms. The recommended staff is separate equipment, never baked into body/hand.",
   "canvas": {
     "width": 1000,
@@ -231,5 +231,227 @@
     "reference": "gynari-warrior/rig.json v5",
     "requires_unit_type_rig_selection": true,
     "weapon_is_equipment": true
-  }
+  },
+  "nodes": [
+    {
+      "part": "shadow"
+    },
+    {
+      "id": "recoil",
+      "transforms": [
+        {
+          "translate": [
+            "recoilX",
+            "recoilY"
+          ]
+        }
+      ],
+      "children": [
+        {
+          "part": "leg_back",
+          "rotation": "backLeg",
+          "dy": "backLift"
+        },
+        {
+          "part": "leg_front",
+          "rotation": "frontLeg",
+          "dy": "frontLift"
+        },
+        {
+          "id": "upper",
+          "transforms": [
+            {
+              "translate": [
+                "attackShift",
+                "bob"
+              ]
+            }
+          ],
+          "children": [
+            {
+              "id": "leftArm",
+              "transforms": [
+                {
+                  "pivot": [
+                    335.72,
+                    994.0
+                  ],
+                  "rotate": "leftArm"
+                }
+              ],
+              "children": [
+                {
+                  "socket": "left"
+                },
+                {
+                  "part": "hand_back"
+                }
+              ]
+            },
+            {
+              "part": "body"
+            },
+            {
+              "id": "rightArm",
+              "transforms": [
+                {
+                  "pivot": [
+                    716.0,
+                    1000.4
+                  ],
+                  "rotate": "rightArm"
+                }
+              ],
+              "children": [
+                {
+                  "socket": "right"
+                },
+                {
+                  "part": "hand_front"
+                }
+              ]
+            },
+            {
+              "id": "neck",
+              "transforms": [
+                {
+                  "pivot": [
+                    514,
+                    838
+                  ],
+                  "rotate": "headTilt"
+                }
+              ],
+              "children": [
+                {
+                  "part": "head_deco"
+                },
+                {
+                  "part": "head"
+                },
+                {
+                  "part": "head_deco",
+                  "clip": "front_clip"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sockets": {
+    "left": {
+      "part": "hand_back",
+      "grip": [
+        0.44,
+        0.8
+      ],
+      "group": "leftArm"
+    },
+    "right": {
+      "part": "hand_front",
+      "grip": [
+        0.5,
+        0.75
+      ],
+      "group": "rightArm"
+    }
+  },
+  "twoHandedPoses": {
+    "hold": {
+      "primary": "left",
+      "nodes": {
+        "leftArm": {
+          "transforms": [
+            {
+              "pivot": [
+                335.72,
+                994.0
+              ],
+              "rotate": -0.35
+            }
+          ]
+        },
+        "rightArm": {
+          "transforms": [
+            {
+              "pivot": [
+                716.0,
+                1000.4
+              ],
+              "rotate": 0.3
+            }
+          ]
+        }
+      }
+    }
+  },
+  "animationProfile": "../../animations/humanoid.json",
+  "animations": {
+    "bob": [
+      "state",
+      "walk",
+      [
+        "*",
+        -1,
+        [
+          "*",
+          [
+            "abs",
+            "stride"
+          ],
+          7
+        ]
+      ],
+      [
+        "*",
+        "wave",
+        5
+      ]
+    ],
+    "leftArm": [
+      "+",
+      0.08,
+      [
+        "state",
+        "walk",
+        [
+          "*",
+          "stride",
+          0.04
+        ],
+        [
+          "state",
+          "attack",
+          [
+            "*",
+            [
+              "sin",
+              [
+                "*",
+                [
+                  "/",
+                  "elapsed",
+                  0.65
+                ],
+                3.141592653589793
+              ]
+            ],
+            -0.08
+          ],
+          0
+        ]
+      ]
+    ],
+    "headTilt": [
+      "*",
+      "wave",
+      0.009
+    ]
+  },
+  "worldTranslate": [
+    "lungeX",
+    "lungeY"
+  ]
 }

@@ -1,0 +1,15 @@
+{
+  "characters": {
+    "gynari-warrior": {
+      "name": "개나리용사",
+      "rig": "units/gynari-warrior/rig.json",
+      "recommendedWeapon": "basic_sword"
+    },
+    "sprout-healer": {
+      "name": "새싹힐러",
+      "rig": "units/sprout-healer/rig.json",
+      "recommendedWeapon": "sprout_staff"
+    }
+  },
+  "equipment": "equipment/catalog.json"
+}

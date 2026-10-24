@@ -11,7 +11,7 @@ Transparent image layers cut from an original generated sprite sheet, prepared f
 ## Rendering
 
 - Treat the **bottom of the feet** as the board cell pivot.
-- `rig.json` v5 matches the supplied character motif on a 1000×1500 artboard: a head slightly smaller than the reference relative to the tunic, a steeper leaf, compact cuffs and a wider short-boot stance. Preserve source image aspect ratios when resizing parts. Canvas assembly lives in `src/render.mjs`.
+- `rig.json` v6 matches the supplied character motif on a 1000×1500 artboard: a head slightly smaller than the reference relative to the tunic, a steeper leaf, compact cuffs and a wider short-boot stance. Preserve source image aspect ratios when resizing parts. Canvas assembly lives in `src/render.mjs`.
 - The torso already has yellow sleeves. The weapon-hand source still includes a yellow sleeve, while the free-hand source is trimmed to the wrist. Normalized `clip` polygons keep both draws within the cuff/palm boundary so no duplicate shoulder is drawn.
 - The free wrist mask also trims the two protruding ends of the old sleeve outline. Its image is tucked farther under the torso sleeve while its pivot stays at the same sleeve attachment, keeping the trimmed edge covered during motion.
 - `hand_back` and `hand_front` identify assembly roles; each role chooses the source image whose wrist points outward on that side.
@@ -23,3 +23,9 @@ Transparent image layers cut from an original generated sprite sheet, prepared f
 - Render board tilt separately. Do **not** skew characters with the board.
 
 Validate both facings and enlarged idle/walk/attack/hit poses when changing these coordinates. `tests/rig.test.mjs` covers motif silhouette proportions and arm order, head decoration occlusion, sleeve masks, shoulder/neck attachments, boot overlap and sword grip continuity. `tests/rig-browser.py` checks actual rendered pixels at the ornament seam and wrist outline in both facings and all four states. There is no separate rear-view artwork.
+
+## Character engine catalog
+
+`assets/characters.json` registers both independent rigs and the equipment catalog. Scene nodes, sockets, layering, shared animation profile and rig-specific overrides are defined in each rig JSON. Weapons are no longer character rig parts. `src/characters/engine.mjs` renders any registered rig without board imports.
+
+The sprout healer uses new leaf/robe SVG artwork and an independent rig, with face, wrist and boot artwork shared with the warrior. Its clover staff is a separate optional equipment asset. See `docs/character-engine.md`.

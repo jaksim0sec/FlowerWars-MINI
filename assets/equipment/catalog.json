@@ -1,0 +1,114 @@
+{
+  "basic_sword": {
+    "name": "기본 검",
+    "asset": "weapons/basic_sword.webp",
+    "w": 385,
+    "h": 357,
+    "grip": [
+      0.75,
+      0.78
+    ],
+    "rotation": 0.2,
+    "motion": "weapon",
+    "hands": 1,
+    "secondaryGrip": [
+      0.82,
+      0.87
+    ],
+    "twoHandedPose": "hold"
+  },
+  "clover_staff": {
+    "name": "클로버 지팡이",
+    "asset": "weapons/clover_staff.svg",
+    "w": 130,
+    "h": 490,
+    "grip": [
+      0.5,
+      0.68
+    ],
+    "secondaryGrip": [
+      0.5,
+      0.86
+    ],
+    "rotation": 0.18,
+    "motion": "weapon",
+    "hands": 1,
+    "twoHandedPose": "hold",
+    "animation": {
+      "weapon": [
+        "state",
+        "attack",
+        [
+          "*",
+          [
+            "sin",
+            [
+              "*",
+              [
+                "/",
+                "elapsed",
+                0.65
+              ],
+              3.141592653589793
+            ]
+          ],
+          -0.35
+        ],
+        [
+          "*",
+          "wave",
+          0.01
+        ]
+      ]
+    },
+    "socketRotations": {
+      "left": -0.32,
+      "right": 0.32
+    }
+  },
+  "sprout_staff": {
+    "name": "새싹 지팡이",
+    "asset": "weapons/sprout_staff.webp",
+    "w": 315,
+    "h": 470,
+    "grip": [
+      0.74,
+      0.78
+    ],
+    "secondaryGrip": [
+      0.82,
+      0.9
+    ],
+    "hands": 1,
+    "twoHandedPose": "hold",
+    "motion": "weapon",
+    "rotation": 0,
+    "animation": {
+      "weapon": [
+        "state",
+        "attack",
+        [
+          "*",
+          [
+            "sin",
+            [
+              "*",
+              [
+                "/",
+                "elapsed",
+                0.65
+              ],
+              3.141592653589793
+            ]
+          ],
+          -0.35
+        ],
+        [
+          "*",
+          "wave",
+          0.01
+        ]
+      ]
+    }
+  }
+}

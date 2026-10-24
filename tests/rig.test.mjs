@@ -5,6 +5,8 @@ import { drawWarrior } from '../src/render.mjs';
 
 const rig = JSON.parse(await readFile(new URL('../assets/units/gynari-warrior/rig.json', import.meta.url)));
 
+rig.animations={...JSON.parse(await readFile(new URL('../assets/animations/humanoid.json',import.meta.url))),...rig.animations};
+
 // A recording canvas implements affine transforms so tests inspect the actual
 // rendered attachment points, without replacing the renderer or artwork rig.
 class RecordingCanvas {
@@ -27,13 +29,17 @@ class RecordingCanvas {
     const [a0, b, c, d, x, y] = this.matrix, s = Math.sin(a), co = Math.cos(a);
     this.matrix = [a0 * co + c * s, b * co + d * s, c * co - a0 * s, d * co - b * s, x, y];
   }
+  transform(a,b,c,d,e,f) { const m=this.matrix; this.matrix=[m[0]*a+m[2]*b,m[1]*a+m[3]*b,m[0]*c+m[2]*d,m[1]*c+m[3]*d,m[0]*e+m[2]*f+m[4],m[1]*e+m[3]*f+m[5]]; }
   drawImage(image, x, y, w, h) { this.order.push(image); this.draws.set(image, { matrix: [...this.matrix], x, y, w, h, clips:[...this.clips] }); }
   point(image, x, y) {
     const d = this.draws.get(image), m = d.matrix, px = d.x + x * d.w, py = d.y + y * d.h;
     return [m[0] * px + m[2] * py + m[4], m[1] * px + m[3] * py + m[5]];
   }
 }
-const artwork = { rig, parts: Object.fromEntries(Object.keys(rig.parts).map(name => [name, name])) };
+const equipment=JSON.parse(await readFile(new URL('../assets/equipment/catalog.json',import.meta.url)));
+for(const [id,e] of Object.entries(equipment)) e.image=id;
+const images=Object.fromEntries(Object.keys(rig.parts).map(name=>[name,name]));
+const artwork={rig,parts:images,catalog:{characters:{'gynari-warrior':{rig,images}},equipment}};
 
 test('rendered silhouette matches the motif with compact arms and short boots', () => {
   const ctx = new RecordingCanvas();

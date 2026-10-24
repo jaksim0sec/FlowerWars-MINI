@@ -29,8 +29,8 @@ with sync_playwright() as p:
             if (sourceCtx.getImageData(x, y, 1, 1).data[3] > 10)
                 failures.push(`source asset: untrimmed wrist outline at ${x},${y}`);
         }
-        const wristArt = {...art, parts: Object.fromEntries(Object.keys(art.parts).map(
-            name => [name, name === 'hand_front' ? art.parts[name] : transparent]))};
+        const wristImages=Object.fromEntries(Object.keys(art.parts).map(name => [name,name==='hand_front'?art.parts[name]:transparent]));
+        const wristArt={...art,catalog:{...art.catalog,equipment:Object.fromEntries(Object.entries(art.catalog.equipment).map(([id,e])=>[id,{...e,image:transparent}])),characters:{...art.catalog.characters,'gynari-warrior':{...art.catalog.characters['gynari-warrior'],images:wristImages}}}};
         const alpha = (ctx, point) => ctx.getImageData(Math.floor(point.x), Math.floor(point.y), 1, 1).data[3];
         for (const facing of [-1, 1]) for (const state of ['idle', 'walk', 'attack', 'hit']) {
             for (const elapsed of [0, .1, .2, .3]) {

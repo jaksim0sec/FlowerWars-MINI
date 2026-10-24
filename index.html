@@ -11,7 +11,7 @@
 <body>
   <header class="masthead">
     <a class="brand" href="./" aria-label="도라가미 처음으로"><span class="brand-mark">✿</span><span>도라가미<small>DORAGAMI</small></span></a>
-    <div class="chapter"><span class="chapter-dot"></span> 첫 번째 전장<span class="chapter-divider">/</span><span id="unit-count">용사 2</span></div>
+    <div class="chapter"><a href="./characters.html">캐릭터 연구실</a><span class="chapter-dot"></span> 첫 번째 전장<span class="chapter-divider">/</span><span id="unit-count">용사 2</span></div>
   </header>
   <main id="battlefield">
     <canvas id="board" tabindex="0" role="application" aria-label="도라가미 전장. 드래그로 이동, 휠 또는 두 손가락으로 확대. 방향키로 타일 탐색, Enter로 선택, S로 소환 모드, A로 공격 모드."></canvas>
@@ -26,7 +26,7 @@
     <p id="notice" role="status" aria-live="polite">전장을 준비하고 있어요…</p>
     <div class="command-bar">
       <div class="selection"><img src="./assets/units/gynari-warrior/head_deco.webp" alt="" class="selection-icon"><div><strong id="selection-name">용사를 선택하세요</strong><small id="selection-detail">용사를 누른 뒤 원하는 칸으로 이동</small></div></div>
-      <div class="actions">
+      <div class="actions"><select id="character-type" aria-label="소환할 캐릭터"><option value="gynari-warrior">개나리용사</option><option value="sprout-healer">새싹힐러</option></select>
         <button id="summon" class="primary" aria-label="개나리용사 소환" aria-pressed="false"><span>＋</span> 소환</button>
         <button id="attack" aria-label="공격" aria-pressed="false" disabled><span>⚔</span> 공격</button>
         <button id="terrain" title="선택한 칸의 지형 변경" hidden>흙으로</button>

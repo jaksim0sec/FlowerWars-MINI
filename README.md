@@ -6,7 +6,7 @@ Vercel에서는 Framework Preset을 **Other**, Output Directory를 **.**으로 �
 
 플레이 방법:
 
-- **소환**을 누르고 빈칸을 선택합니다. 시작 시 시연용 용사 2명이 배치됩니다.
+- **소환**을 누르고 빈칸을 선택합니다. 시작 시 개나리용사와 새싹힐러가 배치됩니다. 캐릭터 선택으로 소환할 종류를 바꿀 수 있습니다.
 - 용사를 선택하고 빈칸을 누르면 다른 용사를 피해 한 칸씩 걸어갑니다.
 - **공격**을 누른 뒤 다른 용사를 선택합니다. 멀리 있으면 인접한 칸까지 이동한 뒤 검을 휘두릅니다. 검의 명중과 상대의 피격 반응이 연결됩니다.
 - 마우스/한 손가락 드래그로 보드 이동, 휠/두 손가락 핀치로 확대·축소합니다. 오른쪽 버튼으로 확대, 축소, 전장 맞춤을 할 수도 있습니다.
@@ -17,7 +17,9 @@ Vercel에서는 Framework Preset을 **Other**, Output Directory를 **.**으로 �
 구성:
 
 - `src/model.mjs`: 타일, 점유, 경로 탐색, 이동 보간, 명중 타이밍. 브라우저와 독립된 모델입니다.
-- `src/render.mjs`: 이미지 로딩, 원화의 타일 외곽 좌표 보정, 깊이 정렬, 발 기준 파츠 조립과 애니메이션. 원본 이미지 파일은 수정하지 않습니다.
+- `src/render.mjs`: 보드 타일 보정·깊이 정렬 및 캐릭터 엔진 호출.
+- `src/characters/`: 보드와 독립된 인스턴스·장비·리그·애니메이션·카탈로그. `characters.html`에서 같은 엔진으로 미리보기합니다.
+- 자세한 API와 확장 방법은 `docs/character-engine.md`를 참고하세요.
 - `src/app.mjs`: 포인터·터치·키보드 입력, 카메라, 선택과 최소 UI.
 - `assets/`: 기존 승인 이미지와 리그 메타데이터. 검은 손과 독립된 이미지로 유지합니다.
 - `legacy/index.html`: 이전 게임 원본 보관.
@@ -30,6 +32,7 @@ node --test tests/*.test.mjs
 BASE_URL=https://your-static-host.example python3 tests/browser.py
 BASE_URL=https://your-static-host.example python3 tests/mobile-layout.py
 BASE_URL=https://your-static-host.example python3 tests/rig-browser.py
+BASE_URL=https://your-static-host.example python3 tests/characters-browser.py
 ```
 
 브라우저 검증은 기본적으로 `/usr/bin/chromium`을 사용합니다. 다른 설치 경로는 `CHROMIUM`, 호스팅 주소는 `BASE_URL` 환경 변수로 지정할 수 있습니다. 데스크톱과 모바일 터치에서 소환·선택·실제 보행·공격·피격·드래그·핀치·초기화, 지형 변경, 이미지 누락 안내를 검사합니다. 모바일 레이아웃 검증은 다섯 화면 크기에서 확대·이동해도 전장이 헤더·조작부 영역을 침범하지 않는지, 화면 높이가 바뀌어도 배치가 유지되는지 검사합니다.
