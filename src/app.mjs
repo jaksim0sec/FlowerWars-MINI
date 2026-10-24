@@ -38,8 +38,8 @@ function newCharacter(id) {
   if(!art) return null;
   const instance=createCharacter(art.catalog,id);
   // Demo UI chooses a loadout explicitly; the character factory stays unarmed.
-  const weapon=art.catalog.characters[id].recommendedWeapon;
-  if(weapon) equip(art.catalog,instance,weapon,'left');
+  const config=art.catalog.characters[id], weapon=config.recommendedWeapon;
+  if(weapon) equip(art.catalog,instance,weapon,config.recommendedHand || 'left');
   return instance;
 }
 function unitName(unit) {return art?.catalog.characters[unit.character?.characterId]?.name || '개나리용사';}

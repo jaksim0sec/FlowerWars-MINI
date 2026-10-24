@@ -1,0 +1,366 @@
+{
+  "id": "roster-book-mage",
+  "version": 1,
+  "source": "source-reference.png",
+  "note": "Split from original roster PNG without repainting visible pixels. Same 3/4 facing, 1000x1500 artboard, [505,1228] foot anchor and per-hand sockets as gynari-warrior v6. Gaps underneath occluded equipment are not fully painted; restore before arbitrary equipment removal.",
+  "canvas": {
+    "width": 1000,
+    "height": 1500
+  },
+  "foot": [
+    505,
+    1228
+  ],
+  "scale": 0.115,
+  "neck": [
+    473.8,
+    769.36
+  ],
+  "parts": {
+    "leg_back": {
+      "asset": "leg_back.webp",
+      "file_dimensions": [
+        70,
+        49
+      ],
+      "x": 289.72,
+      "y": 1096.96,
+      "w": 218.4,
+      "h": 152.88,
+      "origin": [
+        0.5,
+        0.5
+      ]
+    },
+    "leg_front": {
+      "asset": "leg_front.webp",
+      "file_dimensions": [
+        50,
+        49
+      ],
+      "x": 539.32,
+      "y": 1100.08,
+      "w": 156.0,
+      "h": 152.88,
+      "origin": [
+        0.5,
+        0.5
+      ]
+    },
+    "head": {
+      "asset": "head.webp",
+      "file_dimensions": [
+        160,
+        118
+      ],
+      "x": 202.36,
+      "y": 466.72,
+      "w": 499.2,
+      "h": 368.16,
+      "origin": [
+        0.5,
+        0.5
+      ]
+    },
+    "head_deco": {
+      "asset": "head_deco.webp",
+      "file_dimensions": [
+        251,
+        187
+      ],
+      "x": 139.96,
+      "y": 192.16,
+      "w": 783.12,
+      "h": 583.44,
+      "origin": [
+        0.5,
+        0.5
+      ]
+    },
+    "hand_back": {
+      "asset": "hand_back.webp",
+      "file_dimensions": [
+        53,
+        44
+      ],
+      "x": 193.0,
+      "y": 944.08,
+      "w": 165.36,
+      "h": 137.28,
+      "origin": [
+        0.5,
+        0.5
+      ],
+      "grip": [
+        0.4151,
+        0.4545
+      ]
+    },
+    "hand_front": {
+      "asset": "hand_front.webp",
+      "file_dimensions": [
+        44,
+        50
+      ],
+      "x": 607.96,
+      "y": 928.48,
+      "w": 137.28,
+      "h": 156.0,
+      "origin": [
+        0.5,
+        0.5
+      ],
+      "grip": [
+        0.5682,
+        0.54
+      ]
+    },
+    "body": {
+      "asset": "body.webp",
+      "file_dimensions": [
+        210,
+        301
+      ],
+      "x": 139.96,
+      "y": 323.2,
+      "w": 655.2,
+      "h": 939.12,
+      "origin": [
+        0.5,
+        0.5
+      ]
+    },
+    "shadow": {
+      "asset": "shadow.webp",
+      "file_dimensions": [
+        300,
+        67
+      ],
+      "x": 190,
+      "y": 1157.5,
+      "w": 630,
+      "h": 141,
+      "origin": [
+        0.5,
+        0.5
+      ]
+    },
+    "satchel": {
+      "asset": "../../equipment/accessories/roster-book-mage_satchel.webp",
+      "file_dimensions": [
+        55,
+        72
+      ],
+      "x": 579.88,
+      "y": 984.64,
+      "w": 171.6,
+      "h": 224.64,
+      "origin": [
+        0.5,
+        0.5
+      ]
+    }
+  },
+  "sockets": {
+    "left": {
+      "part": "hand_back",
+      "grip": [
+        0.4151,
+        0.4545
+      ],
+      "group": "leftArm"
+    },
+    "right": {
+      "part": "hand_front",
+      "grip": [
+        0.5682,
+        0.54
+      ],
+      "group": "rightArm"
+    }
+  },
+  "twoHandedPoses": {
+    "hold": {
+      "primary": "left",
+      "nodes": {
+        "leftArm": {
+          "transforms": [
+            {
+              "pivot": [
+                252.28,
+                950.32
+              ],
+              "rotate": -0.35
+            }
+          ]
+        },
+        "rightArm": {
+          "transforms": [
+            {
+              "pivot": [
+                673.48,
+                953.44
+              ],
+              "rotate": 0.3
+            }
+          ]
+        }
+      }
+    }
+  },
+  "nodes": [
+    {
+      "part": "shadow"
+    },
+    {
+      "id": "recoil",
+      "transforms": [
+        {
+          "translate": [
+            "recoilX",
+            "recoilY"
+          ]
+        }
+      ],
+      "children": [
+        {
+          "part": "leg_back",
+          "rotation": "backLeg",
+          "dy": "backLift"
+        },
+        {
+          "part": "leg_front",
+          "rotation": "frontLeg",
+          "dy": "frontLift"
+        },
+        {
+          "id": "upper",
+          "transforms": [
+            {
+              "translate": [
+                "attackShift",
+                "bob"
+              ]
+            }
+          ],
+          "children": [
+            {
+              "part": "body"
+            },
+            {
+              "part": "satchel"
+            },
+            {
+              "id": "leftArm",
+              "transforms": [
+                {
+                  "pivot": [
+                    252.28,
+                    950.32
+                  ],
+                  "rotate": "leftArm"
+                }
+              ],
+              "children": [
+                {
+                  "socket": "left"
+                },
+                {
+                  "part": "hand_back"
+                }
+              ]
+            },
+            {
+              "id": "rightArm",
+              "transforms": [
+                {
+                  "pivot": [
+                    673.48,
+                    953.44
+                  ],
+                  "rotate": "rightArm"
+                }
+              ],
+              "children": [
+                {
+                  "socket": "right"
+                },
+                {
+                  "part": "hand_front"
+                }
+              ]
+            },
+            {
+              "id": "neck",
+              "transforms": [
+                {
+                  "pivot": [
+                    473.8,
+                    769.36
+                  ],
+                  "rotate": "headTilt"
+                }
+              ],
+              "children": [
+                {
+                  "part": "head"
+                },
+                {
+                  "part": "head_deco"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "animationProfile": "../../animations/humanoid.json",
+  "animations": {
+    "leftArm": [
+      "state",
+      "walk",
+      [
+        "*",
+        "stride",
+        0.05
+      ],
+      [
+        "state",
+        "attack",
+        [
+          "*",
+          "wave",
+          0.1
+        ],
+        0
+      ]
+    ],
+    "rightArm": [
+      "state",
+      "walk",
+      [
+        "*",
+        "stride",
+        -0.05
+      ],
+      0
+    ],
+    "headTilt": 0
+  },
+  "worldTranslate": [
+    "lungeX",
+    "lungeY"
+  ],
+  "reference_weapon_box": {
+    "x": 52.6,
+    "y": 700.72,
+    "w": 414.96,
+    "h": 355.68
+  },
+  "recommendedEquipment": {
+    "weapon": "roster_spellbook",
+    "hand": "left"
+  },
+  "recommendedHand": "left"
+}

@@ -1,0 +1,366 @@
+{
+  "id": "roster-banner-bearer",
+  "version": 1,
+  "source": "source-reference.png",
+  "note": "Split from original roster PNG without repainting visible pixels. Same 3/4 facing, 1000x1500 artboard, [505,1228] foot anchor and per-hand sockets as gynari-warrior v6. Gaps underneath occluded equipment are not fully painted; restore before arbitrary equipment removal.",
+  "canvas": {
+    "width": 1000,
+    "height": 1500
+  },
+  "foot": [
+    505,
+    1228
+  ],
+  "scale": 0.115,
+  "neck": [
+    589.24,
+    756.88
+  ],
+  "parts": {
+    "leg_back": {
+      "asset": "leg_back.webp",
+      "file_dimensions": [
+        56,
+        60
+      ],
+      "x": 305.32,
+      "y": 1043.92,
+      "w": 174.72,
+      "h": 187.2,
+      "origin": [
+        0.5,
+        0.5
+      ]
+    },
+    "leg_front": {
+      "asset": "leg_front.webp",
+      "file_dimensions": [
+        53,
+        63
+      ],
+      "x": 526.84,
+      "y": 1043.92,
+      "w": 165.36,
+      "h": 196.56,
+      "origin": [
+        0.5,
+        0.5
+      ]
+    },
+    "head": {
+      "asset": "head.webp",
+      "file_dimensions": [
+        162,
+        129
+      ],
+      "x": 277.24,
+      "y": 451.12,
+      "w": 505.44,
+      "h": 402.48,
+      "origin": [
+        0.5,
+        0.5
+      ]
+    },
+    "head_deco": {
+      "asset": "head_deco.webp",
+      "file_dimensions": [
+        172,
+        172
+      ],
+      "x": 395.8,
+      "y": 273.28,
+      "w": 536.64,
+      "h": 536.64,
+      "origin": [
+        0.5,
+        0.5
+      ]
+    },
+    "hand_back": {
+      "asset": "hand_back.webp",
+      "file_dimensions": [
+        50,
+        63
+      ],
+      "x": 158.68,
+      "y": 769.36,
+      "w": 156.0,
+      "h": 196.56,
+      "origin": [
+        0.5,
+        0.5
+      ],
+      "grip": [
+        0.44,
+        0.4921
+      ]
+    },
+    "hand_front": {
+      "asset": "hand_front.webp",
+      "file_dimensions": [
+        56,
+        58
+      ],
+      "x": 592.36,
+      "y": 919.12,
+      "w": 174.72,
+      "h": 180.96,
+      "origin": [
+        0.5,
+        0.5
+      ],
+      "grip": [
+        0.4286,
+        0.5862
+      ]
+    },
+    "body": {
+      "asset": "body.webp",
+      "file_dimensions": [
+        290,
+        318
+      ],
+      "x": 27.64,
+      "y": 210.88,
+      "w": 904.8,
+      "h": 992.16,
+      "origin": [
+        0.5,
+        0.5
+      ]
+    },
+    "shadow": {
+      "asset": "shadow.webp",
+      "file_dimensions": [
+        300,
+        67
+      ],
+      "x": 190,
+      "y": 1157.5,
+      "w": 630,
+      "h": 141,
+      "origin": [
+        0.5,
+        0.5
+      ]
+    },
+    "cape": {
+      "asset": "../../equipment/accessories/roster-banner-bearer_cape.webp",
+      "file_dimensions": [
+        83,
+        118
+      ],
+      "x": 586.12,
+      "y": 834.88,
+      "w": 258.96,
+      "h": 368.16,
+      "origin": [
+        0.5,
+        0.5
+      ]
+    }
+  },
+  "sockets": {
+    "left": {
+      "part": "hand_back",
+      "grip": [
+        0.44,
+        0.4921
+      ],
+      "group": "leftArm"
+    },
+    "right": {
+      "part": "hand_front",
+      "grip": [
+        0.4286,
+        0.5862
+      ],
+      "group": "rightArm"
+    }
+  },
+  "twoHandedPoses": {
+    "hold": {
+      "primary": "left",
+      "nodes": {
+        "leftArm": {
+          "transforms": [
+            {
+              "pivot": [
+                214.84,
+                813.04
+              ],
+              "rotate": -0.35
+            }
+          ]
+        },
+        "rightArm": {
+          "transforms": [
+            {
+              "pivot": [
+                636.04,
+                953.44
+              ],
+              "rotate": 0.3
+            }
+          ]
+        }
+      }
+    }
+  },
+  "nodes": [
+    {
+      "part": "shadow"
+    },
+    {
+      "id": "recoil",
+      "transforms": [
+        {
+          "translate": [
+            "recoilX",
+            "recoilY"
+          ]
+        }
+      ],
+      "children": [
+        {
+          "part": "leg_back",
+          "rotation": "backLeg",
+          "dy": "backLift"
+        },
+        {
+          "part": "leg_front",
+          "rotation": "frontLeg",
+          "dy": "frontLift"
+        },
+        {
+          "id": "upper",
+          "transforms": [
+            {
+              "translate": [
+                "attackShift",
+                "bob"
+              ]
+            }
+          ],
+          "children": [
+            {
+              "part": "cape"
+            },
+            {
+              "id": "leftArm",
+              "transforms": [
+                {
+                  "pivot": [
+                    214.84,
+                    813.04
+                  ],
+                  "rotate": "leftArm"
+                }
+              ],
+              "children": [
+                {
+                  "socket": "left"
+                },
+                {
+                  "part": "hand_back"
+                }
+              ]
+            },
+            {
+              "part": "body"
+            },
+            {
+              "id": "rightArm",
+              "transforms": [
+                {
+                  "pivot": [
+                    636.04,
+                    953.44
+                  ],
+                  "rotate": "rightArm"
+                }
+              ],
+              "children": [
+                {
+                  "socket": "right"
+                },
+                {
+                  "part": "hand_front"
+                }
+              ]
+            },
+            {
+              "id": "neck",
+              "transforms": [
+                {
+                  "pivot": [
+                    589.24,
+                    756.88
+                  ],
+                  "rotate": "headTilt"
+                }
+              ],
+              "children": [
+                {
+                  "part": "head"
+                },
+                {
+                  "part": "head_deco"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "animationProfile": "../../animations/humanoid.json",
+  "animations": {
+    "leftArm": [
+      "state",
+      "walk",
+      [
+        "*",
+        "stride",
+        0.05
+      ],
+      [
+        "state",
+        "attack",
+        [
+          "*",
+          "wave",
+          0.1
+        ],
+        0
+      ]
+    ],
+    "rightArm": [
+      "state",
+      "walk",
+      [
+        "*",
+        "stride",
+        -0.05
+      ],
+      0
+    ],
+    "headTilt": 0
+  },
+  "worldTranslate": [
+    "lungeX",
+    "lungeY"
+  ],
+  "reference_weapon_box": {
+    "x": 27.64,
+    "y": 104.8,
+    "w": 411.84,
+    "h": 1076.4
+  },
+  "recommendedEquipment": {
+    "weapon": "roster_banner",
+    "hand": "left"
+  },
+  "recommendedHand": "left"
+}

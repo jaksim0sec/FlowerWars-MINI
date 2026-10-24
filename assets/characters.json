@@ -9,6 +9,42 @@
       "name": "새싹힐러",
       "rig": "units/sprout-healer/rig.json",
       "recommendedWeapon": "sprout_staff"
+    },
+    "roster-banner-bearer": {
+      "name": "개나리 기수 (원화)",
+      "rig": "units/roster-banner-bearer/rig.json",
+      "recommendedWeapon": "roster_banner",
+      "recommendedHand": "left"
+    },
+    "roster-book-mage": {
+      "name": "개나리 마법사 (원화)",
+      "rig": "units/roster-book-mage/rig.json",
+      "recommendedWeapon": "roster_spellbook",
+      "recommendedHand": "left"
+    },
+    "roster-leaf-archer": {
+      "name": "낙엽궁수 (원화)",
+      "rig": "units/roster-leaf-archer/rig.json",
+      "recommendedWeapon": "roster_bow",
+      "recommendedHand": "right"
+    },
+    "roster-shield-knight": {
+      "name": "방패기사 (원화)",
+      "rig": "units/roster-shield-knight/rig.json",
+      "recommendedWeapon": "roster_shield",
+      "recommendedHand": "left"
+    },
+    "roster-sprout-healer": {
+      "name": "새싹힐러 (원화)",
+      "rig": "units/roster-sprout-healer/rig.json",
+      "recommendedWeapon": "roster_flower_staff",
+      "recommendedHand": "right"
+    },
+    "roster-sword-warrior": {
+      "name": "개나리용사 (원화)",
+      "rig": "units/roster-sword-warrior/rig.json",
+      "recommendedWeapon": "roster_sword",
+      "recommendedHand": "left"
     }
   },
   "equipment": "equipment/catalog.json"

@@ -1,0 +1,366 @@
+{
+  "id": "roster-sprout-healer",
+  "version": 1,
+  "source": "source-reference.png",
+  "note": "Split from original roster PNG without repainting visible pixels. Same 3/4 facing, 1000x1500 artboard, [505,1228] foot anchor and per-hand sockets as gynari-warrior v6. Gaps underneath occluded equipment are not fully painted; restore before arbitrary equipment removal.",
+  "canvas": {
+    "width": 1000,
+    "height": 1500
+  },
+  "foot": [
+    505,
+    1228
+  ],
+  "scale": 0.115,
+  "neck": [
+    370.84,
+    788.08
+  ],
+  "parts": {
+    "leg_back": {
+      "asset": "leg_back.webp",
+      "file_dimensions": [
+        75,
+        51
+      ],
+      "x": 183.64,
+      "y": 1090.72,
+      "w": 234.0,
+      "h": 159.12,
+      "origin": [
+        0.5,
+        0.5
+      ]
+    },
+    "leg_front": {
+      "asset": "leg_front.webp",
+      "file_dimensions": [
+        30,
+        56
+      ],
+      "x": 451.96,
+      "y": 1090.72,
+      "w": 93.6,
+      "h": 174.72,
+      "origin": [
+        0.5,
+        0.5
+      ]
+    },
+    "head": {
+      "asset": "head.webp",
+      "file_dimensions": [
+        158,
+        123
+      ],
+      "x": 74.44,
+      "y": 463.6,
+      "w": 492.96,
+      "h": 383.76,
+      "origin": [
+        0.5,
+        0.5
+      ]
+    },
+    "head_deco": {
+      "asset": "head_deco.webp",
+      "file_dimensions": [
+        179,
+        168
+      ],
+      "x": 90.04,
+      "y": 270.16,
+      "w": 558.48,
+      "h": 524.16,
+      "origin": [
+        0.5,
+        0.5
+      ]
+    },
+    "hand_back": {
+      "asset": "hand_back.webp",
+      "file_dimensions": [
+        49,
+        57
+      ],
+      "x": 65.08,
+      "y": 894.16,
+      "w": 152.88,
+      "h": 177.84,
+      "origin": [
+        0.5,
+        0.5
+      ],
+      "grip": [
+        0.4694,
+        0.5789
+      ]
+    },
+    "hand_front": {
+      "asset": "hand_front.webp",
+      "file_dimensions": [
+        42,
+        54
+      ],
+      "x": 567.4,
+      "y": 847.36,
+      "w": 131.04,
+      "h": 168.48,
+      "origin": [
+        0.5,
+        0.5
+      ],
+      "grip": [
+        0.5714,
+        0.4815
+      ]
+    },
+    "body": {
+      "asset": "body.webp",
+      "file_dimensions": [
+        269,
+        324
+      ],
+      "x": 61.96,
+      "y": 260.8,
+      "w": 839.28,
+      "h": 1010.88,
+      "origin": [
+        0.5,
+        0.5
+      ]
+    },
+    "shadow": {
+      "asset": "shadow.webp",
+      "file_dimensions": [
+        300,
+        67
+      ],
+      "x": 190,
+      "y": 1157.5,
+      "w": 630,
+      "h": 141,
+      "origin": [
+        0.5,
+        0.5
+      ]
+    },
+    "satchel": {
+      "asset": "../../equipment/accessories/roster-sprout-healer_satchel.webp",
+      "file_dimensions": [
+        57,
+        66
+      ],
+      "x": 127.48,
+      "y": 947.2,
+      "w": 177.84,
+      "h": 205.92,
+      "origin": [
+        0.5,
+        0.5
+      ]
+    }
+  },
+  "sockets": {
+    "left": {
+      "part": "hand_back",
+      "grip": [
+        0.4694,
+        0.5789
+      ],
+      "group": "leftArm"
+    },
+    "right": {
+      "part": "hand_front",
+      "grip": [
+        0.5714,
+        0.4815
+      ],
+      "group": "rightArm"
+    }
+  },
+  "twoHandedPoses": {
+    "hold": {
+      "primary": "left",
+      "nodes": {
+        "leftArm": {
+          "transforms": [
+            {
+              "pivot": [
+                105.64,
+                934.72
+              ],
+              "rotate": -0.35
+            }
+          ]
+        },
+        "rightArm": {
+          "transforms": [
+            {
+              "pivot": [
+                611.08,
+                875.44
+              ],
+              "rotate": 0.3
+            }
+          ]
+        }
+      }
+    }
+  },
+  "nodes": [
+    {
+      "part": "shadow"
+    },
+    {
+      "id": "recoil",
+      "transforms": [
+        {
+          "translate": [
+            "recoilX",
+            "recoilY"
+          ]
+        }
+      ],
+      "children": [
+        {
+          "part": "leg_back",
+          "rotation": "backLeg",
+          "dy": "backLift"
+        },
+        {
+          "part": "leg_front",
+          "rotation": "frontLeg",
+          "dy": "frontLift"
+        },
+        {
+          "id": "upper",
+          "transforms": [
+            {
+              "translate": [
+                "attackShift",
+                "bob"
+              ]
+            }
+          ],
+          "children": [
+            {
+              "id": "leftArm",
+              "transforms": [
+                {
+                  "pivot": [
+                    105.64,
+                    934.72
+                  ],
+                  "rotate": "leftArm"
+                }
+              ],
+              "children": [
+                {
+                  "socket": "left"
+                },
+                {
+                  "part": "hand_back"
+                }
+              ]
+            },
+            {
+              "part": "body"
+            },
+            {
+              "part": "satchel"
+            },
+            {
+              "id": "rightArm",
+              "transforms": [
+                {
+                  "pivot": [
+                    611.08,
+                    875.44
+                  ],
+                  "rotate": "rightArm"
+                }
+              ],
+              "children": [
+                {
+                  "socket": "right"
+                },
+                {
+                  "part": "hand_front"
+                }
+              ]
+            },
+            {
+              "id": "neck",
+              "transforms": [
+                {
+                  "pivot": [
+                    370.84,
+                    788.08
+                  ],
+                  "rotate": "headTilt"
+                }
+              ],
+              "children": [
+                {
+                  "part": "head"
+                },
+                {
+                  "part": "head_deco"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "animationProfile": "../../animations/humanoid.json",
+  "animations": {
+    "leftArm": [
+      "state",
+      "walk",
+      [
+        "*",
+        "stride",
+        0.05
+      ],
+      [
+        "state",
+        "attack",
+        [
+          "*",
+          "wave",
+          0.1
+        ],
+        0
+      ]
+    ],
+    "rightArm": [
+      "state",
+      "walk",
+      [
+        "*",
+        "stride",
+        -0.05
+      ],
+      0
+    ],
+    "headTilt": 0
+  },
+  "worldTranslate": [
+    "lungeX",
+    "lungeY"
+  ],
+  "reference_weapon_box": {
+    "x": 498.76,
+    "y": 419.92,
+    "w": 402.48,
+    "h": 814.32
+  },
+  "recommendedEquipment": {
+    "weapon": "roster_flower_staff",
+    "hand": "right"
+  },
+  "recommendedHand": "right"
+}

@@ -110,5 +110,113 @@
         ]
       ]
     }
+  },
+  "roster_banner": {
+    "name": "깃발 (원화)",
+    "asset": "weapons/roster_banner.webp",
+    "w": 411.84,
+    "h": 1076.4,
+    "grip": [
+      0.48485,
+      0.70725
+    ],
+    "rotation": 0,
+    "motion": 0,
+    "hands": 1,
+    "secondaryGrip": [
+      0.51985,
+      0.82725
+    ],
+    "twoHandedPose": "hold"
+  },
+  "roster_spellbook": {
+    "name": "마법책 (원화)",
+    "asset": "weapons/roster_spellbook.webp",
+    "w": 414.96,
+    "h": 355.68,
+    "grip": [
+      0.50376,
+      0.85963
+    ],
+    "rotation": 0,
+    "motion": 0,
+    "hands": 1,
+    "secondaryGrip": [
+      0.53876,
+      0.97963
+    ],
+    "twoHandedPose": "hold"
+  },
+  "roster_bow": {
+    "name": "활 (원화)",
+    "asset": "weapons/roster_bow.webp",
+    "w": 268.32,
+    "h": 817.44,
+    "grip": [
+      0.51162,
+      0.56488
+    ],
+    "rotation": 0,
+    "motion": "weapon",
+    "hands": 1,
+    "secondaryGrip": [
+      0.54662,
+      0.68488
+    ],
+    "twoHandedPose": "hold"
+  },
+  "roster_shield": {
+    "name": "방패 (원화)",
+    "asset": "weapons/roster_shield.webp",
+    "w": 449.28,
+    "h": 695.76,
+    "grip": [
+      0.52083,
+      0.74439
+    ],
+    "rotation": 0,
+    "motion": 0,
+    "hands": 1,
+    "secondaryGrip": [
+      0.55583,
+      0.86439
+    ],
+    "twoHandedPose": "hold"
+  },
+  "roster_flower_staff": {
+    "name": "꽃 지팡이 (원화)",
+    "asset": "weapons/roster_flower_staff.webp",
+    "w": 402.48,
+    "h": 814.32,
+    "grip": [
+      0.35658,
+      0.62452
+    ],
+    "rotation": 0,
+    "motion": "weapon",
+    "hands": 1,
+    "secondaryGrip": [
+      0.39158000000000004,
+      0.74452
+    ],
+    "twoHandedPose": "hold"
+  },
+  "roster_sword": {
+    "name": "검 (원화)",
+    "asset": "weapons/roster_sword.webp",
+    "w": 296.4,
+    "h": 521.04,
+    "grip": [
+      0.63155,
+      0.73652
+    ],
+    "rotation": 0,
+    "motion": "weapon",
+    "hands": 1,
+    "secondaryGrip": [
+      0.66655,
+      0.85652
+    ],
+    "twoHandedPose": "hold"
   }
 }
