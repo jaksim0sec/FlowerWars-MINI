@@ -97,7 +97,7 @@ export class Board {
     if(info)this.obstacles.set(index,{...info});else this.obstacles.delete(index);
     this.obstacleRevision++;this.navigation.invalidate();return true;
   }
-  cancelCommand(u) { if(u.command?.flow)this.flows[u.command.flow]--;if(u.state==='walk'&&!u.step)u.state='idle';u.command=null;u.target=null;u.guide=[];u.guideKey=null;u.recovery=null;u.yieldUntil=0;u.route=[];u.path=[];u.waitReason=null;u.retryAt=0;u.waitSince=null; }
+  cancelCommand(u) { if(u.command?.flow)this.flows[u.command.flow]--;if(u.state==='walk'&&!u.step)u.state='idle';u.command=null;u.target=null;u.guide=[];u.guideKey=null;u.staticSearch=null;u.recovery=null;u.yieldUntil=0;u.route=[];u.path=[];u.waitReason=null;u.retryAt=0;u.waitSince=null; }
   interrupt(u){
     this.cancelCommand(u);
     if(u.state==='attack'){u.strike=null;u.impacted=false;u.elapsed=0;u.state=u.step?'walk':'idle';}
@@ -122,7 +122,7 @@ export class Board {
   move(id,x,y,{replace=false,direct=false}={}) {
     const u=this.unit(id);
     if(!u||u.health.current<=0||!replace&&(u.state!=='idle'||u.step)||!this.inside(x,y)||this.navigation.blocked(y*this.width+x)||u.x===x&&u.y===y&&!u.step)return false;
-    const field=this.navigation.field(x,y);
+    const field=direct?null:this.navigation.field(x,y);
     if(field?.complete&&field.at(u.y*this.width+u.x)<0)return false;
     if(replace)this.interrupt(u);else this.cancelCommand(u);const flow=Math.abs(x-u.x)>=Math.abs(y-u.y)?(x>u.x?'east':'west'):(y>u.y?'south':'north');
     u.command={type:'move',x,y,flow,direct};this.flows[flow]++;this.navigation.plan(u);return true;

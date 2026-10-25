@@ -152,7 +152,7 @@ function runOrder(board,s,replace=false){
    if(!enemies.length){for(const u of units)board.interrupt(u);o.phase='complete';return;}
    board.batchCommands(()=>{for(const u of units){
      if(u.healing){if(u.command?.type==='attack')board.interrupt(u);continue;}
-     if(units.length>1&&u.id===commander(board,s)?.id){board.interrupt(u);continue;}
+     if(units.length>1&&u.id===commander(board,s)?.id){if(u.command)board.cancelCommand(u);continue;}
      if(u.command?.type==='attack'&&enemies.some(e=>e.id===u.command.target))continue;
      if(!replace&&(u.state!=='idle'||u.step))continue;
      const sorted=[...enemies].sort((a,b)=>(Math.abs(a.x-u.x)+Math.abs(a.y-u.y))-(Math.abs(b.x-u.x)+Math.abs(b.y-u.y))||a.id-b.id);

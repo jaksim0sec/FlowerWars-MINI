@@ -570,3 +570,14 @@ body{display:block;}
  .squad-compact-row .squad-option-row button{min-height:29px;}
  #squad-special{min-height:32px;}
 }
+
+/* Rounded command symbols, with the compact hierarchy and four-action layout. */
+.command-dock.is-expanded .quick-orders{gap:5px;}
+.quick-orders button{flex-direction:column;gap:3px;min-height:65px;background:transparent!important;padding:2px!important;border-radius:0;}
+.quick-orders button>.ui-icon{box-sizing:content-box;width:20px;height:20px;padding:11px;background:#fff9edf2!important;border-radius:50%;box-shadow:0 2px 7px #40331d15;}
+.quick-orders button[aria-pressed=true]>.ui-icon{background:#f2d38c!important;box-shadow:0 0 0 1px #bd934866;}
+.quick-orders button>.icon-label{font-size:10px;line-height:1.2;}
+.selection-actions button{border-radius:16px;}
+.platoon-fold{border-radius:50%;}
+.squad-card.is-selected .squad-portrait{border-radius:50%;background:#f2d38c66;}
+@media(max-width:700px){.quick-orders button{min-height:65px;}.squad-tools{bottom:calc(274px + env(safe-area-inset-bottom));}}

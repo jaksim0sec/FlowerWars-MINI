@@ -1,5 +1,6 @@
 import {mix} from './decision.mjs';
 import {tryHeal} from './healing.mjs';
+import {hasLineOfSight} from './combat.mjs';
 // Shared static distance fields + conservative one-step cooperative reservations.
 // No visual/camera state participates in navigation.
 export const SEARCH_BUDGET = 2048;
@@ -41,7 +42,7 @@ export class Navigation {
   }
   field(x,y,adjacent=false) {
     const reach=adjacent===true?{shape:'manhattan',range:1}:adjacent;
-    const key=`${x},${y},${reach?.shape||'point'},${reach?.range||0}`;
+    const key=`${x},${y},${reach?.shape||'point'},${reach?.range||0},${!!reach?.lineOfSight}`;
     if(this.fields.has(key)) {
       const f=this.fields.get(key);this.fields.delete(key);this.fields.set(key,f);this.stats.cacheHits++;this.work();return f;
     }
@@ -60,6 +61,7 @@ export class Navigation {
     const goal=this.index(x,y),seeds=reach?[]:[goal];
     if(reach)for(let dy=-reach.range;dy<=reach.range;dy++)for(let dx=-reach.range;dx<=reach.range;dx++) {
       if(!this.board.inside(x+dx,y+dy)||(reach.shape!=='king'&&Math.abs(dx)+Math.abs(dy)>reach.range))continue;
+      if(reach.lineOfSight&&!hasLineOfSight(this.board,{visualX:x+dx,visualY:y+dy},{visualX:x,visualY:y}))continue;
       seeds.push(this.index(x+dx,y+dy));
     }
     for(const n of seeds)if(n>=0&&!this.blocked(n)){f.distance[n]=0;f.queue[f.tail++]=n;}
@@ -132,6 +134,31 @@ export class Navigation {
     u.state='idle';u.path=[];u.waitReason=reason;u.waitSince??=this.board.time;
     u.retryAt=this.board.time+delay+(u.priorityKey%4)*.025;
   }
+  staticRoute(u,x,y,key){
+    const start=this.index(u.x,u.y),goal=this.index(x,y);
+    const heuristic=cell=>Math.abs(cell%this.board.width-x)+Math.abs(Math.floor(cell/this.board.width)-y);
+    if(u.staticSearch?.key!==key||u.staticSearch.start!==start)u.staticSearch={key,start,open:[{cell:start,g:0,f:heuristic(start)}],cost:new Map([[start,0]]),previous:new Map()};
+    const search=u.staticSearch;let count=0;
+    while(search.open.length&&this.remaining>0&&count++<128){
+      const current=search.open.shift();if(current.g!==search.cost.get(current.cell))continue;
+      this.consume();
+      if(current.cell===goal){
+        const path=[];let cell=goal;while(cell!==start){path.push(cell);cell=search.previous.get(cell);}
+        u.staticSearch=null;return path.reverse();
+      }
+      for(const n of this.neighbors(current.cell,u)){
+        if(n<0||this.blocked(n))continue;
+        const g=current.g+1;if(g>=(search.cost.get(n)??Infinity))continue;
+        search.cost.set(n,g);search.previous.set(n,current.cell);
+        const node={cell:n,g,f:g+heuristic(n)};
+        // Stable A* priority, preferring progress when estimates tie.
+        let low=0,high=search.open.length;while(low<high){const mid=(low+high)>>1,v=search.open[mid];if(v.f<node.f||v.f===node.f&&v.g>=node.g)low=mid+1;else high=mid;}
+        search.open.splice(low,0,node);
+      }
+    }
+    if(!search.open.length){u.staticSearch=null;return false;}
+    return null;
+  }
   plan(u) {
     const b=this.board;
     if(u.step||!['idle','walk'].includes(u.state))return;
@@ -140,17 +167,24 @@ export class Navigation {
     if(b.unit(u.id)!==u||u.health.current<=0||u.step||!['idle','walk'].includes(u.state))return;
     if(b.tryAutoAttack(u))return;
     const command=u.command;
-    if(!command||b.time<(u.retryAt||0))return;
+    if(!command)return;
     let {x,y}=command;
     if(command.type==='attack') {
       const target=b.unit(command.target);
       if(!target||target.health.current<=0){b.cancelCommand(u);return;}
       x=target.x;y=target.y;
-      if(b.inAttackRange(u,target,false)){b.beginAttack(u);return;}
+      if(b.inAttackRange(u,target)&&(!u.combat.lineOfSight||hasLineOfSight(b,u,target))){b.beginAttack(u);return;}
     } else if(u.x===x&&u.y===y){b.cancelCommand(u);return;}
+    if(b.time<(u.retryAt||0))return;
     const start=this.index(u.x,u.y),routeKey=`${x},${y},${b.obstacleRevision}`;
     if(u.guideKey!==routeKey) {
-      const field=this.field(x,y,command.type==='attack'?{shape:u.combat.shape,range:u.combat.range}:false);
+      if(command.direct&&b.obstacles.size){
+        const route=this.staticRoute(u,x,y,routeKey);
+        if(route===false){b.cancelCommand(u);u.waitReason='unreachable';return;}
+        if(!route){this.wait(u,'planning',NAV_INTERVAL);return;}
+        u.guide=route;u.guideKey=routeKey;u.route=[];
+      }else{
+      const field=this.field(x,y,command.type==='attack'?{shape:u.combat.shape,range:u.combat.range,lineOfSight:u.combat.lineOfSight}:false);
       if(!field||field.at(start)<0) {
         if(field?.complete){b.cancelCommand(u);u.waitReason='unreachable';}
         else this.wait(u,'planning',NAV_INTERVAL);
@@ -166,6 +200,7 @@ export class Navigation {
         u.guide.push(next);cell=next;
       }
       u.guideKey=routeKey;u.route=[];
+      }
     }
     const reached=u.guide.indexOf(start);
     if(reached>=0)u.guide.splice(0,reached+1);
