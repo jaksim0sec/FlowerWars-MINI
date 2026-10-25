@@ -47,3 +47,11 @@ test('socket orientation changes equipment without displacing its painted palm',
  const palm=point(d.matrix,(s.grip[0]-p.origin[0])*p.w,(s.grip[1]-p.origin[1])*p.h),anchor=point(l.equipmentDraws.left.matrix);
  assert.ok(Math.hypot(palm[0]-anchor[0],palm[1]-anchor[1])<1e-8);
 });
+test('left-hand bow and mage staff lift the palm and point away from the face',()=>{
+ for(const[id,key,tip]of [['archer','archer_bow',[.87,.02]],['clover-mage','clover_mage_staff',[.65,.08]]]){
+  const c=createCharacter(catalog,id),empty=point(layoutCharacter(catalog,c,0).sockets.left.matrix);
+  equip(catalog,c,key,'left');const l=layoutCharacter(catalog,c,0),palm=point(l.sockets.left.matrix),d=l.equipmentDraws.left,e=catalog.equipment[key];
+  assert.ok(palm[1]<empty[1]-20,`${id}: left palm retains the empty pose`);
+  assert.ok(point(d.matrix,(tip[0]-e.grip[0])*e.w,(tip[1]-e.grip[1])*e.h)[0]<palm[0]-30,`${id}: weapon points into the face`);
+ }
+});
