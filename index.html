@@ -20,6 +20,10 @@
       <span class="tool-divider"></span><button id="fit" aria-label="전장 맞춤" title="전장 맞춤">⌖</button>
     </div>
   </main>
+  <details id="debug-tools" class="debug-tools">
+    <summary aria-label="개발 및 디버그 도구">⚙ 디버그</summary>
+    <div class="debug-content">
+      <label class="debug-legacy"><input type="checkbox" id="legacy-controls-toggle"> 기존 하단 조작 바 표시</label>
   <details id="movement-lab" class="movement-lab">
     <summary>이동 테스트</summary>
     <div class="movement-options">
@@ -37,6 +41,17 @@
     <label>분대 유형<select id="group-type"><option value="mixed">혼성대</option><option value="assault">돌격대</option><option value="defense">철벽대</option><option value="ranged">궁병대</option><option value="mobile">기동대</option><option value="support">지원대</option></select></label>
     <button id="group-place">묶음 배치</button><small id="group-status">0개 부대 등록</small>
   </details>
+  <details id="field-tools" class="field-tools"><summary>전장 설정</summary>
+    <div class="movement-options"><label>가로 칸<input id="board-columns" type="number" min="4" max="256" value="10"></label><label>세로 칸<input id="board-rows" type="number" min="4" max="256" value="16"></label></div>
+    <button id="board-resize">크기 적용</button><p>병력·이동 목표를 벗어나는 축소는 제한됩니다.</p>
+    <button id="combat-enable">전체 공격 활성</button><button id="combat-disable">공격 중지</button>
+  </details>
+    </div>
+  </details>
+  <aside id="squad-roster" class="squad-roster" aria-label="분대 목록" hidden>
+    <div class="squad-roster-head"><strong>분대 지휘</strong><output id="squad-roster-count">0</output></div>
+    <div id="squad-roster-list" class="squad-roster-list" role="list"></div>
+  </aside>
   <details id="squad-tools" class="squad-tools" hidden><summary>분대 명령</summary>
     <strong id="squad-name"></strong><small id="squad-status"></small>
     <div class="squad-controls">
@@ -49,13 +64,9 @@
     </div>
     <button id="squad-execute">명령 실행</button><small>목표가 필요한 명령은 전장에서 칸이나 상대 분대를 선택하세요.</small>
   </details>
-  <details id="field-tools" class="field-tools"><summary>전장 설정</summary>
-    <div class="movement-options"><label>가로 칸<input id="board-columns" type="number" min="4" max="256" value="10"></label><label>세로 칸<input id="board-rows" type="number" min="4" max="256" value="16"></label></div>
-    <button id="board-resize">크기 적용</button><p>병력·이동 목표를 벗어나는 축소는 제한됩니다.</p>
-    <button id="combat-enable">전체 공격 활성</button><button id="combat-disable">공격 중지</button>
-  </details>
-  <footer class="command-area">
-    <p id="notice" role="status" aria-live="polite">전장을 준비하고 있어요…</p>
+
+  <p id="notice" role="status" aria-live="polite">전장을 준비하고 있어요…</p>
+  <footer class="command-area" hidden>
     <div class="command-bar">
       <div class="selection"><img src="./assets/units/shield-guard/head_deco_overlay.png" alt="" class="selection-icon"><div><strong id="selection-name">용사를 선택하세요</strong><small id="selection-health" aria-live="polite"></small><small id="selection-combat" hidden></small><small id="selection-detail">용사를 누른 뒤 원하는 칸으로 이동</small></div></div>
       <div class="actions"><select id="character-type" aria-label="소환할 캐릭터"><option value="shield-guard">개나리 방패병</option></select>
