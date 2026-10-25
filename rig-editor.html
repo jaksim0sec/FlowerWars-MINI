@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>도라가미 · 리그 편집기</title><link rel="stylesheet" href="./src/characters/rig-editor.css"></head><body>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>도라가미 · 리그 편집기</title><link rel="stylesheet" href="./src/characters/rig-editor.css"><link rel="manifest" href="./manifest.json"><link rel="apple-touch-icon" href="./assets/icons/icon-192.png"></head><body>
 <header><a href="./characters.html">← 캐릭터 연구실</a><h1>리그 편집기</h1><span id="save-state" role="status">준비 중…</span></header>
 <nav aria-label="캐릭터 순서"><button id="previous" aria-label="이전 캐릭터">←</button><select id="character" aria-label="편집할 캐릭터"></select><button id="next" aria-label="다음 캐릭터">→</button><span id="progress"></span><button id="done">조정 완료 · 다음</button></nav>
 <main>
@@ -18,4 +18,4 @@
 <div class="actions"><button id="export-one">이 캐릭터 JSON 내보내기</button><button id="export-all" class="primary">전체 JSON 내보내기</button><label class="file">JSON 불러오기<input id="import" type="file" accept="application/json,.json"></label><button id="reset">이 캐릭터 원본 복원</button></div>
 <p id="message" role="status" aria-live="polite"></p><p class="hint">수정값은 브라우저에 임시 저장됩니다. 다른 기기에서 이어 하거나 최종 전달할 때는 JSON을 내보내세요.</p>
 </aside>
-</main><script type="module" src="./src/characters/rig-editor.mjs"></script></body></html>
+</main><script type="module" src="./src/characters/rig-editor.mjs"></script><script type="module" src="./src/offline.mjs"></script></body></html>
