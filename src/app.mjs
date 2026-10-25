@@ -49,7 +49,7 @@ function seed() {
   board.reset();
   const ids=art?visibleCharacters(art.catalog).map(([id])=>id):[];
   if(ids[0]) board.spawn(2, 2, newCharacter(ids[0]));
-  if(ids[1]) {const second=board.spawn(5, 3, newCharacter(ids[1]));second.facing=1;}
+  if(ids[1]) {const second=board.spawn(3, 5, newCharacter(ids[1]));second.facing=1;}
   view.selected = null; view.tile = null; view.hover = null; view.mode = 'move';
   previousBusy = false; previousHits = 0;
   refresh();
