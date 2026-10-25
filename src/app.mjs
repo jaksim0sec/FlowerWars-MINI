@@ -1,7 +1,8 @@
+import {setupMovementScenario,startMovementScenario,movementStats} from './movement-scenarios.mjs';
 import {healthLabel} from './characters/vitality.mjs';
 import {createCharacter,equip} from './characters/engine.mjs';
 import {visibleCharacters} from './characters/catalog.mjs';
-import { Board, project, tileAt, zoomCamera, fitBoardCamera } from './model.mjs';
+import { Board, BOARD_COLUMNS, BOARD_ROWS, project, tileAt, zoomCamera, fitBoardCamera } from './model.mjs';
 import { loadArtwork, render } from './render.mjs';
 
 const $ = id => document.getElementById(id);
@@ -13,6 +14,7 @@ let width = 0, height = 0, dpr = 1, art = null;
 let lastFrame = 0, previousBusy = false, previousHits = 0;
 let lastDraw=0,visibleCount=0,lastCamera='',cameraChanged=0,lastVisual='',cameraSettled=true;
 let fitted = true;
+let movementScenario=null,lastLabUpdate=0;
 const pointers = new Map();
 let origin = null, gestureMoved = false;
 
@@ -49,7 +51,8 @@ function newCharacter(id) {
 }
 function unitName(unit) {return art?.catalog.characters[unit.character?.characterId]?.name || '용사';}
 function seed() {
-  board.reset();
+  board.width=BOARD_COLUMNS;board.height=BOARD_ROWS;board.reset();movementScenario=null;
+  $('movement-start').disabled=true;
   const ids=art?visibleCharacters(art.catalog).map(([id])=>id):[];
   if(ids[0]) board.spawn(2, 2, newCharacter(ids[0]));
   if(ids[1]) {const second=board.spawn(3, 5, newCharacter(ids[1]));second.facing=1;}
@@ -69,12 +72,12 @@ function refresh(invalidate=true) {
   $('summon').setAttribute('aria-label',`${$('character-type').selectedOptions[0].textContent} 소환`);
   $('summon').setAttribute('aria-pressed', String(view.mode === 'summon'));
   $('attack').setAttribute('aria-pressed', String(view.mode === 'attack'));
-  $('attack').disabled = !unit || board.busy;
+  $('attack').disabled = !unit || unit.state!=='idle' || !!unit.step;
   canvas.classList.toggle('summoning', view.mode === 'summon');
   if (unit) {
     text('selection-name', `${unitName(unit)} ${unit.id}`);
     const action = { idle: '대기', walk: '이동 중', attack: '공격 중', hit: '피격', death:'쓰러짐' }[unit.state];
-    text('selection-detail', `${unit.x + 1}, ${unit.y + 1} · ${action}${unit.hits ? ` · 피격 ${unit.hits}회` : ''}`);
+    text('selection-detail', `${unit.x + 1}, ${unit.y + 1} · ${unit.waitReason?'경로 대기':action}${unit.hits ? ` · 피격 ${unit.hits}회` : ''}`);
   } else if (view.tile) {
     text('selection-name', `${view.tile.x + 1}, ${view.tile.y + 1}번 칸`);
     text('selection-detail', board.terrain[view.tile.y][view.tile.x] === 'grass' ? '잔디 블럭' : '흙 블럭');
@@ -126,7 +129,7 @@ function activate(p, keyboardTile = null) {
     if (view.mode === 'attack' && view.selected !== target.id) {
       if (board.attack(view.selected, target.id)) {
         view.mode = 'move'; notify('목표를 향해 갑니다.');
-      } else notify(board.busy ? '지금 동작이 끝난 뒤 다시 선택하세요.' : '그 용사에게 다가갈 길이 없어요.');
+      } else notify('선택한 용사의 동작이나 접근 경로를 확인하세요.');
     } else {
       view.selected = target.id; view.tile = { x: target.x, y: target.y };
       view.mode = 'move'; notify('빈칸으로 이동하거나 공격 버튼을 눌러 대상을 선택하세요.');
@@ -135,7 +138,7 @@ function activate(p, keyboardTile = null) {
     view.tile = tile;
     if (view.selected && view.mode === 'move') {
       if (board.move(view.selected, tile.x, tile.y)) notify('한 걸음씩 이동하고 있어요.');
-      else notify(board.busy ? '지금 동작이 끝난 뒤 다시 선택하세요.' : '그 칸으로 갈 길이 없어요.');
+      else notify('선택한 용사의 동작이나 이동 경로를 확인하세요.');
     } else if (view.mode === 'attack') notify('공격할 용사를 선택하세요.');
     else notify('이 칸의 지형을 바꾸거나 소환 버튼으로 용사를 놓아보세요.');
   } else {
@@ -212,7 +215,7 @@ canvas.addEventListener('keydown', event => {
     refresh();
   } else if (event.key === 'Enter' && view.tile) { event.preventDefault(); activate(null, view.tile); }
   else if (event.key.toLowerCase() === 's') setMode('summon');
-  else if (event.key.toLowerCase() === 'a' && view.selected && !board.busy) setMode('attack');
+  else if (event.key.toLowerCase() === 'a' && view.selected && !$('attack').disabled) setMode('attack');
   else if (event.key === 'Escape') {
     view.mode = 'move'; view.selected = null; view.tile = null; refresh(); notify('선택을 해제했어요.');
   }
@@ -221,13 +224,31 @@ canvas.addEventListener('keydown', event => {
 $('character-type').addEventListener('change',refresh);
 $('summon').addEventListener('click', () => setMode('summon'));
 $('attack').addEventListener('click', () => setMode('attack'));
-$('reset').addEventListener('click', () => { seed(); notify('처음의 두 용사로 돌아왔어요.'); });
+$('reset').addEventListener('click', () => { seed(); fit(); updateMovementStats();notify('처음의 두 용사로 돌아왔어요.'); });
 $('terrain').addEventListener('click', () => {
   if (!view.tile) return;
   const { x, y } = view.tile;
   board.setTerrain(x,y,board.terrain[y][x] === 'grass' ? 'soil' : 'grass');
   refresh(); notify('선택한 칸의 지형을 바꿨어요.');
 });
+function updateMovementStats() {
+  if(!movementScenario){text('movement-stats','배치 → 동시 이동 · 기존 전장 교체');return;}
+  const s=movementStats(board,movementScenario);
+  text('movement-stats',`이동 ${s.moving} · 대기 ${s.waiting} · 도착 ${s.arrived}/${s.total}\nBFS ${s.fieldBuilds} · 우회 ${s.detours} · 탐색 ${s.lastExpansions}/2048`);
+}
+$('movement-setup').addEventListener('click',()=>{
+  if(!art)return;
+  const ids=visibleCharacters(art.catalog).map(([id])=>id);
+  movementScenario=setupMovementScenario(board,$('movement-scenario').value,$('movement-count').value,i=>newCharacter(ids[i%ids.length]));
+  view.selected=null;view.tile=null;view.hover=null;view.mode='move';previousHits=0;previousBusy=false;
+  $('movement-start').disabled=false;fit();updateMovementStats();notify('배치 완료 · 동시 이동으로 시작');
+});
+$('movement-start').addEventListener('click',()=>{
+  const count=startMovementScenario(board,movementScenario);$('movement-start').disabled=true;
+  refresh();updateMovementStats();notify(`${count}개체 동시 이동 · 막히면 대기·우회`);
+});
+$('movement-default').addEventListener('click',()=>{seed();fit();updateMovementStats();notify('기본 전장 복원');});
+$('movement-lab').addEventListener('toggle',updateMovementStats);
 $('zoom-in').addEventListener('click', () => { camera = zoomCamera(camera, { x: width / 2, y: height / 2 }, 1.2); fitted = false; refresh(); });
 $('zoom-out').addEventListener('click', () => { camera = zoomCamera(camera, { x: width / 2, y: height / 2 }, 1 / 1.2); fitted = false; refresh(); });
 $('fit').addEventListener('click', fit);
@@ -238,7 +259,7 @@ loadArtwork().then(loaded => {
   art = loaded;
   $('character-type').replaceChildren(...visibleCharacters(art.catalog).map(([id,def])=>new Option(def.name,id)));
   seed();
-  $('loading').hidden = true;
+  $('loading').hidden = true;$('movement-setup').disabled=false;
   notify('전장 준비 완료 · 용사를 선택하거나 빈칸에 소환해보세요.');
 }).catch(error => {
   text('loading', error.message); notify('에셋을 확인해주세요. 원본 이미지가 필요합니다.');
@@ -251,12 +272,13 @@ function frame(now) {
     board.update(dt);
     const hits = board.units.reduce((n, u) => n + u.hits, 0);
     if (hits > previousHits) notify('공격이 명중했어요! 상대 용사가 충격에 반응합니다.');
-    else if (previousBusy && !board.busy) notify('동작 완료 · 다음 이동이나 공격을 선택하세요.');
+    else if (previousBusy && !board.busy && !board.units.some(u=>u.command)) notify('동작 완료 · 다음 이동이나 공격을 선택하세요.');
     previousHits = hits; previousBusy = board.busy;
     refresh(false);
+    if($('movement-lab').open&&now-lastLabUpdate>=250){updateMovementStats();lastLabUpdate=now;}
     const cameraKey=[camera.x,camera.y,camera.scale].join(',');
     if(cameraKey!==lastCamera){cameraChanged=now;lastCamera=cameraKey;dirty=true;cameraSettled=false;}
-    const visual=[view.selected,view.tile?.x,view.tile?.y,view.hover?.x,view.hover?.y,view.mode,board.units.length,board.terrainRevision,width,height,dpr].join(',');
+    const visual=[view.selected,view.tile?.x,view.tile?.y,view.hover?.x,view.hover?.y,view.mode,board.units.length,board.terrainRevision,board.obstacleRevision,width,height,dpr].join(',');
     if(visual!==lastVisual){lastVisual=visual;dirty=true;}
     const cameraMoving=now-cameraChanged<120;
     if(!cameraMoving&&!cameraSettled)dirty=true;

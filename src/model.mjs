@@ -1,3 +1,4 @@
+import {Navigation,NAV_INTERVAL} from './navigation.mjs';
 import {createHealth,advanceHealth,DEATH_DURATION} from './characters/vitality.mjs';
 export const HALF_W = 72;
 export const HALF_H = 42;
@@ -36,9 +37,6 @@ export function fitBoardCamera(width, height, columns = BOARD_COLUMNS, rows = BO
     y: height / 2 - (top + bottom) / 2 * scale, scale };
 }
 
-const key = (x, y) => `${x},${y}`;
-const neighbors = (x, y) => [[x + 1, y], [x, y + 1], [x - 1, y], [x, y - 1]];
-
 /** Deterministic command model. No timers, DOM, AI or victory rules. */
 export class Board {
   constructor(width = BOARD_COLUMNS, height = BOARD_ROWS) {
@@ -49,7 +47,10 @@ export class Board {
 
   reset() {
     this.terrainRevision=(this.terrainRevision||0)+1;
-    this.units = []; this.effects = []; this.nextId = 1; this.time = 0;
+    this.units = []; this.byId=new Map(); this.cells=new Map(); this.reservations=new Map();
+    this.flows={east:0,west:0,south:0,north:0};
+    this.obstacles=new Map();this.obstacleRevision=0;this.navClock=0;this.navigation=new Navigation(this);
+    this.effects = []; this.nextId = 1; this.time = 0;
     this.terrain = Array.from({ length: this.height }, (_, y) =>
       Array.from({ length: this.width }, (_, x) => (x === 3 || x === 4 || y === 2 && x > 1 && x < 6) ? 'soil' : 'grass'));
   }
@@ -59,70 +60,51 @@ export class Board {
     return true;
   }
   inside(x, y) { return Number.isInteger(x) && Number.isInteger(y) && x >= 0 && y >= 0 && x < this.width && y < this.height; }
-  unit(id) { return this.units.find(u => u.id === id); }
-  at(x, y) { return this.units.find(u => u.health.current>0 && u.x === x && u.y === y); }
+  unit(id) { return this.byId.get(id); }
+  at(x, y) { const u=this.unit(this.cells.get(y*this.width+x));return u?.health.current>0?u:undefined; }
   get busy() { return this.units.some(u => u.state !== 'idle' && u.state !== 'death'); }
-
-  occupied(x, y, except = null) {
-    return this.units.some(u => u.health.current>0 && u.id !== except &&
-      (u.x === x && u.y === y || u.path.some(p => p.x === x && p.y === y)));
+  occupied(x,y,except=null) {
+    const index=y*this.width+x;
+    return [this.cells.get(index),this.reservations.get(index)].some(id=>id!=null&&id!==except);
   }
-
+  setObstacle(x,y,info=null) {
+    if(!this.inside(x,y)||info?.blocked!==false&&info&&this.occupied(x,y))return false;
+    const index=y*this.width+x;
+    if(info)this.obstacles.set(index,{...info});else this.obstacles.delete(index);
+    this.obstacleRevision++;this.navigation.invalidate();return true;
+  }
+  cancelCommand(u) { if(u.command?.flow)this.flows[u.command.flow]--;if(u.state==='walk'&&!u.step)u.state='idle';u.command=null;u.target=null;u.guide=[];u.guideKey=null;u.yieldUntil=0;u.route=[];u.path=[];u.waitReason=null;u.retryAt=0;u.waitSince=null; }
   spawn(x, y, character = null) {
-    if (!this.inside(x, y) || this.occupied(x, y)) return null;
+    if (!this.inside(x, y) || this.navigation.blocked(y*this.width+x) || this.occupied(x, y)) return null;
     const u = { character, health:character?.health||createHealth(), damage:25, id: this.nextId++, x, y, visualX: x, visualY: y,
-      state: 'idle', elapsed: 0, facing: -1, path: [], target: null, hits: 0, impacted: false };
-    this.units.push(u);
+      state: 'idle', elapsed: 0, facing: -1, path: [], target: null, command:null, step:null, route:[], waitReason:null, hits: 0, impacted: false };
+    this.units.push(u);this.byId.set(u.id,u);this.cells.set(y*this.width+x,u.id);
     return u;
   }
 
-  pathTo(u, goal) {
-    const queue = [{ x: u.x, y: u.y, path: [] }], seen = new Set([key(u.x, u.y)]);
-    for (let i = 0; i < queue.length; i++) {
-      const current = queue[i];
-      if (goal(current.x, current.y)) return current.path;
-      for (const [x, y] of neighbors(current.x, current.y)) {
-        if (!this.inside(x, y) || seen.has(key(x, y)) || this.occupied(x, y, u.id)) continue;
-        seen.add(key(x, y));
-        queue.push({ x, y, path: [...current.path, { x, y }] });
-      }
-    }
-    return null;
+  move(id,x,y) {
+    const u=this.unit(id);
+    if(!u||u.health.current<=0||u.state!=='idle'||u.step||!this.inside(x,y)||this.navigation.blocked(y*this.width+x)||u.x===x&&u.y===y)return false;
+    const field=this.navigation.field(x,y);
+    if(field?.complete&&field.at(u.y*this.width+u.x)<0)return false;
+    this.cancelCommand(u);const flow=Math.abs(x-u.x)>=Math.abs(y-u.y)?(x>u.x?'east':'west'):(y>u.y?'south':'north');
+    u.command={type:'move',x,y,flow};this.flows[flow]++;this.navigation.plan(u);return true;
   }
-
-  move(id, x, y) {
-    const u = this.unit(id);
-    if (!u || u.health.current<=0 || this.busy || !this.inside(x, y) || this.occupied(x, y) || u.x === x && u.y === y) return false;
-    const path = this.pathTo(u, (a, b) => a === x && b === y);
-    if (!path?.length) return false;
-    u.path = path;
-    u.target = null;
-    this.beginStep(u);
-    return true;
+  attack(id,targetId) {
+    const u=this.unit(id),target=this.unit(targetId);
+    if(!u||!target||u===target||u.health.current<=0||target.health.current<=0||u.state!=='idle'||u.step)return false;
+    this.cancelCommand(u);u.target=targetId;u.command={type:'attack',target:targetId};this.navigation.plan(u);return true;
   }
-
-  attack(id, targetId) {
-    const u = this.unit(id), target = this.unit(targetId);
-    if (!u || !target || u.health.current<=0 || target.health.current<=0 || u === target || this.busy) return false;
-    const path = this.pathTo(u, (x, y) => Math.abs(x - target.x) + Math.abs(y - target.y) === 1);
-    if (!path) return false;
-    u.target = targetId;
-    u.path = path;
-    if (path.length) this.beginStep(u);
-    else this.beginAttack(u);
-    return true;
-  }
-
-  beginStep(u) {
-    u.state = 'walk'; u.elapsed = 0;
-    const next = u.path[0];
-    u.facing = project(next.x - u.x, next.y - u.y).x >= 0 ? 1 : -1;
+  beginStep(u,next) {
+    u.state='walk';u.elapsed=0;u.step={...next,elapsed:0};u.path=[next];
+    this.reservations.set(next.y*this.width+next.x,u.id);
+    u.facing=project(next.x-u.x,next.y-u.y).x>=0?1:-1;
   }
 
   beginAttack(u) {
     const target = this.unit(u.target);
     if (!target || target.health.current<=0 || Math.abs(u.x - target.x) + Math.abs(u.y - target.y) !== 1) {
-      u.state = 'idle'; u.target = null; return;
+      u.state = 'idle'; this.cancelCommand(u); return;
     }
     u.facing = project(target.x - u.x, target.y - u.y).x >= 0 ? 1 : -1;
     u.attackVector = project(target.x - u.x, target.y - u.y);
@@ -136,47 +118,54 @@ export class Board {
   damage(id,amount,direction=1) {
     const u=this.unit(id);if(!u||u.health.current<=0||!Number.isFinite(amount)||amount<=0)return false;
     u.health.current=Math.max(0,u.health.current-amount);u.hits++;u.elapsed=0;
-    u.state=u.health.current<=0?'death':'hit';u.path=[];u.target=null;u.deathDirection=direction;
+    this.cancelCommand(u);u.state=u.health.current<=0?'death':'hit';u.deathDirection=direction;
+    if(u.health.current<=0){this.cells.delete(u.y*this.width+u.x);if(u.step)this.reservations.delete(u.step.y*this.width+u.step.x);u.step=null;}
     return true;
   }
   update(dt) {
-    this.time += dt;
-    for (const e of this.effects) e.age += dt;
-    this.effects = this.effects.filter(e => e.age < 0.55);
+    if(!Number.isFinite(dt)||dt<=0)return;
+    // Bound event integration, keeping impacts/arrivals consistent for large dt.
+    while(dt>1e-9){const slice=Math.min(dt,.05);this.advance(slice);dt-=slice;}
+  }
+  advance(dt) {
+    this.time+=dt;
+    for(const e of this.effects)e.age+=dt;
+    this.effects=this.effects.filter(e=>e.age<.55);
     for(const u of this.units){u.elapsed+=dt;advanceHealth(u.health,dt);}
-    for (const u of this.units) {
-      if (u.state === 'walk') {
-        // Carry excess frame time into the next step; logical cells change only on arrival.
-        while (u.path.length && u.elapsed >= STEP_TIME) {
-          const next = u.path.shift();
-          u.x = next.x; u.y = next.y;
-          u.visualX = u.x; u.visualY = u.y;
-          u.elapsed -= STEP_TIME;
-          if (u.path.length) {
-            const p = u.path[0];
-            u.facing = project(p.x - u.x, p.y - u.y).x >= 0 ? 1 : -1;
-          }
-        }
-        if (u.path.length) {
-          const t = u.elapsed / STEP_TIME, p = u.path[0];
-          u.visualX = u.x + (p.x - u.x) * t;
-          u.visualY = u.y + (p.y - u.y) * t;
-        } else if (u.target) this.beginAttack(u);
-        else { u.state = 'idle'; u.elapsed = 0; }
-      } else if (u.state === 'attack') {
-        if (!u.impacted && u.elapsed >= IMPACT_TIME) {
-          u.impacted = true;
-          const target = this.unit(u.target);
-          if (target && target.health.current>0 && Math.abs(u.x - target.x) + Math.abs(u.y - target.y) === 1) {
-            this.damage(target.id,u.damage,project(target.x-u.x,target.y-u.y).x>=0?1:-1);
-            this.effects.push({ x: target.x, y: target.y, age: 0 });
-          }
-        }
-        if (u.elapsed >= 0.65) { u.state = 'idle'; u.elapsed = 0; u.target = null; }
-      } else if (u.state === 'hit' && u.elapsed >= 0.36) {
-        u.state = 'idle'; u.elapsed = 0;
+    // Commit all arrivals before reserving departures: order cannot cause swaps.
+    for(const u of this.units)if(u.step) {
+      const p=u.step;p.elapsed+=dt;
+      if(p.elapsed+1e-9>=STEP_TIME) {
+        this.cells.delete(u.y*this.width+u.x);this.reservations.delete(p.y*this.width+p.x);
+        u.x=p.x;u.y=p.y;u.visualX=u.x;u.visualY=u.y;this.cells.set(u.y*this.width+u.x,u.id);
+        u.step=null;u.path=[];
+        if(u.state==='walk'){u.state=u.command?'walk':'idle';u.elapsed=0;}
+        this.movementPolicy?.onArrive?.({board:this,unit:u,at:{x:u.x,y:u.y}});
+        if(u.command?.type==='move'&&u.x===u.command.x&&u.y===u.command.y){this.cancelCommand(u);if(u.state==='walk')u.state='idle';}
+      } else {
+        const t=p.elapsed/STEP_TIME;u.visualX=u.x+(p.x-u.x)*t;u.visualY=u.y+(p.y-u.y)*t;
       }
     }
-    this.units=this.units.filter(u=>u.state!=='death'||u.elapsed<DEATH_DURATION);
+    for(const u of this.units) {
+      if(u.state==='attack') {
+        if(!u.impacted&&u.elapsed+1e-9>=IMPACT_TIME) {
+          u.impacted=true;const target=this.unit(u.target);
+          // Moving targets use their physical position at impact, not the old cell.
+          if(target&&target.health.current>0&&Math.abs(u.visualX-target.visualX)+Math.abs(u.visualY-target.visualY)<=1.001) {
+            this.damage(target.id,u.damage,project(target.visualX-u.visualX,target.visualY-u.visualY).x>=0?1:-1);
+            this.effects.push({x:target.visualX,y:target.visualY,age:0});
+          }
+        }
+        if(u.elapsed>=.65){u.state='idle';u.elapsed=0;this.cancelCommand(u);}
+      } else if(u.state==='hit'&&u.elapsed>=.36){u.state='idle';u.elapsed=0;}
+    }
+    this.navClock+=dt;
+    if(this.navClock+1e-9>=NAV_INTERVAL) {
+      this.navClock%=NAV_INTERVAL;this.navigation.refill();this.navigation.schedule();
+    }
+    this.units=this.units.filter(u=>{
+      if(u.state!=='death'||u.elapsed<DEATH_DURATION)return true;
+      this.byId.delete(u.id);return false;
+    });
   }
 }

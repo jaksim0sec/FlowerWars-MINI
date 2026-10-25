@@ -1,5 +1,5 @@
 import {characterRadius,onScreen,cachedPose,releasePose} from './character-render-cache.mjs';
-import {drawTerrain} from './terrain-render.mjs';
+import {drawTerrain,visibleTiles} from './terrain-render.mjs';
 import {loadCatalog, loadImage} from './characters/catalog.mjs';
 import {createCharacter, equip, drawCharacter} from './characters/engine.mjs';
 import { project, HALF_W, HALF_H } from './model.mjs';
@@ -77,6 +77,11 @@ export function render(ctx, art, board, view, camera, width, height, dpr, option
   ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.translate(camera.x,camera.y);ctx.scale(camera.scale,camera.scale);
 
+  if(board.obstacles?.size)for(const {x,y} of visibleTiles(board,camera,width,height)) {
+    const obstacle=board.obstacles.get(y*board.width+x);if(!obstacle||obstacle.blocked===false)continue;
+    const p=project(x,y);diamond(ctx,p.x,p.y,'#423a3090','#766448',8);
+    ctx.strokeStyle='#e8d9b4';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(p.x-9,p.y-7);ctx.lineTo(p.x+9,p.y+7);ctx.moveTo(p.x+9,p.y-7);ctx.lineTo(p.x-9,p.y+7);ctx.stroke();
+  }
   if (view.hover) {
     const p = project(view.hover.x, view.hover.y);
     diamond(ctx, p.x, p.y, '#fff4b521', '#fff3c281');

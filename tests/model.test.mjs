@@ -63,13 +63,14 @@ test('walking uses a free cardinal path and interpolates instead of teleporting'
   assert.deepEqual([u.x, u.y, u.visualX, u.visualY], [2, 0, 2, 0]);
 });
 
-test('occupied, same-cell and unreachable commands leave units idle', () => {
+test('invalid commands are rejected and dynamically blocked commands wait', () => {
   const b = new Board(3, 3);
   const u = b.spawn(0, 0);
   b.spawn(1, 0); b.spawn(0, 1);
   assert.equal(b.move(u.id, 0, 0), false);
-  assert.equal(b.move(u.id, 1, 0), false);
-  assert.equal(b.move(u.id, 2, 2), false);
+  assert.equal(b.move(u.id, 1, 0), true);
+  assert.equal(b.move(u.id, 2, 2), true);
+  assert.equal(u.waitReason, 'traffic');
   assert.equal(b.move(u.id, 9, 9), false);
   assert.equal(u.state, 'idle');
 });
@@ -94,11 +95,12 @@ test('attack approaches its target and applies exactly one hit at sword impact',
   assert.equal(b.attack(u.id, u.id), false);
 });
 
-test('new commands cannot interrupt an active action and reset cancels impacts', () => {
+test('actions only lock their own actor and reset cancels all impacts', () => {
   const b = new Board(3, 3);
   const u = b.spawn(0, 0), v = b.spawn(1, 0);
   b.attack(u.id, v.id);
-  assert.equal(b.move(v.id, 2, 0), false);
+  assert.equal(b.move(u.id, 2, 0), false);
+  assert.equal(b.move(v.id, 2, 0), true);
   b.reset();
   b.update(5);
   assert.equal(b.units.length, 0);

@@ -17,6 +17,8 @@ Vercel에서는 Framework Preset을 **Other**, Output Directory를 **.**으로 �
 구성:
 
 - `src/model.mjs`: 타일, 점유, 경로 탐색, 이동 보간, 명중 타이밍. 브라우저와 독립된 모델입니다.
+- `src/navigation.mjs`: 공유 거리장, 한 칸 예약, 경로 재사용·대기·우회와 탐색 예산.
+- `src/movement-scenarios.mjs`: 선택적으로 사용하는 재현용 동시 이동 배치.
 - `src/render.mjs`: 보드 타일 보정·깊이 정렬 및 캐릭터 엔진 호출.
 - `src/characters/`: 보드와 독립된 인스턴스·장비·리그·애니메이션·카탈로그. `characters.html`에서 같은 엔진으로 미리보기합니다.
 - 자세한 API와 확장 방법은 `docs/character-engine.md`를 참고하세요.
@@ -41,11 +43,13 @@ BASE_URL=https://your-static-host.example python3 tests/character-visibility-bro
 BASE_URL=https://your-static-host.example python3 tests/health-browser.py
 BASE_URL=https://your-static-host.example python3 tests/terrain-browser.py
 BASE_URL=https://your-static-host.example python3 tests/immersive-browser.py
+BASE_URL=https://your-static-host.example python3 tests/navigation-browser.py
+node scripts/benchmark_navigation.mjs
 ```
 
 브라우저 검증은 기본적으로 `/usr/bin/chromium`을 사용합니다. 다른 설치 경로는 `CHROMIUM`, 호스팅 주소는 `BASE_URL` 환경 변수로 지정할 수 있습니다. 데스크톱과 모바일 터치에서 소환·선택·실제 보행·공격·피격·드래그·핀치·초기화, 지형 변경, 이미지 누락 안내를 검사합니다. 모바일 레이아웃 검증은 다섯 화면 크기에서 확대·이동해도 전장이 헤더·조작부 영역을 침범하지 않는지, 화면 높이가 바뀌어도 배치가 유지되는지 검사합니다.
 
-이번 버전은 조작 시연용입니다. 동작 중에는 새 이동·공격 명령을 받지 않으며 여러 용사를 배치하고 각각 선택할 수 있습니다. 체력·부상·빈사·사망 연출을 지원하며, 승패·자동 전투는 구현하지 않습니다. 방향 전환은 제공된 파츠의 좌우 반전을 사용합니다. 별도의 후면 원화는 현재 저장소에 없습니다. 화면을 구성하는 모든 필수 이미지가 실제로 존재하며, 누락 시 파일 경로를 안내하고 대체 디자인을 사용하지 않습니다.
+이번 버전은 조작 시연용입니다. 서로 다른 용사는 동시에 이동·공격할 수 있으며, 각 개체는 충돌을 피하며 대기·우회합니다. 동작 중인 해당 용사는 동작을 마친 후 새 명령을 받습니다. 오른쪽 위 **이동 테스트**에서 교차·병목·장애물 상황을 최대 1,000개체로 배치해 검증할 수 있습니다. 알고리즘·확장 API·측정 한계는 `docs/concurrent-navigation.md`를 참고하세요. 체력·부상·빈사·사망 연출을 지원하며, 승패·자동 전투는 구현하지 않습니다. 방향 전환은 제공된 파츠의 좌우 반전을 사용합니다. 별도의 후면 원화는 현재 저장소에 없습니다. 화면을 구성하는 모든 필수 이미지가 실제로 존재하며, 누락 시 파일 경로를 안내하고 대체 디자인을 사용하지 않습니다.
 
 지형과 그림자는 화면 크기의 캐시로 그리며 카메라·지형이 바뀔 때만 다시 만듭니다. 화면 밖 타일은 재생성 대상에서도 제외합니다. 측정 결과와 재현 방법은 `docs/render-performance.md`를 참고하세요.
 

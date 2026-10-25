@@ -20,6 +20,15 @@
       <span class="tool-divider"></span><button id="fit" aria-label="전장 맞춤" title="전장 맞춤">⌖</button>
     </div>
   </main>
+  <details id="movement-lab" class="movement-lab">
+    <summary>이동 테스트</summary>
+    <div class="movement-options">
+      <label>상황<select id="movement-scenario"><option value="crossing">교차·맞대향</option><option value="bottleneck">한 칸 병목</option><option value="obstacles">장애물 우회</option><option value="crowd">대규모 이동</option></select></label>
+      <label>개체 수<select id="movement-count"><option value="16">16</option><option value="64">64</option><option value="256">256</option><option value="1000">1,000</option></select></label>
+    </div>
+    <div class="movement-buttons"><button id="movement-setup" disabled>배치</button><button id="movement-start" disabled>동시 이동</button><button id="movement-default">기본 전장</button></div>
+    <output id="movement-stats" aria-live="off">배치 → 동시 이동 · 기존 전장 교체</output>
+  </details>
   <footer class="command-area">
     <p id="notice" role="status" aria-live="polite">전장을 준비하고 있어요…</p>
     <div class="command-bar">

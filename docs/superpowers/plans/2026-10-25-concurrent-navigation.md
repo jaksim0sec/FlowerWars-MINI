@@ -1,0 +1,17 @@
+# Concurrent navigation implementation plan
+
+Goal: simultaneous collision-free commands, bounded shared pathfinding, small reproducible test menu.
+Architecture: indexed occupancy and one-step reservations; cached reverse BFS over static obstacles, incremental global work budget; local bounded detours against dynamic occupancy. Waiting commands retry with backoff; rotating scheduling avoids permanent ID priority. Rendering never governs simulation.
+Tech stack: existing plain JS ES modules, Canvas, Node tests, Python Playwright; no dependencies.
+
+User authorized autonomous implementation and main push. Preserve rigs, combat damage/timing and full-screen layout; no AI/turn system. No broader refactoring.
+
+- [x] Model/navigation: reproduce global busy rejection, write simultaneous movement/collision/bottleneck/detour/interruption/target movement/budget tests, implement src/navigation.mjs and integrate src/model.mjs. Only actor's own action blocks a new command. Goals remain commands while waiting; reserve only current step. Process arrivals before departures. Retain source and destination through a step, preventing swaps/overlap. Damage cancels command, surviving movers finish their reserved step. Static blocked cells have metadata. beforeStep and onArrive provide conditional action boundaries without adding auto-attack.
+- [x] Test menu: collapsed details panel, scenario + troop count + setup/start/reset, live moving/waiting/arrived and search statistics only while open. Deterministic scenarios use visible characters, blockers shown as tile overlays. Normal controls accept independent simultaneous commands. Browser test desktop/mobile menu, manual two-unit moves, offscreen simulation, reset and combat.
+- [x] Verification: run full Node suite, affected browser suites, deterministic stress/collision checks and benchmark. Review diff, document measured limits and API, commit then push HEAD:main after checking remote.
+
+Review focus: asynchronous arrivals/edge swaps; hit/death while moving; changed target/obstacle; blocked goal/backoff; many distinct goals and field cache eviction. Deliberate limit: local cooperative planner is not a complete optimal multi-agent solver; physically sealed lanes may wait until space clears. Work budget bounds search expansions, not total frame time or field allocation cost.
+
+Implementation decisions: blank grids use analytic distances and direction-specific travel lanes only for long opposing flows; isolated commands keep their shortest path. Agents retain integer-cell route guides, not full distance grids. Completed shared fields use adaptive LRU up to 64 entries / approximately 4MiB of distance arrays, plus one pending queue. Budget is 2048 expansions per 0.12s navigation pulse, not a total frame-time guarantee. Test destinations retain access corridors; impossible closed lanes still wait.
+
+Verification ledger: full Node suite 75/75; each regression added before its fix. Independent final review found no Critical/Important issue; randomized 30 × 2000-frame collision stress passed. Reviewer hook-input mutation finding reproduced RED and corrected with copied destination input; cancellation/death hook guards likewise RED→GREEN. Model benchmark checks source/reservation ownership each frame; all 1000 arrived in90s simulated. Final browser runs passed: navigation, standard pointer/touch, health, immersive rendering, mobile layout, terrain cache. Commit/push follows this verification record.
