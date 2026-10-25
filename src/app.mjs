@@ -15,7 +15,7 @@ let camera = { x: 0, y: 0, scale: 1 };
 let width = 0, height = 0, dpr = 1, art = null;
 let lastFrame = 0, previousBusy = false, previousHits = 0;
 let lastDraw=0,visibleCount=0,lastCamera='',cameraChanged=0,lastVisual='',cameraSettled=true;
-let fitted = true;
+let fitted = true,lastBoardSize='';
 let movementScenario=null,lastLabUpdate=0;
 const pointers = new Map();
 let origin = null, gestureMoved = false;
@@ -68,6 +68,7 @@ function seed() {
 let dirty=true;
 function refresh(invalidate=true) {
   if(invalidate)dirty=true;
+  const boardSize=`${board.width},${board.height}`;if(boardSize!==lastBoardSize){lastBoardSize=boardSize;$('board-columns').value=board.width;$('board-rows').value=board.height;}
   let unit = board.unit(view.selected);
   if(unit?.health.current<=0){view.selected=null;view.tile=null;unit=null;}
   text('selection-health',unit?`${unit.team?unit.team+' · ':''}체력 ${unit.health.current} / ${unit.health.max} · ${healthLabel(unit.health)}`:'');
@@ -258,8 +259,13 @@ $('movement-start').addEventListener('click',()=>{
   const count=startMovementScenario(board,movementScenario);$('movement-start').disabled=true;
   refresh();updateMovementStats();notify(`${count}개체 시작 · ${movementScenario.combat?'A/B 주변 8칸 자동 공격':'이동만 · 대기·우회'}`);
 });
-$('group-tools').addEventListener('toggle',()=>{if($('group-tools').open)$('movement-lab').open=false;});
-$('movement-lab').addEventListener('toggle',()=>{if($('movement-lab').open)$('group-tools').open=false;});
+for(const id of ['group-tools','movement-lab','field-tools'])$(id).addEventListener('toggle',()=>{if($(id).open)for(const other of ['group-tools','movement-lab','field-tools'])if(other!==id)$(other).open=false;});
+$('board-resize').addEventListener('click',()=>{
+  if(!board.resize(Number($('board-columns').value),Number($('board-rows').value))){notify('4~256칸의 정수 크기를 입력하세요. 병력·이동 목표가 잘리는 축소는 불가합니다.');return;}
+  if(view.tile&&!board.inside(view.tile.x,view.tile.y))view.tile=null;view.hover=null;fit();notify(`${board.width} × ${board.height}칸 · 기존 병력 유지`);
+});
+$('combat-enable').addEventListener('click',()=>{const n=board.setAutoCombat(true);refresh();notify(`${n}명 공격 활성 · 무진영 병력은 A/B 자동 배정`);});
+$('combat-disable').addEventListener('click',()=>{board.setAutoCombat(false);refresh();notify('자동 공격 중지 · 진행 중인 타격은 마무리합니다.');});
 $('group-place').addEventListener('click',()=>{if(!art)return;view.mode='group';notify('앞줄 기준 칸을 선택하세요. 부대 전체를 함께 배치합니다.');refresh();});
 $('movement-default').addEventListener('click',()=>{seed();fit();updateMovementStats();notify('기본 전장 복원');});
 $('movement-lab').addEventListener('toggle',updateMovementStats);

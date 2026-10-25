@@ -1,0 +1,5 @@
+import os
+from playwright.sync_api import sync_playwright
+BASE=os.environ.get('BASE_URL','http://127.0.0.1:8019')
+with sync_playwright() as p:
+ b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox']);page=b.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.goto(BASE);page.get_by_text('전장 준비 완료',exact=False).wait_for();page.locator('#field-tools summary').click();page.locator('#board-columns').fill('20');page.locator('#board-rows').fill('24');page.locator('#board-resize').click();assert page.locator('#unit-count').inner_text()=='용사 2';assert '20 × 24' in page.locator('#notice').inner_text();page.locator('#combat-enable').click();assert '2명 공격 활성' in page.locator('#notice').inner_text();page.locator('#combat-disable').click();assert '자동 공격 중지' in page.locator('#notice').inner_text();assert page.locator('#character-type option[value="scout"]').inner_text()=='개나리 보병';assert not errors,errors;b.close();print('PASS board resize preserving troops, global combat controls and infantry rename')

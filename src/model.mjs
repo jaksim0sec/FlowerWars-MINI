@@ -61,6 +61,22 @@ export class Board {
     this.terrain = Array.from({ length: this.height }, (_, y) =>
       Array.from({ length: this.width }, (_, x) => (x === 3 || x === 4 || y === 2 && x > 1 && x < 6) ? 'soil' : 'grass'));
   }
+  resize(width,height){
+    if(!Number.isInteger(width)||!Number.isInteger(height)||width<4||height<4||width>256||height>256||this.navigation.collecting)return false;
+    const inside=p=>p.x>=0&&p.y>=0&&p.x<width&&p.y<height;
+    if(this.units.some(u=>u.health.current>0&&(!inside(u)||u.step&&!inside(u.step)||u.command?.type==='move'&&!inside(u.command))))return false;
+    const oldWidth=this.width,terrain=this.terrain,obstacles=this.obstacles;
+    this.width=width;this.height=height;this.terrain=Array.from({length:height},(_,y)=>Array.from({length:width},(_,x)=>terrain[y]?.[x]||'grass'));
+    this.obstacles=new Map();for(const[n,info]of obstacles){const p={x:n%oldWidth,y:Math.floor(n/oldWidth)};if(inside(p))this.obstacles.set(p.y*width+p.x,info);}
+    this.cells=new Map();this.reservations=new Map();this.spatial=new SpatialIndex(width,height);this.navigation=new Navigation(this);this.navClock=0;
+    for(const u of this.units){u.guide=[];u.guideKey=null;u.route=[];if(u.health.current<=0)continue;this.cells.set(u.y*width+u.x,u.id);if(u.step)this.reservations.set(u.step.y*width+u.step.x,u.id);this.spatial.add(u);}
+    this.terrainRevision++;this.obstacleRevision++;return true;
+  }
+  setAutoCombat(enabled=true){
+    const alive=this.units.filter(u=>u.health.current>0),counts={A:0,B:0};for(const u of alive)if(u.team in counts)counts[u.team]++;
+    for(const u of alive){if(enabled&&!u.team){u.team=counts.A<=counts.B?'A':'B';counts[u.team]++;u.combat.shape='king';}u.combat.auto=!!enabled;if(!enabled&&u.waitReason==='combat')u.waitReason=null;u.combat.targetId=null;u.combat.nextSearchAt=0;}
+    return alive.length;
+  }
   setTerrain(x,y,type) {
     if(!this.inside(x,y)||!['grass','soil'].includes(type))return false;
     if(this.terrain[y][x]!==type){this.terrain[y][x]=type;this.terrainRevision++;}
