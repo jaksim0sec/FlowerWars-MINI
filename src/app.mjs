@@ -12,6 +12,26 @@ import { loadArtwork, render } from './render.mjs';
 const $ = id => document.getElementById(id);
 const canvas = $('board'), ctx = canvas.getContext('2d');
 const board = new Board();
+// Default sandbox map only. Test scenarios retain their own map sizes and layouts.
+const DEFAULT_FIELD_SIZE=100;
+const DEFAULT_WALL_SEGMENTS=[
+  [21,35,44,35],[49,35,78,35],
+  [22,50,38,50],[44,50,62,50],[67,50,81,50],
+  [25,65,51,65],[57,65,79,65],
+  [32,28,32,43],[32,48,32,59],
+  [69,39,69,56],[69,61,69,76],
+  [54,18,54,29],[54,73,54,86],
+  [46,76,46,90],[76,18,76,30]
+];
+function placeDefaultWalls(){
+  for(const [x1,y1,x2,y2] of DEFAULT_WALL_SEGMENTS){
+    const dx=Math.sign(x2-x1),dy=Math.sign(y2-y1);
+    for(let x=x1,y=y1;;x+=dx,y+=dy){
+      board.setObstacle(x,y,{kind:'stone-wall',blocked:true,attackable:false});
+      if(x===x2&&y===y2)break;
+    }
+  }
+}
 const view = { selected: null, tile: null, hover: null, mode: 'move' };
 let camera = { x: 0, y: 0, scale: 1 };
 let width = 0, height = 0, dpr = 1, art = null;
@@ -193,11 +213,13 @@ function selectUnit(unit){
 }
 function seed() {
   clearTimeout(feedbackTimer);$('command-feedback').hidden=true;cancelLongPress();
-  board.width=BOARD_COLUMNS;board.height=BOARD_ROWS;board.reset();movementScenario=null;
+  board.width=DEFAULT_FIELD_SIZE;board.height=DEFAULT_FIELD_SIZE;board.reset();movementScenario=null;
+  placeDefaultWalls();
   $('movement-start').disabled=true;
   const ids=art?visibleCharacters(art.catalog).map(([id])=>id):[];
-  if(ids[0]) board.spawn(2, 2, newCharacter(ids[0]));
-  if(ids[1]) {const second=board.spawn(3, 5, newCharacter(ids[1]));second.facing=1;}
+  // Spawn near the map center so the units and nearby wall passages are visible.
+  if(ids[0]) board.spawn(48, 47, newCharacter(ids[0]));
+  if(ids[1]) {const second=board.spawn(51, 46, newCharacter(ids[1]));second.facing=1;}
   view.selected = null; view.tile = null; view.hover = null; view.mode = 'move';
   previousBusy = false; previousHits = 0;lastSelectedSquad='';selectedSquadId=null;commandPanelOpen=false;squadQuickCommand=false;cancelSquadTarget();
   syncSquadRoster();refresh();
