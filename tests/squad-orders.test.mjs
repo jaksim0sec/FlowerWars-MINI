@@ -183,3 +183,17 @@ test('a focus order leaves the commander defending locally, not rushing at a dis
  assert.equal(leader.command,null,'focus should stop a flag bearer advancing alone');
  assert.equal(leader.combat.auto,true,'commander retains automatic close-range self defence');
 });
+
+test('the last surviving soldier can still focus an enemy after the flag is lost',()=>{
+ const board=new Board(100,50),make=m=>({characterId:m.characterId});
+ const a=placeGroup(board,createFormationGroup(12,'squad','A 생존','mixed'),{x:25,y:20},{team:'A',makeCharacter:make});
+ const b=placeGroup(board,createFormationGroup(12,'squad','B 적','mixed'),{x:75,y:20},{team:'B',makeCharacter:make});
+ const s=squadsFor(board).get(a.squads[0]),survivor=board.unit(s.memberIds[s.memberIds.length-1]);
+ for(const id of s.memberIds)if(id!==survivor.id){const u=board.unit(id);board.damage(id,u.health.current);}
+ const summary=squadSummary(board,s.id);
+ assert.equal(summary.alive,1);
+ assert.equal(summary.leaderAlive,false);
+ assert.equal(summary.actingCommanderId,survivor.id);
+ assert.ok(orderSquad(board,s.id,'focus',{squadId:b.squads[0]}));
+ assert.equal(survivor.command?.type,'attack');
+});
