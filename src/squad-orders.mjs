@@ -4,7 +4,7 @@ export const SQUAD_ACTIONS={
  move:{label:'이동',target:true,hint:'교전보다 이동 우선'},
  advance:{label:'공격 이동',target:true,hint:'경로의 적과 교전하며 전진'},
  focus:{label:'집중 공격',target:true,hint:'선택한 적을 추적·공격'},
- flank:{label:'우회 기동',target:true,hint:'측면 경유 후 목표로 이동'},
+ flank:{label:'우회 공격',target:true,hint:'적 선택 → 측면 우회 후 집중 공격 · 지면 선택은 우회 이동'},
  fortify:{label:'방어진 구축',target:true,hint:'목표에 방패 전열을 세우고 사수'},
  retreat:{label:'후퇴',target:true,hint:'교전을 끊고 지정 위치로 철수'},
  hold:{label:'현 위치 사수',hint:'이동 중단·제자리 교전'},
@@ -80,6 +80,10 @@ function followLeader(board,s,target){
 export function orderSquad(board,id,action,target=null){
  const s=squadsFor(board).get(id),lead=s&&commander(board,s),type=ALIASES[action]||action,def=SQUAD_ACTIONS[type];
  if(!s||!lead||lead.health.current<=0||!def)return false;
+ if(type==='focus'&&s.order?.type==='flank'&&['flanking','moving'].includes(s.order.phase)){
+   if(!enemyUnits(board,s,target).length)return false;
+   s.order.after={type:'focus',target:{...target}};return true;
+ }
  // The API still accepts untargeted defensive orders around the commander.
  if(!target&&['fortify','firing-line'].includes(type))target={x:lead.step?.x??lead.x,y:lead.step?.y??lead.y};
  if(type==='focus'){if(!enemyUnits(board,s,target).length)return false;}
@@ -89,6 +93,7 @@ export function orderSquad(board,id,action,target=null){
  if(same)return true;
  const facing=target?.x!=null?Math.sign(target.x-lead.x)||(s.team==='B'?-1:1):(s.team==='B'?-1:1);
  const order={type,source:action,target:type==='rally'?{x:lead.step?.x??lead.x,y:lead.step?.y??lead.y}:target?{...target}:null,dirty:true,previous:null,goals:new Map(),lastMembers:0,facing,phase:'moving',waypoints:[]};
+ if(type==='flank'&&target.attackTarget){if(!enemyUnits(board,s,target.attackTarget).length)return false;order.after={type:'focus',target:{...target.attackTarget}};}
  if(type==='flank'){
    const units=alive(board,s),x=Math.round(units.reduce((n,u)=>n+u.x,0)/units.length),y=Math.round(units.reduce((n,u)=>n+u.y,0)/units.length);
    const candidates=[Math.max(2,y-9),Math.min(board.height-3,y+9)].filter(side=>Math.abs(side-y)>=3);
@@ -146,6 +151,7 @@ function runOrder(board,s,replace=false){
    const enemies=enemyUnits(board,s,o.target);
    if(!enemies.length){for(const u of units)board.interrupt(u);o.phase='complete';return;}
    board.batchCommands(()=>{for(const u of units){
+     if(u.healing){if(u.command?.type==='attack')board.interrupt(u);continue;}
      if(units.length>1&&u.id===commander(board,s)?.id){board.interrupt(u);continue;}
      if(u.command?.type==='attack'&&enemies.some(e=>e.id===u.command.target))continue;
      if(!replace&&(u.state!=='idle'||u.step))continue;
@@ -178,6 +184,7 @@ function runOrder(board,s,replace=false){
    board.move(u.id,p.x,p.y,{replace,direct:true});
  }});
  if(!o.waypoints.length)o.phase=arrived===units.length?(['fortify','firing-line'].includes(o.type)?'holding':'arrived'):'moving';
+ if(o.phase==='arrived'&&o.after){const next=o.after;s.order=null;orderSquad(board,s.id,next.type,next.target);}
 }
 export function updateSquadOrders(board){for(const s of squadsFor(board).values())if(s.order&&!['wait','hold'].includes(s.order.type))runOrder(board,s);}
 export function squadSummary(board,id){

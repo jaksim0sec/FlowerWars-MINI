@@ -1,4 +1,5 @@
 import {SpatialIndex} from './spatial-index.mjs';
+import {healingOptions} from './healing.mjs';
 import {mix,movementOptions} from './decision.mjs';
 import {combatOptions,inAttackRange,tryAutoAttack,hasLineOfSight,BASE_ATTACK_DURATION} from './combat.mjs';
 import {Navigation,NAV_INTERVAL} from './navigation.mjs';
@@ -108,6 +109,7 @@ export class Board {
     const u = { character, health, priorityKey:mix(this.seed^Math.imul(this.nextId,0x9e3779b9)),movement:movementOptions(options.movement),capabilities:[...(options.capabilities||[])],team:options.team||null,combat:combatOptions(options),strike:null,
       damage:Number.isFinite(options.stats?.damage)&&options.stats.damage>0?options.stats.damage:25, id: this.nextId++, x, y, visualX: x, visualY: y,
       state: 'idle', elapsed: 0, facing: -1, path: [], target: null, command:null, step:null, route:[], waitReason:null, hits: 0, impacted: false };
+    u.healing=healingOptions(options,character);
     this.units.push(u);this.byId.set(u.id,u);this.cells.set(y*this.width+x,u.id);this.spatial.add(u);
     return u;
   }
@@ -198,7 +200,12 @@ export class Board {
         const strike=u.strike;
         if(!u.impacted&&u.elapsed+1e-9>=strike.impactTime) {
           u.impacted=true;const target=this.unit(strike.target);
-          if(target&&target.health.current>0&&inAttackRange(u,target)&&(!u.combat.lineOfSight||hasLineOfSight(this,u,target))) {
+          if(strike.healing){
+            if(target?.health.current>0&&target.team===u.team&&Math.max(Math.abs(u.visualX-target.visualX),Math.abs(u.visualY-target.visualY))<=u.healing.range&&hasLineOfSight(this,u,target)){
+              const gained=this.heal(target.id,u.healing.amount);
+              if(gained)this.effects.push({x:target.visualX,y:target.visualY,age:0,healing:true,amount:gained});
+            }
+          }else if(target&&target.health.current>0&&inAttackRange(u,target)&&(!u.combat.lineOfSight||hasLineOfSight(this,u,target))) {
             impacts.push({target,damage:u.damage,direction:project(target.visualX-u.visualX,target.visualY-u.visualY).x>=0?1:-1});
           }
         }

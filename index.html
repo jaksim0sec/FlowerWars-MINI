@@ -81,7 +81,7 @@
   </section>
   <section id="command-dock" class="command-dock" aria-label="선택 부대 지휘" hidden>
     <div class="command-selection-row"><div><strong id="command-selection"></strong><small id="command-state" aria-live="polite"></small></div><button id="orders-toggle" aria-expanded="true" aria-label="명령 펼치기">명령</button><button id="selection-clear" aria-label="부대 선택 해제">×</button></div>
-    <div class="selection-actions"><button id="selection-add" aria-pressed="false">＋ 추가 선택</button><button id="selection-platoon">소대 선택</button><button id="selection-options" aria-expanded="false">태세·진형</button></div>
+    <div class="selection-actions"><button id="selection-add" aria-pressed="false">＋ 추가 선택</button><button id="selection-platoon">소대 선택</button><button id="selection-locate">부대 보기</button><button id="selection-options" aria-expanded="false">태세·진형</button></div>
     <div class="quick-orders" role="group" aria-label="빠른 명령">
       <button data-squad-action="move"><span aria-hidden="true">➜</span>이동<kbd>M</kbd></button>
       <button data-squad-action="advance"><span aria-hidden="true">⚔</span>공격 이동<kbd>A</kbd></button>
@@ -92,6 +92,7 @@
       <button data-squad-action="hold"><span aria-hidden="true">⬟</span>현 위치 사수<kbd>H</kbd></button>
       <button data-squad-action="wait"><span aria-hidden="true">Ⅱ</span>정지<kbd>X</kbd></button>
     </div>
+    <button id="orders-more" type="button" aria-expanded="false">추가 전술</button>
     <small class="command-help">분대 선택 → 명령 → 목표 · Shift/추가 선택으로 묶기 · 우클릭 이동/공격</small>
   </section>
   <div id="squad-aim" class="squad-aim" hidden role="status">

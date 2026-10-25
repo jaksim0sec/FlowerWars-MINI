@@ -82,6 +82,7 @@ function nextSearch(board,actor) {
   return (Math.floor((board.time-phase)/interval)+1)*interval+phase;
 }
 export function tryAutoAttack(board,actor) {
+  if(actor.healing)return false;
   if(!actor.combat.auto||!actor.team||actor.step||actor.command?.type==='attack')return false;
   let target=board.unit(actor.combat.targetId);
   if(!validEnemy(board,actor,target)) {

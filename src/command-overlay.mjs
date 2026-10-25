@@ -3,7 +3,7 @@ import {squadsFor} from './unit-groups.mjs';
 import {SQUAD_ACTIONS} from './squad-orders.mjs';
 
 function marker(ctx,p,color){
- const point=project(p.x,p.y);ctx.beginPath();ctx.ellipse(point.x,point.y,25,14,0,0,Math.PI*2);ctx.strokeStyle=color;ctx.lineWidth=3;ctx.stroke();
+ const point=project(p.x,p.y);ctx.beginPath();ctx.ellipse(point.x,point.y,12,8,0,0,Math.PI*2);ctx.strokeStyle=color;ctx.lineWidth=2;ctx.stroke();
  ctx.beginPath();ctx.moveTo(point.x-7,point.y);ctx.lineTo(point.x+7,point.y);ctx.moveTo(point.x,point.y-5);ctx.lineTo(point.x,point.y+5);ctx.stroke();
 }
 export function drawCommandOverlay(ctx,board,view,scale=1){
@@ -29,7 +29,7 @@ export function drawCommandOverlay(ctx,board,view,scale=1){
    const end=project(target.x,target.y),label=pending?SQUAD_ACTIONS[view.squadOrder]?.label:SQUAD_ACTIONS[o?.type]?.label;
    if(selected.has(id)){
     ctx.save();ctx.translate(end.x,end.y);ctx.scale(1/scale,1/scale);
-    const caption=`${s.name} · ${label||''} → ${target.x+1},${target.y+1}`;
+    const caption=o?.after?'우회 → 집중 공격':label||'';
     ctx.font='600 11px system-ui';ctx.textAlign='center';ctx.lineWidth=3;ctx.strokeStyle='#443b2b';ctx.strokeText(caption,0,-23);ctx.fillStyle=color;ctx.fillText(caption,0,-23);ctx.restore();
    }
   }

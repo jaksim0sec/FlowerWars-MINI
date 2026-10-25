@@ -496,6 +496,53 @@ body{display:block;}
  .squad-aim{top:96px;bottom:auto;max-width:calc(100vw - 16px);font-size:10px;}
 }
 .platoon-pick i>span{display:flex;align-items:center;gap:1px;padding:2px;border-radius:8px;background:#fff8e9b3;}
+
+/* Tactical hierarchy: one dense command row, explicit expandable platoons. */
+.command-dock{width:304px;}
+.command-selection-row>div{flex:1;max-width:none!important;padding:6px 10px;}
+#command-state{max-width:220px;font-size:10px;}
+.command-dock.is-expanded .quick-orders{grid-template-columns:repeat(4,minmax(0,1fr));gap:3px;}
+.quick-orders button{min-height:44px;flex-direction:row;gap:4px;border-radius:12px;background:#fff9edf0;padding:5px!important;}
+.quick-orders button>.ui-icon{width:18px;height:18px;box-sizing:border-box;padding:0;background:none!important;box-shadow:none;}
+.quick-orders button>.icon-label{font-size:10px;white-space:nowrap;}
+.quick-orders [data-squad-action=move]{order:0;}.quick-orders [data-squad-action=focus]{order:1;}.quick-orders [data-squad-action=flank]{order:2;}.quick-orders [data-squad-action=wait]{order:3;}
+.quick-orders [data-squad-action=advance],.quick-orders [data-squad-action=fortify],.quick-orders [data-squad-action=retreat],.quick-orders [data-squad-action=hold]{display:none;order:4;}
+.show-extra.is-expanded .quick-orders button{display:flex;}
+.quick-orders button[aria-pressed=true]{background:#f2d38c;}
+#orders-more{display:none;float:right;min-height:30px;padding:4px 10px;margin-top:4px;background:#fff9eddf;border-radius:12px;font-size:10px;}
+.is-expanded #orders-more{display:block;}
+.command-dock.is-expanded .selection-actions{gap:4px;margin:4px 0;}
+.selection-actions button{display:flex;align-items:center;gap:3px;flex:0 1 auto;width:auto;height:28px;min-height:28px;padding:4px 7px;border-radius:10px;box-shadow:none;font-size:10px;}
+.selection-actions .control-label{display:inline;}.selection-actions .ui-icon{width:15px;height:15px;}
+.selection-actions #selection-platoon{display:none;}
+.platoon-group{flex-shrink:0;min-width:0;}
+.platoon-heading{display:flex;align-items:center;gap:2px;}
+.platoon-pick{flex:1;width:auto;min-height:26px;max-width:none;flex-wrap:nowrap;justify-content:flex-start;font-size:10px;}
+.platoon-pick i{display:none;}
+.platoon-fold{pointer-events:auto;width:28px;height:28px;padding:5px;border-radius:9px;background:#fff9edaa;}
+.platoon-fold .ui-icon{width:16px;height:16px;transform:rotate(90deg);}.platoon-fold[aria-expanded=false] .ui-icon{transform:none;}
+.platoon-squads{display:flex;flex-direction:column;gap:3px;padding-left:8px;border-left:1px solid #b79f7750;}
+.platoon-squads[hidden]{display:none;}
+.squad-roster{width:130px;}.squad-roster-list{align-items:stretch;gap:8px;}
+.squad-card,.squad-card:hover,.squad-card.is-selected{display:grid;grid-template-columns:32px 1fr;gap:3px;width:118px;max-width:none;min-width:0;padding:3px 2px;text-align:left;border-radius:11px;}
+.squad-card.is-selected{background:#fff3d0d9;}
+.squad-portrait{width:30px;height:32px;grid-row:1;}.squad-avatar{width:29px;height:29px;}.squad-card-team{right:-4px;font-size:7px;}
+.squad-card-body{align-items:flex-start;gap:1px;}.squad-card-title{font-size:9px;text-align:left;}.squad-card-status{font-size:8px;max-width:86px;}
+.squad-badges{position:absolute;inset:0;visibility:hidden;pointer-events:none;}.squad-card{position:relative;}
+.squad-card .squad-role{visibility:visible;position:absolute;left:18px;top:21px;padding:2px;}.squad-card .squad-role .ui-icon{width:11px;height:11px;}
+.squad-card .squad-activity{visibility:visible;position:absolute;left:100px;top:3px;padding:1px;}.squad-card .squad-activity .ui-icon{width:12px;height:12px;}
+@media(min-width:701px){.command-dock{right:146px;}.squad-tools{right:146px;}}
+@media(max-width:700px){
+ .squad-roster{height:88px;max-height:88px;width:100%;background:linear-gradient(0deg,#f5ecdbe8,transparent);}
+ .squad-roster-list{align-items:flex-start;gap:9px;padding:0 8px 3px;}
+ .platoon-heading{height:25px;}.platoon-pick{writing-mode:horizontal-tb;min-height:25px;max-height:25px;flex-direction:row;gap:4px;min-width:88px;}.platoon-pick>span{writing-mode:horizontal-tb;max-height:none;}
+ .platoon-squads{flex-direction:row;gap:3px;padding-left:5px;}
+ .squad-card,.squad-card:hover,.squad-card.is-selected{height:53px;width:118px;min-width:118px;max-width:118px;grid-template-columns:32px 1fr;}
+ .command-dock{right:8px;bottom:calc(92px + env(safe-area-inset-bottom))!important;width:304px;}
+ .quick-orders button{min-height:44px;}
+ .squad-tools{bottom:calc(252px + env(safe-area-inset-bottom));max-height:calc(100dvh - 315px);}
+ .squad-aim{top:96px;max-width:calc(100vw - 16px);font-size:11px;}
+}
 /* Lightweight confirmation of a map-issued squad order, no modal/toast blocking */
 .command-feedback[hidden]{display:none!important;}
 .command-feedback{

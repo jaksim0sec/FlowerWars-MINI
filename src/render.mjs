@@ -127,6 +127,7 @@ export function render(ctx, art, board, view, camera, width, height, dpr, option
     const p = project(effect.x, effect.y), t = effect.age / .55;
     if(!onScreen(p.x,p.y-54,50,camera,width,height))continue;
     ctx.save(); ctx.translate(p.x, p.y - 54); ctx.globalAlpha = 1 - t;
+    if(effect.healing){ctx.strokeStyle='#3d9b68';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(-9,-t*25);ctx.lineTo(9,-t*25);ctx.moveTo(0,-9-t*25);ctx.lineTo(0,9-t*25);ctx.stroke();ctx.fillStyle='#286a42';ctx.font='bold 20px system-ui';ctx.fillText('+'+effect.amount,13,-t*25);ctx.restore();continue;}
     for (let i = 0; i < 7; i++) {
       const a = i / 7 * Math.PI * 2, distance = 12 + t * 36;
       ctx.strokeStyle = i % 2 ? '#fff6cc' : '#f3b936'; ctx.lineWidth = 3 * (1 - t) + 1;

@@ -1,4 +1,5 @@
 import {mix} from './decision.mjs';
+import {tryHeal} from './healing.mjs';
 // Shared static distance fields + conservative one-step cooperative reservations.
 // No visual/camera state participates in navigation.
 export const SEARCH_BUDGET = 2048;
@@ -134,6 +135,7 @@ export class Navigation {
   plan(u) {
     const b=this.board;
     if(u.step||!['idle','walk'].includes(u.state))return;
+    if(tryHeal(b,u))return;
     if(this.keepDistance(u))return;
     if(b.unit(u.id)!==u||u.health.current<=0||u.step||!['idle','walk'].includes(u.state))return;
     if(b.tryAutoAttack(u))return;
