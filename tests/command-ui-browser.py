@@ -15,7 +15,8 @@ with sync_playwright() as p:
         assert page.locator('#command-dock').is_visible()
         if width>700:cards.nth(1).click(modifiers=['Shift'])
         else:
-            page.locator('#selection-add').click();cards.nth(1).click();page.locator('#selection-add').click()
+            page.locator('#selection-add').click();cards.nth(1).click()
+            assert page.locator('#selection-add').get_attribute('aria-pressed')=='false'
         assert page.locator('.squad-card[aria-pressed="true"]').count()==2
         assert '2개 분대' in page.locator('#command-selection').inner_text()
         if width>700:
