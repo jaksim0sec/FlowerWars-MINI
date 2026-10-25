@@ -8,6 +8,37 @@ import numpy as np
 ROOT=Path(__file__).resolve().parents[1]
 def read(p):return json.loads(p.read_text())
 def write(p,v):p.parent.mkdir(parents=True,exist_ok=True);p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+REFERENCE_LAYOUTS = {"shield-guard":{"center":220,"ground":558,"factor":1.8,"parts":{"head":[165,201,0.36],"head_deco":[68,0,0.76],"body":[103,279,0.68],"hand_back":[86,298,0.7],"hand_front":[270,236,0.76],"leg_back":[110,459,0.52],"leg_front":[242,452,0.72]},"grips":{"left":[0.15,0.55],"right":[0.72,0.8]}},"scholar":{"center":205,"ground":545,"factor":1.8,"parts":{"head":[162,208,0.36],"head_deco":[42,18,0.68],"body":[104,296,0.56],"hand_back":[62,314,0.56],"hand_front":[236,316,0.56],"leg_back":[96,464,0.56],"leg_front":[222,460,0.56]},"grips":{"left":[0.22,0.35],"right":[0.72,0.8]}},"banner-bearer":{"center":230,"ground":543,"factor":1.8,"parts":{"head":[212,235,0.28],"head_deco":[132,86,0.6],"body":[74,296,0.68],"hand_back":[72,315,0.64],"hand_front":[274,334,0.52],"leg_back":[122,462,0.64],"leg_front":[250,464,0.64]},"grips":{"left":[0.32,0.33],"right":[0.72,0.8]}},"clover-mage":{"center":165,"ground":544,"factor":1.8,"parts":{"head":[30,105,0.7],"head_deco":[14,10,0.68],"body":[36,274,0.6],"hand_back":[6,304,0.56],"hand_front":[190,300,0.42],"leg_back":[44,454,0.48],"leg_front":[174,450,0.52]},"grips":{"left":[0.28,0.8],"right":[0.84,0.58]}},"archer":{"center":196,"ground":626,"factor":1.5,"parts":{"head":[42,155,0.7],"head_deco":[30,6,0.84],"body":[66,322,0.72],"hand_back":[30,360,0.68],"hand_front":[242,346,0.52],"leg_back":[74,526,0.56],"leg_front":[216,518,0.56]},"grips":{"left":[0.28,0.8],"right":[0.87,0.69]}},"scout":{"center":170,"ground":640,"factor":1.55,"parts":{"head":[38,154,0.7],"head_deco":[4,0,1],"body":[50,338,1],"hand_back":[52,410,0.52],"hand_front":[234,400,1],"leg_back":[138,480,0.64],"leg_front":[46,552,1]},"grips":{"left":[0.28,0.8],"right":[0.72,0.8]}}}
+REFERENCE_EQUIPMENT = {"shield_guard_shield":{"grip":[0.52,0.52],"w":357,"h":458.34193548387094},"scholar_book":{"grip":[0.47,0.56],"w":290,"h":218.80239520958085},"banner_bearer_banner":{"asset":"weapons/banner_bearer_banner.png","grip":[0.38,0.73],"rotation":0,"w":491.4,"h":867.6},"clover_mage_staff":{"grip":[0.1,0.66],"w":350,"h":593},"archer_bow":{"grip":[0.18,0.66],"w":210,"h":565.4587155963303}}
+
+def apply_reference_layout(rig, unit_id, equipment):
+ cfg=REFERENCE_LAYOUTS[unit_id];f=cfg['factor']
+ rig['version']=rig.get('version',1)+1
+ rig['note']='Assembled-preview alignment, shared tile-foot anchor and unmodified original part artwork'
+ for name,(x,y,s) in cfg['parts'].items():
+  p=rig['parts'][name];iw,ih=p['file_dimensions']
+  p.update(x=round(505+(x-cfg['center'])*f,4),y=round(1228+(y-cfg['ground'])*f,4),w=round(iw*s*f,4),h=round(ih*s*f,4))
+ rig['foot']=[505,1228]
+ rig['parts']['head_deco']['asset']='head_deco.png'
+ rig['parts']['head_deco'].pop('front_clip',None)
+ rig['parts']['shadow']['x']=505-rig['parts']['shadow']['w']/2
+ rig['parts']['shadow']['y']=1228-rig['parts']['shadow']['h']/2
+ for side,grip in cfg['grips'].items():rig['sockets'][side]['grip']=grip
+ def visit(nodes):
+  for n in nodes:
+   if n.get('id')=='neck':
+    n['children']=[{'part':'head'},{'part':'head_deco'}]
+    b=rig['parts']['body'];rig['neck']=[b['x']+b['w']*.5,b['y']+b['h']*.05]
+    n['transforms'][0]['pivot']=rig['neck']
+   if n.get('id') in ('leftArm','rightArm'):
+    p=rig['parts']['hand_back' if n['id']=='leftArm' else 'hand_front']
+    pt=[p['x']+p['w']*p['origin'][0],p['y']+p['h']*p['origin'][1]]
+    n['transforms'][0]['pivot']=pt;rig['twoHandedPoses']['hold']['nodes'][n['id']]['transforms'][0]['pivot']=pt
+   visit(n.get('children',[]))
+ visit(rig['nodes'])
+ for eid,change in REFERENCE_EQUIPMENT.items():
+  if eid.startswith(unit_id.replace('-','_')+'_'):equipment[eid].update(change)
+
 def register(source):
  manifest=read(source/'manifest.json');catalog=read(ROOT/'assets/characters.json');equipment=read(ROOT/'assets/equipment/catalog.json')
  base=read(ROOT/'assets/units/gynari-warrior/rig.json')
@@ -93,6 +124,7 @@ def register(source):
    if name==weapons[index]:
     info['recommendedWeapon']=eid
     if id in ['archer','clover-mage']:info['recommendedHand']='right'
+  apply_reference_layout(rig,id,equipment)
   write(target/'rig.json',rig);catalog['characters'][id]=info
   write(target/'source.json',entry)
  write(ROOT/'assets/characters.json',catalog);write(ROOT/'assets/equipment/catalog.json',equipment)

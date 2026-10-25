@@ -114,11 +114,11 @@
   "shield_guard_shield": {
     "name": "수호 방패",
     "asset": "weapons/shield_guard_shield.png",
-    "w": 350,
-    "h": 449.35483870967744,
+    "w": 357,
+    "h": 458.34193548387094,
     "grip": [
-      0.55,
-      0.55
+      0.52,
+      0.52
     ],
     "hands": 1,
     "motion": "weapon",
@@ -130,11 +130,11 @@
   "scholar_book": {
     "name": "꽃잎 마도서",
     "asset": "weapons/scholar_book.png",
-    "w": 340,
-    "h": 256.52694610778445,
+    "w": 290,
+    "h": 218.80239520958085,
     "grip": [
-      0.5,
-      0.85
+      0.47,
+      0.56
     ],
     "hands": 1,
     "motion": "weapon",
@@ -145,16 +145,16 @@
   },
   "banner_bearer_banner": {
     "name": "도라가미 깃발",
-    "asset": "weapons/banner_bearer_banner_left.png",
-    "w": 500,
-    "h": 882.7838827838827,
+    "asset": "weapons/banner_bearer_banner.png",
+    "w": 491.4,
+    "h": 867.6,
     "grip": [
-      0.84,
-      0.8
+      0.38,
+      0.73
     ],
     "hands": 1,
     "motion": "weapon",
-    "rotation": 0.05,
+    "rotation": 0,
     "animation": {
       "weapon": 0
     },
@@ -167,11 +167,11 @@
   "clover_mage_staff": {
     "name": "클로버 마법봉",
     "asset": "weapons/clover_mage_staff.png",
-    "w": 330,
-    "h": 559.1142857142858,
+    "w": 350,
+    "h": 593,
     "grip": [
-      0.34,
-      0.72
+      0.1,
+      0.66
     ],
     "hands": 1,
     "motion": "weapon",
@@ -185,11 +185,11 @@
   "archer_bow": {
     "name": "잎새 활",
     "asset": "weapons/archer_bow.png",
-    "w": 170,
-    "h": 457.7522935779817,
+    "w": 210,
+    "h": 565.4587155963303,
     "grip": [
-      0.48,
-      0.52
+      0.18,
+      0.66
     ],
     "hands": 1,
     "motion": "weapon",

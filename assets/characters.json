@@ -23,7 +23,6 @@
     "banner-bearer": {
       "name": "깃발기수",
       "rig": "units/banner-bearer/rig.json",
-      "previewScale": 0.48,
       "recommendedWeapon": "banner_bearer_banner"
     },
     "clover-mage": {
