@@ -415,7 +415,7 @@ document.addEventListener('keydown',event=>{
  if(event.key!=='Escape')return;
  if(view.mode==='squad-target'){event.preventDefault();event.stopPropagation();cancelSquadTarget();}
  else if(commandPanelOpen){event.preventDefault();event.stopPropagation();closeSquadPanel();}
- else if($('debug-tools').open){event.preventDefault();event.stopPropagation();$('debug-tools').open=false;}
+ else if($('debug-tools').open){$('debug-tools').open=false;if(event.target!==canvas){event.preventDefault();event.stopPropagation();}}
 },true);
 $('legacy-controls-toggle').addEventListener('change',event=>{$('legacy-controls').hidden=!event.target.checked;if(event.target.checked)$('debug-tools').open=false;refresh();});
 $('board-resize').addEventListener('click',()=>{
