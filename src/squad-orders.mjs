@@ -44,7 +44,7 @@ export function orderSquad(board,id,action,target=null){
  const real=ORDER_ALIASES[action]||action;
  if(real==='focus'&&!enemyUnits(board,s,target).length)return false;
  if(real==='follow'&&!followLeader(board,s,target))return false;
- s.order={type:real,source:action,target:target?{...target}:null,dirty:true,previous:null,goals:new Map(),lastMembers:0};
+ s.order={type:real,source:action,target:real==='rally'?{x:lead.x,y:lead.y}:target?{...target}:null,dirty:true,previous:null,goals:new Map(),lastMembers:0};
  if(action==='firing-line')s.formation='spread';
  if(action==='flank')s.formation='column';
  if(action==='reform')s.formation='line';
@@ -64,7 +64,7 @@ function followLeader(board,s,target){
  return lead?.health.current>0?lead:null;
 }
 function centerFor(board,s,order){
- if(order.type==='rally'){const u=commander(board,s);return u?{x:u.x,y:u.y}:null;}
+ if(order.type==='rally')return order.target;
  if(order.type==='follow'){
    const lead=followLeader(board,s,order.target);if(!lead)return null;
    return {x:Math.max(0,Math.min(board.width-1,lead.x+(s.team==='B'?2:-2))),y:lead.y};
