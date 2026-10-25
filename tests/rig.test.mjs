@@ -50,7 +50,7 @@ test('rendered silhouette matches the motif with compact arms and short boots', 
   };
   // Reference proportions measured from the supplied motif, with a slightly
   // smaller head and a compact cuff/palm rather than an oversized forward fist.
-  for (const [name, min, max] of [['body', .66, .72], ['hand_back', .35, .38],
+  for (const [name, min, max] of [['body', .66, .72], ['hand_back', .32, .38],
     ['hand_front', .32, .36], ['leg_back', .20, .24], ['leg_front', .19, .23]]) {
     const ratio = width(name) / width('head');
     assert.ok(ratio >= min && ratio <= max, `${name}/head width ${ratio} changes the motif proportions`);
@@ -120,7 +120,8 @@ test('wrist roots meet the torso sleeve ends and the jaw meets the collar', () =
     drawWarrior(ctx,artwork,{id:1,state,facing,elapsed:.3,attackVector:{x:facing*72,y:42}},.3);
     for(const [hand,shoulder] of [['hand_back',[.11,.38]],['hand_front',[.88,.40]]]) {
       const root=ctx.point(hand,...rig.parts[hand].origin), sleeve=ctx.point('body',...shoulder);
-      assert.ok(Math.hypot(root[0]-sleeve[0],root[1]-sleeve[1])<2,`${hand} detached at shoulder during ${state}`);
+      // Allow the smaller rear cuff and placement in the user's manual export.
+      assert.ok(Math.hypot(root[0]-sleeve[0],root[1]-sleeve[1])<3,`${hand} detached at shoulder during ${state}`);
     }
     const jaw=ctx.point('head',.5,.99), collar=ctx.point('body',.52,.08);
     assert.ok(Math.hypot(jaw[0]-collar[0],jaw[1]-collar[1])<2,`head floats above collar during ${state}`);

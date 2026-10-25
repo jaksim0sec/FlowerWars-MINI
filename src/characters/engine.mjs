@@ -82,7 +82,8 @@ export function layoutCharacter(catalog, instance, time=0) {
       if(node.children) visit(node.children,m,lineage);
       if(node.socket) {
         const s=rig.sockets[node.socket],p=rig.parts[s.part];
-        sockets[node.socket]={matrix:multiply(m,multiply(translate(p.x+p.w*p.origin[0],p.y+p.h*p.origin[1]),multiply(rotate(p.rotation||0),translate((s.grip[0]-p.origin[0])*p.w,(s.grip[1]-p.origin[1])*p.h)))),ancestors:lineage};
+        const palm=multiply(m,multiply(translate(p.x+p.w*p.origin[0],p.y+p.h*p.origin[1]),multiply(rotate(p.rotation||0),translate((s.grip[0]-p.origin[0])*p.w,(s.grip[1]-p.origin[1])*p.h))));
+        sockets[node.socket]={matrix:multiply(palm,rotate(s.rotation||0)),ancestors:lineage};
         draws.push({socket:node.socket,ancestors:lineage});
       }
       if(node.part) {

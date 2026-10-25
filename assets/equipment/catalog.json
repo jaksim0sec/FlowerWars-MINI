@@ -149,18 +149,18 @@
     "w": 509.75103734439836,
     "h": 900,
     "grip": [
-      0.533007,
-      0.845948
+      0.2,
+      0.846
     ],
     "hands": 1,
     "motion": "weapon",
-    "rotation": -0.72,
+    "rotation": 0,
     "animation": {
       "weapon": 0
     },
     "secondaryGrip": [
-      0.84,
-      0.92
+      0.2,
+      0.96
     ],
     "twoHandedPose": "hold"
   },
@@ -175,7 +175,7 @@
     ],
     "hands": 1,
     "motion": "weapon",
-    "rotation": 0.55,
+    "rotation": 0,
     "secondaryGrip": [
       0.34,
       0.84
@@ -188,14 +188,14 @@
     "w": 259.96598133334703,
     "h": 700,
     "grip": [
-      0.419347,
-      0.692731
+      0.73,
+      0.54
     ],
     "hands": 1,
     "motion": "weapon",
-    "rotation": 0.55,
+    "rotation": 0.05,
     "secondaryGrip": [
-      0.48,
+      0.67,
       0.64
     ],
     "twoHandedPose": "hold"
