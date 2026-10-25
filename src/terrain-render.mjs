@@ -28,15 +28,23 @@ function paint(ctx,art,board,camera,width,height,dpr){
  return tiles.length;
 }
 /** One viewport-sized backing canvas per renderer, never a map-sized allocation. */
-export function drawTerrain(ctx,art,board,camera,width,height,dpr){
+export function drawTerrain(ctx,art,board,camera,width,height,dpr,interactive=false){
  let cache=caches.get(ctx);
  if(!cache){cache={canvas:document.createElement('canvas'),builds:0,tiles:0};caches.set(ctx,cache);}
- const key=[board.width,board.height,board.terrainRevision,board.terrain,art.tiles,camera.x,camera.y,camera.scale,width,height,dpr];
- if(!cache.key||key.some((v,i)=>v!==cache.key[i])){
-  const pw=Math.round(width*dpr),ph=Math.round(height*dpr);
+ const pad=128,key=[board.width,board.height,board.terrainRevision,board.terrain,art.tiles,width,height,dpr];
+ const base=cache.camera;
+ const covered=base&&-camera.x/camera.scale>=(-base.x-pad)/base.scale&&
+  (width-camera.x)/camera.scale<=(width-base.x+pad)/base.scale&&
+  -camera.y/camera.scale>=(-base.y-pad)/base.scale&&
+  (height-camera.y)/camera.scale<=(height-base.y+pad)/base.scale;
+ if(!cache.key||key.some((v,i)=>v!==cache.key[i])||!covered||(!interactive&&(base.scale!==camera.scale||base.x!==camera.x||base.y!==camera.y))){
+  const pw=Math.round((width+pad*2)*dpr),ph=Math.round((height+pad*2)*dpr);
   if(cache.canvas.width!==pw||cache.canvas.height!==ph){cache.canvas.width=pw;cache.canvas.height=ph;}
-  cache.tiles=paint(cache.canvas.getContext('2d'),art,board,camera,width,height,dpr);cache.key=key;cache.builds++;
+  cache.tiles=paint(cache.canvas.getContext('2d'),art,board,{...camera,x:camera.x+pad,y:camera.y+pad},width+pad*2,height+pad*2,dpr);
+  cache.camera={...camera};cache.key=key;cache.builds++;
  }
- ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(cache.canvas,0,0);
+ const ratio=camera.scale/cache.camera.scale;
+ ctx.setTransform(1,0,0,1,0,0);
+ ctx.drawImage(cache.canvas,(camera.x-(cache.camera.x+pad)*ratio)*dpr,(camera.y-(cache.camera.y+pad)*ratio)*dpr,cache.canvas.width*ratio,cache.canvas.height*ratio);
 }
 export function terrainRenderStats(ctx){const c=caches.get(ctx);return c?{builds:c.builds,tiles:c.tiles,bytes:c.canvas.width*c.canvas.height*4}:null;}

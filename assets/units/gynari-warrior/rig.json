@@ -391,5 +391,11 @@
   "worldTranslate": [
     "lungeX",
     "lungeY"
-  ]
+  ],
+  "equipmentRotations": {
+    "basic_sword": {
+      "left": -0.20534276893638692,
+      "right": 0.08000000000000002
+    }
+  }
 }

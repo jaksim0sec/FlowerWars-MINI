@@ -1,3 +1,4 @@
+import {characterRadius,onScreen,cachedPose,releasePose} from './character-render-cache.mjs';
 import {drawTerrain} from './terrain-render.mjs';
 import {loadCatalog, loadImage} from './characters/catalog.mjs';
 import {createCharacter, equip, drawCharacter} from './characters/engine.mjs';
@@ -70,9 +71,9 @@ export function drawWarrior(ctx, art, unit, time) {
   drawCharacter(ctx,art.catalog,instance,time);
 }
 
-export function render(ctx, art, board, view, camera, width, height, dpr) {
+export function render(ctx, art, board, view, camera, width, height, dpr, options={}) {
   ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,width,height);
-  drawTerrain(ctx,art,board,camera,width,height,dpr);
+  drawTerrain(ctx,art,board,camera,width,height,dpr,options.cameraMoving);
   ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.translate(camera.x,camera.y);ctx.scale(camera.scale,camera.scale);
 
@@ -92,7 +93,8 @@ export function render(ctx, art, board, view, camera, width, height, dpr) {
     for (const step of selected.path) { const p = project(step.x, step.y); ctx.lineTo(p.x, p.y); }
     ctx.setLineDash([3, 6]); ctx.strokeStyle = '#fff3b9'; ctx.lineWidth = 3; ctx.stroke(); ctx.restore();
   }
-  const units = [...board.units].sort((a, b) => (a.visualX + a.visualY) - (b.visualX + b.visualY) || a.visualX - b.visualX);
+  let posedUnits=0;
+  const units = board.units.filter(u=>{const p=project(u.visualX,u.visualY);const visible=onScreen(p.x,p.y,u.character?characterRadius(art.catalog,u.character):250,camera,width,height);if(!visible&&u.character)releasePose(u.character);return visible;}).sort((a, b) => (a.visualX + a.visualY) - (b.visualX + b.visualY) || a.visualX - b.visualX);
   for (const unit of units) {
     const p = project(unit.visualX, unit.visualY);
     ctx.save(); ctx.translate(p.x, p.y);
@@ -103,7 +105,8 @@ export function render(ctx, art, board, view, camera, width, height, dpr) {
     }
     if(unit.character) {
       Object.assign(unit.character.animation,{state:unit.state,elapsed:unit.elapsed,facing:unit.facing,phase:unit.id,attackVector:unit.attackVector,deathDirection:unit.deathDirection});
-      drawCharacter(ctx,art.catalog,unit.character,board.time);
+      const pose=cachedPose(art.catalog,unit.character,board.time,camera.scale);if(pose.computed)posedUnits++;
+      drawCharacter(ctx,art.catalog,unit.character,board.time,{layout:pose.layout});
     } else drawWarrior(ctx, art, unit, board.time);
     if (unit.id === view.selected && unit.state!=='death') {
       const y = -123 + Math.sin(board.time * 3) * 2;
@@ -122,4 +125,5 @@ export function render(ctx, art, board, view, camera, width, height, dpr) {
     }
     ctx.restore();
   }
+  return {visibleUnits:units.length,posedUnits};
 }

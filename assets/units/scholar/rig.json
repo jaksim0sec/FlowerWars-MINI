@@ -348,5 +348,11 @@
     "lungeY"
   ],
   "slotPoses": {},
-  "bodyStandard": "../body-standard.json"
+  "bodyStandard": "../body-standard.json",
+  "equipmentRotations": {
+    "basic_sword": {
+      "left": 0.1315374829721519,
+      "right": -0.011511324493461095
+    }
+  }
 }

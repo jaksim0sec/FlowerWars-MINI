@@ -13,8 +13,8 @@ with sync_playwright() as p:
         header=page.locator('.masthead').bounding_box()
         field=page.locator('#board').bounding_box()
         footer=page.locator('.command-area').bounding_box()
-        assert field['y'] >= header['y']+header['height']-1, f'field behind header at {width}px'
-        assert field['y']+field['height'] <= footer['y']+1, f'field behind controls at {width}px'
+        assert field['y']==0 and field['height']==height, f'field is not full viewport at {width}px'
+        assert footer['y']>=0 and footer['y']+footer['height']<=height+1, f'floating controls outside screen at {width}px'
         assert not page.locator('.field-caption').is_visible(), 'decorative title must not cover gameplay'
         assert footer['height'] <= 110 if width < 600 else footer['height'] <= 140, f'oversized controls at {width}px'
         # Reproduce 71% zoom, then pan aggressively. Canvas must stay clipped
@@ -30,9 +30,10 @@ with sync_playwright() as p:
         page.wait_for_timeout(100)
         new_field=page.locator('#board').bounding_box()
         new_footer=page.locator('.command-area').bounding_box()
-        assert new_field['y']+new_field['height'] <= new_footer['y']+1
+        assert new_field['y']==0 and new_field['height']==max(320,height-100)
+        assert new_footer['y']+new_footer['height']<=max(320,height-100)+1
         assert not errors, errors
         if width==375: page.screenshot(path='/tmp/doragami-layout-after.png')
         page.close()
     browser.close()
-    print('PASS protected field, compact mobile controls, zoom/pan isolation and viewport resize (5 sizes)')
+    print('PASS fullscreen field, compact floating controls, zoom/pan isolation and viewport resize (5 sizes)')

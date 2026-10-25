@@ -110,8 +110,8 @@ export function layoutCharacter(catalog, instance, time=0) {
     const e=catalog.equipment[attachment.equipmentId];
     const side=attachment.hand==='both' ? pose.primary : attachment.hand;
     const socket=sockets[side];
-    const equipmentVars=channels(rig,instance,time,[e]);
-    const rotation=(e.socketRotations?.[side] ?? e.rotation ?? 0)+value(e.motion||0,equipmentVars)+(attachment.overrides.rotation||0);
+    const equipmentVars=!e.animation?vars:Object.keys(e.animation).length===1&&Object.hasOwn(e.animation,'weapon')?{...vars,weapon:value(e.animation.weapon,vars)}:channels(rig,instance,time,[e]);
+    const rotation=(e.socketRotations?.[side] ?? e.rotation ?? 0)+(rig.equipmentRotations?.[attachment.equipmentId]?.[side]||0)+value(e.motion||0,equipmentVars)*(e.socketMotionSigns?.[side]??1)+(attachment.overrides.rotation||0);
     const mirror=e.socketMirrors?.[side] ? [-1,0,0,1,0,0] : I();
     const matrix=multiply(socket.matrix,multiply(translate(...(e.offset || [0,0])),multiply(rotate(rotation),mirror)));
     equipmentDraws[side]={equipmentId:attachment.equipmentId,matrix,w:e.w,h:e.h,grip:e.grip};
@@ -154,9 +154,9 @@ export function layoutCharacter(catalog, instance, time=0) {
   draws.sort((a,b)=>layer(a)-layer(b));
   return {draws,sockets,equipmentDraws,groups,vars};
 }
-export function drawCharacter(ctx,catalog,instance,time=0,{scale}={}) {
+export function drawCharacter(ctx,catalog,instance,time=0,{scale,layout}={}) {
   const def=catalog.characters[instance.characterId],rig=def.rig;
-  const {draws,equipmentDraws,vars}=layoutCharacter(catalog,instance,time);
+  const {draws,equipmentDraws,vars}=layout||layoutCharacter(catalog,instance,time);
   ctx.save();
   ctx.translate(...(rig.worldTranslate || [0,0]).map(expr=>value(expr,vars)));
   const s=scale ?? rig.scale;

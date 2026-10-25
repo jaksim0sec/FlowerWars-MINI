@@ -10,8 +10,7 @@
 </head>
 <body>
   <header class="masthead">
-    <a class="brand" href="./" aria-label="도라가미 처음으로"><span class="brand-mark">✿</span><span>도라가미<small>DORAGAMI</small></span></a>
-    <div class="chapter"><a href="./characters.html">캐릭터 연구실</a><span class="chapter-dot"></span> 첫 번째 전장<span class="chapter-divider">/</span><span id="unit-count">용사 2</span></div>
+    <div class="chapter"><a href="./characters.html">캐릭터 연구실</a><span id="unit-count">용사 2</span></div>
   </header>
   <main id="battlefield">
     <canvas id="board" tabindex="0" role="application" aria-label="도라가미 전장. 드래그로 이동, 휠 또는 두 손가락으로 확대. 방향키로 타일 탐색, Enter로 선택, S로 소환 모드, A로 공격 모드."></canvas>
@@ -20,7 +19,6 @@
       <button id="zoom-in" aria-label="확대">+</button><output id="zoom-value" aria-label="확대 비율">100%</output><button id="zoom-out" aria-label="축소">−</button>
       <span class="tool-divider"></span><button id="fit" aria-label="전장 맞춤" title="전장 맞춤">⌖</button>
     </div>
-    <div class="field-label"><i></i> 10 × 16 <span>잔디 · 흙</span></div>
   </main>
   <footer class="command-area">
     <p id="notice" role="status" aria-live="polite">전장을 준비하고 있어요…</p>
@@ -33,7 +31,6 @@
         <button id="reset" class="subtle" aria-label="초기화" title="초기화">↺</button>
       </div>
     </div>
-    <div class="instructions"><span>드래그로 이동 · 휠 / 두 손가락으로 확대</span><span>선택 → 빈칸 이동 · 공격 → 상대 선택</span></div>
   </footer>
   <script type="module" src="./src/app.mjs"></script>
 </body>

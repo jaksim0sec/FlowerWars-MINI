@@ -16,7 +16,7 @@ button:not(:disabled):active { transform: translateY(1px); }
 .chapter { display: flex; align-items: center; gap: 10px; color: #7d6a51; font-size: 11px; white-space: nowrap; }
 .chapter-dot { width: 6px; height: 6px; background: #92a25d; border-radius: 50%; }
 .chapter-divider { opacity: .3; margin: 0 3px; }
-/* The canvas is clipped to this grid row. Camera transforms cannot cover UI. */
+/* Canvas clips camera transforms; the floating controls remain above it. */
 #battlefield { position: relative; width: 100%; min-height: 0; overflow: hidden; isolation: isolate; background: radial-gradient(ellipse at 50% 48%, #fbf5e9, #f0e6d2 75%, #e9ddc7); }
 #board { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
 #board.dragging { cursor: grabbing; }
@@ -75,3 +75,17 @@ select {font:inherit;color:var(--ink);background:#fffaf0;border:1px solid var(--
 @media(max-width:600px){.command-bar{gap:3px;}.selection{min-height:19px;}.selection-icon{display:none;}.selection small{margin-top:0;}.actions button{height:36px;}.command-area{padding-top:5px;padding-bottom:max(6px,env(safe-area-inset-bottom));}}
 
 @media(max-width:600px){.command-bar{padding-top:3px;padding-bottom:3px;}}
+/* Full viewport battlefield with a compact floating test dock. */
+body{display:block;}
+#battlefield{position:fixed;inset:0;height:100dvh;}
+.masthead{position:fixed;z-index:2;top:max(10px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));padding:0;border:0;}
+.brand,.chapter-dot,.chapter-divider,.field-label,.instructions,.selection-icon{display:none;}
+.chapter{gap:10px;padding:7px 10px;border-radius:12px;background:#fffaf0cf;backdrop-filter:blur(8px);}
+.command-area{position:fixed;z-index:2;left:50%;bottom:max(10px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(620px,calc(100% - 20px));padding:0;background:none;border:0;}
+.command-bar{width:100%;grid-template-columns:minmax(100px,1fr) auto;padding:7px 9px;gap:8px;background:#fffaf0e8;box-shadow:0 3px 20px #45351b16;backdrop-filter:blur(10px);}
+#notice{position:fixed;bottom:calc(100% + 8px);left:0;width:100%;margin:0;pointer-events:none;}
+.camera-tools{bottom:auto;top:max(10px,env(safe-area-inset-top));flex-direction:row;border-radius:12px;}
+.camera-tools button{width:34px;height:34px;font-size:20px;}.tool-divider{width:1px;height:18px;margin:0 3px;}
+@media(max-width:600px){.command-bar{grid-template-columns:1fr;gap:4px;}.selection>div{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}.selection{min-height:0;}.selection small{margin:0;}.actions{justify-content:space-between;}.actions button{height:36px;}.camera-tools{right:10px;}.chapter{font-size:10px;}#selection-detail{display:none;}}
+
+#notice{opacity:0;transition:opacity .3s;}#notice.visible{opacity:1;}

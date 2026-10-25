@@ -107,7 +107,7 @@ with sync_playwright() as p:
     for w in [320,375,390]:
         small=browser.new_page(viewport={'width':w,'height':568})
         small.goto(BASE);small.get_by_text('전장 준비 완료',exact=False).wait_for()
-        label=small.locator('#selection-detail').bounding_box()
+        label=small.locator('#selection-name').bounding_box()
         actions=small.locator('.actions').bounding_box()
         assert label['x']+label['width'] <= actions['x'] or label['y']+label['height'] <= actions['y'], f'selection overlaps controls at {w}px'
         small.close()

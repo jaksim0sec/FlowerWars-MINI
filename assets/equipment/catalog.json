@@ -15,7 +15,19 @@
       0.89,
       0.92
     ],
-    "twoHandedPose": "hold"
+    "twoHandedPose": "hold",
+    "socketMirrors": {
+      "left": false,
+      "right": true
+    },
+    "socketRotations": {
+      "left": 0.2,
+      "right": -0.2
+    },
+    "socketMotionSigns": {
+      "left": 1,
+      "right": -1
+    }
   },
   "clover_staff": {
     "name": "클로버 지팡이",
@@ -70,7 +82,7 @@
     "name": "새싹 지팡이",
     "asset": "weapons/sprout_staff.webp",
     "w": 348.510638,
-    "h": 520.0,
+    "h": 520,
     "grip": [
       0.74,
       0.78
@@ -115,7 +127,7 @@
     "name": "수호 방패",
     "asset": "weapons/shield_guard_shield.png",
     "w": 420.603015,
-    "h": 540.0,
+    "h": 540,
     "grip": [
       0.643817,
       0.638322
@@ -174,7 +186,7 @@
     "name": "클로버 마법봉",
     "asset": "weapons/clover_mage_staff.png",
     "w": 365.935919,
-    "h": 620.0,
+    "h": 620,
     "grip": [
       0.294301,
       0.6525
@@ -200,7 +212,7 @@
     "name": "잎새 활",
     "asset": "weapons/archer_bow.png",
     "w": 252.538382,
-    "h": 680.0,
+    "h": 680,
     "grip": [
       0.73,
       0.54

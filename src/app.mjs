@@ -11,12 +11,14 @@ const view = { selected: null, tile: null, hover: null, mode: 'move' };
 let camera = { x: 0, y: 0, scale: 1 };
 let width = 0, height = 0, dpr = 1, art = null;
 let lastFrame = 0, previousBusy = false, previousHits = 0;
+let lastDraw=0,visibleCount=0,lastCamera='',cameraChanged=0,lastVisual='',cameraSettled=true;
 let fitted = true;
 const pointers = new Map();
 let origin = null, gestureMoved = false;
 
 function text(id, value) { if ($(id).textContent !== value) $(id).textContent = value; }
-function notify(message) { text('notice', message); }
+let noticeTimer;
+function notify(message) { text('notice', message);$('notice').classList.add('visible');clearTimeout(noticeTimer);noticeTimer=setTimeout(()=>$('notice').classList.remove('visible'),2600); }
 
 function fit() {
   camera = fitBoardCamera(width, height, board.width, board.height);
@@ -56,7 +58,9 @@ function seed() {
   refresh();
 }
 
-function refresh() {
+let dirty=true;
+function refresh(invalidate=true) {
+  if(invalidate)dirty=true;
   let unit = board.unit(view.selected);
   if(unit?.health.current<=0){view.selected=null;view.tile=null;unit=null;}
   text('selection-health',unit?`체력 ${unit.health.current} / ${unit.health.max} · ${healthLabel(unit.health)}`:'');
@@ -249,7 +253,17 @@ function frame(now) {
     if (hits > previousHits) notify('공격이 명중했어요! 상대 용사가 충격에 반응합니다.');
     else if (previousBusy && !board.busy) notify('동작 완료 · 다음 이동이나 공격을 선택하세요.');
     previousHits = hits; previousBusy = board.busy;
-    refresh(); render(ctx, art, board, view, camera, width, height, dpr);
+    refresh(false);
+    const cameraKey=[camera.x,camera.y,camera.scale].join(',');
+    if(cameraKey!==lastCamera){cameraChanged=now;lastCamera=cameraKey;dirty=true;cameraSettled=false;}
+    const visual=[view.selected,view.tile?.x,view.tile?.y,view.hover?.x,view.hover?.y,view.mode,board.units.length,board.terrainRevision,width,height,dpr].join(',');
+    if(visual!==lastVisual){lastVisual=visual;dirty=true;}
+    const cameraMoving=now-cameraChanged<120;
+    if(!cameraMoving&&!cameraSettled)dirty=true;
+    const active=board.busy||board.effects.length>0||cameraMoving;
+    if(dirty||active||(visibleCount>0&&now-lastDraw>=1000/30-1)){
+      const result=render(ctx,art,board,view,camera,width,height,dpr,{cameraMoving});visibleCount=result.visibleUnits;lastDraw=now;dirty=false;if(!cameraMoving)cameraSettled=true;
+    }
   }
   requestAnimationFrame(frame);
 }
