@@ -39,6 +39,58 @@ def apply_reference_layout(rig, unit_id, equipment):
  for eid,change in REFERENCE_EQUIPMENT.items():
   if eid.startswith(unit_id.replace('-','_')+'_'):equipment[eid].update(change)
 
+def apply_reference_pose(rig, unit_id, equipment):
+    spec=read(ROOT/'assets/units/reference-poses.json')['characters'][unit_id]
+    f=spec['factor']
+    def world(x,y):return 505+(x-spec['center'])*f,1228+(y-spec['ground'])*f
+    for name,(x,y,scale) in spec['parts'].items():
+        p=rig['parts'][name];iw,ih=p['file_dimensions'];wx,wy=world(x,y)
+        p.update(x=round(wx,4),y=round(wy,4),w=round(iw*scale*f,4),h=round(ih*scale*f,4))
+    head=rig['parts']['head_deco'];head['asset']='head_deco.png'
+    head.pop('front_clip',None);head.pop('clip',None)
+    rig['foot']=[505,1228]
+    shadow=rig['parts']['shadow'];shadow['x']=505-shadow['w']/2;shadow['y']=1228-shadow['h']/2
+    b=rig['parts']['body'];rig['neck']=[round(b['x']+b['w']*.5,4),round(b['y']+b['h']*.1,4)]
+    for side,name,ratio in [('left','hand_back',.13),('right','hand_front',.87)]:
+        p=rig['parts'][name];sx=b['x']+b['w']*ratio;sy=b['y']+b['h']*.2
+        p['origin']=[round((sx-p['x'])/p['w'],5),round((sy-p['y'])/p['h'],5)]
+        rig['sockets'][side]['grip']=[.28,.8] if side=='left' else [.72,.8]
+    def visit(nodes):
+        for n in nodes:
+            if n.get('id')=='neck':
+                n['transforms'][0]['pivot']=rig['neck']
+                n['children']=[{'part':'head_deco'}] if unit_id=='shield-guard' else [{'part':'head'},{'part':'head_deco'}]
+            if n.get('id') in ('leftArm','rightArm'):
+                p=rig['parts']['hand_back' if n['id']=='leftArm' else 'hand_front']
+                pivot=[p['x']+p['w']*p['origin'][0],p['y']+p['h']*p['origin'][1]]
+                n['transforms'][0]['pivot']=pivot
+                rig['twoHandedPoses']['hold']['nodes'][n['id']]['transforms'][0]['pivot']=pivot
+            visit(n.get('children',[]))
+    visit(rig['nodes'])
+    upper=next(n for n in rig['nodes'][1]['children'] if n.get('id')=='upper')
+    nodes=upper['children'];left=next(n for n in nodes if n.get('id')=='leftArm')
+    right=next(n for n in nodes if n.get('id')=='rightArm')
+    body=next(n for n in nodes if n.get('part')=='body')
+    neck=next(n for n in nodes if n.get('id')=='neck')
+    others=[n for n in nodes if n.get('socket') in ('back','waist')]
+    if unit_id in ('shield-guard','scholar'):
+        left['children']=[{'part':'hand_back'},{'socket':'left'}]
+        upper['children']=[body,left,right,neck]
+    elif unit_id=='archer':
+        upper['children']=[*[n for n in others if n.get('socket')=='back'],left,body,*[n for n in others if n.get('socket')=='waist'],right,neck]
+    else:upper['children']=[left,body,right,neck]
+    sizes={'shield_guard_shield':(310,398),'scholar_book':(334,252),'banner_bearer_banner':(273,482),'clover_mage_staff':(350,593),'archer_bow':(218,587),'archer_quiver':(233,297),'archer_side_pouch':(274,255)}
+    for eid,entry in spec['equipment'].items():
+        item=equipment[eid];ex,ey,scale=entry['position'];iw,ih=sizes[eid]
+        item['w']=round(iw*scale*f,4);item['h']=round(ih*scale*f,4)
+        item['grip']=entry['grip'];item['rotation']=0
+        if eid=='banner_bearer_banner':item['asset']='weapons/banner_bearer_banner.png'
+        x,y=world(ex,ey);x+=item['w']*item['grip'][0];y+=item['h']*item['grip'][1]
+        slot=rig['sockets'][entry['hand']];p=rig['parts'][slot['part']]
+        slot['grip']=[round((x-p['x'])/p['w'],5),round((y-p['y'])/p['h'],5)]
+    rig['version']=rig.get('version',1)+1
+    rig['note']='Reference-matched rig positions and painter order; source PNGs unmodified.'
+
 def register(source):
  manifest=read(source/'manifest.json');catalog=read(ROOT/'assets/characters.json');equipment=read(ROOT/'assets/equipment/catalog.json')
  base=read(ROOT/'assets/units/gynari-warrior/rig.json')
@@ -125,6 +177,7 @@ def register(source):
     info['recommendedWeapon']=eid
     if id in ['archer','clover-mage']:info['recommendedHand']='right'
   apply_reference_layout(rig,id,equipment)
+  apply_reference_pose(rig,id,equipment)
   write(target/'rig.json',rig);catalog['characters'][id]=info
   write(target/'source.json',entry)
  write(ROOT/'assets/characters.json',catalog);write(ROOT/'assets/equipment/catalog.json',equipment)

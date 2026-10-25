@@ -17,10 +17,10 @@ with sync_playwright() as p:
  const {loadCatalog}=await import('/src/characters/catalog.mjs');const {createCharacter,equip,layoutCharacter}=await import('/src/characters/engine.mjs');const lib=await loadCatalog(),failures=[];
  for(const [id,d] of Object.entries(lib.characters).filter(([id])=>!['gynari-warrior','sprout-healer'].includes(id)))for(const state of ['idle','walk','attack','hit']){
  const c=createCharacter(lib,id);Object.assign(c.animation,{state,elapsed:.2});const l=layoutCharacter(lib,c,.2),masks={};
- for(const name of ['head','body','hand_back','hand_front','leg_back','leg_front']){
+ for(const name of (id==='shield-guard'?['head_deco','body','hand_back','hand_front','leg_back','leg_front']:['head','body','hand_back','hand_front','leg_back','leg_front'])){
  const cv=document.createElement('canvas');cv.width=600;cv.height=700;const ctx=cv.getContext('2d'),p=d.rig.parts[name],draw=l.draws.find(x=>x.part===name);ctx.translate(300,650);ctx.scale(.5,.5);ctx.translate(-d.rig.foot[0],-d.rig.foot[1]);ctx.transform(...draw.matrix);ctx.drawImage(d.images[name],-p.w*p.origin[0],-p.h*p.origin[1],p.w,p.h);masks[name]=ctx.getImageData(0,0,600,700).data;
  }
- for(const name of ['head','hand_back','hand_front','leg_back','leg_front']){
+ for(const name of (id==='shield-guard'?['head_deco','hand_back','hand_front','leg_back','leg_front']:['head','hand_back','hand_front','leg_back','leg_front'])){
  let overlap=0;const a=masks[name],b=masks.body;for(let i=3;i<a.length;i+=4)if(a[i]>100&&b[i]>100)overlap++;
  if(overlap<10)failures.push(`${id}/${state}: ${name} detached (${overlap} pixels overlap)`);
  }

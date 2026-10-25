@@ -1,0 +1,354 @@
+{
+  "version": 1,
+  "source": "flowerwars_selected_merged.zip",
+  "notes": "Reference pixel geometry, uniform ground baseline; original part PNGs remain untouched.",
+  "characters": {
+    "shield-guard": {
+      "center": 220,
+      "ground": 545,
+      "factor": 1.64,
+      "parts": {
+        "leg_back": [
+          98.52,
+          456.44,
+          0.62
+        ],
+        "leg_front": [
+          240.79,
+          447.96,
+          0.74
+        ],
+        "hand_back": [
+          104.54,
+          316.74,
+          0.53
+        ],
+        "body": [
+          127.04,
+          264.51,
+          0.69
+        ],
+        "hand_front": [
+          270.49,
+          237.7,
+          0.76
+        ],
+        "head_deco": [
+          65.05,
+          -6.6,
+          0.79
+        ],
+        "head": [
+          95,
+          115,
+          0.68
+        ]
+      },
+      "equipment": {
+        "shield_guard_shield": {
+          "position": [
+            -1,
+            234.71,
+            0.65
+          ],
+          "grip": [
+            0.69,
+            0.55
+          ],
+          "hand": "left"
+        }
+      }
+    },
+    "scholar": {
+      "center": 205,
+      "ground": 546,
+      "factor": 1.66,
+      "parts": {
+        "leg_back": [
+          97.99,
+          466.71,
+          0.56
+        ],
+        "leg_front": [
+          217.62,
+          467.04,
+          0.56
+        ],
+        "hand_back": [
+          59.94,
+          314.07,
+          0.55
+        ],
+        "body": [
+          90.72,
+          282.25,
+          0.64
+        ],
+        "hand_front": [
+          236.53,
+          316.37,
+          0.56
+        ],
+        "head": [
+          61.71,
+          112.57,
+          0.77
+        ],
+        "head_deco": [
+          24.08,
+          4.69,
+          0.73
+        ]
+      },
+      "equipment": {
+        "scholar_book": {
+          "position": [
+            9.5,
+            285.47,
+            0.47
+          ],
+          "grip": [
+            0.62,
+            0.72
+          ],
+          "hand": "left"
+        }
+      }
+    },
+    "banner-bearer": {
+      "center": 230,
+      "ground": 545,
+      "factor": 1.65,
+      "parts": {
+        "leg_back": [
+          120.19,
+          464.2,
+          0.65
+        ],
+        "leg_front": [
+          250.19,
+          465.7,
+          0.64
+        ],
+        "hand_back": [
+          76.59,
+          299.55,
+          0.74
+        ],
+        "body": [
+          72.42,
+          292.32,
+          0.7
+        ],
+        "hand_front": [
+          272.25,
+          328.07,
+          0.57
+        ],
+        "head": [
+          129.41,
+          138.38,
+          0.7
+        ],
+        "head_deco": [
+          128.65,
+          88.73,
+          0.61
+        ]
+      },
+      "equipment": {
+        "banner_bearer_banner": {
+          "position": [
+            -5.42,
+            9.04,
+            0.79
+          ],
+          "grip": [
+            0.52,
+            0.86
+          ],
+          "hand": "left"
+        }
+      }
+    },
+    "clover-mage": {
+      "center": 165,
+      "ground": 544,
+      "factor": 1.67,
+      "parts": {
+        "leg_back": [
+          40.01,
+          444.47,
+          0.52
+        ],
+        "leg_front": [
+          173.67,
+          451.02,
+          0.51
+        ],
+        "hand_back": [
+          4.94,
+          299.21,
+          0.6
+        ],
+        "body": [
+          39.02,
+          274.96,
+          0.59
+        ],
+        "hand_front": [
+          202.14,
+          288.11,
+          0.54
+        ],
+        "head": [
+          10.59,
+          78.82,
+          0.79
+        ],
+        "head_deco": [
+          13.86,
+          8.32,
+          0.7
+        ]
+      },
+      "equipment": {
+        "clover_mage_staff": {
+          "position": [
+            247.79,
+            138.4,
+            0.56
+          ],
+          "grip": [
+            0.12,
+            0.7
+          ],
+          "hand": "right"
+        }
+      }
+    },
+    "archer": {
+      "center": 196,
+      "ground": 629,
+      "factor": 1.43,
+      "parts": {
+        "leg_back": [
+          64.8975,
+          513.252,
+          0.656
+        ],
+        "leg_front": [
+          208.5933,
+          500.386,
+          0.709
+        ],
+        "hand_back": [
+          27.0636,
+          350.1025,
+          0.7513
+        ],
+        "body": [
+          66.8144,
+          320.3573,
+          0.7264
+        ],
+        "hand_front": [
+          242.2108,
+          346.9926,
+          0.575
+        ],
+        "head": [
+          36.2091,
+          118.0417,
+          0.8182
+        ],
+        "head_deco": [
+          29.978,
+          8.3625,
+          0.8552
+        ]
+      },
+      "equipment": {
+        "archer_bow": {
+          "position": [
+            304.5484,
+            159.8445,
+            0.6501
+          ],
+          "grip": [
+            0.25,
+            0.65
+          ],
+          "hand": "right"
+        },
+        "archer_quiver": {
+          "position": [
+            6.5285,
+            287.6237,
+            0.5385
+          ],
+          "grip": [
+            0.6,
+            0.5
+          ],
+          "hand": "back"
+        },
+        "archer_side_pouch": {
+          "position": [
+            70.8343,
+            434.3358,
+            0.3884
+          ],
+          "grip": [
+            0.5,
+            0.3
+          ],
+          "hand": "waist"
+        }
+      }
+    },
+    "scout": {
+      "center": 160,
+      "ground": 639,
+      "factor": 1.41,
+      "parts": {
+        "leg_back": [
+          176.5019,
+          508.5081,
+          0.737
+        ],
+        "leg_front": [
+          46.9011,
+          551.8793,
+          0.9916
+        ],
+        "hand_back": [
+          50.2337,
+          409.2246,
+          0.5667
+        ],
+        "body": [
+          50.6656,
+          337.9771,
+          0.9948
+        ],
+        "hand_front": [
+          231.4394,
+          398.8561,
+          1.0113
+        ],
+        "head": [
+          6.3675,
+          117.1107,
+          0.8863
+        ],
+        "head_deco": [
+          4.2793,
+          -0.619,
+          1.0013
+        ]
+      },
+      "equipment": {}
+    }
+  }
+}
