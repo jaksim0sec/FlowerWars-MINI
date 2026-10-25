@@ -104,7 +104,7 @@ function commitSquadTarget(squad,action,aim){
 }
 function issueSquadAction(action){
  const squad=activeSquad();if(!squad)return;
- if(!squadSummary(board,squad.id)?.commanderAlive){notify('지휘관이 없어 명령할 수 없습니다.');return;}
+ if(!squadSummary(board,squad.id)?.commanderAlive){notify('생존 병력이 없어 명령할 수 없습니다.');return;}
  if(targetedSquadActions.has(action)){
   view.squadId=squad.id;view.squadOrder=action;view.mode='squad-target';
   commandPanelOpen=false;
@@ -128,8 +128,7 @@ function selectSquad(id,trigger=null){
   else {notify('명령에 맞는 대상 분대를 선택하세요.');return;}
  }
  selectedSquadId=id;
- const lead=board.unit(squad.leaderId);
- const unit=lead?.health.current>0?lead:squad.memberIds.map(member=>board.unit(member)).find(u=>u?.health.current>0);
+ const unit=board.unit(squadSummary(board,id)?.actingCommanderId);
  view.selected=unit?.id??null;view.tile=unit?{x:unit.x,y:unit.y}:null;
  // The commander icon always opens its squad's orders; only ×/outside/Esc closes.
  commandPanelOpen=true;squadQuickCommand=true;
@@ -174,13 +173,13 @@ function syncSquadRoster(){
     if(!button){button=rosterButton(squad);rosterCards.set(squad.id,button);list.append(button);}
     const summary=squadSummary(board,squad.id);
     const echelon=squad.platoonIndex!=null?'제'+(squad.platoonIndex+1)+'소대 · ':'';
-    const label=echelon+(summary.commanderAlive?'기수 ':'기수 전사 ')+summary.alive+'/'+squad.memberIds.length;
+    const label=echelon+(summary.leaderAlive?'기수 지휘 ':summary.commanderAlive?'임시 지휘 ':'전멸 ')+summary.alive+'/'+squad.memberIds.length;
     const status=button.querySelector('.squad-card-status');
     const remaining=summary.alive+'/'+squad.memberIds.length;
     if(status.textContent!==remaining)status.textContent=remaining;
     const active=squad.id===selectedSquadId&&(commandPanelOpen||squadQuickCommand);
     button.classList.toggle('is-selected',active);
-    button.classList.toggle('is-leader-down',!summary.commanderAlive);
+    button.classList.toggle('is-leader-down',!summary.leaderAlive);
     button.setAttribute('aria-pressed',String(active));
     button.setAttribute('aria-label',squad.team+'팀 '+squad.name+', '+label+'. 분대 명령 열기');
   }
@@ -226,7 +225,7 @@ function refresh(invalidate=true) {
   if(squad){
     const summary=squadSummary(board,squad.id),special=squadSpecial[squad.type]||squadSpecial.mixed;
     text('squad-name',squad.name);
-    text('squad-status',`${summary.alive}/${squad.memberIds.length}명 · ${summary.commanderAlive?'기수 지휘':'지휘관 전사'} · ${squadActionLabels[squad.order?.source]||'대기'}`);
+    text('squad-status',`${summary.alive}/${squad.memberIds.length}명 · ${summary.leaderAlive?'기수 지휘':summary.commanderAlive?'임시 지휘관 승계':'분대 전멸'} · ${squadActionLabels[squad.order?.source]||'대기'}`);
     if(lastSelectedSquad!==squad.id){
       lastSelectedSquad=squad.id;
       $('squad-special').dataset.squadAction=special[0];
