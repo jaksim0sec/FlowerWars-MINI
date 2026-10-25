@@ -115,3 +115,17 @@ body{display:block;}
 .group-tools{position:fixed;z-index:3;left:12px;top:54px;background:#fffaf0ed;border:1px solid var(--line);border-radius:10px;font-size:11px;max-width:calc(100% - 24px);}.group-tools summary{padding:9px 12px;cursor:pointer;}.group-tools[open]{width:260px;padding:0 10px 10px;}.group-tools .movement-options{margin:8px 0;}.group-tools select,.group-tools input{width:100%;min-width:0;max-width:none;padding:6px;border:1px solid var(--line);border-radius:6px;background:#fffaf0;font:inherit;}#group-place{padding:8px 12px;border-radius:7px;background:#edbf4e;}#group-status{margin-left:8px;color:var(--muted);}
 
 .field-tools{position:fixed;z-index:3;left:12px;top:98px;background:#fffaf0ed;border:1px solid var(--line);border-radius:10px;max-width:calc(100% - 24px);font-size:11px;}.field-tools summary{padding:9px 12px;cursor:pointer;}.field-tools[open]{width:280px;padding:0 10px 10px;}.field-tools input{width:100%;min-width:0;padding:6px;border:1px solid var(--line);border-radius:6px;background:#fffaf0;font:inherit;}.field-tools button{padding:8px;margin:6px 3px 0 0;border-radius:7px;background:#e7d9b7;}.field-tools p{font-size:10px;color:var(--muted);}
+
+/* Optional squad dock; hidden until a registered squad member is selected. */
+.squad-tools{position:fixed;z-index:3;left:12px;top:142px;width:270px;max-width:calc(100% - 24px);max-height:calc(100dvh - 220px);overflow:auto;background:#fffaf0ed;border:1px solid var(--line);border-radius:10px;font-size:11px;}
+.squad-tools summary{padding:9px 12px;cursor:pointer;}
+.squad-tools[open]{padding:0 10px 10px;}
+.squad-tools[open] summary{margin:0 -10px 8px;border-bottom:1px solid var(--line);}
+.squad-tools strong,.squad-tools small{display:block;margin:4px 0;color:var(--muted);}
+.squad-tools strong{color:var(--ink);}
+.squad-controls{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0;}
+.squad-controls label{display:grid;gap:3px;color:var(--muted);}
+.squad-controls label:first-child{grid-column:1/-1;}
+.squad-controls select{width:100%;max-width:none;padding:6px;font-size:11px;}
+#squad-execute{border-radius:7px;background:#edbf4e;padding:8px 12px;}
+@media(max-height:450px){.squad-tools{top:48px;max-height:calc(100dvh - 110px);}}
