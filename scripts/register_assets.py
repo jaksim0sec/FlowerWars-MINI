@@ -53,7 +53,7 @@ def apply_reference_pose(rig, unit_id, equipment):
     b=rig['parts']['body'];rig['neck']=[round(b['x']+b['w']*.5,4),round(b['y']+b['h']*.1,4)]
     for side,name,ratio in [('left','hand_back',.13),('right','hand_front',.87)]:
         p=rig['parts'][name];sx=b['x']+b['w']*ratio;sy=b['y']+b['h']*.2
-        p['origin']=[round((sx-p['x'])/p['w'],5),round((sy-p['y'])/p['h'],5)]
+        p['origin']=spec.get('armOrigins',{}).get(side,[round((sx-p['x'])/p['w'],5),round((sy-p['y'])/p['h'],5)])
         rig['sockets'][side]['grip']=[.28,.8] if side=='left' else [.72,.8]
     def visit(nodes):
         for n in nodes:
@@ -67,6 +67,8 @@ def apply_reference_pose(rig, unit_id, equipment):
                 rig['twoHandedPoses']['hold']['nodes'][n['id']]['transforms'][0]['pivot']=pivot
             visit(n.get('children',[]))
     visit(rig['nodes'])
+    for side,angle in spec.get('armAngles',{}).items():
+        rig['animations'][side+'Arm']=['+',angle,['state','walk',['*','stride',.04 if side=='left' else -.04],0]]
     upper=next(n for n in rig['nodes'][1]['children'] if n.get('id')=='upper')
     nodes=upper['children'];left=next(n for n in nodes if n.get('id')=='leftArm')
     right=next(n for n in nodes if n.get('id')=='rightArm')
@@ -75,6 +77,11 @@ def apply_reference_pose(rig, unit_id, equipment):
     others=[n for n in nodes if n.get('socket') in ('back','waist')]
     if unit_id in ('shield-guard','scholar'):
         left['children']=[{'part':'hand_back'},{'socket':'left'}]
+        if unit_id=='scholar':
+            rig['parts']['hand_back']['palm_clip']=[[0,.68],[.65,.68],[.65,1],[0,1]]
+            left['children'].append({'part':'hand_back','clip':'palm_clip'})
+        upper['children']=[body,left,right,neck]
+    elif unit_id=='banner-bearer':
         upper['children']=[body,left,right,neck]
     elif unit_id=='archer':
         upper['children']=[*[n for n in others if n.get('socket')=='back'],left,body,*[n for n in others if n.get('socket')=='waist'],right,neck]
@@ -87,7 +94,18 @@ def apply_reference_pose(rig, unit_id, equipment):
         if eid=='banner_bearer_banner':item['asset']='weapons/banner_bearer_banner.png'
         x,y=world(ex,ey);x+=item['w']*item['grip'][0];y+=item['h']*item['grip'][1]
         slot=rig['sockets'][entry['hand']];p=rig['parts'][slot['part']]
-        slot['grip']=[round((x-p['x'])/p['w'],5),round((y-p['y'])/p['h'],5)]
+        if entry['hand'] in ('left','right'):
+            import math
+            palm=spec.get('palms',{}).get(entry['hand'],[.28,.8] if entry['hand']=='left' else [.72,.8])
+            slot['grip']=palm
+            px=p['x']+p['w']*p['origin'][0];py=p['y']+p['h']*p['origin'][1]
+            dx=(palm[0]-p['origin'][0])*p['w'];dy=(palm[1]-p['origin'][1])*p['h']
+            angle=spec.get('armAngles',{}).get(entry['hand'],0)
+            gx=px+math.cos(angle)*dx-math.sin(angle)*dy;gy=py+math.sin(angle)*dx+math.cos(angle)*dy
+            ex,ey=world(ex,ey)
+            item['grip']=[round((gx-ex)/item['w'],6),round((gy-ey)/item['h'],6)]
+            item['rotation']=-angle
+        else:slot['grip']=[round((x-p['x'])/p['w'],5),round((y-p['y'])/p['h'],5)]
     rig['version']=rig.get('version',1)+1
     rig['note']='Reference-matched rig positions and painter order; source PNGs unmodified.'
 
@@ -156,7 +174,6 @@ def register(source):
     visit(n.get('children',[]))
   visit(rig['nodes']);rig['sockets']['left']['grip']=[.28,.8];rig['sockets']['right']['grip']=[.72,.8]
   info={'name':names[index],'rig':f'units/{id}/rig.json'}
-  if id=='banner-bearer':info['previewScale']=.48
   for name in [x for x in sources if x not in mapping]:
    p=sources[name];wid,hei=p['size_wh'];eid=id.replace('-','_')+'_'+name;dest=ROOT/'assets/equipment'/('accessories' if name in ['quiver','side_pouch'] else 'weapons')/(eid+'.png');dest.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(source/p['path'],dest)
    width={'shield':350,'book':340,'banner':500,'staff':330,'bow':170,'quiver':170,'side_pouch':180}[name]

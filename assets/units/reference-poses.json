@@ -1,7 +1,7 @@
 {
-  "version": 1,
+  "version": 2,
   "source": "flowerwars_selected_merged.zip",
-  "notes": "Reference pixel geometry, uniform ground baseline; original part PNGs remain untouched.",
+  "notes": "Individually compared with source assembled previews: face circles, forearm foreshortening and hand painter order. Scales preserve every source aspect ratio.",
   "characters": {
     "shield-guard": {
       "center": 220,
@@ -10,7 +10,7 @@
       "parts": {
         "leg_back": [
           98.52,
-          456.44,
+          448.44,
           0.62
         ],
         "leg_front": [
@@ -57,6 +57,20 @@
           ],
           "hand": "left"
         }
+      },
+      "armOrigins": {
+        "left": [
+          0.8,
+          0.18
+        ],
+        "right": [
+          0.35,
+          0.12
+        ]
+      },
+      "armAngles": {
+        "left": 0,
+        "right": 0
       }
     },
     "scholar": {
@@ -75,8 +89,8 @@
           0.56
         ],
         "hand_back": [
-          59.94,
-          314.07,
+          80,
+          290,
           0.55
         ],
         "body": [
@@ -90,9 +104,9 @@
           0.56
         ],
         "head": [
-          61.71,
-          112.57,
-          0.77
+          55,
+          80,
+          0.9
         ],
         "head_deco": [
           24.08,
@@ -113,6 +127,20 @@
           ],
           "hand": "left"
         }
+      },
+      "armOrigins": {
+        "left": [
+          0.8,
+          0.18
+        ],
+        "right": [
+          0.2,
+          0.18
+        ]
+      },
+      "armAngles": {
+        "left": 0,
+        "right": 0
       }
     },
     "banner-bearer": {
@@ -131,9 +159,9 @@
           0.64
         ],
         "hand_back": [
-          76.59,
-          299.55,
-          0.74
+          110,
+          300,
+          0.6
         ],
         "body": [
           72.42,
@@ -169,6 +197,20 @@
           ],
           "hand": "left"
         }
+      },
+      "armOrigins": {
+        "left": [
+          0.8,
+          0.18
+        ],
+        "right": [
+          0.2,
+          0.18
+        ]
+      },
+      "armAngles": {
+        "left": 0.72,
+        "right": 0
       }
     },
     "clover-mage": {
@@ -202,9 +244,9 @@
           0.54
         ],
         "head": [
-          10.59,
-          78.82,
-          0.79
+          12,
+          32,
+          0.9
         ],
         "head_deco": [
           13.86,
@@ -225,6 +267,20 @@
           ],
           "hand": "right"
         }
+      },
+      "armOrigins": {
+        "left": [
+          0.8,
+          0.18
+        ],
+        "right": [
+          0.2,
+          0.18
+        ]
+      },
+      "armAngles": {
+        "left": 0,
+        "right": -0.55
       }
     },
     "archer": {
@@ -253,14 +309,14 @@
           0.7264
         ],
         "hand_front": [
-          242.2108,
-          346.9926,
-          0.575
+          234.24,
+          339.5,
+          0.8
         ],
         "head": [
-          36.2091,
-          118.0417,
-          0.8182
+          30,
+          55,
+          1
         ],
         "head_deco": [
           29.978,
@@ -305,6 +361,20 @@
           ],
           "hand": "waist"
         }
+      },
+      "armOrigins": {
+        "left": [
+          0.8,
+          0.18
+        ],
+        "right": [
+          0.2,
+          0.18
+        ]
+      },
+      "armAngles": {
+        "left": 0,
+        "right": -0.55
       }
     },
     "scout": {
@@ -323,9 +393,9 @@
           0.9916
         ],
         "hand_back": [
-          50.2337,
-          409.2246,
-          0.5667
+          40,
+          400,
+          0.7
         ],
         "body": [
           50.6656,
@@ -333,14 +403,14 @@
           0.9948
         ],
         "hand_front": [
-          231.4394,
-          398.8561,
-          1.0113
+          234,
+          400,
+          0.95
         ],
         "head": [
-          6.3675,
-          117.1107,
-          0.8863
+          5,
+          110,
+          1.05
         ],
         "head_deco": [
           4.2793,
@@ -348,7 +418,21 @@
           1.0013
         ]
       },
-      "equipment": {}
+      "equipment": {},
+      "armOrigins": {
+        "left": [
+          0.5,
+          0.08
+        ],
+        "right": [
+          0.5,
+          0.08
+        ]
+      },
+      "armAngles": {
+        "left": 0,
+        "right": 0
+      }
     }
   }
 }

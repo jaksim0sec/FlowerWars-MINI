@@ -41,3 +41,11 @@ The sprout healer uses its independent WebP artwork and rig. Its sprout staff is
 방패·책·깃발·마법봉·활은 독립 손 장비입니다. 궁수의 화살통·가방은 각각 back/waist 슬롯으로 분리하고 미리보기와 명시적 권장 장착에서 선택합니다. 생성기는 권장 장비를 강제하지 않습니다. 정찰병은 첨부에 무기가 없어 기본 맨손입니다. 기본 전장 두 캐릭터는 그대로 두며 소환 목록과 캐릭터 연구실에서 총 8종을 선택합니다.
 
 검증: `node --test tests/*.test.mjs`, 기존 브라우저 검사 4종, `BASE_URL=http://127.0.0.1:8002 python3 tests/selected-pack-browser.py`. 신규 6종의 실제 알파 중첩으로 머리·팔·부츠의 접합을 검사하고 모든 8종에 대해 애니메이션 중 양손/개별 손의 무기 연결점을 검사합니다. 신규 직업 전용 전투 규칙(원거리 투사체 등)은 추가하지 않으며 기존 공통 동작을 사용합니다.
+
+## Reference proportion calibration (2026-10-25)
+
+`units/reference-poses.json` defines each of the six supplied reference poses individually: head/body/arm sizes, shoulder origins, resting arm angles and equipment positions. The mage, archer, scholar and scout use larger face circles positioned under their own crowns. The banner hand is raised to its pole; the mage and archer forearms extend toward their equipment instead of hanging down. Source aspect ratios remain unchanged.
+
+The scholar draws the full forearm behind the book and only its clipped palm in front. The guard draws the shield over its forearm; the banner arm sits in front of the torso. Equipment grip coordinates are computed from the actual rotated palm, with resting arm rotation compensated on the equipment so the staff, bow and pole stay at the reference angle. These definitions are reapplied by `scripts/register_assets.py` and are not engine-specific character branches.
+
+`docs/rig-comparison.jpg` shows the supplied reference on the left and actual Canvas rendering on the right for all six. Regenerate with `BASE_URL=http://127.0.0.1:8003 python3 scripts/compare_reference_rigs.py EXTRACTED_PACK`. Unit tests constrain individual head/body and near-arm/body ratios and painter order, while browser tests still inspect physical attachment overlap and animation behavior.
