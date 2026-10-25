@@ -10,7 +10,7 @@ def select(page,x,y):
 with sync_playwright() as p:
  browser=p.chromium.launch(executable_path=os.environ.get('CHROMIUM','/usr/bin/chromium'),args=['--no-sandbox'])
  page=browser.new_page(viewport={'width':1200,'height':800});page.set_default_timeout(5000);errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
- page.goto(BASE);page.get_by_text('전장 준비 완료',exact=False).wait_for()
+ page.goto(BASE);page.evaluate("document.getElementById('debug-tools')?.setAttribute('open','');document.getElementById('legacy-controls')?.removeAttribute('hidden')");page.get_by_text('전장 준비 완료',exact=False).wait_for()
  assert not page.locator('#movement-lab').get_attribute('open')
  select(page,2,2)
  for _ in range(6):page.keyboard.press('ArrowRight')
@@ -34,7 +34,7 @@ with sync_playwright() as p:
  assert not errors,errors
  print('PASS scenario setup/start/statistics/default reset')
  mobile=browser.new_page(viewport={'width':390,'height':844},is_mobile=True,has_touch=True)
- mobile.on('pageerror',lambda e:errors.append(str(e)));mobile.goto(BASE);mobile.get_by_text('전장 준비 완료',exact=False).wait_for()
+ mobile.on('pageerror',lambda e:errors.append(str(e)));mobile.goto(BASE);mobile.evaluate("document.getElementById('debug-tools')?.setAttribute('open','');document.getElementById('legacy-controls')?.removeAttribute('hidden')");mobile.get_by_text('전장 준비 완료',exact=False).wait_for()
  mobile.locator('#movement-lab summary').tap();mobile.locator('#movement-combat').uncheck();mobile.select_option('#movement-scenario','crossing');mobile.select_option('#movement-count','64');mobile.locator('#movement-setup').tap();mobile.locator('#movement-start').tap();mobile.wait_for_timeout(500)
  assert mobile.locator('#unit-count').inner_text()=='용사 64'
  box=mobile.locator('#movement-lab').bounding_box();assert box['x']>=0 and box['x']+box['width']<=390 and box['height']<350
