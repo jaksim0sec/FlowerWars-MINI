@@ -3,6 +3,9 @@
 * { box-sizing: border-box; }
 html { height: 100%; background: #f2e9d8; }
 body { margin: 0; height: 100vh; height: 100dvh; overflow: hidden; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; background: #f2e9d8; color: var(--ink); font-family: "Noto Sans KR", "Apple SD Gothic Neo", system-ui, sans-serif; }
+/* Prevent accidental text highlighting while dragging or long-pressing the game UI. */
+body { -webkit-user-select: none; user-select: none; }
+input, textarea, [contenteditable="true"] { -webkit-user-select: text; user-select: text; }
 button, a, canvas { -webkit-tap-highlight-color: transparent; }
 button { font: inherit; color: inherit; border: 0; cursor: pointer; }
 button:focus-visible, a:focus-visible { outline: 3px solid #b77c24; outline-offset: -3px; }
@@ -493,3 +496,30 @@ body{display:block;}
  .squad-aim{top:96px;bottom:auto;max-width:calc(100vw - 16px);font-size:10px;}
 }
 .platoon-pick i>span{display:flex;align-items:center;gap:1px;padding:2px;border-radius:8px;background:#fff8e9b3;}
+/* Lightweight confirmation of a map-issued squad order, no modal/toast blocking */
+.command-feedback[hidden]{display:none!important;}
+.command-feedback{
+ position:fixed;z-index:6;pointer-events:none;touch-action:none;
+ width:30px;height:30px;border:2px solid #c4a04d;border-radius:50%;
+ transform:translate(-50%,-50%);box-shadow:0 0 0 3px #fff1c344;
+}
+.command-feedback[data-kind="focus"]{border-color:#b75a2c;box-shadow:0 0 0 3px #fbe0ce66;}
+.command-feedback.command-feedback-playing{animation:squad-command-pulse .6s ease-out both;}
+@keyframes squad-command-pulse{
+ 0%{opacity:.95;transform:translate(-50%,-50%) scale(.58);}
+ 60%{opacity:.85;}
+ 100%{opacity:0;transform:translate(-50%,-50%) scale(1.55);}
+}
+/* The drawn face may be small, but the actual finger hit area stays generous. */
+.squad-card{touch-action:manipulation;}
+.squad-roster-list{touch-action:pan-x pan-y;}
+@media(prefers-reduced-motion:reduce){
+ .command-feedback.command-feedback-playing{animation:none;opacity:.75;}
+}
+
+/* Tiny visual controls, but forgiving tap targets on actual touch devices. */
+@media(pointer:coarse){
+ .squad-action-grid button{min-height:41px;}
+ .squad-compact-row .squad-option-row button{min-height:29px;}
+ #squad-special{min-height:32px;}
+}

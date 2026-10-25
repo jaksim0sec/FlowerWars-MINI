@@ -17,22 +17,37 @@ const ALIASES={assault:'advance','support-focus':'follow',reform:'rally'};
 const STANCES=new Set(['aggressive','balanced','avoid']);
 const FORMATIONS=new Set(['line','column','dense','spread']);
 const alive=(board,squad)=>squad.memberIds.map(id=>board.unit(id)).filter(u=>u&&u.health.current>0);
-const commander=(board,squad)=>board.unit(squad.leaderId);
+/** The flag bearer commands while alive. After their loss, a surviving soldier
+ * takes over without replacing or respawning the fallen character. */
+const originalCommander=(board,squad)=>board.unit(squad.leaderId);
+const commander=(board,squad)=>{
+ const leader=originalCommander(board,squad);
+ if(leader?.health.current>0)return leader;
+ const incumbent=board.unit(squad.actingLeaderId);
+ if(incumbent?.health.current>0)return incumbent;
+ const successor=alive(board,squad).sort((a,b)=>a.id-b.id)[0]||null;
+ squad.actingLeaderId=successor?.id??null;
+ return successor;
+};
 const priority=u=>({'shield-guard':0,scout:1,archer:2,'clover-mage':3,scholar:4,'banner-bearer':5}[u.character?.characterId]??2);
 function slots(board,squad,center,formation=squad.formation){
- const units=alive(board,squad).sort((a,b)=>priority(a)-priority(b)||a.id-b.id),own=new Set(squad.memberIds);
+ const lead=commander(board,squad);
+ const units=alive(board,squad).filter(u=>u.id!==lead?.id).sort((a,b)=>priority(a)-priority(b)||a.id-b.id),own=new Set(squad.memberIds);
+ if(lead)units.push(lead);
  const n=units.length,columns=Math.min(n,formation==='column'?2:formation==='line'?6:4);
  const gap=formation==='spread'?2:1,sign=squad.order?.facing||(squad.team==='B'?-1:1);
  // Fit the entire footprint, leaving a passing row/column at board edges.
  // Per-slot clamping can seal unfilled corner slots behind arrived troops.
- const depth=Math.floor((n-1)/columns)*gap,low=Math.floor(columns/2)*gap,high=(columns-1-Math.floor(columns/2))*gap;
+ const rearRank=Math.max(2,Math.floor(Math.max(0,n-2)/columns)+2)*gap;
+ const depth=rearRank,low=Math.floor(columns/2)*gap,high=(columns-1-Math.floor(columns/2))*gap;
  const marginX=board.width>depth+2?1:0,marginY=board.height>low+high+2?1:0;
  center={x:Math.max(marginX+(sign>0?depth:0),Math.min(board.width-1-marginX-(sign<0?depth:0),center.x)),y:Math.max(marginY+low,Math.min(board.height-1-marginY-high,center.y))};
  const claimed=new Set(),assignments=[];
  for(const other of squadsFor(board).values())if(other.id!==squad.id&&other.team===squad.team)
    for(const p of other.order?.goals?.values()||[])claimed.add(p.y*board.width+p.x);
  for(let i=0;i<n;i++){
-   const rank=Math.floor(i/columns)*gap,lane=(i%columns-Math.floor(columns/2))*gap;
+   const leaderSlot=units[i].id===lead?.id;
+   const rank=leaderSlot?rearRank:Math.floor(i/columns)*gap,lane=leaderSlot?0:(i%columns-Math.floor(columns/2))*gap;
    const wanted={x:center.x-sign*rank,y:center.y+lane};let best=null;
    for(let radius=0;radius<=Math.max(12,Math.ceil(n/columns)*gap+2)&&!best;radius++)
      for(let dx=-radius;dx<=radius&&!best;dx++)for(let dy=-radius;dy<=radius;dy++){
@@ -124,14 +139,14 @@ function runOrder(board,s,replace=false){
  const o=s.order;if(!o)return;const units=alive(board,s);
  if(!units.length){s.order=null;return;}
  if(o.type==='wait'||o.type==='hold'){
-   for(const u of units){if(replace)board.interrupt(u);u.combat.auto=o.type==='hold';u.combat.holdPosition=true;}
+   for(const u of units){if(replace)board.interrupt(u);u.combat.holdPosition=true;}
    o.phase=o.type==='hold'?'holding':'stopped';o.dirty=false;return;
  }
  if(o.type==='focus'){
    const enemies=enemyUnits(board,s,o.target);
    if(!enemies.length){for(const u of units)board.interrupt(u);o.phase='complete';return;}
    board.batchCommands(()=>{for(const u of units){
-     u.combat.auto=false;
+     if(units.length>1&&u.id===commander(board,s)?.id){board.interrupt(u);continue;}
      if(u.command?.type==='attack'&&enemies.some(e=>e.id===u.command.target))continue;
      if(!replace&&(u.state!=='idle'||u.step))continue;
      const sorted=[...enemies].sort((a,b)=>(Math.abs(a.x-u.x)+Math.abs(a.y-u.y))-(Math.abs(b.x-u.x)+Math.abs(b.y-u.y))||a.id-b.id);
@@ -155,7 +170,7 @@ function runOrder(board,s,replace=false){
  board.batchCommands(()=>{for(const u of units){
    const p=o.goals.get(u.id),at=p&&u.x===p.x&&u.y===p.y&&!u.step;
    const defensive=['fortify','firing-line'].includes(o.type);
-   u.combat.auto=(defensive?at:o.type==='advance'||o.type==='rally'||o.type==='follow'&&s.stance!=='avoid')&&s.stance!=='avoid';
+
    u.combat.holdPosition=defensive&&at;
    if(at){arrived++;if(replace)board.interrupt(u);continue;}
    if(!p||u.command?.type==='move'&&u.command.x===p.x&&u.command.y===p.y)continue;
@@ -168,5 +183,5 @@ export function updateSquadOrders(board){for(const s of squadsFor(board).values(
 export function squadSummary(board,id){
  const s=squadsFor(board).get(id);if(!s)return null;
  const units=alive(board,s);
- return {...s,alive:units.length,commanderAlive:(commander(board,s)?.health.current||0)>0,moving:units.filter(u=>u.step).length,waiting:units.filter(u=>u.waitReason&&u.waitReason!=='combat').length};
+ return {...s,alive:units.length,commanderAlive:!!commander(board,s),leaderAlive:(originalCommander(board,s)?.health.current||0)>0,actingCommanderId:commander(board,s)?.id??null,moving:units.filter(u=>u.step).length,waiting:units.filter(u=>u.waitReason&&u.waitReason!=='combat').length};
 }

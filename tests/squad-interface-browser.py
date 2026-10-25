@@ -58,6 +58,18 @@ with sync_playwright() as p:
         page.locator('#selection-options').click()
         page.locator('#squad-close').click()
         assert page.locator('#squad-tools').is_hidden()
+        # Bad North style: commander selected, then map tap = squad move, not single-unit move.
+        page.locator('#board').focus()
+        for _ in range(15):page.keyboard.press('ArrowLeft')
+        for _ in range(15):page.keyboard.press('ArrowUp')
+        page.keyboard.press('Enter')
+        assert '이동' in page.locator('#squad-status').text_content()
+        assert page.locator('#command-feedback').is_visible()
+        assert page.locator('.squad-card.is-selected').count()==1
+        # A direct map order must leave the commander selectable and panel closable.
+        page.locator('.squad-card').click()
+        assert page.locator('#squad-tools').is_visible()
+        page.locator('#squad-close').click()
         page.locator('#debug-tools > summary').click()
         assert page.locator('#debug-tools').get_attribute('open') is not None
         page.locator('#debug-close').click()

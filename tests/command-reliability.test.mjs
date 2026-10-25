@@ -29,7 +29,7 @@ test('a new focus target replaces an active attack instead of retaining the old 
  const [b,s]=squadFixture(),a=b.spawn(35,10,null,{team:'B'}),c=b.spawn(45,20,null,{team:'B'});
  orderSquad(b,s.id,'focus',{unitId:a.id});
  assert.ok(orderSquad(b,s.id,'focus',{unitId:c.id}));
- assert.ok(s.memberIds.every(id=>b.unit(id).command?.target===c.id));safe(b);
+ assert.ok(s.memberIds.filter(id=>id!==s.leaderId).every(id=>b.unit(id).command?.target===c.id));safe(b);
 });
 test('team movement survives damage even when moving without auto combat',()=>{
  const b=new Board(20,5),u=b.spawn(1,2,null,{team:'A'});
