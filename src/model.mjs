@@ -1,5 +1,7 @@
 export const HALF_W = 72;
 export const HALF_H = 42;
+export const BOARD_COLUMNS = 16;
+export const BOARD_ROWS = 5;
 export const STEP_TIME = 0.34;
 export const IMPACT_TIME = 0.3;
 
@@ -18,17 +20,17 @@ export function tileAt(px, py, width, height) {
 }
 
 export function zoomCamera(camera, anchor, factor) {
-  const scale = Math.min(2.4, Math.max(0.15, camera.scale * factor));
+  const scale = Math.min(2.4, Math.max(0.1, camera.scale * factor));
   const ratio = scale / camera.scale;
   return { x: anchor.x - (anchor.x - camera.x) * ratio,
     y: anchor.y - (anchor.y - camera.y) * ratio, scale };
 }
 
-export function fitBoardCamera(width, height, columns = 8, rows = 6) {
+export function fitBoardCamera(width, height, columns = BOARD_COLUMNS, rows = BOARD_ROWS) {
   const left = -rows * HALF_W, right = columns * HALF_W;
   // Leave space above back-row units and below the outer stone sidewalls.
   const top = -126, bottom = (columns + rows - 1) * HALF_H + 22;
-  const scale = Math.max(.15, Math.min((width - 32) / (right - left), (height - 32) / (bottom - top), 1.1));
+  const scale = Math.max(.1, Math.min((width - 32) / (right - left), (height - 32) / (bottom - top), 1.1));
   return { x: width / 2 - (left + right) / 2 * scale,
     y: height / 2 - (top + bottom) / 2 * scale, scale };
 }
@@ -38,7 +40,7 @@ const neighbors = (x, y) => [[x + 1, y], [x, y + 1], [x - 1, y], [x, y - 1]];
 
 /** Deterministic command model. No timers, DOM, AI, health or victory rules. */
 export class Board {
-  constructor(width = 8, height = 6) {
+  constructor(width = BOARD_COLUMNS, height = BOARD_ROWS) {
     this.width = width;
     this.height = height;
     this.reset();

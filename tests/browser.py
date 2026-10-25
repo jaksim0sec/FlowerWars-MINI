@@ -6,9 +6,12 @@ BASE = os.environ.get('BASE_URL', 'http://127.0.0.1:8000')
 
 def point(page, x, y):
     field = page.locator('#board').bounding_box()
-    scale = max(.15,min((field['width'] - 32) / 1008, (field['height'] - 32) / 694, 1.1))
-    return (field['x']+field['width']/2 + ((x-y)*72-72)*scale,
-            field['y']+field['height']/2 + ((x+y)*42-221)*scale)
+    columns, rows = 16, 5
+    left, right = -rows * 72, columns * 72
+    top, bottom = -126, (columns + rows - 1) * 42 + 22
+    scale = max(.1, min((field['width'] - 32) / (right - left), (field['height'] - 32) / (bottom - top), 1.1))
+    return (field['x']+field['width']/2 + ((x-y)*72-(left+right)/2)*scale,
+            field['y']+field['height']/2 + ((x+y)*42-(top+bottom)/2)*scale)
 
 def cell(page, x, y, touch=False):
     p = point(page,x,y)

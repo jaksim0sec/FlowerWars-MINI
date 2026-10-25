@@ -75,7 +75,11 @@ export function render(ctx, art, board, view, camera, width, height, dpr) {
 
   ctx.save();
   ctx.beginPath();
-  ctx.moveTo(0, -42); ctx.lineTo(576, 294); ctx.lineTo(144, 546); ctx.lineTo(-432, 210); ctx.closePath();
+  ctx.moveTo(0, -HALF_H);
+  ctx.lineTo(board.width * HALF_W, (board.width - 1) * HALF_H);
+  ctx.lineTo((board.width - board.height) * HALF_W, (board.width + board.height - 1) * HALF_H);
+  ctx.lineTo(-board.height * HALF_W, (board.height - 1) * HALF_H);
+  ctx.closePath();
   ctx.translate(0, 23); ctx.shadowColor = '#68502455'; ctx.shadowBlur = 38; ctx.shadowOffsetY = 23;
   ctx.fillStyle = '#97794140'; ctx.fill(); ctx.restore();
 
