@@ -308,14 +308,14 @@ body{display:block;}
 .squad-roster-list{
  flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;gap:3px;
  overflow-x:hidden;overflow-y:auto;padding:0;background:transparent;
- overscroll-behavior:contain;scrollbar-width:none;pointer-events:auto;
+ overscroll-behavior:contain;scrollbar-width:none;pointer-events:none;
 }
 .squad-roster-list::-webkit-scrollbar{display:none;}
 .squad-card,.squad-card:hover,.squad-card.is-selected{
  flex:0 0 auto;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;
  gap:1px;width:76px;min-width:0;min-height:0;height:auto;
  padding:2px 1px 3px;border:0;border-radius:0;background:transparent;
- box-shadow:none;text-align:center;transition:none;cursor:pointer;color:var(--ink);
+ box-shadow:none;text-align:center;transition:none;cursor:pointer;color:var(--ink);pointer-events:auto;
 }
 .squad-card:active .squad-avatar{transform:scale(.94);}
 .squad-card:focus-visible{outline:2px solid #a87b32;outline-offset:-2px;border-radius:8px;}
