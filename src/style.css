@@ -3,6 +3,9 @@
 * { box-sizing: border-box; }
 html { height: 100%; background: #f2e9d8; }
 body { margin: 0; height: 100vh; height: 100dvh; overflow: hidden; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; background: #f2e9d8; color: var(--ink); font-family: "Noto Sans KR", "Apple SD Gothic Neo", system-ui, sans-serif; }
+/* Prevent accidental text highlighting while dragging or long-pressing the game UI. */
+body { -webkit-user-select: none; user-select: none; }
+input, textarea, [contenteditable="true"] { -webkit-user-select: text; user-select: text; }
 button, a, canvas { -webkit-tap-highlight-color: transparent; }
 button { font: inherit; color: inherit; border: 0; cursor: pointer; }
 button:focus-visible, a:focus-visible { outline: 3px solid #b77c24; outline-offset: -3px; }
