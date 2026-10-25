@@ -48,9 +48,15 @@ export class Board {
   }
 
   reset() {
+    this.terrainRevision=(this.terrainRevision||0)+1;
     this.units = []; this.effects = []; this.nextId = 1; this.time = 0;
     this.terrain = Array.from({ length: this.height }, (_, y) =>
       Array.from({ length: this.width }, (_, x) => (x === 3 || x === 4 || y === 2 && x > 1 && x < 6) ? 'soil' : 'grass'));
+  }
+  setTerrain(x,y,type) {
+    if(!this.inside(x,y)||!['grass','soil'].includes(type))return false;
+    if(this.terrain[y][x]!==type){this.terrain[y][x]=type;this.terrainRevision++;}
+    return true;
   }
   inside(x, y) { return Number.isInteger(x) && Number.isInteger(y) && x >= 0 && y >= 0 && x < this.width && y < this.height; }
   unit(id) { return this.units.find(u => u.id === id); }

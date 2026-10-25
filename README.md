@@ -39,8 +39,11 @@ BASE_URL=https://your-static-host.example python3 tests/rig-editor-browser.py
 BASE_URL=https://your-static-host.example python3 tests/equipment-grips-browser.py
 BASE_URL=https://your-static-host.example python3 tests/character-visibility-browser.py
 BASE_URL=https://your-static-host.example python3 tests/health-browser.py
+BASE_URL=https://your-static-host.example python3 tests/terrain-browser.py
 ```
 
 브라우저 검증은 기본적으로 `/usr/bin/chromium`을 사용합니다. 다른 설치 경로는 `CHROMIUM`, 호스팅 주소는 `BASE_URL` 환경 변수로 지정할 수 있습니다. 데스크톱과 모바일 터치에서 소환·선택·실제 보행·공격·피격·드래그·핀치·초기화, 지형 변경, 이미지 누락 안내를 검사합니다. 모바일 레이아웃 검증은 다섯 화면 크기에서 확대·이동해도 전장이 헤더·조작부 영역을 침범하지 않는지, 화면 높이가 바뀌어도 배치가 유지되는지 검사합니다.
 
 이번 버전은 조작 시연용입니다. 동작 중에는 새 이동·공격 명령을 받지 않으며 여러 용사를 배치하고 각각 선택할 수 있습니다. 체력·부상·빈사·사망 연출을 지원하며, 승패·자동 전투는 구현하지 않습니다. 방향 전환은 제공된 파츠의 좌우 반전을 사용합니다. 별도의 후면 원화는 현재 저장소에 없습니다. 화면을 구성하는 모든 필수 이미지가 실제로 존재하며, 누락 시 파일 경로를 안내하고 대체 디자인을 사용하지 않습니다.
+
+지형과 그림자는 화면 크기의 캐시로 그리며 카메라·지형이 바뀔 때만 다시 만듭니다. 화면 밖 타일은 재생성 대상에서도 제외합니다. 측정 결과와 재현 방법은 `docs/render-performance.md`를 참고하세요.

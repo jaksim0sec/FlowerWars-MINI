@@ -221,7 +221,7 @@ $('reset').addEventListener('click', () => { seed(); notify('처음의 두 용�
 $('terrain').addEventListener('click', () => {
   if (!view.tile) return;
   const { x, y } = view.tile;
-  board.terrain[y][x] = board.terrain[y][x] === 'grass' ? 'soil' : 'grass';
+  board.setTerrain(x,y,board.terrain[y][x] === 'grass' ? 'soil' : 'grass');
   refresh(); notify('선택한 칸의 지형을 바꿨어요.');
 });
 $('zoom-in').addEventListener('click', () => { camera = zoomCamera(camera, { x: width / 2, y: height / 2 }, 1.2); fitted = false; refresh(); });

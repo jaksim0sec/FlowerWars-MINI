@@ -1,3 +1,4 @@
+import {drawTerrain} from './terrain-render.mjs';
 import {loadCatalog, loadImage} from './characters/catalog.mjs';
 import {createCharacter, equip, drawCharacter} from './characters/engine.mjs';
 import { project, HALF_W, HALF_H } from './model.mjs';
@@ -70,28 +71,11 @@ export function drawWarrior(ctx, art, unit, time) {
 }
 
 export function render(ctx, art, board, view, camera, width, height, dpr) {
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  ctx.clearRect(0, 0, width, height);
-  ctx.translate(camera.x, camera.y); ctx.scale(camera.scale, camera.scale);
+  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,width,height);
+  drawTerrain(ctx,art,board,camera,width,height,dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.translate(camera.x,camera.y);ctx.scale(camera.scale,camera.scale);
 
-  ctx.save();
-  ctx.beginPath();
-  ctx.moveTo(0, -HALF_H);
-  ctx.lineTo(board.width * HALF_W, (board.width - 1) * HALF_H);
-  ctx.lineTo((board.width - board.height) * HALF_W, (board.width + board.height - 1) * HALF_H);
-  ctx.lineTo(-board.height * HALF_W, (board.height - 1) * HALF_H);
-  ctx.closePath();
-  ctx.translate(0, 23); ctx.shadowColor = '#68502455'; ctx.shadowBlur = 38; ctx.shadowOffsetY = 23;
-  ctx.fillStyle = '#97794140'; ctx.fill(); ctx.restore();
-
-  for (let depth = 0; depth < board.width + board.height - 1; depth++) {
-    for (let y = 0; y < board.height; y++) {
-      const x = depth - y;
-      if (!board.inside(x, y)) continue;
-      const p = project(x, y);
-      ctx.drawImage(art.tiles[board.terrain[y][x]], p.x - 72, p.y - 42, 144, 107);
-    }
-  }
   if (view.hover) {
     const p = project(view.hover.x, view.hover.y);
     diamond(ctx, p.x, p.y, '#fff4b521', '#fff3c281');
