@@ -146,3 +146,40 @@ test('the commander receives a safer rear target even when the formation is dens
    type+' exposed the leader ahead of another squad member');
  }
 });
+
+test('a moving squad actually attacks nearby enemies without explicit focus orders',()=>{
+ const board=new Board(100,50),make=m=>({characterId:m.characterId});
+ const group=placeGroup(board,createFormationGroup(12,'squad','A 전진','defense'),{x:25,y:20},{team:'A',makeCharacter:make});
+ const squad=squadsFor(board).get(group.squads[0]);
+ const fighters=squad.memberIds.map(id=>board.unit(id)).filter(u=>u.id!==squad.leaderId);
+ const directions=[[1,0],[-1,0],[0,1],[0,-1]];
+ let enemy=null;
+ for(const soldier of fighters){
+  for(const [dx,dy] of directions){
+   const x=soldier.x+dx,y=soldier.y+dy;
+   if(board.inside(x,y)&&!board.occupied(x,y)){
+    enemy=board.spawn(x,y,null,{team:'B',autoCombat:false,stats:{maxHealth:500}});
+    break;
+   }
+  }
+  if(enemy)break;
+ }
+ assert.ok(enemy,'a vacant adjacent test cell must exist');
+ assert.ok(orderSquad(board,squad.id,'move',{x:62,y:25}));
+ for(let tick=0;tick<28;tick++)board.update(.05);
+ assert.ok(enemy.health.current<enemy.health.max,
+  'a soldier must strike an adjacent enemy while following a move order');
+ assert.ok(board.combatStats.hits>0);
+});
+
+test('a focus order leaves the commander defending locally, not rushing at a distant mark',()=>{
+ const board=new Board(100,50),make=m=>({characterId:m.characterId});
+ const a=placeGroup(board,createFormationGroup(12,'squad','A 전진','mixed'),{x:24,y:20},{team:'A',makeCharacter:make});
+ const b=placeGroup(board,createFormationGroup(12,'squad','B 적','mixed'),{x:75,y:20},{team:'B',makeCharacter:make});
+ const s=squadsFor(board).get(a.squads[0]),leader=board.unit(s.leaderId);
+ assert.ok(orderSquad(board,s.id,'move',{x:58,y:22}));
+ assert.ok(leader.command?.type==='move');
+ assert.ok(orderSquad(board,s.id,'focus',{squadId:b.squads[0]}));
+ assert.equal(leader.command,null,'focus should stop a flag bearer advancing alone');
+ assert.equal(leader.combat.auto,true,'commander retains automatic close-range self defence');
+});
