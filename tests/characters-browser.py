@@ -20,9 +20,9 @@ with sync_playwright() as p:
  assert not any('/model.mjs' in r or '/render.mjs' in r for r in requests), 'preview depends on board'
  page.screenshot(path='/workspace/work/characters-preview.png',full_page=True)
  page.goto(BASE);page.get_by_text('전장 준비 완료',exact=False).wait_for()
- page.get_by_label('소환할 캐릭터').select_option('clover-mage');page.get_by_role('button',name='클로버마법사 소환').click()
+ page.get_by_label('소환할 캐릭터').select_option('clover-mage');page.get_by_role('button',name='새싹힐러 소환').click()
  page.locator('#board').focus();page.keyboard.press('Escape');page.keyboard.press('ArrowRight');page.keyboard.press('s');page.keyboard.press('Enter')
- assert '클로버마법사 3' in page.locator('#selection-name').inner_text()
+ assert '새싹힐러 3' in page.locator('#selection-name').inner_text()
  page.screenshot(path='/workspace/work/clover-board.png')
  assert not errors,errors
  b.close();print('PASS character preview: standalone, unarmed, equip, dual wield, shared grip UI, independent instances; clover mage board summon')

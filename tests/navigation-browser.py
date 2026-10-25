@@ -22,8 +22,8 @@ with sync_playwright() as p:
  page.keyboard.press('Enter');assert '이동 중' in page.locator('#selection-detail').inner_text()
  # Move the camera out of range while both actors are still travelling.
  page.mouse.move(500,300);page.mouse.down();page.mouse.move(15000,12000,steps=3);page.mouse.up();page.wait_for_timeout(3000)
- select(page,8,2);assert '방패수호자 1' in page.locator('#selection-name').inner_text()
- select(page,3,11);assert '꽃잎학자 2' in page.locator('#selection-name').inner_text()
+ select(page,8,2);assert '개나리 방패병 1' in page.locator('#selection-name').inner_text()
+ select(page,3,11);assert '개나리소환사 2' in page.locator('#selection-name').inner_text()
  print('PASS simultaneous manual commands and offscreen completion')
  page.locator('#movement-lab summary').click();page.locator('#movement-combat').uncheck();page.select_option('#movement-scenario','bottleneck');page.select_option('#movement-count','16');page.locator('#movement-setup').click()
  assert page.locator('#unit-count').inner_text()=='용사 16';assert '도착 0/16' in page.locator('#movement-stats').inner_text()

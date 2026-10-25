@@ -27,10 +27,10 @@ with sync_playwright() as p:
     page.goto(BASE)
     page.locator('canvas').wait_for()
     page.get_by_text('전장 준비 완료', exact=False).wait_for()
-    page.get_by_role('button', name='방패수호자 소환').click()
+    page.get_by_role('button', name='개나리 방패병 소환').click()
     cell(page, 2, 4)
     assert page.locator('#unit-count').inner_text() == '용사 3'
-    assert '방패수호자 3' in page.locator('#selection-name').inner_text()
+    assert '개나리 방패병 3' in page.locator('#selection-name').inner_text()
     cell(page, 4, 4)
     assert '이동 중' in page.locator('#selection-detail').inner_text()
     page.wait_for_timeout(1000)
@@ -41,7 +41,7 @@ with sync_playwright() as p:
     cell(page, 3, 5)
     assert '피격 1회' in page.locator('#selection-detail').inner_text()
     # A drag while summoning must move the camera without adding a unit.
-    page.get_by_role('button', name='방패수호자 소환').click()
+    page.get_by_role('button', name='개나리 방패병 소환').click()
     start=point(page,1,3)
     page.mouse.move(*start);page.mouse.down();page.mouse.move(start[0]+90,start[1]+30,steps=10);page.mouse.up()
     assert page.locator('#unit-count').inner_text() == '용사 3'
@@ -63,7 +63,7 @@ with sync_playwright() as p:
     page.get_by_role('button',name='초기화',exact=True).click()
     cell(page,0,3)
     assert page.locator('#selection-detail').inner_text() == '잔디 블럭'
-    page.get_by_role('button',name='방패수호자 소환').click();cell(page,2,2)
+    page.get_by_role('button',name='개나리 방패병 소환').click();cell(page,2,2)
     assert page.locator('#unit-count').inner_text() == '용사 2'
     # Canvas keyboard controls offer the same select/place flow.
     page.locator('#board').focus();page.keyboard.press('Escape');page.keyboard.press('ArrowRight');page.keyboard.press('s');page.keyboard.press('Enter')
@@ -76,7 +76,7 @@ with sync_playwright() as p:
     mobile = browser.new_context(viewport={'width':390,'height':844},is_mobile=True,has_touch=True,device_scale_factor=2)
     page=mobile.new_page();page.on('pageerror',lambda e:errors.append(str(e)))
     page.goto(BASE);page.get_by_text('전장 준비 완료',exact=False).wait_for()
-    page.get_by_role('button',name='방패수호자 소환').tap();cell(page,2,4,True)
+    page.get_by_role('button',name='개나리 방패병 소환').tap();cell(page,2,4,True)
     assert page.locator('#unit-count').inner_text()=='용사 3'
     cell(page,4,4,True);page.wait_for_timeout(1000)
     assert '5, 5' in page.locator('#selection-detail').inner_text()
@@ -94,7 +94,7 @@ with sync_playwright() as p:
     assert page.locator('#zoom-value').inner_text()!=old
     assert page.locator('#unit-count').inner_text()=='용사 3'
     page.get_by_role('button',name='전장 맞춤').tap()
-    page.get_by_role('button',name='방패수호자 소환').tap()
+    page.get_by_role('button',name='개나리 방패병 소환').tap()
     touches('touchStart',[(180,410)])
     touches('touchMove',[(230,445)])
     touches('touchEnd',[])

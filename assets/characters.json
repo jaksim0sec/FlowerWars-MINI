@@ -4,16 +4,18 @@
       "name": "개나리용사",
       "rig": "units/gynari-warrior/rig.json",
       "recommendedWeapon": "basic_sword",
-      "hidden": true
+      "hidden": true,
+      "role": "warrior"
     },
     "sprout-healer": {
       "name": "새싹힐러",
       "rig": "units/sprout-healer/rig.json",
       "recommendedWeapon": "sprout_staff",
-      "hidden": true
+      "hidden": true,
+      "role": "support"
     },
     "shield-guard": {
-      "name": "방패수호자",
+      "name": "개나리 방패병",
       "rig": "units/shield-guard/rig.json",
       "recommendedWeapon": "shield_guard_shield",
       "testCombat": {
@@ -22,10 +24,11 @@
         "attackPeriod": 1.25,
         "range": 1,
         "rangeShape": "king"
-      }
+      },
+      "role": "tank"
     },
     "scholar": {
-      "name": "꽃잎학자",
+      "name": "개나리소환사",
       "rig": "units/scholar/rig.json",
       "recommendedWeapon": "scholar_book",
       "testCombat": {
@@ -34,10 +37,11 @@
         "attackPeriod": 1.1,
         "range": 1,
         "rangeShape": "king"
-      }
+      },
+      "role": "support"
     },
     "banner-bearer": {
-      "name": "깃발기수",
+      "name": "골든개나리병",
       "rig": "units/banner-bearer/rig.json",
       "recommendedWeapon": "banner_bearer_banner",
       "previewScale": 0.5,
@@ -47,10 +51,11 @@
         "attackPeriod": 0.95,
         "range": 1,
         "rangeShape": "king"
-      }
+      },
+      "role": "warrior"
     },
     "clover-mage": {
-      "name": "클로버마법사",
+      "name": "새싹힐러",
       "rig": "units/clover-mage/rig.json",
       "recommendedWeapon": "clover_mage_staff",
       "recommendedHand": "right",
@@ -60,10 +65,11 @@
         "attackPeriod": 1.35,
         "range": 1,
         "rangeShape": "king"
-      }
+      },
+      "role": "support"
     },
     "archer": {
-      "name": "잎새궁수",
+      "name": "낙옆궁수",
       "rig": "units/archer/rig.json",
       "recommendedWeapon": "archer_bow",
       "recommendedHand": "right",
@@ -77,10 +83,11 @@
         "attackPeriod": 0.7,
         "range": 1,
         "rangeShape": "king"
-      }
+      },
+      "role": "archer"
     },
     "scout": {
-      "name": "꽃잎정찰병",
+      "name": "개나리 기사",
       "rig": "units/scout/rig.json",
       "testCombat": {
         "maxHealth": 75,
@@ -88,7 +95,8 @@
         "attackPeriod": 0.45,
         "range": 1,
         "rangeShape": "king"
-      }
+      },
+      "role": "warrior"
     }
   },
   "equipment": "equipment/catalog.json"
