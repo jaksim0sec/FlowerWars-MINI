@@ -36,6 +36,16 @@ test('battle test uses paired mirrored battalions with real specialized squads',
     const soldiers=squad.memberIds.map(uid=>board.unit(uid));
     const guards=soldiers.filter(u=>u.formationRole==='guard');
     const archers=soldiers.filter(u=>u.formationRole==='archer');
+    const nonLeaders=soldiers.filter(u=>u.id!==leader.id);
+    if(nonLeaders.length){
+     assert.ok(team==='A'
+       ?leader.x<Math.min(...nonLeaders.map(u=>u.x))
+       :leader.x>Math.max(...nonLeaders.map(u=>u.x)),
+       'flag commander should begin behind the entire squad');
+    }
+    const leaderOrder=scenario.orders.find(o=>o.id===leader.id);
+    assert.equal(Math.abs(leaderOrder.x-leader.x),3,
+      'a flag bearer should advance only a short distance, not charge across the map');
     // Shield front ranks should be nearer the enemy than their own archers.
     for(const guard of guards)for(const archer of archers)
      assert.ok(team==='A'?guard.x>archer.x:guard.x<archer.x);
