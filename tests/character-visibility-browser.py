@@ -8,7 +8,7 @@ with sync_playwright() as p:
  page=b.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
  page.goto(BASE+'/characters.html');page.get_by_text('각 캐릭터의 동작과 장비',exact=False).wait_for()
  assert page.locator('[data-character]').evaluate_all('(cards)=>cards.map(c=>c.dataset.character)')==VISIBLE
- page.goto(BASE);page.get_by_text('전장 준비 완료',exact=False).wait_for()
+ page.goto(BASE);page.evaluate("document.getElementById('debug-tools')?.setAttribute('open','');document.getElementById('legacy-controls')?.removeAttribute('hidden')");page.get_by_text('전장 준비 완료',exact=False).wait_for()
  assert page.locator('#character-type option').evaluate_all('(options)=>options.map(o=>o.value)')==VISIBLE
  for moves,name in [(['ArrowRight']*2+['ArrowDown']*2,'개나리 방패병 1'),(['ArrowRight']*3+['ArrowDown']*5,'개나리소환사 2')]:
   page.locator('#board').focus();page.keyboard.press('Escape')

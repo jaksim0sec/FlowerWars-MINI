@@ -28,7 +28,7 @@ with sync_playwright() as p:
  return failures;
  }''')
  assert not failures,'\n'.join(failures)
- page.goto(BASE);page.get_by_text('전장 준비 완료',exact=False).wait_for()
+ page.goto(BASE);page.evaluate("document.getElementById('debug-tools')?.setAttribute('open','');document.getElementById('legacy-controls')?.removeAttribute('hidden')");page.get_by_text('전장 준비 완료',exact=False).wait_for()
  assert page.locator('#character-type option').count()==6
  for id in NEW:
   page.locator('#reset').click();page.locator('#character-type').select_option(id);page.locator('#board').focus();page.keyboard.press('Escape');page.keyboard.press('ArrowRight');page.keyboard.press('s');page.keyboard.press('Enter')

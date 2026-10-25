@@ -10,7 +10,7 @@ def select(page,x,y):
 with sync_playwright() as p:
  browser=p.chromium.launch(executable_path=os.environ.get('CHROMIUM','/usr/bin/chromium'),args=['--no-sandbox'])
  page=browser.new_page(viewport={'width':1200,'height':850});page.set_default_timeout(6000);errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
- page.goto(BASE);page.get_by_text('전장 준비 완료',exact=False).wait_for();page.locator('#movement-lab summary').click()
+ page.goto(BASE);page.evaluate("document.getElementById('debug-tools')?.setAttribute('open','');document.getElementById('legacy-controls')?.removeAttribute('hidden')");page.get_by_text('전장 준비 완료',exact=False).wait_for();page.locator('#movement-lab summary').click()
  assert page.locator('#movement-combat').is_checked();page.select_option('#movement-scenario','skirmish');page.select_option('#movement-count','16');page.locator('#movement-setup').click();select(page,1,1)
  assert '180 / 180' in page.locator('#selection-health').inner_text();assert 'A' in page.locator('#selection-health').inner_text();assert '공격 38' in page.locator('#selection-combat').inner_text();assert '0.80' in page.locator('#selection-combat').inner_text()
  page.wait_for_timeout(600);assert '180 / 180' in page.locator('#selection-health').inner_text(),'setup must not start fighting'
@@ -27,7 +27,7 @@ with sync_playwright() as p:
  print('PASS A/B data, idle auto attacks, selected stats, offscreen deaths and reset')
  page.locator('#movement-combat').uncheck();page.select_option('#movement-scenario','crossing');page.locator('#movement-setup').click();page.locator('#movement-start').click();page.wait_for_timeout(3000)
  assert page.locator('#unit-count').inner_text()=='용사 16';assert '퇴장 0' in page.locator('#movement-stats').inner_text();print('PASS combat-off navigation remains nonviolent')
- mobile=browser.new_page(viewport={'width':390,'height':844},is_mobile=True,has_touch=True);mobile.on('pageerror',lambda e:errors.append(str(e)));mobile.goto(BASE);mobile.get_by_text('전장 준비 완료',exact=False).wait_for()
+ mobile=browser.new_page(viewport={'width':390,'height':844},is_mobile=True,has_touch=True);mobile.on('pageerror',lambda e:errors.append(str(e)));mobile.goto(BASE);mobile.evaluate("document.getElementById('debug-tools')?.setAttribute('open','');document.getElementById('legacy-controls')?.removeAttribute('hidden')");mobile.get_by_text('전장 준비 완료',exact=False).wait_for()
  mobile.locator('#movement-lab summary').tap();mobile.select_option('#movement-scenario','skirmish');mobile.locator('#movement-setup').tap();select(mobile,1,1);mobile.locator('#movement-start').tap();mobile.wait_for_timeout(800)
  assert mobile.locator('#selection-combat').is_visible();assert '180' in mobile.locator('#selection-health').inner_text()
  assert mobile.evaluate('document.documentElement.scrollWidth<=innerWidth');box=mobile.locator('#movement-lab').bounding_box();assert box['height']<350 and box['x']>=0 and box['x']+box['width']<=390

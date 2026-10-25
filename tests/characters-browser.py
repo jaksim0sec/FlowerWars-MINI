@@ -19,7 +19,7 @@ with sync_playwright() as p:
  guard.locator('.left').select_option('basic_sword');guard.locator('.right').select_option('clover_staff')
  assert not any('/model.mjs' in r or '/render.mjs' in r for r in requests), 'preview depends on board'
  page.screenshot(path='/workspace/work/characters-preview.png',full_page=True)
- page.goto(BASE);page.get_by_text('전장 준비 완료',exact=False).wait_for()
+ page.goto(BASE);page.evaluate("document.getElementById('debug-tools')?.setAttribute('open','');document.getElementById('legacy-controls')?.removeAttribute('hidden')");page.get_by_text('전장 준비 완료',exact=False).wait_for()
  page.get_by_label('소환할 캐릭터').select_option('clover-mage');page.get_by_role('button',name='새싹힐러 소환').click()
  page.locator('#board').focus();page.keyboard.press('Escape');page.keyboard.press('ArrowRight');page.keyboard.press('s');page.keyboard.press('Enter')
  assert '새싹힐러 3' in page.locator('#selection-name').inner_text()

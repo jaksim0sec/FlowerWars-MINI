@@ -129,3 +129,103 @@ body{display:block;}
 .squad-controls select{width:100%;max-width:none;padding:6px;font-size:11px;}
 #squad-execute{border-radius:7px;background:#edbf4e;padding:8px 12px;}
 @media(max-height:450px){.squad-tools{top:48px;max-height:calc(100dvh - 110px);}}
+
+/* Compact, opt-in debug drawer: existing labs remain intact inside one menu. */
+.debug-tools{
+ position:fixed;z-index:8;left:max(12px,env(safe-area-inset-left));top:max(48px,calc(env(safe-area-inset-top) + 38px));
+ width:112px;max-width:calc(100% - 24px);background:#fffaf0ed;border:1px solid #a78d6847;
+ border-radius:13px;box-shadow:0 5px 20px #47382218;color:var(--ink);font-size:11px;backdrop-filter:blur(10px);
+}
+.debug-tools>summary{padding:9px 12px;cursor:pointer;font-weight:700;list-style:none;}
+.debug-tools>summary::-webkit-details-marker{display:none;}
+.debug-tools>summary::after{content:"▾";float:right;color:var(--muted);}
+.debug-tools[open]>summary::after{content:"▴";}
+.debug-tools[open]{width:312px;}
+.debug-content{border-top:1px solid var(--line);padding:9px;overflow-y:auto;max-height:calc(100dvh - 130px);overscroll-behavior:contain;}
+.debug-legacy{display:flex;align-items:center;gap:6px;margin:1px 0 9px;padding:7px 8px;background:#f3e8d4;border-radius:8px;font-size:11px;}
+.debug-legacy input{accent-color:#ab852f;}
+.debug-tools .movement-lab,.debug-tools .group-tools,.debug-tools .field-tools{
+ position:static;top:auto;right:auto;bottom:auto;left:auto;z-index:auto;
+ max-width:none;width:100%;margin:6px 0;border-radius:9px;background:#fffaf0;
+ box-shadow:none;
+}
+.debug-tools .movement-lab[open],.debug-tools .group-tools[open],.debug-tools .field-tools[open]{
+ width:100%;max-width:none;max-height:none;overflow:visible;padding:0 10px 10px;
+}
+.debug-tools .movement-lab>summary,.debug-tools .group-tools>summary,.debug-tools .field-tools>summary{
+ font-size:11px;padding:9px 10px;font-weight:600;
+}
+.debug-tools .movement-lab[open] summary,.debug-tools .group-tools[open] summary,.debug-tools .field-tools[open] summary{
+ margin:0 -10px 8px;border-bottom:1px solid var(--line);
+}
+/* Actual squad commander portraits and team badges, right sidebar on desktop. */
+.squad-roster{
+ position:fixed;z-index:4;top:64px;right:max(12px,env(safe-area-inset-right));
+ bottom:max(12px,env(safe-area-inset-bottom));width:188px;display:flex;flex-direction:column;
+ background:#fff9ecef;border:1px solid #8f74514a;border-radius:15px;
+ box-shadow:0 8px 32px #3f321b1a;backdrop-filter:blur(12px);overflow:hidden;
+}
+.squad-roster-head{height:37px;min-height:37px;display:flex;justify-content:space-between;align-items:center;gap:6px;padding:7px 11px;border-bottom:1px solid var(--line);}
+.squad-roster-head strong{font-size:12px;letter-spacing:-.15px;}
+.squad-roster-head output{font-size:10px;color:var(--muted);}
+.squad-roster-list{display:flex;flex-direction:column;gap:5px;padding:7px;overflow-y:auto;min-height:0;overscroll-behavior:contain;scrollbar-width:thin;}
+.squad-card{width:100%;min-width:0;min-height:64px;display:flex;align-items:center;gap:8px;padding:6px;text-align:left;border:1px solid #aa906644;border-radius:10px;background:#fffdf6;flex-shrink:0;transition:background .15s,border-color .15s;}
+.squad-card:hover{background:#fff3d7;}
+.squad-card.is-selected{background:#f7e7bd;border:2px solid #c79a43;padding:5px;}
+.squad-card.is-leader-down .squad-avatar{filter:grayscale(1);opacity:.65;}
+.squad-card:focus-visible{outline:2px solid #986d25;outline-offset:-2px;}
+.squad-avatar{width:46px;height:46px;object-fit:cover;flex-shrink:0;border-radius:9px;background:#e5d7ae;border:1px solid #bfa77b66;}
+.squad-card-body{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px;line-height:1.2;}
+.squad-card-heading{display:flex;flex-wrap:wrap;align-items:center;gap:3px;min-width:0;}
+.squad-card-title{display:block;max-width:100%;font-size:10px;font-weight:700;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.squad-card-team{font-size:9px;font-weight:800;border-radius:5px;padding:2px 5px;flex-shrink:0;}
+.squad-card-team.team-a{background:#d9eaf7;color:#27618a;}
+.squad-card-team.team-b{background:#f7dfcb;color:#a64d25;}
+.squad-card-status{font-size:9px;color:var(--muted);white-space:nowrap;text-overflow:ellipsis;overflow:hidden;}
+/* Squad controls open beside the right-side roster, not under debug menus. */
+.squad-tools{
+ top:74px;left:auto;right:212px;bottom:auto;width:286px;z-index:7;
+ max-width:calc(100vw - 228px);max-height:calc(100dvh - 98px);
+ box-shadow:0 8px 30px #45351b28;backdrop-filter:blur(14px);
+}
+.squad-tools summary{font-weight:700;font-size:12px;}
+.squad-tools[open]{padding:0 12px 12px;}
+.squad-tools[open] summary{margin:0 -12px 8px;}
+.squad-tools>small{line-height:1.4;}
+/* Preserve the old command bar in DOM; expose only via debug checkbox. */
+#legacy-controls[hidden]{display:none!important;}
+#notice{
+ position:fixed;z-index:9;left:50%;top:max(64px,calc(env(safe-area-inset-top) + 54px));bottom:auto;
+ transform:translateX(-50%);width:max-content;max-width:calc(100vw - 36px);height:auto;min-height:24px;
+ padding:6px 12px;margin:0;border-radius:10px;color:#654e2d;background:#fff7dfec;
+ box-shadow:0 4px 15px #46341d1a;text-align:center;white-space:normal;overflow:visible;pointer-events:none;
+}
+@media(max-width:700px){
+ .squad-roster{
+   top:auto;left:0;right:0;bottom:0;width:100%;height:auto;max-height:125px;
+   border-radius:17px 17px 0 0;border-left:0;border-right:0;border-bottom:0;
+   padding-bottom:env(safe-area-inset-bottom);
+ }
+ .squad-roster-head{height:27px;min-height:27px;padding:3px 12px;}
+ .squad-roster-head strong{font-size:11px;}
+ .squad-roster-list{flex-direction:row;overflow-x:auto;overflow-y:hidden;gap:6px;padding:4px 9px 6px;scroll-snap-type:x proximity;}
+ .squad-card{flex:0 0 126px;width:126px;min-height:66px;height:66px;padding:5px;gap:5px;scroll-snap-align:start;}
+ .squad-card.is-selected{padding:4px;}
+ .squad-avatar{width:40px;height:40px;border-radius:9px;}
+ .squad-card-body{gap:3px;}
+ .squad-card-heading{align-items:flex-start;}
+ .squad-card-title{font-size:9px;}
+ .squad-card-status{font-size:8px;}
+ .squad-tools{left:8px;right:8px;top:auto;bottom:calc(107px + env(safe-area-inset-bottom));width:auto;max-width:none;max-height:calc(100dvh - 210px);overflow:auto;}
+ .debug-tools{top:max(47px,calc(env(safe-area-inset-top) + 37px));}
+ .debug-tools[open]{width:min(312px,calc(100vw - 24px));}
+ .debug-content{max-height:calc(100dvh - 175px);}
+ #notice{top:max(93px,calc(env(safe-area-inset-top) + 82px));max-width:calc(100vw - 28px);}
+ #legacy-controls:not([hidden]){bottom:calc(112px + env(safe-area-inset-bottom));}
+}
+@media(max-width:700px) and (max-height:470px){
+ .squad-roster{max-height:102px;}
+ .squad-roster-head{display:none;}
+ .squad-tools{bottom:calc(74px + env(safe-area-inset-bottom));max-height:calc(100dvh - 138px);}
+ .debug-content{max-height:calc(100dvh - 88px);}
+}

@@ -8,7 +8,7 @@ def tile(page,x,y,enter=True):
  for _ in range(y):page.keyboard.press('ArrowDown')
  if enter:page.keyboard.press('Enter')
 with sync_playwright() as p:
- b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox']);page=b.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.goto(BASE);page.get_by_text('전장 준비 완료',exact=False).wait_for()
+ b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox']);page=b.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.goto(BASE);page.evaluate("document.getElementById('debug-tools')?.setAttribute('open','');document.getElementById('legacy-controls')?.removeAttribute('hidden')");page.get_by_text('전장 준비 완료',exact=False).wait_for()
  for x in [0,1]:
   tile(page,x,0,False);page.keyboard.press('s');page.keyboard.press('Enter')
  assert page.locator('#unit-count').inner_text()=='용사 4'

@@ -24,7 +24,7 @@ with sync_playwright() as p:
     errors, failed = [], []
     page.on('pageerror', lambda e: errors.append(str(e)))
     page.on('response', lambda r: failed.append(r.url) if r.status >= 400 else None)
-    page.goto(BASE)
+    page.goto(BASE);page.evaluate("document.getElementById('debug-tools')?.setAttribute('open','');document.getElementById('legacy-controls')?.removeAttribute('hidden')")
     page.locator('canvas').wait_for()
     page.get_by_text('전장 준비 완료', exact=False).wait_for()
     page.get_by_role('button', name='개나리 방패병 소환').click()
@@ -75,7 +75,7 @@ with sync_playwright() as p:
 
     mobile = browser.new_context(viewport={'width':390,'height':844},is_mobile=True,has_touch=True,device_scale_factor=2)
     page=mobile.new_page();page.on('pageerror',lambda e:errors.append(str(e)))
-    page.goto(BASE);page.get_by_text('전장 준비 완료',exact=False).wait_for()
+    page.goto(BASE);page.evaluate("document.getElementById('debug-tools')?.setAttribute('open','');document.getElementById('legacy-controls')?.removeAttribute('hidden')");page.get_by_text('전장 준비 완료',exact=False).wait_for()
     page.get_by_role('button',name='개나리 방패병 소환').tap();cell(page,2,4,True)
     assert page.locator('#unit-count').inner_text()=='용사 3'
     cell(page,4,4,True);page.wait_for_timeout(1000)
@@ -106,7 +106,7 @@ with sync_playwright() as p:
     print('PASS mobile: touch summon, walk, attack, pinch, responsive layout')
     for w in [320,375,390]:
         small=browser.new_page(viewport={'width':w,'height':568})
-        small.goto(BASE);small.get_by_text('전장 준비 완료',exact=False).wait_for()
+        small.goto(BASE);small.evaluate("document.getElementById('debug-tools')?.setAttribute('open','');document.getElementById('legacy-controls')?.removeAttribute('hidden')");small.get_by_text('전장 준비 완료',exact=False).wait_for()
         label=small.locator('#selection-name').bounding_box()
         actions=small.locator('.actions').bounding_box()
         assert label['x']+label['width'] <= actions['x'] or label['y']+label['height'] <= actions['y'], f'selection overlaps controls at {w}px'
@@ -115,7 +115,7 @@ with sync_playwright() as p:
     # Missing approved assets must be named, never silently substituted.
     missing=browser.new_page()
     missing.route('**/grass.webp', lambda route: route.fulfill(status=404,body='missing'))
-    missing.goto(BASE)
+    missing.goto(BASE);missing.evaluate("document.getElementById('debug-tools')?.setAttribute('open','');document.getElementById('legacy-controls')?.removeAttribute('hidden')")
     missing.locator('#loading').filter(has_text='grass.webp').wait_for()
     assert '에셋을 확인' in missing.locator('#notice').inner_text()
     print('PASS missing artwork: reports required file without substitute images')
