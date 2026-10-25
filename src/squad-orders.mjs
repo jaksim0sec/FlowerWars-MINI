@@ -5,16 +5,34 @@ const ORDER_ALIASES={assault:'advance',fortify:'hold','firing-line':'hold',flank
 const STANCES=new Set(['aggressive','balanced','avoid']);
 const FORMATIONS=new Set(['line','column','dense','spread']);
 const alive=(board,squad)=>squad.memberIds.map(id=>board.unit(id)).filter(u=>u&&u.health.current>0);
-const commander=(board,squad)=>board.unit(squad.leaderId);
+/** The flag bearer commands while alive. After their loss, a surviving soldier
+ * takes over without replacing or respawning the fallen character. */
+const originalCommander=(board,squad)=>board.unit(squad.leaderId);
+const commander=(board,squad)=>{
+ const leader=originalCommander(board,squad);
+ if(leader?.health.current>0)return leader;
+ const incumbent=board.unit(squad.actingLeaderId);
+ if(incumbent?.health.current>0)return incumbent;
+ const successor=alive(board,squad).sort((a,b)=>a.id-b.id)[0]||null;
+ squad.actingLeaderId=successor?.id??null;
+ return successor;
+};
 const priority=u=>({'shield-guard':0,scout:1,archer:2,'clover-mage':3,scholar:4,'banner-bearer':5}[u.character?.characterId]??2);
 
 function slots(board,squad,center,formation=squad.formation){
- const units=alive(board,squad).sort((a,b)=>priority(a)-priority(b)||a.id-b.id);
+ const lead=commander(board,squad);
+ const units=alive(board,squad).filter(u=>u.id!==lead?.id)
+   .sort((a,b)=>priority(a)-priority(b)||a.id-b.id);
+ if(lead)units.push(lead);
  const n=units.length,columns=formation==='column'?2:formation==='line'?6:4;
  const gap=formation==='spread'?2:1,sign=squad.team==='B'?-1:1;
+ // Keep the commander behind every fighting rank, including in a column.
+ const rearRank=Math.max(2,Math.floor(Math.max(0,n-2)/columns)+2)*gap;
  const claimed=new Set(),assignments=[];
  for(let i=0;i<n;i++){
-   const rank=Math.floor(i/columns)*gap,lane=(i%columns-Math.floor(columns/2))*gap;
+   const leaderSlot=units[i].id===lead?.id;
+   const rank=leaderSlot?rearRank:Math.floor(i/columns)*gap;
+   const lane=leaderSlot?0:(i%columns-Math.floor(columns/2))*gap;
    const wanted={x:center.x-sign*rank,y:center.y+lane};
    let best=null;
    for(let radius=0;radius<=Math.max(10,Math.ceil(n/columns)*gap+2)&&!best;radius++)
@@ -76,14 +94,19 @@ function runOrder(board,s){
  const units=alive(board,s);
  if(!units.length){s.order=null;return;}
  if(o.type==='wait'||o.type==='hold'){
-   for(const u of units){board.cancelCommand(u);u.combat.auto=o.type==='hold'||s.stance!=='avoid';}
+   // Holding ground never disables existing local self-defence. Respect a
+   // deliberate "attack off" setting from the test/debug controls.
+   for(const u of units)board.cancelCommand(u);
    o.dirty=false;return;
  }
  if(o.type==='focus'){
    const enemies=enemyUnits(board,s,o.target);
    if(!enemies.length){s.order=null;return;}
+   const lead=commander(board,s);
    for(const u of units){
-     u.combat.auto=false;
+     // The commander does not pursue focus targets into the front line;
+     // automatic point-blank defence remains available if enemies arrive.
+     if(u.id===lead?.id){if(u.command)board.cancelCommand(u);continue;}
      if(u.command?.type==='attack'&&board.unit(u.command.target)?.health.current>0)continue;
      if(u.state!=='idle'||u.step)continue;
      const sorted=[...enemies].sort((a,b)=>(Math.abs(a.x-u.x)+Math.abs(a.y-u.y))-(Math.abs(b.x-u.x)+Math.abs(b.y-u.y))||a.id-b.id);
@@ -99,7 +122,9 @@ function runOrder(board,s){
  }
  board.batchCommands(()=>{
    for(const u of units){
-     u.combat.auto=o.type==='advance'||o.type==='rally'||(o.type==='follow'&&s.stance!=='avoid')||(s.stance==='aggressive'&&o.type!=='retreat');
+     // Keep the unit's own auto-combat setting: all squad orders, including
+     // moving, retreating and waiting, still defend against nearby enemies.
+     // The debug "attack off" switch must not be silently re-enabled.
      const p=o.goals.get(u.id);
      if(!p||u.x===p.x&&u.y===p.y&&!u.step)continue;
      if(u.command?.type==='move'&&u.command.x===p.x&&u.command.y===p.y)continue;
@@ -113,5 +138,8 @@ export function updateSquadOrders(board){
 }
 export function squadSummary(board,id){
  const s=squadsFor(board).get(id);if(!s)return null;
- return {...s,alive:alive(board,s).length,commanderAlive:(commander(board,s)?.health.current||0)>0};
+ const active=commander(board,s),original=originalCommander(board,s);
+ return {...s,alive:alive(board,s).length,
+   commanderAlive:!!active,leaderAlive:!!original&&original.health.current>0,
+   actingCommanderId:active?.id??null};
 }
