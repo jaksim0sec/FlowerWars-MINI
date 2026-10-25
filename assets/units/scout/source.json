@@ -1,0 +1,101 @@
+{
+  "source_zip": "flowerwars_sprites.zip",
+  "original_dimensions": [
+    1482,
+    2160
+  ],
+  "parts": {
+    "head": {
+      "path": "06_scout/parts/head.png",
+      "origin_xy": [
+        148,
+        150
+      ],
+      "size_wh": [
+        309,
+        294
+      ],
+      "original_part_name": "head"
+    },
+    "hat": {
+      "path": "06_scout/parts/hat.png",
+      "origin_xy": [
+        119,
+        568
+      ],
+      "size_wh": [
+        374,
+        378
+      ],
+      "original_part_name": "hat"
+    },
+    "torso": {
+      "path": "06_scout/parts/torso.png",
+      "origin_xy": [
+        178,
+        1074
+      ],
+      "size_wh": [
+        252,
+        250
+      ],
+      "original_part_name": "torso"
+    },
+    "arm_upper": {
+      "path": "06_scout/parts/arm_upper.png",
+      "origin_xy": [
+        413,
+        1428
+      ],
+      "size_wh": [
+        106,
+        147
+      ],
+      "original_part_name": "arm_upper"
+    },
+    "boot_upper": {
+      "path": "06_scout/parts/boot_upper.png",
+      "origin_xy": [
+        237,
+        1475
+      ],
+      "size_wh": [
+        100,
+        88
+      ],
+      "original_part_name": "boot_upper"
+    },
+    "arm_lower": {
+      "path": "06_scout/parts/arm_lower.png",
+      "origin_xy": [
+        421,
+        1627
+      ],
+      "size_wh": [
+        112,
+        152
+      ],
+      "original_part_name": "arm_lower"
+    },
+    "boot_lower": {
+      "path": "06_scout/parts/boot_lower.png",
+      "origin_xy": [
+        256,
+        1650
+      ],
+      "size_wh": [
+        100,
+        88
+      ],
+      "original_part_name": "boot_lower"
+    }
+  },
+  "preview": "06_scout/reference/assembled_preview.png",
+  "original_character_manifest": "06_scout/manifest.json",
+  "extra_assets": [
+    "06_scout/contact_sheet.png",
+    "06_scout/reference/assembled_preview.png",
+    "06_scout/reference/exploded_transparent.png",
+    "06_scout/reference/original.png"
+  ]
+}

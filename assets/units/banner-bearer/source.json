@@ -1,0 +1,111 @@
+{
+  "source_zip": "flowerwars_clean_parts.zip",
+  "original_dimensions": [
+    1024,
+    1536
+  ],
+  "parts": {
+    "head": {
+      "path": "03_banner_bearer/01_head.png",
+      "origin_xy": [
+        134,
+        28
+      ],
+      "size_wh": [
+        267,
+        248
+      ],
+      "original_part_name": "01_head"
+    },
+    "hat": {
+      "path": "03_banner_bearer/02_headpiece.png",
+      "origin_xy": [
+        92,
+        278
+      ],
+      "size_wh": [
+        481,
+        337
+      ],
+      "original_part_name": "02_headpiece"
+    },
+    "torso": {
+      "path": "03_banner_bearer/03_torso.png",
+      "origin_xy": [
+        144,
+        615
+      ],
+      "size_wh": [
+        451,
+        302
+      ],
+      "original_part_name": "03_torso"
+    },
+    "arm_left_screen": {
+      "path": "03_banner_bearer/04_arm_left_on_sheet.png",
+      "origin_xy": [
+        32,
+        644
+      ],
+      "size_wh": [
+        167,
+        169
+      ],
+      "original_part_name": "04_arm_left_on_sheet"
+    },
+    "arm_right_screen": {
+      "path": "03_banner_bearer/05_arm_right_on_sheet.png",
+      "origin_xy": [
+        555,
+        636
+      ],
+      "size_wh": [
+        163,
+        176
+      ],
+      "original_part_name": "05_arm_right_on_sheet"
+    },
+    "boot_left_screen": {
+      "path": "03_banner_bearer/06_boot_left_on_sheet.png",
+      "origin_xy": [
+        153,
+        893
+      ],
+      "size_wh": [
+        148,
+        123
+      ],
+      "original_part_name": "06_boot_left_on_sheet"
+    },
+    "boot_right_screen": {
+      "path": "03_banner_bearer/07_boot_right_on_sheet.png",
+      "origin_xy": [
+        403,
+        895
+      ],
+      "size_wh": [
+        144,
+        123
+      ],
+      "original_part_name": "07_boot_right_on_sheet"
+    },
+    "banner": {
+      "path": "03_banner_bearer/08_banner.png",
+      "origin_xy": [
+        57,
+        1001
+      ],
+      "size_wh": [
+        273,
+        482
+      ],
+      "original_part_name": "08_banner"
+    }
+  },
+  "preview": "03_banner_bearer/00_preview.png",
+  "original_character_manifest": null,
+  "extra_assets": [
+    "03_banner_bearer/00_preview.png",
+    "03_banner_bearer/full_sheet.png"
+  ]
+}

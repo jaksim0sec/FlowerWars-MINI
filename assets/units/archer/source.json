@@ -1,0 +1,137 @@
+{
+  "source_zip": "flowerwars_sprites.zip",
+  "original_dimensions": [
+    1024,
+    1536
+  ],
+  "parts": {
+    "head": {
+      "path": "05_archer/parts/head.png",
+      "origin_xy": [
+        102,
+        98
+      ],
+      "size_wh": [
+        306,
+        286
+      ],
+      "original_part_name": "head"
+    },
+    "hat": {
+      "path": "05_archer/parts/hat.png",
+      "origin_xy": [
+        70,
+        374
+      ],
+      "size_wh": [
+        424,
+        369
+      ],
+      "original_part_name": "hat"
+    },
+    "torso": {
+      "path": "05_archer/parts/torso.png",
+      "origin_xy": [
+        124,
+        735
+      ],
+      "size_wh": [
+        327,
+        311
+      ],
+      "original_part_name": "torso"
+    },
+    "arm_left_screen": {
+      "path": "05_archer/parts/arm_left_screen.png",
+      "origin_xy": [
+        12,
+        786
+      ],
+      "size_wh": [
+        157,
+        195
+      ],
+      "original_part_name": "arm_left_screen"
+    },
+    "arm_right_screen": {
+      "path": "05_archer/parts/arm_right_screen.png",
+      "origin_xy": [
+        434,
+        786
+      ],
+      "size_wh": [
+        161,
+        212
+      ],
+      "original_part_name": "arm_right_screen"
+    },
+    "bow": {
+      "path": "05_archer/parts/bow.png",
+      "origin_xy": [
+        521,
+        796
+      ],
+      "size_wh": [
+        218,
+        587
+      ],
+      "original_part_name": "bow"
+    },
+    "quiver": {
+      "path": "05_archer/parts/quiver.png",
+      "origin_xy": [
+        754,
+        883
+      ],
+      "size_wh": [
+        233,
+        297
+      ],
+      "original_part_name": "quiver"
+    },
+    "boot_left_screen": {
+      "path": "05_archer/parts/boot_left_screen.png",
+      "origin_xy": [
+        85,
+        1112
+      ],
+      "size_wh": [
+        183,
+        167
+      ],
+      "original_part_name": "boot_left_screen"
+    },
+    "boot_right_screen": {
+      "path": "05_archer/parts/boot_right_screen.png",
+      "origin_xy": [
+        340,
+        1112
+      ],
+      "size_wh": [
+        171,
+        182
+      ],
+      "original_part_name": "boot_right_screen"
+    },
+    "side_pouch": {
+      "path": "05_archer/parts/side_pouch.png",
+      "origin_xy": [
+        609,
+        1164
+      ],
+      "size_wh": [
+        274,
+        255
+      ],
+      "original_part_name": "side_pouch"
+    }
+  },
+  "preview": "05_archer/reference/assembled_preview.png",
+  "original_character_manifest": "05_archer/manifest.json",
+  "extra_assets": [
+    "05_archer/contact_sheet.png",
+    "05_archer/reference/assembled_preview.png",
+    "05_archer/reference/exploded_transparent.png",
+    "05_archer/reference/original.png"
+  ]
+}

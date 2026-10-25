@@ -39,7 +39,8 @@ function newCharacter(id) {
   const instance=createCharacter(art.catalog,id);
   // Demo UI chooses a loadout explicitly; the character factory stays unarmed.
   const weapon=art.catalog.characters[id].recommendedWeapon;
-  if(weapon) equip(art.catalog,instance,weapon,'left');
+  if(weapon) equip(art.catalog,instance,weapon,art.catalog.characters[id].recommendedHand || 'left');
+  for(const [slot,equipmentId] of Object.entries(art.catalog.characters[id].recommendedAccessories || {}))equip(art.catalog,instance,equipmentId,slot);
   return instance;
 }
 function unitName(unit) {return art?.catalog.characters[unit.character?.characterId]?.name || '개나리용사';}
@@ -224,7 +225,9 @@ new ResizeObserver(resize).observe(canvas);
 seed(); resize();
 
 loadArtwork().then(loaded => {
-  art = loaded; seed();
+  art = loaded;
+  $('character-type').replaceChildren(...Object.entries(art.catalog.characters).map(([id,def])=>new Option(def.name,id)));
+  seed();
   $('loading').hidden = true;
   notify('전장 준비 완료 · 용사를 선택하거나 빈칸에 소환해보세요.');
 }).catch(error => {

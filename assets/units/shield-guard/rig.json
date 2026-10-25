@@ -1,0 +1,340 @@
+{
+  "id": "shield-guard",
+  "version": 1,
+  "note": "Selected merged ZIP: source PNGs unchanged. Assembly coordinates are independent of exploded-sheet origins.",
+  "canvas": {
+    "width": 1000,
+    "height": 1500
+  },
+  "foot": [
+    505,
+    1209.3975903614457
+  ],
+  "scale": 0.115,
+  "neck": [
+    505,
+    835
+  ],
+  "parts": {
+    "head": {
+      "asset": "head.png",
+      "file_dimensions": [
+        283,
+        260
+      ],
+      "x": 231.0,
+      "y": 331.53710247349824,
+      "w": 548,
+      "h": 503.46289752650176,
+      "origin": [
+        0.5,
+        0.98
+      ]
+    },
+    "head_deco": {
+      "asset": "head_deco_overlay.png",
+      "file_dimensions": [
+        459,
+        365
+      ],
+      "x": 190,
+      "y": 260,
+      "w": 680,
+      "h": 540.7407407407408,
+      "origin": [
+        0.5,
+        0.5
+      ],
+      "front_clip": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    "body": {
+      "asset": "body.png",
+      "file_dimensions": [
+        317,
+        286
+      ],
+      "x": 306.0,
+      "y": 810,
+      "w": 398,
+      "h": 359.0788643533123,
+      "origin": [
+        0.5,
+        0.1
+      ]
+    },
+    "hand_back": {
+      "asset": "hand_back.png",
+      "file_dimensions": [
+        163,
+        196
+      ],
+      "x": 227.0,
+      "y": 855.3693251533742,
+      "w": 160,
+      "h": 192.3926380368098,
+      "origin": [
+        0.8,
+        0.18
+      ]
+    },
+    "hand_front": {
+      "asset": "hand_front.png",
+      "file_dimensions": [
+        176,
+        294
+      ],
+      "x": 625.0,
+      "y": 844.8977272727273,
+      "w": 150,
+      "h": 250.5681818181818,
+      "origin": [
+        0.2,
+        0.18
+      ]
+    },
+    "leg_back": {
+      "asset": "leg_back.png",
+      "file_dimensions": [
+        166,
+        150
+      ],
+      "x": 350,
+      "y": 1110,
+      "w": 110,
+      "h": 99.39759036144578,
+      "origin": [
+        0.5,
+        0.05
+      ]
+    },
+    "leg_front": {
+      "asset": "leg_front.png",
+      "file_dimensions": [
+        164,
+        147
+      ],
+      "x": 555,
+      "y": 1110,
+      "w": 110,
+      "h": 98.59756097560975,
+      "origin": [
+        0.5,
+        0.05
+      ]
+    },
+    "shadow": {
+      "asset": "../gynari-warrior/shadow.webp",
+      "file_dimensions": [
+        300,
+        67
+      ],
+      "x": 190,
+      "y": 1138.8975903614457,
+      "w": 630,
+      "h": 141,
+      "origin": [
+        0.5,
+        0.5
+      ]
+    }
+  },
+  "sockets": {
+    "left": {
+      "part": "hand_back",
+      "grip": [
+        0.28,
+        0.8
+      ],
+      "group": "leftArm"
+    },
+    "right": {
+      "part": "hand_front",
+      "grip": [
+        0.72,
+        0.8
+      ],
+      "group": "rightArm"
+    }
+  },
+  "twoHandedPoses": {
+    "hold": {
+      "primary": "left",
+      "nodes": {
+        "leftArm": {
+          "transforms": [
+            {
+              "pivot": [
+                355.0,
+                890.0
+              ],
+              "rotate": -0.35
+            }
+          ]
+        },
+        "rightArm": {
+          "transforms": [
+            {
+              "pivot": [
+                655.0,
+                890.0
+              ],
+              "rotate": 0.3
+            }
+          ]
+        }
+      }
+    }
+  },
+  "nodes": [
+    {
+      "part": "shadow"
+    },
+    {
+      "id": "recoil",
+      "transforms": [
+        {
+          "translate": [
+            "recoilX",
+            "recoilY"
+          ]
+        }
+      ],
+      "children": [
+        {
+          "part": "leg_back",
+          "rotation": "backLeg",
+          "dy": "backLift"
+        },
+        {
+          "part": "leg_front",
+          "rotation": "frontLeg",
+          "dy": "frontLift"
+        },
+        {
+          "id": "upper",
+          "transforms": [
+            {
+              "translate": [
+                "attackShift",
+                "bob"
+              ]
+            }
+          ],
+          "children": [
+            {
+              "id": "leftArm",
+              "transforms": [
+                {
+                  "pivot": [
+                    355.0,
+                    890.0
+                  ],
+                  "rotate": "leftArm"
+                }
+              ],
+              "children": [
+                {
+                  "socket": "left"
+                },
+                {
+                  "part": "hand_back"
+                }
+              ]
+            },
+            {
+              "part": "body"
+            },
+            {
+              "id": "rightArm",
+              "transforms": [
+                {
+                  "pivot": [
+                    655.0,
+                    890.0
+                  ],
+                  "rotate": "rightArm"
+                }
+              ],
+              "children": [
+                {
+                  "socket": "right"
+                },
+                {
+                  "part": "hand_front"
+                }
+              ]
+            },
+            {
+              "id": "neck",
+              "transforms": [
+                {
+                  "pivot": [
+                    505,
+                    835
+                  ],
+                  "rotate": "headTilt"
+                }
+              ],
+              "children": [
+                {
+                  "part": "head_deco"
+                },
+                {
+                  "part": "head"
+                },
+                {
+                  "part": "head_deco",
+                  "clip": "front_clip"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "animationProfile": "../../animations/humanoid.json",
+  "animations": {
+    "leftArm": [
+      "state",
+      "walk",
+      [
+        "*",
+        "stride",
+        0.04
+      ],
+      0
+    ],
+    "rightArm": [
+      "state",
+      "walk",
+      [
+        "*",
+        "stride",
+        -0.04
+      ],
+      0
+    ]
+  },
+  "worldTranslate": [
+    "lungeX",
+    "lungeY"
+  ]
+}

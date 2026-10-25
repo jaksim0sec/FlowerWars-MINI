@@ -1,0 +1,113 @@
+{
+  "source_zip": "flowerwars_sprites.zip",
+  "original_dimensions": [
+    1024,
+    1536
+  ],
+  "parts": {
+    "head": {
+      "path": "04_clover_mage/parts/head.png",
+      "origin_xy": [
+        103,
+        91
+      ],
+      "size_wh": [
+        309,
+        285
+      ],
+      "original_part_name": "head"
+    },
+    "hat": {
+      "path": "04_clover_mage/parts/hat.png",
+      "origin_xy": [
+        69,
+        368
+      ],
+      "size_wh": [
+        455,
+        396
+      ],
+      "original_part_name": "hat"
+    },
+    "staff": {
+      "path": "04_clover_mage/parts/staff.png",
+      "origin_xy": [
+        644,
+        776
+      ],
+      "size_wh": [
+        350,
+        593
+      ],
+      "original_part_name": "staff"
+    },
+    "torso": {
+      "path": "04_clover_mage/parts/torso.png",
+      "origin_xy": [
+        138,
+        779
+      ],
+      "size_wh": [
+        377,
+        341
+      ],
+      "original_part_name": "torso"
+    },
+    "arm_left_screen": {
+      "path": "04_clover_mage/parts/arm_left_screen.png",
+      "origin_xy": [
+        13,
+        823
+      ],
+      "size_wh": [
+        178,
+        224
+      ],
+      "original_part_name": "arm_left_screen"
+    },
+    "arm_right_screen": {
+      "path": "04_clover_mage/parts/arm_right_screen.png",
+      "origin_xy": [
+        483,
+        829
+      ],
+      "size_wh": [
+        216,
+        242
+      ],
+      "original_part_name": "arm_right_screen"
+    },
+    "boot_right_screen": {
+      "path": "04_clover_mage/parts/boot_right_screen.png",
+      "origin_xy": [
+        366,
+        1176
+      ],
+      "size_wh": [
+        197,
+        180
+      ],
+      "original_part_name": "boot_right_screen"
+    },
+    "boot_left_screen": {
+      "path": "04_clover_mage/parts/boot_left_screen.png",
+      "origin_xy": [
+        76,
+        1178
+      ],
+      "size_wh": [
+        203,
+        177
+      ],
+      "original_part_name": "boot_left_screen"
+    }
+  },
+  "preview": "04_clover_mage/reference/assembled_preview.png",
+  "original_character_manifest": "04_clover_mage/manifest.json",
+  "extra_assets": [
+    "04_clover_mage/contact_sheet.png",
+    "04_clover_mage/reference/assembled_preview.png",
+    "04_clover_mage/reference/exploded_transparent.png",
+    "04_clover_mage/reference/original.png"
+  ]
+}

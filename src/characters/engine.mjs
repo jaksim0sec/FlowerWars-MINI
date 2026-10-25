@@ -1,23 +1,24 @@
 /** Board/DOM-independent instance, animation, rig and equipment engine. */
 export function createCharacter(catalog, characterId, options = {}) {
   if (!catalog.characters[characterId]) throw new Error(`Unknown character: ${characterId}`);
-  return {characterId, equipment:{left:null,right:null}, appearance:{parts:{}},
+  return {characterId, equipment:Object.fromEntries(['left','right',...Object.keys(catalog.characters[characterId].rig.sockets || {})].map(slot=>[slot,null])), appearance:{parts:{}},
     animation:{state:'idle',elapsed:0,facing:-1,phase:0}, ...structuredClone(options)};
 }
 export function unequip(instance, hand) {
-  if (!['left','right','both'].includes(hand)) throw new Error(`Unknown hand: ${hand}`);
+  if (hand!=='both' && !Object.hasOwn(instance.equipment,hand)) throw new Error(`Unknown hand: ${hand}`);
   for (const side of hand === 'both' ? ['left','right'] : [hand]) {
     const item=instance.equipment[side];
-    for(const slot of ['left','right']) if(instance.equipment[slot]===item) instance.equipment[slot]=null;
+    for(const slot of Object.keys(instance.equipment)) if(instance.equipment[slot]===item) instance.equipment[slot]=null;
   }
 }
 export function equip(catalog, instance, equipmentId, hand) {
   const item=catalog.equipment[equipmentId];
-  if (!item || !['left','right','both'].includes(hand)) throw new Error('Invalid equipment or hand');
+  if (!item || (hand!=='both' && !Object.hasOwn(instance.equipment,hand))) throw new Error('Invalid equipment or hand');
   const rig=catalog.characters[instance.characterId].rig;
   if(hand==='both' && (!item.secondaryGrip || !item.twoHandedPose || !rig.twoHandedPoses?.[item.twoHandedPose]))
     throw new Error('Equipment has no compatible two-hand grip/pose');
   if(hand!=='both' && item.hands===2) throw new Error('Equipment requires both hands');
+  if(item.slot ? item.slot!==hand : !['left','right','both'].includes(hand)) throw new Error('Equipment slot mismatch');
   unequip(instance,hand);
   const attachment={equipmentId, hand, overrides:{}};
   for(const slot of hand==='both'?['left','right']:[hand]) instance.equipment[slot]=attachment;

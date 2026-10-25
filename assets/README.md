@@ -28,4 +28,16 @@ Validate both facings and enlarged idle/walk/attack/hit poses when changing thes
 
 `assets/characters.json` registers both independent rigs and the equipment catalog. Scene nodes, sockets, layering, shared animation profile and rig-specific overrides are defined in each rig JSON. Weapons are no longer character rig parts. `src/characters/engine.mjs` renders any registered rig without board imports.
 
-The sprout healer uses new leaf/robe SVG artwork and an independent rig, with face, wrist and boot artwork shared with the warrior. Its clover staff is a separate optional equipment asset. See `docs/character-engine.md`.
+The sprout healer uses its independent WebP artwork and rig. Its sprout staff is a separate optional equipment asset; the earlier leaf/robe SVGs remain alternate source material. See `docs/character-engine.md`.
+
+## Selected merged pack (2026-10-25)
+
+신규 6종: 방패수호자(`shield-guard`), 꽃잎학자(`scholar`), 깃발기수(`banner-bearer`), 클로버마법사(`clover-mage`), 잎새궁수(`archer`), 꽃잎정찰병(`scout`). 적용 기준은 마지막 첨부 `flowerwars_selected_merged.zip`입니다. 기존 두 캐릭터의 리그·원화는 유지합니다.
+
+첨부본과 저장소에 기존 `register_assets.py`가 없어 `scripts/register_assets.py`를 추가했습니다. Python Pillow·NumPy가 있는 환경에서 `python3 scripts/register_assets.py /path/to/extracted-pack`으로 재등록합니다. 정적 게임 실행에는 Python 의존성이 필요 없습니다. `source.json`에 원본 manifest 항목을 보존합니다. origin_xy는 분해도 좌표로 보관하고 실제 조립은 독립 rig.json 좌표를 사용합니다.
+
+원본 PNG는 변경하지 않고 복사했습니다. 얼굴 조각이 포함된 잎 장식은 RGB를 유지하고 알파만 정리한 `head_deco_overlay.png`를 별도로 사용합니다. 깃발은 얼굴 뒤에 가려지지 않도록 원본을 보존한 별도 좌우 반전 장비를 사용합니다. 원본 비율을 유지하고 머리·소매·발 접합 좌표와 접지 그림자를 보정했습니다.
+
+방패·책·깃발·마법봉·활은 독립 손 장비입니다. 궁수의 화살통·가방은 각각 back/waist 슬롯으로 분리하고 미리보기와 명시적 권장 장착에서 선택합니다. 생성기는 권장 장비를 강제하지 않습니다. 정찰병은 첨부에 무기가 없어 기본 맨손입니다. 기본 전장 두 캐릭터는 그대로 두며 소환 목록과 캐릭터 연구실에서 총 8종을 선택합니다.
+
+검증: `node --test tests/*.test.mjs`, 기존 브라우저 검사 4종, `BASE_URL=http://127.0.0.1:8002 python3 tests/selected-pack-browser.py`. 신규 6종의 실제 알파 중첩으로 머리·팔·부츠의 접합을 검사하고 모든 8종에 대해 애니메이션 중 양손/개별 손의 무기 연결점을 검사합니다. 신규 직업 전용 전투 규칙(원거리 투사체 등)은 추가하지 않으며 기존 공통 동작을 사용합니다.

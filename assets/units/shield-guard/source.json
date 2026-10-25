@@ -1,0 +1,111 @@
+{
+  "source_zip": "flowerwars_clean_parts.zip",
+  "original_dimensions": [
+    1024,
+    1536
+  ],
+  "parts": {
+    "head": {
+      "path": "01_shield_guard/01_head.png",
+      "origin_xy": [
+        130,
+        33
+      ],
+      "size_wh": [
+        283,
+        260
+      ],
+      "original_part_name": "01_head"
+    },
+    "hat": {
+      "path": "01_shield_guard/02_headpiece.png",
+      "origin_xy": [
+        85,
+        284
+      ],
+      "size_wh": [
+        459,
+        365
+      ],
+      "original_part_name": "02_headpiece"
+    },
+    "torso": {
+      "path": "01_shield_guard/03_torso.png",
+      "origin_xy": [
+        176,
+        663
+      ],
+      "size_wh": [
+        317,
+        286
+      ],
+      "original_part_name": "03_torso"
+    },
+    "arm_left_screen": {
+      "path": "01_shield_guard/04_arm_left_on_sheet.png",
+      "origin_xy": [
+        27,
+        692
+      ],
+      "size_wh": [
+        163,
+        196
+      ],
+      "original_part_name": "04_arm_left_on_sheet"
+    },
+    "arm_right_screen": {
+      "path": "01_shield_guard/05_arm_right_on_sheet.png",
+      "origin_xy": [
+        481,
+        684
+      ],
+      "size_wh": [
+        176,
+        294
+      ],
+      "original_part_name": "05_arm_right_on_sheet"
+    },
+    "boot_left_screen": {
+      "path": "01_shield_guard/06_boot_left_on_sheet.png",
+      "origin_xy": [
+        128,
+        954
+      ],
+      "size_wh": [
+        166,
+        150
+      ],
+      "original_part_name": "06_boot_left_on_sheet"
+    },
+    "boot_right_screen": {
+      "path": "01_shield_guard/07_boot_right_on_sheet.png",
+      "origin_xy": [
+        380,
+        954
+      ],
+      "size_wh": [
+        164,
+        147
+      ],
+      "original_part_name": "07_boot_right_on_sheet"
+    },
+    "shield": {
+      "path": "01_shield_guard/08_shield.png",
+      "origin_xy": [
+        47,
+        1094
+      ],
+      "size_wh": [
+        310,
+        398
+      ],
+      "original_part_name": "08_shield"
+    }
+  },
+  "preview": "01_shield_guard/00_preview.png",
+  "original_character_manifest": null,
+  "extra_assets": [
+    "01_shield_guard/00_preview.png",
+    "01_shield_guard/full_sheet.png"
+  ]
+}

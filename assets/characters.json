@@ -9,6 +9,42 @@
       "name": "새싹힐러",
       "rig": "units/sprout-healer/rig.json",
       "recommendedWeapon": "sprout_staff"
+    },
+    "shield-guard": {
+      "name": "방패수호자",
+      "rig": "units/shield-guard/rig.json",
+      "recommendedWeapon": "shield_guard_shield"
+    },
+    "scholar": {
+      "name": "꽃잎학자",
+      "rig": "units/scholar/rig.json",
+      "recommendedWeapon": "scholar_book"
+    },
+    "banner-bearer": {
+      "name": "깃발기수",
+      "rig": "units/banner-bearer/rig.json",
+      "previewScale": 0.48,
+      "recommendedWeapon": "banner_bearer_banner"
+    },
+    "clover-mage": {
+      "name": "클로버마법사",
+      "rig": "units/clover-mage/rig.json",
+      "recommendedWeapon": "clover_mage_staff",
+      "recommendedHand": "right"
+    },
+    "archer": {
+      "name": "잎새궁수",
+      "rig": "units/archer/rig.json",
+      "recommendedWeapon": "archer_bow",
+      "recommendedHand": "right",
+      "recommendedAccessories": {
+        "back": "archer_quiver",
+        "waist": "archer_side_pouch"
+      }
+    },
+    "scout": {
+      "name": "꽃잎정찰병",
+      "rig": "units/scout/rig.json"
     }
   },
   "equipment": "equipment/catalog.json"

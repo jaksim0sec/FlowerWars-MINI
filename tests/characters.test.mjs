@@ -26,7 +26,7 @@ import {layoutCharacter,point} from '../src/characters/engine.mjs';
 const load=async path=>JSON.parse(await readFile(new URL(path,import.meta.url)));
 const profile=await load('../assets/animations/humanoid.json');
 const rigs={};
-for(const id of ['gynari-warrior','sprout-healer']) {const rig=await load(`../assets/units/${id}/rig.json`);rig.animations={...profile,...rig.animations};rigs[id]={rig};}
+for(const id of Object.keys((await load('../assets/characters.json')).characters)) {const rig=await load(`../assets/units/${id}/rig.json`);rig.animations={...profile,...rig.animations};rigs[id]={rig};}
 const real={characters:rigs,equipment:await load('../assets/equipment/catalog.json')};
 const near=(a,b)=>assert.ok(Math.hypot(a[0]-b[0],a[1]-b[1])<1e-8,`${a} != ${b}`);
 test('every rig keeps independent and shared weapon grips on both animated hands',()=>{
@@ -52,4 +52,10 @@ test('one weapon animation override cannot change the other weapon during dual w
  const before=layoutCharacter(real,a,.2).equipmentDraws.left.matrix;
  equip(real,a,'clover_staff','right');
  assert.deepEqual(layoutCharacter(real,a,.2).equipmentDraws.left.matrix,before);
+});
+
+test('accessory slots reject hand equipment and remain independent of hands',()=>{
+ const c=createCharacter(real,'archer');equip(real,c,'archer_quiver','back');equip(real,c,'archer_side_pouch','waist');equip(real,c,'basic_sword','both');
+ assert.equal(c.equipment.back.equipmentId,'archer_quiver');assert.throws(()=>equip(real,c,'archer_quiver','left'));assert.throws(()=>equip(real,c,'basic_sword','back'));
+ unequip(c,'both');assert.equal(c.equipment.back.equipmentId,'archer_quiver');unequip(c,'back');assert.equal(c.equipment.waist.equipmentId,'archer_side_pouch');
 });
