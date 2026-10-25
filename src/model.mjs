@@ -1,3 +1,4 @@
+import {createHealth,advanceHealth,DEATH_DURATION} from './characters/vitality.mjs';
 export const HALF_W = 72;
 export const HALF_H = 42;
 export const BOARD_COLUMNS = 5;
@@ -38,7 +39,7 @@ export function fitBoardCamera(width, height, columns = BOARD_COLUMNS, rows = BO
 const key = (x, y) => `${x},${y}`;
 const neighbors = (x, y) => [[x + 1, y], [x, y + 1], [x - 1, y], [x, y - 1]];
 
-/** Deterministic command model. No timers, DOM, AI, health or victory rules. */
+/** Deterministic command model. No timers, DOM, AI or victory rules. */
 export class Board {
   constructor(width = BOARD_COLUMNS, height = BOARD_ROWS) {
     this.width = width;
@@ -53,17 +54,17 @@ export class Board {
   }
   inside(x, y) { return Number.isInteger(x) && Number.isInteger(y) && x >= 0 && y >= 0 && x < this.width && y < this.height; }
   unit(id) { return this.units.find(u => u.id === id); }
-  at(x, y) { return this.units.find(u => u.x === x && u.y === y); }
-  get busy() { return this.units.some(u => u.state !== 'idle'); }
+  at(x, y) { return this.units.find(u => u.health.current>0 && u.x === x && u.y === y); }
+  get busy() { return this.units.some(u => u.state !== 'idle' && u.state !== 'death'); }
 
   occupied(x, y, except = null) {
-    return this.units.some(u => u.id !== except &&
+    return this.units.some(u => u.health.current>0 && u.id !== except &&
       (u.x === x && u.y === y || u.path.some(p => p.x === x && p.y === y)));
   }
 
   spawn(x, y, character = null) {
     if (!this.inside(x, y) || this.occupied(x, y)) return null;
-    const u = { character, id: this.nextId++, x, y, visualX: x, visualY: y,
+    const u = { character, health:character?.health||createHealth(), damage:25, id: this.nextId++, x, y, visualX: x, visualY: y,
       state: 'idle', elapsed: 0, facing: -1, path: [], target: null, hits: 0, impacted: false };
     this.units.push(u);
     return u;
@@ -85,7 +86,7 @@ export class Board {
 
   move(id, x, y) {
     const u = this.unit(id);
-    if (!u || this.busy || !this.inside(x, y) || this.occupied(x, y) || u.x === x && u.y === y) return false;
+    if (!u || u.health.current<=0 || this.busy || !this.inside(x, y) || this.occupied(x, y) || u.x === x && u.y === y) return false;
     const path = this.pathTo(u, (a, b) => a === x && b === y);
     if (!path?.length) return false;
     u.path = path;
@@ -96,7 +97,7 @@ export class Board {
 
   attack(id, targetId) {
     const u = this.unit(id), target = this.unit(targetId);
-    if (!u || !target || u === target || this.busy) return false;
+    if (!u || !target || u.health.current<=0 || target.health.current<=0 || u === target || this.busy) return false;
     const path = this.pathTo(u, (x, y) => Math.abs(x - target.x) + Math.abs(y - target.y) === 1);
     if (!path) return false;
     u.target = targetId;
@@ -114,7 +115,7 @@ export class Board {
 
   beginAttack(u) {
     const target = this.unit(u.target);
-    if (!target || Math.abs(u.x - target.x) + Math.abs(u.y - target.y) !== 1) {
+    if (!target || target.health.current<=0 || Math.abs(u.x - target.x) + Math.abs(u.y - target.y) !== 1) {
       u.state = 'idle'; u.target = null; return;
     }
     u.facing = project(target.x - u.x, target.y - u.y).x >= 0 ? 1 : -1;
@@ -122,12 +123,22 @@ export class Board {
     u.state = 'attack'; u.elapsed = 0; u.impacted = false;
   }
 
+  heal(id,amount) {
+    const u=this.unit(id);if(!u||u.health.current<=0||!Number.isFinite(amount)||amount<=0)return 0;
+    const gain=Math.min(amount,u.health.max-u.health.current);u.health.current+=gain;return gain;
+  }
+  damage(id,amount,direction=1) {
+    const u=this.unit(id);if(!u||u.health.current<=0||!Number.isFinite(amount)||amount<=0)return false;
+    u.health.current=Math.max(0,u.health.current-amount);u.hits++;u.elapsed=0;
+    u.state=u.health.current<=0?'death':'hit';u.path=[];u.target=null;u.deathDirection=direction;
+    return true;
+  }
   update(dt) {
     this.time += dt;
     for (const e of this.effects) e.age += dt;
     this.effects = this.effects.filter(e => e.age < 0.55);
+    for(const u of this.units){u.elapsed+=dt;advanceHealth(u.health,dt);}
     for (const u of this.units) {
-      u.elapsed += dt;
       if (u.state === 'walk') {
         // Carry excess frame time into the next step; logical cells change only on arrival.
         while (u.path.length && u.elapsed >= STEP_TIME) {
@@ -150,8 +161,8 @@ export class Board {
         if (!u.impacted && u.elapsed >= IMPACT_TIME) {
           u.impacted = true;
           const target = this.unit(u.target);
-          if (target && Math.abs(u.x - target.x) + Math.abs(u.y - target.y) === 1) {
-            target.state = 'hit'; target.elapsed = 0; target.hits++;
+          if (target && target.health.current>0 && Math.abs(u.x - target.x) + Math.abs(u.y - target.y) === 1) {
+            this.damage(target.id,u.damage,project(target.x-u.x,target.y-u.y).x>=0?1:-1);
             this.effects.push({ x: target.x, y: target.y, age: 0 });
           }
         }
@@ -160,5 +171,6 @@ export class Board {
         u.state = 'idle'; u.elapsed = 0;
       }
     }
+    this.units=this.units.filter(u=>u.state!=='death'||u.elapsed<DEATH_DURATION);
   }
 }

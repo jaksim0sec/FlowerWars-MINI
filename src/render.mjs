@@ -65,6 +65,7 @@ export function drawWarrior(ctx, art, unit, time) {
   const instance=createCharacter(art.catalog,'gynari-warrior');
   equip(art.catalog,instance,'basic_sword','left');
   instance.animation={...unit,phase:unit.id};
+  if(unit.health)instance.health=unit.health;
   drawCharacter(ctx,art.catalog,instance,time);
 }
 
@@ -111,16 +112,16 @@ export function render(ctx, art, board, view, camera, width, height, dpr) {
   for (const unit of units) {
     const p = project(unit.visualX, unit.visualY);
     ctx.save(); ctx.translate(p.x, p.y);
-    if (unit.id === view.selected || view.mode === 'attack') {
+    if (unit.state!=='death' && (unit.id === view.selected || view.mode === 'attack')) {
       ctx.beginPath(); ctx.ellipse(0, -1, 34, 13, 0, 0, Math.PI * 2);
       ctx.strokeStyle = unit.id === view.selected ? '#fff3ae' : '#b96335';
       ctx.lineWidth = unit.id === view.selected ? 2.5 : 1.5; ctx.stroke();
     }
     if(unit.character) {
-      Object.assign(unit.character.animation,{state:unit.state,elapsed:unit.elapsed,facing:unit.facing,phase:unit.id,attackVector:unit.attackVector});
+      Object.assign(unit.character.animation,{state:unit.state,elapsed:unit.elapsed,facing:unit.facing,phase:unit.id,attackVector:unit.attackVector,deathDirection:unit.deathDirection});
       drawCharacter(ctx,art.catalog,unit.character,board.time);
     } else drawWarrior(ctx, art, unit, board.time);
-    if (unit.id === view.selected) {
+    if (unit.id === view.selected && unit.state!=='death') {
       const y = -123 + Math.sin(board.time * 3) * 2;
       ctx.fillStyle = '#fff1a3'; ctx.beginPath(); ctx.moveTo(-4, y); ctx.lineTo(4, y); ctx.lineTo(0, y + 5); ctx.fill();
     }

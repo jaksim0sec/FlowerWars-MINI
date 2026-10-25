@@ -10,7 +10,7 @@ with sync_playwright() as p:
  assert page.locator('[data-character]').evaluate_all('(cards)=>cards.map(c=>c.dataset.character)')==VISIBLE
  page.goto(BASE);page.get_by_text('전장 준비 완료',exact=False).wait_for()
  assert page.locator('#character-type option').evaluate_all('(options)=>options.map(o=>o.value)')==VISIBLE
- for moves,name in [(['ArrowRight']*2+['ArrowDown']*2,'방패수호자 1'),(['ArrowRight']*5+['ArrowDown']*3,'꽃잎학자 2')]:
+ for moves,name in [(['ArrowRight']*2+['ArrowDown']*2,'방패수호자 1'),(['ArrowRight']*3+['ArrowDown']*5,'꽃잎학자 2')]:
   page.locator('#board').focus();page.keyboard.press('Escape')
   for key in moves:page.keyboard.press(key)
   page.keyboard.press('Enter');assert page.locator('#selection-name').inner_text()==name

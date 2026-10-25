@@ -6,7 +6,7 @@ BASE = os.environ.get('BASE_URL', 'http://127.0.0.1:8000')
 
 def point(page, x, y):
     field = page.locator('#board').bounding_box()
-    columns, rows = 16, 5
+    columns, rows = 5, 16
     left, right = -rows * 72, columns * 72
     top, bottom = -126, (columns + rows - 1) * 42 + 22
     scale = max(.1, min((field['width'] - 32) / (right - left), (field['height'] - 32) / (bottom - top), 1.1))
@@ -36,9 +36,9 @@ with sync_playwright() as p:
     page.wait_for_timeout(1000)
     assert '5, 5' in page.locator('#selection-detail').inner_text()
     page.get_by_role('button', name='공격', exact=True).click()
-    cell(page, 5, 3)
+    cell(page, 3, 5)
     page.wait_for_timeout(1600)
-    cell(page, 5, 3)
+    cell(page, 3, 5)
     assert '피격 1회' in page.locator('#selection-detail').inner_text()
     # A drag while summoning must move the camera without adding a unit.
     page.get_by_role('button', name='방패수호자 소환').click()
@@ -52,7 +52,7 @@ with sync_playwright() as p:
     cell(page,1,3)
     assert page.locator('#unit-count').inner_text() == '용사 4'
     # Reset while an action is in progress cannot deliver a stale hit.
-    page.get_by_role('button',name='공격',exact=True).click();cell(page,5,3)
+    page.get_by_role('button',name='공격',exact=True).click();cell(page,3,5)
     page.get_by_role('button',name='초기화',exact=True).click();page.wait_for_timeout(1600)
     assert page.locator('#unit-count').inner_text() == '용사 2'
     # Selecting a tile allows mixing terrain; occupied summoning keeps the count.
@@ -80,8 +80,8 @@ with sync_playwright() as p:
     assert page.locator('#unit-count').inner_text()=='용사 3'
     cell(page,4,4,True);page.wait_for_timeout(1000)
     assert '5, 5' in page.locator('#selection-detail').inner_text()
-    page.get_by_role('button',name='공격',exact=True).tap();cell(page,5,3,True);page.wait_for_timeout(1600)
-    cell(page,5,3,True)
+    page.get_by_role('button',name='공격',exact=True).tap();cell(page,3,5,True);page.wait_for_timeout(1600)
+    cell(page,3,5,True)
     assert '피격 1회' in page.locator('#selection-detail').inner_text()
     cdp=mobile.new_cdp_session(page)
     def touches(event, points):

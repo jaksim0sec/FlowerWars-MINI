@@ -1,3 +1,4 @@
+import {healthLabel} from './characters/vitality.mjs';
 import {createCharacter,equip} from './characters/engine.mjs';
 import {visibleCharacters} from './characters/catalog.mjs';
 import { Board, project, tileAt, zoomCamera, fitBoardCamera } from './model.mjs';
@@ -56,8 +57,10 @@ function seed() {
 }
 
 function refresh() {
-  const unit = board.unit(view.selected);
-  text('unit-count', `용사 ${board.units.length}`);
+  let unit = board.unit(view.selected);
+  if(unit?.health.current<=0){view.selected=null;view.tile=null;unit=null;}
+  text('selection-health',unit?`체력 ${unit.health.current} / ${unit.health.max} · ${healthLabel(unit.health)}`:'');
+  text('unit-count', `용사 ${board.units.filter(u=>u.health.current>0).length}`);
   text('zoom-value', `${Math.round(camera.scale * 100)}%`);
   $('summon').setAttribute('aria-label',`${$('character-type').selectedOptions[0].textContent} 소환`);
   $('summon').setAttribute('aria-pressed', String(view.mode === 'summon'));
@@ -66,7 +69,7 @@ function refresh() {
   canvas.classList.toggle('summoning', view.mode === 'summon');
   if (unit) {
     text('selection-name', `${unitName(unit)} ${unit.id}`);
-    const action = { idle: '대기', walk: '이동 중', attack: '공격 중', hit: '피격' }[unit.state];
+    const action = { idle: '대기', walk: '이동 중', attack: '공격 중', hit: '피격', death:'쓰러짐' }[unit.state];
     text('selection-detail', `${unit.x + 1}, ${unit.y + 1} · ${action}${unit.hits ? ` · 피격 ${unit.hits}회` : ''}`);
   } else if (view.tile) {
     text('selection-name', `${view.tile.x + 1}, ${view.tile.y + 1}번 칸`);
@@ -99,6 +102,7 @@ function pickUnit(p) {
   const w = world(p);
   return [...board.units].sort((a, b) => (b.visualX + b.visualY) - (a.visualX + a.visualY) || b.visualX - a.visualX)
     .find(unit => {
+      if(unit.health.current<=0)return false;
       const foot = project(unit.visualX, unit.visualY);
       return Math.abs(w.x - foot.x) < 32 && w.y > foot.y - 108 && w.y < foot.y + 7;
     });

@@ -1,7 +1,8 @@
+import {createHealth,DEATH_DURATION} from './vitality.mjs';
 /** Board/DOM-independent instance, animation, rig and equipment engine. */
 export function createCharacter(catalog, characterId, options = {}) {
   if (!catalog.characters[characterId]) throw new Error(`Unknown character: ${characterId}`);
-  return {characterId, equipment:Object.fromEntries(['left','right',...Object.keys(catalog.characters[characterId].rig.sockets || {})].map(slot=>[slot,null])), appearance:{parts:{}},
+  return {characterId, health:createHealth(catalog.characters[characterId].maxHealth||100), equipment:Object.fromEntries(['left','right',...Object.keys(catalog.characters[characterId].rig.sockets || {})].map(slot=>[slot,null])), appearance:{parts:{}},
     animation:{state:'idle',elapsed:0,facing:-1,phase:0}, ...structuredClone(options)};
 }
 export function unequip(instance, hand) {
@@ -51,7 +52,10 @@ function channels(rig, instance, time, equipment) {
   const a=instance.animation;
   const vars={state:a.state,time,elapsed:a.elapsed,phase:a.phase,vectorX:a.attackVector?.x||0,vectorY:a.attackVector?.y||0};
   const overrides=Object.assign({},...equipment.map(e=>e.animation||{}));
-  for(const [name,expr] of Object.entries({...rig.animations,...overrides,...instance.appearance.animations})) vars[name]=value(expr,vars);
+  for(const [name,expr] of Object.entries({...rig.animations,...overrides,...instance.appearance.animations})) {
+    vars[name]=value(expr,vars);
+    if(name==='stride'||name==='wave')vars[name]*=1-(instance.health?.injury||0)*.18-(instance.health?.critical||0)*.12;
+  }
   return vars;
 }
 /** Returns rig-space matrices, usable by Canvas, cards, tools and tests. */
@@ -65,6 +69,7 @@ export function layoutCharacter(catalog, instance, time=0) {
     Object.assign(slotNodes,states[instance.equipment[slot]?'equipped':'empty'] || {});
   }
   const vars=channels(rig,instance,time,[]);
+  const injury=instance.health?.injury||0,critical=instance.health?.critical||0,style=rig.vitality||{};
   const draws=[],sockets={},groups={};
   function visit(nodes,parent,ancestors=[]) {
     for(const node of nodes) {
@@ -76,6 +81,12 @@ export function layoutCharacter(catalog, instance, time=0) {
         if(op.translate) m=multiply(m,translate(...op.translate.map(x=>value(x,vars))));
         if(op.rotate!==undefined) {const pivot=op.pivot||[0,0];m=multiply(m,multiply(translate(...pivot),multiply(rotate(value(op.rotate,vars)),translate(-pivot[0],-pivot[1]))));}
         if(op.scale) {const pivot=op.pivot||[0,0],s=op.scale.map(x=>value(x,vars));m=multiply(m,multiply(translate(...pivot),multiply([s[0],0,0,s[1],0,0],translate(-pivot[0],-pivot[1]))));}
+      }
+      if(node.id==='upper')m=multiply(m,translate(critical*Math.sin(time*8)*5,injury*9+critical*8));
+      if(['neck','leftArm','rightArm'].includes(node.id)){
+        const p=node.transforms?.find(op=>op.pivot)?.pivot||rig.neck||[0,0];
+        const angle=node.id==='neck'?injury*(style.headDroop??.07)+critical*(.07+Math.sin(time*7)*(style.criticalSway??.065)):(node.id==='leftArm'?-1:1)*(injury*.10+critical*.07);
+        m=multiply(m,multiply(translate(...p),multiply(rotate(angle),translate(-p[0],-p[1]))));
       }
       if(node.id) groups[node.id]={matrix:m,parentMatrix:parent,editorBase};
       const lineage=[...ancestors,node.id];
@@ -113,6 +124,31 @@ export function layoutCharacter(catalog, instance, time=0) {
       secondary.matrix=multiply(translate(dx,dy),secondary.matrix);
     }
   }
+  if(instance.animation.state==='death'){
+    const t=instance.animation.elapsed,dir=(instance.animation.deathDirection||1)*(instance.animation.facing===1?-1:1);
+    const fall=Math.max(0,Math.min(1,(t-.12)/.48));
+    const angle=dir*(Math.sin(Math.min(t/.24,1)*Math.PI)*.22+fall*(style.fallAngle??.62));
+    const root=multiply(translate(rig.foot[0],rig.foot[1]),multiply(rotate(angle),translate(-rig.foot[0],-rig.foot[1])));
+    const alpha=Math.min(1,Math.max(0,(DEATH_DURATION-t)/.35));
+    const debris=(matrix,key,geometry)=>{
+      let seed=0;for(const c of key)seed=(seed*31+c.charCodeAt(0))>>>0;
+      const age=Math.max(0,t-(style.parts?.[key]?.delay??(.30+(seed%5)*.045)));
+      const base=multiply(root,matrix);if(!age)return base;
+      const anchor=point(base),duration=.48+(seed%3)*.05,p=Math.min(age/duration,1);
+      const spun=multiply(base,rotate(((seed%9)-4)*.22*p));
+      const origin=geometry.origin||geometry.grip;
+      const bottom=Math.max(...[[0,0],[1,0],[1,1],[0,1]].map(([x,y])=>point(spun,(x-origin[0])*geometry.w,(y-origin[1])*geometry.h)[1]-anchor[1]));
+      const destination=rig.foot[1]-8-bottom;
+      const y=(destination-anchor[1])*p*p-Math.sin(p*Math.PI)*45;
+      const bounce=age>duration?-Math.abs(Math.sin((age-duration)*15))*Math.exp(-(age-duration)*8)*22:0;
+      return multiply(translate(dir*age*25+((seed%7)-3)*p*(style.scatter??22),y+bounce),spun);
+    };
+    for(const draw of draws)if(draw.matrix){
+      if(draw.part==='shadow'){draw.alpha=alpha*(1-fall*.6);continue;}
+      draw.matrix=debris(draw.matrix,draw.part,rig.parts[draw.part]);draw.alpha=alpha;
+    }
+    for(const[side,d]of Object.entries(equipmentDraws)){d.matrix=debris(d.matrix,'equipment-'+side,d);d.alpha=alpha;}
+  }
   // Foreground equipment stays above the authored body layers on either hand.
   const layer=draw=>catalog.equipment[equipmentDraws[draw.socket]?.equipmentId]?.drawLayer==='foreground'?1:0;
   draws.sort((a,b)=>layer(a)-layer(b));
@@ -132,7 +168,7 @@ export function drawCharacter(ctx,catalog,instance,time=0,{scale}={}) {
     const image=equipment ? catalog.equipment[equipment.equipmentId].image : def.images[instance.appearance.parts[draw.part] || draw.part];
     if(!image) throw new Error(`Missing character part: ${draw.part}`);
     const origin=equipment ? p.grip : p.origin;
-    ctx.save();ctx.transform(...matrix);
+    ctx.save();if((equipment?.alpha??draw.alpha)!==undefined)ctx.globalAlpha=(ctx.globalAlpha??1)*(equipment?.alpha??draw.alpha);ctx.transform(...matrix);
     if(draw.clip) {ctx.beginPath();draw.clip.forEach(([x,y],i)=>{const v=[(x-origin[0])*p.w,(y-origin[1])*p.h];if(i)ctx.lineTo(...v);else ctx.moveTo(...v);});ctx.closePath();ctx.clip();}
     ctx.drawImage(image,-p.w*origin[0],-p.h*origin[1],p.w,p.h);ctx.restore();
   }
