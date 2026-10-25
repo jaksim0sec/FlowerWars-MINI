@@ -24,7 +24,20 @@ function paint(ctx,art,board,camera,width,height,dpr){
  ctx.lineTo(-board.height*HALF_W,(board.height-1)*HALF_H);ctx.closePath();
  ctx.translate(0,23);ctx.shadowColor='#68502455';ctx.shadowBlur=38;ctx.shadowOffsetY=23;ctx.fillStyle='#97794140';ctx.fill();ctx.restore();
  const tiles=visibleTiles(board,camera,width,height);
- for(const{x,y}of tiles)ctx.drawImage(art.tiles[board.terrain[y][x]],(x-y)*HALF_W-72,(x+y)*HALF_H-42,144,107);
+ for(const{x,y}of tiles){
+  const type=board.terrain[y][x],px=(x-y)*HALF_W,py=(x+y)*HALF_H;
+  ctx.drawImage(art.tiles[type==='road'?'soil':type==='forest'?'grass':type],px-72,py-42,144,107);
+  if(type==='forest'){
+   ctx.fillStyle='#215e46aa';ctx.beginPath();ctx.moveTo(px,py-42);ctx.lineTo(px+72,py);ctx.lineTo(px,py+42);ctx.lineTo(px-72,py);ctx.closePath();ctx.fill();
+   // Low, rounded tree clusters keep soldiers readable. Baked into terrain cache.
+   const seed=(x*17+y*31)%7;
+   for(const [dx,dy,r]of [[-26,-5,18],[14,-12,23],[31,10,17],[-7,13,21]]){
+    ctx.fillStyle='#133f3355';ctx.beginPath();ctx.ellipse(px+dx+4,py+dy+9,r,r*.45,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=(seed%2)?'#326c4b':'#397850';ctx.beginPath();ctx.ellipse(px+dx,py+dy-7,r,r*.65,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#65935c80';ctx.beginPath();ctx.ellipse(px+dx-4,py+dy-12,r*.65,r*.35,-.2,0,Math.PI*2);ctx.fill();
+   }
+  }
+ }
  return tiles.length;
 }
 /** One viewport-sized backing canvas per renderer, never a map-sized allocation. */

@@ -1,4 +1,5 @@
 import {squadTapIntent} from './gesture-commands.mjs';
+import {terrainNames} from './battlefield-terrain.mjs';
 import {FlagMatch} from './flag-match.mjs';
 import {deploymentBlueprint} from './deployment-layout.mjs';
 import {icon,typeLabels} from './ui-icons.mjs';
@@ -277,7 +278,7 @@ function updateMatchHud(){
  $('deployment-tools').hidden=!m||m.phase!=='preparation';
  $('match-result').hidden=!m||m.phase!=='finished';
  document.body.classList.toggle('in-match',!!m);
- for(const id of ['group-place','summon','board-resize','combat-enable','combat-disable','group-team'])$(id).disabled=!!m;
+ for(const id of ['group-place','summon','board-resize','combat-enable','combat-disable','group-team','terrain'])$(id).disabled=!!m;
  if(!m)return;
  text('match-phase',m.phase==='preparation'?'병력 준비':m.phase==='battle'?'깃발 점령전':'전투 종료');
  const seconds=Math.ceil(m.remaining);text('match-timer',m.phase==='preparation'?Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0'):'');
@@ -357,7 +358,7 @@ function refresh(invalidate=true) {
     text('selection-detail', `${unit.x + 1}, ${unit.y + 1} · ${unit.waitReason==='combat'?'교전 대기':unit.waitReason?'경로 대기':action}${unit.hits ? ` · 피격 ${unit.hits}회` : ''}`);
   } else if (view.tile) {
     text('selection-name', `${view.tile.x + 1}, ${view.tile.y + 1}번 칸`);
-    text('selection-detail', board.terrain[view.tile.y][view.tile.x] === 'grass' ? '잔디 블럭' : '흙 블럭');
+    text('selection-detail', terrainNames[board.terrain[view.tile.y][view.tile.x]]||'개활지');
   } else {
     text('selection-name', '용사를 선택하세요');
     text('selection-detail', '용사를 누른 뒤 원하는 칸으로 이동');
@@ -570,7 +571,7 @@ $('summon').addEventListener('click', () => setMode('summon'));
 $('attack').addEventListener('click', () => setMode('attack'));
 $('reset').addEventListener('click', () => { seed(); fit(); updateMovementStats();notify('처음의 두 용사로 돌아왔어요.'); });
 $('terrain').addEventListener('click', () => {
-  if (!view.tile) return;
+  if (!view.tile||board.match) return;
   const { x, y } = view.tile;
   board.setTerrain(x,y,board.terrain[y][x] === 'grass' ? 'soil' : 'grass');
   refresh(); notify('선택한 칸의 지형을 바꿨어요.');

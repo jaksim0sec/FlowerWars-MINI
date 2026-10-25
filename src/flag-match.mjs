@@ -2,6 +2,7 @@ import {placeGroup,squadsFor} from './unit-groups.mjs';
 import {orderSquads} from './squad-orders.mjs';
 import {survey,deployment,planOperation} from './bot-strategy.mjs';
 import {commandBotSquad} from './bot-tactics.mjs';
+import {createBattlefield} from './battlefield-terrain.mjs';
 import {deploymentBlueprint} from './deployment-layout.mjs';
 
 export const PREPARATION_SECONDS=300;
@@ -21,9 +22,7 @@ export class FlagMatch{
   this.limit=Math.max(1,Math.min(ARMY_LIMIT,Math.floor(Number(count)||ARMY_LIMIT)));
   this.reserve={A:this.limit,B:this.limit};this.makeCharacter=makeCharacter;this.optionsFor=optionsFor;
   board.match=this;
-  // Broad symmetric passages: terrain is shared, the middle is a deployment
-  // boundary during preparation rather than an invisible permanent wall.
-  for(const x of [46,53])for(let y=10;y<90;y++)if(y%20>=4&&y%20<=13)board.setObstacle(x,y,{kind:'stone-wall',blocked:true});
+  createBattlefield(board);
   const previousPolicy=board.movementPolicy;
   board.movementPolicy={matchOwner:this,previousPolicy,beforeStep:context=>{
    if(board.match===this&&this.phase==='preparation'&&!this.inTerritory(context.unit.team,context.to))return 'wait';

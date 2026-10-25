@@ -12,6 +12,16 @@ function state(board,squad){
 }
 function move(board,squad,action,point){
  const aim={x:Math.max(3,Math.min(94,Math.round(point.x))),y:Math.max(4,Math.min(95,Math.round(point.y)))};
+ if(squad.type==='ranged'&&['advance','fortify'].includes(action)){
+  let best={...aim},score=board.terrain[aim.y][aim.x]==='forest'?-1.5:0;
+  for(let dx=-2;dx<=2;dx++)for(let dy=-2;dy<=2;dy++){
+   const x=aim.x+dx,y=aim.y+dy;
+   if(!board.inside(x,y)||board.navigation.blocked(y*board.width+x))continue;
+   const value=Math.max(Math.abs(dx),Math.abs(dy))*.5-(board.terrain[y][x]==='forest'?1.5:0);
+   if(value<score){score=value;best={x,y};}
+  }
+  Object.assign(aim,best);
+ }
  if(board.navigation.blocked(aim.y*board.width+aim.x)){
   let free=null;
   for(let r=1;r<=4&&!free;r++)for(const dx of [-r,0,r])for(const dy of [-r,0,r]){

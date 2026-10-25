@@ -1,4 +1,5 @@
 import {SpatialIndex} from './spatial-index.mjs';
+import {terrainStepMultiplier,terrainDamage} from './battlefield-terrain.mjs';
 import {healingOptions} from './healing.mjs';
 import {mix,movementOptions} from './decision.mjs';
 import {combatOptions,inAttackRange,tryAutoAttack,hasLineOfSight,BASE_ATTACK_DURATION} from './combat.mjs';
@@ -81,7 +82,7 @@ export class Board {
     return alive.length;
   }
   setTerrain(x,y,type) {
-    if(!this.inside(x,y)||!['grass','soil'].includes(type))return false;
+    if(!this.inside(x,y)||!['grass','soil','road','forest'].includes(type))return false;
     if(this.terrain[y][x]!==type){this.terrain[y][x]=type;this.terrainRevision++;}
     return true;
   }
@@ -138,7 +139,7 @@ export class Board {
     if(replace)this.interrupt(u);else this.cancelCommand(u);u.target=targetId;u.command={type:'attack',target:targetId};this.navigation.plan(u);return true;
   }
   beginStep(u,next) {
-    u.state='walk';u.elapsed=0;u.step={...next,elapsed:0,duration:u.movement.stepTime};u.path=[next];
+    u.state='walk';u.elapsed=0;u.step={...next,elapsed:0,duration:u.movement.stepTime*terrainStepMultiplier(this,u,next)};u.path=[next];
     this.reservations.set(next.y*this.width+next.x,u.id);this.spatial.move(u);
     u.facing=project(next.x-u.x,next.y-u.y).x>=0?1:-1;
   }
@@ -213,7 +214,7 @@ export class Board {
               if(gained)this.effects.push({x:target.visualX,y:target.visualY,age:0,healing:true,amount:gained});
             }
           }else if(target&&target.health.current>0&&inAttackRange(u,target)&&(!u.combat.lineOfSight||hasLineOfSight(this,u,target))) {
-            impacts.push({target,damage:u.damage,direction:project(target.visualX-u.visualX,target.visualY-u.visualY).x>=0?1:-1});
+            impacts.push({target,damage:u.damage*terrainDamage(this,u,target),direction:project(target.visualX-u.visualX,target.visualY-u.visualY).x>=0?1:-1});
           }
         }
         if(u.elapsed+1e-9>=strike.duration){

@@ -11,6 +11,7 @@ with sync_playwright() as p:
         assert page.locator('#match-armies').text_content().startswith('배치 0/500')
         assert page.locator('.squad-card').count()==0
         assert page.locator('#deployment-tools').is_visible()
+        assert page.locator('#terrain').is_disabled(), 'match terrain must stay fixed for both teams'
         page.locator('[data-deploy-type="defense"]').click()
         page.locator('#board').focus();page.keyboard.press('ArrowRight')
         for _ in range(19):page.keyboard.press('ArrowRight')
