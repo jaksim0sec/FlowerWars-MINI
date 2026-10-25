@@ -51,7 +51,7 @@ import {combatAnimationElapsed} from '../src/combat.mjs';
 const manifest=JSON.parse(await readFile(new URL('../assets/characters.json',import.meta.url)));
 test('visible test classes have independent configured health, damage and attack speed',()=>{
  const defs=Object.values(manifest.characters).filter(d=>!d.hidden);
- for(const d of defs){assert.ok(d.testCombat);assert.ok(d.testCombat.maxHealth>0&&d.testCombat.damage>0&&d.testCombat.attackPeriod>0);assert.equal(d.testCombat.range,1);assert.equal(d.testCombat.rangeShape,'king');}
+ for(const d of defs){assert.ok(d.testCombat);assert.ok(d.testCombat.maxHealth>0&&d.testCombat.damage>0&&d.testCombat.attackPeriod>0);assert.ok(d.testCombat.range>=1);assert.equal(d.testCombat.rangeShape,'king');}
  const guard=manifest.characters['shield-guard'].testCombat,scout=manifest.characters.scout.testCombat;
  assert.ok(guard.maxHealth>scout.maxHealth*2&&guard.damage>scout.damage&&guard.attackPeriod>scout.attackPeriod*2);
  const b=new Board(),u=soldier(b,1,1,'A',guard),v=soldier(b,2,1,'B',{},false);b.update(.12);u.elapsed=u.strike.duration/2;

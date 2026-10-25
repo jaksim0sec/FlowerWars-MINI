@@ -1,3 +1,4 @@
+import {mix} from './decision.mjs';
 // Shared static distance fields + conservative one-step cooperative reservations.
 // No visual/camera state participates in navigation.
 export const SEARCH_BUDGET = 2048;
@@ -15,7 +16,7 @@ export class Navigation {
   coords(index){return {x:index%this.board.width,y:Math.floor(index/this.board.width)};}
   neighbors(index) {
     const w=this.board.width,h=this.board.height,x=index%w,y=Math.floor(index/w);
-    return [x+1<w?index+1:-1,y+1<h?index+w:-1,x>0?index-1:-1,y>0?index-w:-1];
+    const east=x+1<w?index+1:-1,west=x>0?index-1:-1;return this.board.navigationOrientation===-1?[west,y+1<h?index+w:-1,east,y>0?index-w:-1]:[east,y+1<h?index+w:-1,west,y>0?index-w:-1];
   }
   blocked(index){return this.board.obstacles.get(index)?.blocked!==false&&this.board.obstacles.has(index);}
   consume(){this.remaining--;this.stats.expansions++;this.stats.lastExpansions++;}
@@ -75,12 +76,13 @@ export class Navigation {
       return position;
     };
     const opposite={east:'west',west:'east',south:'north',north:'south'}[u.command.flow];
-    const traffic=b.flows[opposite]>0;
+    const traffic=b.flows[opposite]>0&&!u.combat.auto;
     if(traffic&&Math.abs(dx)>=Math.abs(dy)&&Math.abs(dx)>=4) {
-      const lane=laneFor(py,b.height,dx);
+      const lane=laneFor(py,b.height,dx*b.navigationOrientation);
       vertical(lane);horizontal(x);vertical(y);
     } else if(traffic&&Math.abs(dy)>=4) {
-      const lane=laneFor(px,b.width,dy);
+      const canonical=b.navigationOrientation===-1?b.width-1-px:px;
+      const chosen=laneFor(canonical,b.width,dy),lane=b.navigationOrientation===-1?b.width-1-chosen:chosen;
       horizontal(lane);vertical(y);horizontal(x);
     } else {horizontal(x);vertical(y);}
     return guide;
@@ -102,11 +104,13 @@ export class Navigation {
   }
   wait(u,reason,delay=.24) {
     u.state='idle';u.path=[];u.waitReason=reason;u.waitSince??=this.board.time;
-    u.retryAt=this.board.time+delay+(u.id%4)*.025;
+    u.retryAt=this.board.time+delay+(u.priorityKey%4)*.025;
   }
   plan(u) {
     const b=this.board;
     if(u.step||!['idle','walk'].includes(u.state))return;
+    if(this.keepDistance(u))return;
+    if(b.unit(u.id)!==u||u.health.current<=0||u.step||!['idle','walk'].includes(u.state))return;
     if(b.tryAutoAttack(u))return;
     const command=u.command;
     if(!command||b.time<(u.retryAt||0))return;
@@ -156,7 +160,7 @@ export class Navigation {
     if(!next) {
       const waited=b.time-(u.waitSince??b.time);
       // Let a moving neighbor finish before spending any local search budget.
-      if(!blocker?.command||waited>=.24) {
+      if(!blocker?.command||waited>=u.movement.waitBeforeDetour) {
         // A detour must rejoin a future route cell, never its origin. This
         // prevents sideways oscillation and preserves static obstacle guidance.
         const potential=new Map(u.guide.map((cell,i)=>[cell,u.guide.length-i]));
@@ -170,7 +174,7 @@ export class Navigation {
       }
       // A passing bay can require temporary motion away from the goal. Yield
       // sideways, hold long enough for the opposing unit to clear the lane.
-      if(!next&&blocker?.command&&waited>=.65) {
+      if(!next&&blocker?.command&&waited>=u.movement.yieldAfter) {
         const dx=blocker.x-u.x,dy=blocker.y-u.y;
         for(const n of candidates)if(this.free(n,u)) {
           const p=this.coords(n);
@@ -179,21 +183,65 @@ export class Navigation {
       }
     }
     if(!next){this.wait(u,'traffic',Math.min(.65,.16+(b.time-(u.waitSince??b.time))*.15));return;}
+    this.requestStep(u,next);
+  }
+  requestStep(u,next){
+    const b=this.board,command=u.command;
     const decision=b.movementPolicy?.beforeStep?.({board:b,unit:u,from:{x:u.x,y:u.y},to:{...next},obstacle:b.obstacles.get(this.index(next.x,next.y))})||'move';
     if(b.unit(u.id)!==u||u.health.current<=0||u.command!==command||u.step||!['idle','walk'].includes(u.state))return;
     if(decision==='cancel'){b.cancelCommand(u);return;}
     if(decision!=='move'){this.wait(u,'condition');return;}
     // Hooks may change the board; validate once more before reserving.
     if(!this.free(this.index(next.x,next.y),u)){this.wait(u,'traffic');return;}
-    b.beginStep(u,next);u.waitReason=null;u.waitSince=null;u.retryAt=0;
+    this.offer(u,next);return true;
+  }
+  keepDistance(u){
+    const b=this.board,preferred=u.combat.preferredRange,target=b.unit(u.combat.targetId);
+    if(u.command?.type==='attack'||!u.combat.auto||!(preferred>1)||!target||target.health.current<=0||target.team===u.team||b.time<(u.combat.spacingAt||0))return false;
+    const metric=(x,y)=>u.combat.shape==='king'?Math.max(Math.abs(x-target.visualX),Math.abs(y-target.visualY)):Math.abs(x-target.visualX)+Math.abs(y-target.visualY);
+    const distance=metric(u.x,u.y);
+    if(distance>=preferred)return false;
+    let best=null,score=distance;
+    for(const n of this.neighbors(this.index(u.x,u.y)))if(this.free(n,u)){
+      const p=this.coords(n),d=metric(p.x,p.y);
+      if(d>score&&d<=u.combat.range){score=d;best=p;}
+    }
+    if(!best)return false;
+    if(!this.requestStep(u,best))return false;u.combat.spacingAt=b.time+.6;return true;
+  }
+  offer(u,next){
+    if(this.collecting){this.intents.set(u.id,{u,next,command:u.command});return;}
+    this.board.beginStep(u,next);u.waitReason=null;u.waitSince=null;u.retryAt=0;
+  }
+  startCollection(){this.collecting=true;this.intents=new Map();}
+  commit(){
+    const b=this.board,winners=new Map();this.collecting=false;
+    for(const intent of this.intents.values()){
+      const {u,next}=intent;
+      if(b.unit(u.id)!==u||u.health.current<=0||u.command!==intent.command||u.step||!['idle','walk'].includes(u.state))continue;
+      const key=this.index(next.x,next.y),old=winners.get(key);
+      const age=b.time-(u.waitSince??b.time),oldAge=old?b.time-(old.u.waitSince??b.time):-1;
+      const rank=mix(u.priorityKey^b.decisionEpoch),oldRank=old?mix(old.u.priorityKey^b.decisionEpoch):0;
+      if(!old||age>oldAge||age===oldAge&&rank>oldRank)winners.set(key,intent);
+    }
+    for(const intent of this.intents.values()){
+      const {u,next,command}=intent;
+      if(b.unit(u.id)!==u||u.health.current<=0||u.command!==command||u.step||!['idle','walk'].includes(u.state))continue;
+      if(winners.get(this.index(next.x,next.y))!==intent||!this.free(this.index(next.x,next.y),u)){
+        u.route.unshift(next);this.wait(u,'traffic',.12);continue;
+      }
+      b.beginStep(u,next);u.waitReason=null;u.waitSince=null;u.retryAt=0;
+    }
+    this.intents.clear();
   }
   schedule() {
     const units=this.board.units,n=units.length;if(!n)return;
-    this.cursor=(this.cursor+1)%n;
-    // Older waiters get first refusal, rotating index breaks ties in O(N).
-    for(const old of [true,false])for(let i=0;i<n;i++) {
-      const u=units[(i+this.cursor)%n];
-      if((u.waitSince!=null&&this.board.time-u.waitSince>=.5)===old)this.plan(u);
-    }
+    this.board.decisionEpoch++;this.cursor=(this.cursor+1)%n;this.startCollection();
+    try{
+      for(const old of [true,false])for(let i=0;i<n;i++) {
+        const u=units[(i+this.cursor)%n];
+        if((u.waitSince!=null&&this.board.time-u.waitSince>=.5)===old)this.plan(u);
+      }
+    }finally{this.commit();}
   }
 }

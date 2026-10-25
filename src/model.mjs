@@ -1,4 +1,6 @@
-import {combatOptions,inAttackRange,tryAutoAttack,BASE_ATTACK_DURATION} from './combat.mjs';
+import {SpatialIndex} from './spatial-index.mjs';
+import {mix,movementOptions} from './decision.mjs';
+import {combatOptions,inAttackRange,tryAutoAttack,hasLineOfSight,BASE_ATTACK_DURATION} from './combat.mjs';
 import {Navigation,NAV_INTERVAL} from './navigation.mjs';
 import {createHealth,advanceHealth,DEATH_DURATION} from './characters/vitality.mjs';
 export const HALF_W = 72;
@@ -40,7 +42,8 @@ export function fitBoardCamera(width, height, columns = BOARD_COLUMNS, rows = BO
 
 /** Deterministic command model with optional local test combat; no DOM or victory rules. */
 export class Board {
-  constructor(width = BOARD_COLUMNS, height = BOARD_ROWS) {
+  constructor(width = BOARD_COLUMNS, height = BOARD_ROWS, options={}) {
+    this.seed=options.seed??1;this.navigationOrientation=1;
     this.width = width;
     this.height = height;
     this.reset();
@@ -48,9 +51,11 @@ export class Board {
 
   reset() {
     this.terrainRevision=(this.terrainRevision||0)+1;
+    this.decisionEpoch=0;
     this.units = []; this.byId=new Map(); this.cells=new Map(); this.reservations=new Map();
     this.flows={east:0,west:0,south:0,north:0};
     this.obstacles=new Map();this.obstacleRevision=0;this.navClock=0;this.navigation=new Navigation(this);
+    this.spatial=new SpatialIndex(this.width,this.height);
     this.combatStats={checks:0,probes:0,attacks:0,hits:0};
     this.effects = []; this.nextId = 1; this.time = 0;
     this.terrain = Array.from({ length: this.height }, (_, y) =>
@@ -80,13 +85,18 @@ export class Board {
     if (!this.inside(x, y) || this.navigation.blocked(y*this.width+x) || this.occupied(x, y)) return null;
     const health=character?.health||createHealth();
     if(Number.isFinite(options.stats?.maxHealth)&&options.stats.maxHealth>0)health.current=health.max=options.stats.maxHealth;
-    const u = { character, health, team:options.team||null,combat:combatOptions(options),strike:null,
+    const u = { character, health, priorityKey:mix(this.seed^Math.imul(this.nextId,0x9e3779b9)),movement:movementOptions(options.movement),capabilities:[...(options.capabilities||[])],team:options.team||null,combat:combatOptions(options),strike:null,
       damage:Number.isFinite(options.stats?.damage)&&options.stats.damage>0?options.stats.damage:25, id: this.nextId++, x, y, visualX: x, visualY: y,
       state: 'idle', elapsed: 0, facing: -1, path: [], target: null, command:null, step:null, route:[], waitReason:null, hits: 0, impacted: false };
-    this.units.push(u);this.byId.set(u.id,u);this.cells.set(y*this.width+x,u.id);
+    this.units.push(u);this.byId.set(u.id,u);this.cells.set(y*this.width+x,u.id);this.spatial.add(u);
     return u;
   }
 
+  batchCommands(callback){
+    const nav=this.navigation,outer=nav.collecting;
+    if(!outer)nav.startCollection();
+    try{return callback();}finally{if(!outer)nav.commit();}
+  }
   move(id,x,y) {
     const u=this.unit(id);
     if(!u||u.health.current<=0||u.state!=='idle'||u.step||!this.inside(x,y)||this.navigation.blocked(y*this.width+x)||u.x===x&&u.y===y)return false;
@@ -101,8 +111,8 @@ export class Board {
     this.cancelCommand(u);u.target=targetId;u.command={type:'attack',target:targetId};this.navigation.plan(u);return true;
   }
   beginStep(u,next) {
-    u.state='walk';u.elapsed=0;u.step={...next,elapsed:0};u.path=[next];
-    this.reservations.set(next.y*this.width+next.x,u.id);
+    u.state='walk';u.elapsed=0;u.step={...next,elapsed:0,duration:u.movement.stepTime};u.path=[next];
+    this.reservations.set(next.y*this.width+next.x,u.id);this.spatial.move(u);
     u.facing=project(next.x-u.x,next.y-u.y).x>=0?1:-1;
   }
 
@@ -133,7 +143,7 @@ export class Board {
       u.elapsed=0;u.state=u.health.current<=0?'death':'hit';u.strike=null;
     }
     u.deathDirection=direction;
-    if(u.health.current<=0){this.cells.delete(u.y*this.width+u.x);if(u.step)this.reservations.delete(u.step.y*this.width+u.step.x);u.step=null;}
+    if(u.health.current<=0){this.cells.delete(u.y*this.width+u.x);if(u.step)this.reservations.delete(u.step.y*this.width+u.step.x);u.step=null;this.spatial.remove(u);}
     return true;
   }
   update(dt) {
@@ -149,15 +159,15 @@ export class Board {
     // Commit all arrivals before reserving departures: order cannot cause swaps.
     for(const u of this.units)if(u.step) {
       const p=u.step;p.elapsed+=dt;
-      if(p.elapsed+1e-9>=STEP_TIME) {
+      if(p.elapsed+1e-9>=p.duration) {
         this.cells.delete(u.y*this.width+u.x);this.reservations.delete(p.y*this.width+p.x);
         u.x=p.x;u.y=p.y;u.visualX=u.x;u.visualY=u.y;this.cells.set(u.y*this.width+u.x,u.id);
-        u.step=null;u.path=[];
+        u.step=null;u.path=[];this.spatial.move(u);
         if(u.state==='walk'){u.state=u.command?'walk':'idle';u.elapsed=0;}
         this.movementPolicy?.onArrive?.({board:this,unit:u,at:{x:u.x,y:u.y}});
         if(u.command?.type==='move'&&u.x===u.command.x&&u.y===u.command.y){this.cancelCommand(u);if(u.state==='walk')u.state='idle';}
       } else {
-        const t=p.elapsed/STEP_TIME;u.visualX=u.x+(p.x-u.x)*t;u.visualY=u.y+(p.y-u.y)*t;
+        const t=p.elapsed/p.duration;u.visualX=u.x+(p.x-u.x)*t;u.visualY=u.y+(p.y-u.y)*t;
       }
     }
     // Commit same-slice strikes before applying damage: neither actor order nor
@@ -168,7 +178,7 @@ export class Board {
         const strike=u.strike;
         if(!u.impacted&&u.elapsed+1e-9>=strike.impactTime) {
           u.impacted=true;const target=this.unit(strike.target);
-          if(target&&target.health.current>0&&inAttackRange(u,target)) {
+          if(target&&target.health.current>0&&inAttackRange(u,target)&&(!u.combat.lineOfSight||hasLineOfSight(this,u,target))) {
             impacts.push({target,damage:u.damage,direction:project(target.visualX-u.visualX,target.visualY-u.visualY).x>=0?1:-1});
           }
         }

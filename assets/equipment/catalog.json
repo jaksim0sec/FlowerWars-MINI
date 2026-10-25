@@ -138,7 +138,10 @@
     "animation": {
       "weapon": 0
     },
-    "drawLayer": "foreground"
+    "drawLayer": "foreground",
+    "movement": {
+      "stepMultiplier": 1.08
+    }
   },
   "scholar_book": {
     "name": "꽃잎 마도서",
@@ -155,7 +158,10 @@
     "animation": {
       "weapon": 0
     },
-    "drawLayer": "foreground"
+    "drawLayer": "foreground",
+    "movement": {
+      "stepMultiplier": 1.02
+    }
   },
   "banner_bearer_banner": {
     "name": "도라가미 깃발",
@@ -180,6 +186,9 @@
     "socketMirrors": {
       "left": true,
       "right": false
+    },
+    "movement": {
+      "stepMultiplier": 1.03
     }
   },
   "clover_mage_staff": {

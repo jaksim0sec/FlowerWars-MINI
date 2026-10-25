@@ -109,3 +109,5 @@ body{display:block;}
 .combat-toggle span{margin-left:auto;color:var(--muted);font-size:10px;}
 .team-a{color:#3983b8;}.team-b{color:#c86232;}
 #selection-combat{font-size:9px;}
+
+#movement-seed{width:100%;min-width:0;border:1px solid var(--line);border-radius:6px;background:#fffaf0;color:var(--ink);padding:5px;font:inherit;}.mirror-toggle{display:flex!important;align-items:center;gap:3px!important;white-space:nowrap;}.movement-options+.movement-options{margin-top:7px;}

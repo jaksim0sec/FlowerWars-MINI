@@ -68,7 +68,7 @@ function refresh(invalidate=true) {
   let unit = board.unit(view.selected);
   if(unit?.health.current<=0){view.selected=null;view.tile=null;unit=null;}
   text('selection-health',unit?`${unit.team?unit.team+' · ':''}체력 ${unit.health.current} / ${unit.health.max} · ${healthLabel(unit.health)}`:'');
-  text('selection-combat',unit?.team?`공격 ${unit.damage} · 공속 ${(1/unit.combat.period).toFixed(2)}회/초`:'');$('selection-combat').hidden=!unit?.team;
+  text('selection-combat',unit?.team?`공격 ${unit.damage} · 공속 ${(1/unit.combat.period).toFixed(2)}회/초 · 사거리 ${unit.combat.range}`:'');$('selection-combat').hidden=!unit?.team;
   text('unit-count', `용사 ${board.units.filter(u=>u.health.current>0).length}`);
   text('zoom-value', `${Math.round(camera.scale * 100)}%`);
   $('summon').setAttribute('aria-label',`${$('character-type').selectedOptions[0].textContent} 소환`);
@@ -241,7 +241,7 @@ function updateMovementStats() {
 $('movement-setup').addEventListener('click',()=>{
   if(!art)return;
   const ids=visibleCharacters(art.catalog).map(([id])=>id);
-  movementScenario=setupMovementScenario(board,$('movement-scenario').value,$('movement-count').value,(i,slot)=>{const c=newCharacter(slot?.characterId||ids[Math.floor(i/2)%ids.length]);if(slot?.weapon){for(const key of Object.keys(c.equipment))unequip(c,key);equip(art.catalog,c,slot.weapon,'left');c.testName=slot.name;c.testStats=slot.stats;}return c;},{combat:$('movement-combat').checked,statsFor:character=>character.testStats||art.catalog.characters[character.characterId].testCombat});
+  movementScenario=setupMovementScenario(board,$('movement-scenario').value,$('movement-count').value,(i,slot)=>{const c=newCharacter(slot?.characterId||ids[Math.floor(i/2)%ids.length]);if(slot?.weapon){for(const key of Object.keys(c.equipment))unequip(c,key);equip(art.catalog,c,slot.weapon,'left');c.testName=slot.name;c.testStats=slot.stats;}return c;},{combat:$('movement-combat').checked,statsFor:character=>character.testStats||art.catalog.characters[character.characterId].testCombat,seed:$('movement-seed').value,mirror:$('movement-mirror').checked,movementFor:c=>{const profile={...art.catalog.characters[c.characterId].testMovement};for(const attachment of new Set(Object.values(c.equipment).filter(Boolean)))profile.stepTime*=art.catalog.equipment[attachment.equipmentId].movement?.stepMultiplier||1;return profile;},capabilitiesFor:c=>art.catalog.characters[c.characterId].capabilities||[]});
   view.selected=null;view.tile=null;view.hover=null;view.mode='move';previousHits=0;previousBusy=false;
   $('movement-start').disabled=false;fit();updateMovementStats();notify('배치 완료 · 동시 이동으로 시작');
 });

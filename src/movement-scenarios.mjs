@@ -12,9 +12,11 @@ export function setupMovementScenario(board,type,count,makeCharacter,options={})
   if(type==='skirmish'){board.width=Math.max(14,3*pairColumns+2);board.height=Math.max(16,3*Math.ceil(count/2/pairColumns)+2);}
   const formation=type==='formation'?armyFormation(Math.ceil(count/2)):null;
   if(formation){board.width=2*(2+formation.depth*2)+5;board.height=formation.rows*2+4;}
+  if(options.seed!=null)board.seed=Number(options.seed)>>>0;
+  board.navigationOrientation=options.mirror?-1:1;
   board.reset();
   const w=board.width,h=board.height,middle=Math.floor(w/2),orders=[];
-  const wall=(x,y)=>board.setObstacle(x,y,{blocked:true,kind:'test-wall',attackable:false});
+  const wall=(x,y)=>board.setObstacle(options.mirror?w-1-x:x,y,{blocked:true,kind:'test-wall',attackable:false});
   if(type==='bottleneck')for(let y=0;y<h;y++)if(y!==Math.floor(h/2))wall(middle,y);
   if(type==='obstacles')for(let y=0;y<h;y++){
     if(y!==h-3)wall(Math.floor(w*.4),y);
@@ -27,10 +29,12 @@ export function setupMovementScenario(board,type,count,makeCharacter,options={})
     const slot=formation?.slots[Math.floor(i/2)];
     if(slot){const front=2+formation.depth*2;x=i%2?w-1-front+slot.depth*2:front-slot.depth*2;y=2+slot.row*2;}
     const character=makeCharacter(i,slot);
-    const unit=board.spawn(right?w-1-x:x,y,character,{team:i%2?'B':'A',autoCombat:false,stats:{range:1,rangeShape:'king',...options.statsFor?.(character,i)}});
+    const spawnX=right?w-1-x:x;
+    const unit=board.spawn(options.mirror?w-1-spawnX:spawnX,y,character,{team:i%2?'B':'A',autoCombat:false,movement:options.movementFor?.(character,i),capabilities:options.capabilitiesFor?.(character,i),stats:{range:1,rangeShape:'king',...options.statsFor?.(character,i)}});
     if(!unit)throw new Error('테스트 배치가 겹칩니다.');
-    if(slot)unit.facing=i%2?-1:1;
-    orders.push({id:unit.id,x:type==='skirmish'?(i%2?1:w-2):(right?x:w-1-x),y});
+    if(slot)unit.facing=(i%2?-1:1)*(options.mirror?-1:1);
+    const goalX=type==='skirmish'?(i%2?1:w-2):(right?x:w-1-x);
+    orders.push({id:unit.id,x:options.mirror?w-1-goalX:goalX,y});
   }
   return {type,count,orders,combat:!!options.combat,started:false,startTime:null};
 }
@@ -38,7 +42,7 @@ export function startMovementScenario(board,scenario) {
   if(!scenario||scenario.started)return 0;
   scenario.started=true;scenario.startTime=board.time;
   for(const o of scenario.orders){const u=board.unit(o.id);if(u)u.combat.auto=scenario.combat;}
-  return scenario.orders.reduce((n,o)=>n+Number(board.move(o.id,o.x,o.y)),0);
+  return board.batchCommands(()=>scenario.orders.reduce((n,o)=>n+Number(board.move(o.id,o.x,o.y)),0));
 }
 export function movementStats(board,scenario) {
   let moving=0,waiting=0,arrived=0,attacking=0,casualties=0;const teams={A:0,B:0};
