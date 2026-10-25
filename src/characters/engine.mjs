@@ -43,7 +43,7 @@ function value(expr, vars) {
   switch(op) {
     case '+':return a.reduce((x,y)=>x+y,0);case '*':return a.reduce((x,y)=>x*y,1);
     case '-':return a[0]-a[1];case '/':return a[0]/a[1];case 'sin':return Math.sin(a[0]);
-    case 'abs':return Math.abs(a[0]);case 'max':return Math.max(...a);case 'min':return Math.min(...a);
+    case 'abs':return Math.abs(a[0]);case 'max':return Math.max(...a);case 'min':return Math.min(...a);case 'atan2':return Math.atan2(a[0],a[1]);
 
     default:throw new Error(`Unknown animation expression: ${op}`);
   }
@@ -64,16 +64,28 @@ export function layoutCharacter(catalog, instance, time=0) {
   const unique=[...new Set(Object.values(instance.equipment).filter(Boolean))];
   const shared=unique.find(x=>x.hand==='both');
   const pose=shared ? rig.twoHandedPoses[catalog.equipment[shared.equipmentId].twoHandedPose] : null;
+  // Equipment can select an authored rig pose without changing the base anatomy.
+  // An independently equipped opposite hand keeps its own pose and animation.
+  const equipmentPoses=unique.flatMap(a=>{
+    const p=rig.equipmentPoses?.[catalog.equipment[a.equipmentId].rigPose]?.[a.hand];
+    if(!p)return [];
+    const support=a.hand==='left'?'right':'left';
+    return [{...p,supportFree:!instance.equipment[support],supportGroup:rig.sockets[support]?.group}];
+  });
+  const equipmentNodes={};
+  for(const p of equipmentPoses)for(const[id,node]of Object.entries(p.nodes||{}))
+    if(p.supportFree||id!==p.supportGroup)equipmentNodes[id]=node;
   const slotNodes={};
   for(const [slot,states] of Object.entries(rig.slotPoses || {})){
     Object.assign(slotNodes,states[instance.equipment[slot]?'equipped':'empty'] || {});
   }
-  const vars=channels(rig,instance,time,[]);
+  const animationRig={...rig,animations:{...rig.animations,...Object.assign({},...unique.map(a=>catalog.equipment[a.equipmentId].rigAnimation||{}))}};
+  const vars=channels(animationRig,instance,time,[]);
   const injury=instance.health?.injury||0,critical=instance.health?.critical||0,style=rig.vitality||{};
   const draws=[],sockets={},groups={};
   function visit(nodes,parent,ancestors=[]) {
     for(const node of nodes) {
-      const override=pose?.nodes?.[node.id] || slotNodes[node.id] || {};
+      const override=pose?.nodes?.[node.id] || equipmentNodes[node.id] || slotNodes[node.id] || {};
       let m=parent,editorBase=parent;
       const operations=override.transforms ? [...override.transforms,...(node.transforms || []).filter(op=>op.editorAdjustment)] : node.transforms || [];
       for(const op of operations) {
@@ -114,7 +126,31 @@ export function layoutCharacter(catalog, instance, time=0) {
     const rotation=(e.socketRotations?.[side] ?? e.rotation ?? 0)+(rig.equipmentRotations?.[attachment.equipmentId]?.[side]||0)+value(e.motion||0,equipmentVars)*(e.socketMotionSigns?.[side]??1)+(attachment.overrides.rotation||0);
     const mirror=e.socketMirrors?.[side] ? [-1,0,0,1,0,0] : I();
     const matrix=multiply(socket.matrix,multiply(translate(...(e.offset || [0,0])),multiply(rotate(rotation),mirror)));
-    equipmentDraws[side]={equipmentId:attachment.equipmentId,matrix,w:e.w,h:e.h,grip:e.grip};
+    equipmentDraws[side]={equipmentId:attachment.equipmentId,matrix,w:e.w,h:e.h,grip:e.grip,clip:e.clip,facingSign:e.socketFacingSigns?.[side]};
+    if(e.bow){
+      const b=e.bow,local=([x,y])=>[(x-e.grip[0])*e.w,(y-e.grip[1])*e.h];
+      const other=side==='left'?'right':'left',supportSocket=!instance.equipment[other]&&equipmentPoses.some(p=>p.supportFree)?other:null;
+      const rest=local(b.nock),support=supportSocket?point(sockets[supportSocket].matrix):point(matrix,...rest);
+      const det=matrix[0]*matrix[3]-matrix[1]*matrix[2],dx=support[0]-matrix[4],dy=support[1]-matrix[5];
+      const palm=[(matrix[3]*dx-matrix[2]*dy)/det,(-matrix[1]*dx+matrix[0]*dy)/det];
+      const t=instance.animation.elapsed,attacking=instance.animation.state==='attack';
+      const tension=attacking?Math.min(1,t/b.grabAt)*Math.max(0,1-Math.max(0,t-b.releaseAt)/b.snapDuration):0;
+      const nock=rest.map((v,i)=>v+(palm[i]-v)*tension);
+      const length=Math.hypot(...palm)||1,drawDirection=palm.map(v=>-v/length);
+      let direction=drawDirection;
+      // Combat vectors are projected world vectors. Undo the root facing and
+      // equipment affine transform so the visual release follows the same ray.
+      const vector=instance.animation.attackVector;
+      if(vector&&(vector.x||vector.y)&&t>=b.releaseAt){
+        const flip=instance.animation.facing*(e.socketFacingSigns?.[side]||1)===1?-1:1;
+        const x=vector.x*flip,y=vector.y;
+        const v=[(matrix[3]*x-matrix[2]*y)/det,(-matrix[1]*x+matrix[0]*y)/det],norm=Math.hypot(...v);
+        direction=v.map(n=>n/norm);
+      }
+      const flight=attacking&&t>=b.releaseAt&&t<b.flightEnd?(t-b.releaseAt)/(b.flightEnd-b.releaseAt):0;
+      equipmentDraws[side].bow={tips:b.tips.map(local),rest,nock,supportSocket,loaded:attacking&&t>=b.grabAt&&t<b.releaseAt,flight,launched:attacking&&t>=b.releaseAt&&t<b.flightEnd,
+        arrowTail:direction.map(v=>v*(-length+b.flightDistance*flight)),direction,arrowLength:length+b.arrowOverhang};
+    }
     if(attachment.hand==='both') {
       const other=side==='left'?'right':'left', secondary=sockets[other];
       const target=point(matrix,(e.secondaryGrip[0]-e.grip[0])*e.w,(e.secondaryGrip[1]-e.grip[1])*e.h);
@@ -123,6 +159,12 @@ export function layoutCharacter(catalog, instance, time=0) {
       for(const draw of draws) if(draw.matrix && draw.ancestors.includes(group)) draw.matrix=multiply(translate(dx,dy),draw.matrix);
       secondary.matrix=multiply(translate(dx,dy),secondary.matrix);
     }
+  }
+  // Only the palm crosses the tunic while drawing; its shoulder remains in the
+  // authored rear-arm layer. Both copies share the exact same arm matrix.
+  for(const p of equipmentPoses)if(p.supportFree&&value(p.overlayWhen,vars))for(const overlay of p.overlays||[]){
+    const source=draws.find(d=>d.part===overlay.part);
+    if(source)draws.push({overlayPart:overlay.part,matrix:source.matrix,clip:overlay.clip,ancestors:source.ancestors});
   }
   if(instance.animation.state==='death'){
     const t=instance.animation.elapsed,dir=(instance.animation.deathDirection||1)*(instance.animation.facing===1?-1:1);
@@ -145,7 +187,7 @@ export function layoutCharacter(catalog, instance, time=0) {
     };
     for(const draw of draws)if(draw.matrix){
       if(draw.part==='shadow'){draw.alpha=alpha*(1-fall*.6);continue;}
-      draw.matrix=debris(draw.matrix,draw.part,rig.parts[draw.part]);draw.alpha=alpha;
+      draw.matrix=debris(draw.matrix,draw.part||draw.overlayPart,rig.parts[draw.part||draw.overlayPart]);draw.alpha=alpha;
     }
     for(const[side,d]of Object.entries(equipmentDraws)){d.matrix=debris(d.matrix,'equipment-'+side,d);d.alpha=alpha;}
   }
@@ -160,17 +202,37 @@ export function drawCharacter(ctx,catalog,instance,time=0,{scale,layout}={}) {
   ctx.save();
   ctx.translate(...(rig.worldTranslate || [0,0]).map(expr=>value(expr,vars)));
   const s=scale ?? rig.scale;
-  ctx.scale(instance.animation.facing===1?-s:s,s);ctx.translate(-rig.foot[0],-rig.foot[1]);
+  const facing=instance.animation.facing*(Object.values(equipmentDraws).find(e=>e.facingSign)?.facingSign||1);
+  ctx.scale(facing===1?-s:s,s);ctx.translate(-rig.foot[0],-rig.foot[1]);
   for(const draw of draws) {
     const equipment=draw.socket && equipmentDraws[draw.socket];
     if(draw.socket && !equipment) continue;
-    const p=equipment || rig.parts[draw.part],matrix=equipment?.matrix || draw.matrix;
-    const image=equipment ? catalog.equipment[equipment.equipmentId].image : def.images[instance.appearance.parts[draw.part] || draw.part];
+    const part=draw.part||draw.overlayPart;
+    const p=equipment || rig.parts[part],matrix=equipment?.matrix || draw.matrix;
+    const image=equipment ? catalog.equipment[equipment.equipmentId].image : def.images[instance.appearance.parts[part] || part];
     if(!image) throw new Error(`Missing character part: ${draw.part}`);
     const origin=equipment ? p.grip : p.origin;
     ctx.save();if((equipment?.alpha??draw.alpha)!==undefined)ctx.globalAlpha=(ctx.globalAlpha??1)*(equipment?.alpha??draw.alpha);ctx.transform(...matrix);
-    if(draw.clip) {ctx.beginPath();draw.clip.forEach(([x,y],i)=>{const v=[(x-origin[0])*p.w,(y-origin[1])*p.h];if(i)ctx.lineTo(...v);else ctx.moveTo(...v);});ctx.closePath();ctx.clip();}
+    const clip=equipment?.clip||draw.clip;
+    if(clip) {ctx.beginPath();clip.forEach(([x,y],i)=>{const v=[(x-origin[0])*p.w,(y-origin[1])*p.h];if(i)ctx.lineTo(...v);else ctx.moveTo(...v);});ctx.closePath();ctx.clip();}
     ctx.drawImage(image,-p.w*origin[0],-p.h*origin[1],p.w,p.h);ctx.restore();
+    if(equipment?.bow){
+      const b=equipment.bow,style=catalog.equipment[equipment.equipmentId].bow;
+      ctx.save();ctx.globalAlpha=(ctx.globalAlpha??1)*(equipment.alpha??1);ctx.transform(...matrix);ctx.strokeStyle=style.stringColor;ctx.lineWidth=style.stringWidth;ctx.lineCap='round';
+      ctx.beginPath();ctx.moveTo(...b.tips[0]);ctx.lineTo(...b.nock);ctx.lineTo(...b.tips[1]);ctx.stroke();
+      if(b.loaded||b.launched){
+        const tail=b.loaded?b.nock:b.arrowTail,tip=tail.map((v,i)=>v+b.direction[i]*b.arrowLength),normal=[-b.direction[1],b.direction[0]];
+        ctx.globalAlpha*=b.loaded?1:1-b.flight;
+        ctx.strokeStyle=style.arrowColor;ctx.lineWidth=style.arrowWidth;
+        ctx.beginPath();ctx.moveTo(...tail);ctx.lineTo(...tip);ctx.stroke();
+        ctx.fillStyle=style.arrowheadColor;ctx.beginPath();ctx.moveTo(...tip);
+        ctx.lineTo(tip[0]-b.direction[0]*18+normal[0]*9,tip[1]-b.direction[1]*18+normal[1]*9);
+        ctx.lineTo(tip[0]-b.direction[0]*18-normal[0]*9,tip[1]-b.direction[1]*18-normal[1]*9);ctx.closePath();ctx.fill();
+        ctx.strokeStyle=style.fletchingColor;ctx.lineWidth=7;ctx.beginPath();
+        for(const sign of [-1,1]){ctx.moveTo(tail[0]+b.direction[0]*10,tail[1]+b.direction[1]*10);ctx.lineTo(tail[0]+b.direction[0]*28+normal[0]*sign*10,tail[1]+b.direction[1]*28+normal[1]*sign*10);}ctx.stroke();
+      }
+      ctx.restore();
+    }
   }
   ctx.restore();
 }

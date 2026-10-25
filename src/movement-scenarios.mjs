@@ -1,3 +1,4 @@
+import {registerPlacedGroup} from './unit-groups.mjs';
 import {armyFormation} from './test-formation.mjs';
 // Deterministic, opt-in test settings. Uses the same Board commands as gameplay.
 export function setupMovementScenario(board,type,count,makeCharacter,options={}) {
@@ -32,11 +33,14 @@ export function setupMovementScenario(board,type,count,makeCharacter,options={})
     const spawnX=right?w-1-x:x;
     const unit=board.spawn(options.mirror?w-1-spawnX:spawnX,y,character,{team:i%2?'B':'A',autoCombat:false,movement:options.movementFor?.(character,i),capabilities:options.capabilitiesFor?.(character,i),stats:{range:1,rangeShape:'king',...options.statsFor?.(character,i)}});
     if(!unit)throw new Error('테스트 배치가 겹칩니다.');
+    unit.formationRole=slot?.role||null;
     if(slot)unit.facing=(i%2?-1:1)*(options.mirror?-1:1);
     const goalX=type==='skirmish'?(i%2?1:w-2):(right?x:w-1-x);
     orders.push({id:unit.id,x:options.mirror?w-1-goalX:goalX,y});
   }
-  return {type,count,orders,combat:!!options.combat,started:false,startTime:null};
+  const groups=[];
+  if(type==='formation')for(const team of ['A','B']){const members=board.units.filter(u=>u.team===team).map(u=>u.id);const g=registerPlacedGroup(board,members,{kind:'platoon',name:`${team} 혼성 소대`,team});if(g)groups.push(g.id);}
+  return {type,count,orders,groupIds:groups,combat:!!options.combat,started:false,startTime:null};
 }
 export function startMovementScenario(board,scenario) {
   if(!scenario||scenario.started)return 0;

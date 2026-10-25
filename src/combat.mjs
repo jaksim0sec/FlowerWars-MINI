@@ -70,7 +70,9 @@ export function findLocalEnemy(board,actor) {
     if(!validEnemy(board,actor,target))continue;
     const dx=Math.abs(actor.visualX-target.visualX),dy=Math.abs(actor.visualY-target.visualY);
     const distance=actor.combat.shape==='king'?Math.max(dx,dy):dx+dy;
-    const score=actor.combat.preferredRange==null?distance:Math.abs(distance-actor.combat.preferredRange),tie=rank(board,actor,target);
+    // Mirrored interpolation can differ in the last floating point bit. Keep
+    // those geometrically equal distances tied so the seeded priority decides.
+    const score=Math.round((actor.combat.preferredRange==null?distance:Math.abs(distance-actor.combat.preferredRange))*1e9),tie=rank(board,actor,target);
     if(score<bestDistance||score===bestDistance&&tie<bestRank){best=target;bestDistance=score;bestRank=tie;}
   }
   return best;

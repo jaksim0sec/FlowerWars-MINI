@@ -1,3 +1,4 @@
+import {createFormationGroup,placeGroup,groupsFor} from './unit-groups.mjs';
 import {characterRadius,onScreen} from './character-render-cache.mjs';
 import {setupMovementScenario,startMovementScenario,movementStats} from './movement-scenarios.mjs';
 import {healthLabel} from './characters/vitality.mjs';
@@ -50,6 +51,8 @@ function newCharacter(id) {
   for(const [slot,equipmentId] of Object.entries(art.catalog.characters[id].recommendedAccessories || {}))equip(art.catalog,instance,equipmentId,slot);
   return instance;
 }
+function characterForSlot(i,slot){const ids=visibleCharacters(art.catalog).map(([id])=>id),c=newCharacter(slot?.characterId||ids[Math.floor(i/2)%ids.length]);if(slot?.weapon){for(const key of Object.keys(c.equipment))unequip(c,key);equip(art.catalog,c,slot.weapon,'left');}if(slot?.name)c.testName=slot.name;if(slot?.stats)c.testStats={...slot.stats};if(slot?.movement)c.testMovement={...slot.movement};return c;}
+function movementFor(c){if(c.testMovement)return {...c.testMovement};const profile={...art.catalog.characters[c.characterId].testMovement};for(const attachment of new Set(Object.values(c.equipment).filter(Boolean)))profile.stepTime*=art.catalog.equipment[attachment.equipmentId].movement?.stepMultiplier||1;return profile;}
 function unitName(unit) {return unit.character?.testName || art?.catalog.characters[unit.character?.characterId]?.name || '용사';}
 function seed() {
   board.width=BOARD_COLUMNS;board.height=BOARD_ROWS;board.reset();movementScenario=null;
@@ -75,9 +78,10 @@ function refresh(invalidate=true) {
   $('summon').setAttribute('aria-pressed', String(view.mode === 'summon'));
   $('attack').setAttribute('aria-pressed', String(view.mode === 'attack'));
   $('attack').disabled = !unit || unit.state!=='idle' || !!unit.step;
-  canvas.classList.toggle('summoning', view.mode === 'summon');
+  canvas.classList.toggle('summoning', ['summon','group'].includes(view.mode));
+  text('group-status',`${groupsFor(board).size}개 부대 등록`);
   if (unit) {
-    text('selection-name', `${unitName(unit)} ${unit.id}`);
+    text('selection-name', `${unitName(unit)} ${unit.id}${unit.groupId?' · '+groupsFor(board).get(unit.groupId)?.name:''}`);
     const action = { idle: '대기', walk: '이동 중', attack: '공격 중', hit: '피격', death:'쓰러짐' }[unit.state];
     text('selection-detail', `${unit.x + 1}, ${unit.y + 1} · ${unit.waitReason==='combat'?'교전 대기':unit.waitReason?'경로 대기':action}${unit.hits ? ` · 피격 ${unit.hits}회` : ''}`);
   } else if (view.tile) {
@@ -121,7 +125,13 @@ function activate(p, keyboardTile = null) {
   if (!art) return;
   const tile = keyboardTile || pick(p);
   const target = keyboardTile ? board.at(tile.x, tile.y) : pickUnit(p) || (tile && board.at(tile.x, tile.y));
-  if (view.mode === 'summon') {
+  if(view.mode==='group'){
+    if(!tile)return;
+    const blueprint=createFormationGroup($('group-size').value,$('group-kind').value,$('group-name').value);
+    const group=placeGroup(board,blueprint,tile,{team:$('group-team').value,makeCharacter:(slot,i)=>characterForSlot(i,slot),optionsFor:c=>({stats:c.testStats||art.catalog.characters[c.characterId].testCombat,movement:movementFor(c),capabilities:art.catalog.characters[c.characterId].capabilities||[]})});
+    if(!group){notify('부대 전체가 들어갈 빈 공간을 선택하세요. 앞줄 위치가 기준입니다.');return;}
+    view.selected=group.memberIds[0];view.tile=tile;view.mode='move';notify(`${group.name} · ${group.memberIds.length}명 일괄 배치`);
+  } else if (view.mode === 'summon') {
     if (!tile) return;
     const unit = board.spawn(tile.x, tile.y,newCharacter($('character-type').value));
     if (!unit) { notify('다른 용사가 있거나 이동 중인 칸이에요. 빈칸을 선택하세요.'); return; }
@@ -240,8 +250,7 @@ function updateMovementStats() {
 }
 $('movement-setup').addEventListener('click',()=>{
   if(!art)return;
-  const ids=visibleCharacters(art.catalog).map(([id])=>id);
-  movementScenario=setupMovementScenario(board,$('movement-scenario').value,$('movement-count').value,(i,slot)=>{const c=newCharacter(slot?.characterId||ids[Math.floor(i/2)%ids.length]);if(slot?.weapon){for(const key of Object.keys(c.equipment))unequip(c,key);equip(art.catalog,c,slot.weapon,'left');c.testName=slot.name;c.testStats=slot.stats;}return c;},{combat:$('movement-combat').checked,statsFor:character=>character.testStats||art.catalog.characters[character.characterId].testCombat,seed:$('movement-seed').value,mirror:$('movement-mirror').checked,movementFor:c=>{const profile={...art.catalog.characters[c.characterId].testMovement};for(const attachment of new Set(Object.values(c.equipment).filter(Boolean)))profile.stepTime*=art.catalog.equipment[attachment.equipmentId].movement?.stepMultiplier||1;return profile;},capabilitiesFor:c=>art.catalog.characters[c.characterId].capabilities||[]});
+  movementScenario=setupMovementScenario(board,$('movement-scenario').value,$('movement-count').value,characterForSlot,{combat:$('movement-combat').checked,statsFor:character=>character.testStats||art.catalog.characters[character.characterId].testCombat,seed:$('movement-seed').value,mirror:$('movement-mirror').checked,movementFor,capabilitiesFor:c=>art.catalog.characters[c.characterId].capabilities||[]});
   view.selected=null;view.tile=null;view.hover=null;view.mode='move';previousHits=0;previousBusy=false;
   $('movement-start').disabled=false;fit();updateMovementStats();notify('배치 완료 · 동시 이동으로 시작');
 });
@@ -249,6 +258,9 @@ $('movement-start').addEventListener('click',()=>{
   const count=startMovementScenario(board,movementScenario);$('movement-start').disabled=true;
   refresh();updateMovementStats();notify(`${count}개체 시작 · ${movementScenario.combat?'A/B 주변 8칸 자동 공격':'이동만 · 대기·우회'}`);
 });
+$('group-tools').addEventListener('toggle',()=>{if($('group-tools').open)$('movement-lab').open=false;});
+$('movement-lab').addEventListener('toggle',()=>{if($('movement-lab').open)$('group-tools').open=false;});
+$('group-place').addEventListener('click',()=>{if(!art)return;view.mode='group';notify('앞줄 기준 칸을 선택하세요. 부대 전체를 함께 배치합니다.');refresh();});
 $('movement-default').addEventListener('click',()=>{seed();fit();updateMovementStats();notify('기본 전장 복원');});
 $('movement-lab').addEventListener('toggle',updateMovementStats);
 $('zoom-in').addEventListener('click', () => { camera = zoomCamera(camera, { x: width / 2, y: height / 2 }, 1.2); fitted = false; refresh(); });

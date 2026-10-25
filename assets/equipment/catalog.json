@@ -241,6 +241,140 @@
     "socketRotations": {
       "left": -0.12,
       "right": 0.12
+    },
+    "animation": {
+      "weapon": [
+        "state",
+        "attack",
+        [
+          "*",
+          [
+            "atan2",
+            "vectorY",
+            [
+              "abs",
+              "vectorX"
+            ]
+          ],
+          "bowAim"
+        ],
+        0
+      ]
+    },
+    "rigAnimation": {
+      "attackShift": 0,
+      "lunge": 0
+    },
+    "rigPose": "bow",
+    "clip": [
+      [
+        0.75,
+        0
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        0.9,
+        0.1
+      ],
+      [
+        0.8,
+        0.2
+      ],
+      [
+        1,
+        0.35
+      ],
+      [
+        1,
+        0.48
+      ],
+      [
+        0.82,
+        0.65
+      ],
+      [
+        0.64,
+        0.77
+      ],
+      [
+        0.28,
+        0.89
+      ],
+      [
+        0.17,
+        1
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        0,
+        0.87
+      ],
+      [
+        0.17,
+        0.78
+      ],
+      [
+        0.5,
+        0.68
+      ],
+      [
+        0.6,
+        0.54
+      ],
+      [
+        0.68,
+        0.41
+      ],
+      [
+        0.55,
+        0.25
+      ],
+      [
+        0.55,
+        0.1
+      ]
+    ],
+    "bow": {
+      "tips": [
+        [
+          0.855,
+          0.035
+        ],
+        [
+          0.135,
+          0.965
+        ]
+      ],
+      "nock": [
+        0.4,
+        0.54
+      ],
+      "grabAt": 0.08,
+      "releaseAt": 0.3,
+      "snapDuration": 0.025,
+      "flightEnd": 0.42,
+      "flightDistance": 620,
+      "arrowOverhang": 95,
+      "stringColor": "#f5e4b8",
+      "stringWidth": 4,
+      "arrowColor": "#76512f",
+      "arrowWidth": 7,
+      "arrowheadColor": "#e8e9d6",
+      "fletchingColor": "#d8a349"
+    },
+    "socketFacingSigns": {
+      "left": 1,
+      "right": -1
+    },
+    "socketMotionSigns": {
+      "left": -1,
+      "right": 1
     }
   },
   "archer_quiver": {

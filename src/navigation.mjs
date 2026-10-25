@@ -14,9 +14,16 @@ export class Navigation {
   invalidate(){this.fields.clear();this.pending=null;}
   index(x,y){return y*this.board.width+x;}
   coords(index){return {x:index%this.board.width,y:Math.floor(index/this.board.width)};}
-  neighbors(index) {
+  neighbors(index,unit=null) {
     const w=this.board.width,h=this.board.height,x=index%w,y=Math.floor(index/w);
-    const east=x+1<w?index+1:-1,west=x>0?index-1:-1;return this.board.navigationOrientation===-1?[west,y+1<h?index+w:-1,east,y>0?index-w:-1]:[east,y+1<h?index+w:-1,west,y>0?index-w:-1];
+    // Actor searches break equal paths relative to their destination. A fixed
+    // east-first order gives opposing armies different detours and search-budget
+    // success rates, even when their start positions and goals are symmetric.
+    const target=unit?.command?.type==='attack'?this.board.unit(unit.command.target):unit?.command;
+    const direction=target?Math.sign(target.x-unit.x):0;
+    const approach=unit?.command?.flow==='east'?1:unit?.command?.flow==='west'?-1:0;
+    const orientation=direction||approach||this.board.navigationOrientation;
+    const east=x+1<w?index+1:-1,west=x>0?index-1:-1;return orientation===-1?[west,y+1<h?index+w:-1,east,y>0?index-w:-1]:[east,y+1<h?index+w:-1,west,y>0?index-w:-1];
   }
   blocked(index){return this.board.obstacles.get(index)?.blocked!==false&&this.board.obstacles.has(index);}
   consume(){this.remaining--;this.stats.expansions++;this.stats.lastExpansions++;}
@@ -96,7 +103,7 @@ export class Navigation {
         while(n!==start){path.push(this.coords(n));n=previous.get(n);}
         this.stats.detours++;return path.reverse();
       }
-      for(const n of this.neighbors(cell))if(!previous.has(n)&&this.free(n,u)&&previous.size<LOCAL_LIMIT) {
+      for(const n of this.neighbors(cell,u))if(!previous.has(n)&&this.free(n,u)&&previous.size<LOCAL_LIMIT) {
         previous.set(n,cell);queue.push(n);
       }
     }
@@ -134,7 +141,7 @@ export class Navigation {
       u.guide=[];let cell=start;
       if(!b.obstacles.size&&command.type==='move')u.guide=this.openGuide(u,x,y);
       else while(field.at(cell)>0) {
-        const next=this.neighbors(cell).find(n=>n>=0&&!this.blocked(n)&&field.at(n)===field.at(cell)-1);
+        const next=this.neighbors(cell,u).find(n=>n>=0&&!this.blocked(n)&&field.at(n)===field.at(cell)-1);
         if(next==null)break;
         u.guide.push(next);cell=next;
       }
@@ -156,7 +163,7 @@ export class Navigation {
       if(this.free(u.guide[0],u))next=desired;
       else blocker=b.at(desired.x,desired.y)||b.unit(b.reservations.get(u.guide[0]));
     }
-    const candidates=this.neighbors(start);
+    const candidates=this.neighbors(start,u);
     if(!next) {
       const waited=b.time-(u.waitSince??b.time);
       // Let a moving neighbor finish before spending any local search budget.
@@ -202,7 +209,7 @@ export class Navigation {
     const distance=metric(u.x,u.y);
     if(distance>=preferred)return false;
     let best=null,score=distance;
-    for(const n of this.neighbors(this.index(u.x,u.y)))if(this.free(n,u)){
+    for(const n of this.neighbors(this.index(u.x,u.y),u))if(this.free(n,u)){
       const p=this.coords(n),d=metric(p.x,p.y);
       if(d>score&&d<=u.combat.range){score=d;best=p;}
     }

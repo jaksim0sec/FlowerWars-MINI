@@ -31,6 +31,11 @@
     <div class="movement-buttons"><button id="movement-setup" disabled>배치</button><button id="movement-start" disabled>동시 이동</button><button id="movement-default">기본 전장</button></div>
     <output id="movement-stats" aria-live="off">배치 → 동시 이동 · 기존 전장 교체</output>
   </details>
+  <details id="group-tools" class="group-tools"><summary>소대/분대 배치</summary>
+    <div class="movement-options"><label>단위<select id="group-kind"><option value="squad">분대</option><option value="platoon">소대</option></select></label><label>병력<select id="group-size"><option>8</option><option>16</option><option>32</option><option>64</option></select></label></div>
+    <div class="movement-options"><label>이름<input id="group-name" placeholder="혼성 분대" maxlength="24"></label><label>진영<select id="group-team"><option>A</option><option>B</option></select></label></div>
+    <button id="group-place">묶음 배치</button><small id="group-status">0개 부대 등록</small>
+  </details>
   <footer class="command-area">
     <p id="notice" role="status" aria-live="polite">전장을 준비하고 있어요…</p>
     <div class="command-bar">
