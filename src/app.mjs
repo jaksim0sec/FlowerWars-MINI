@@ -1,4 +1,5 @@
 import {createCharacter,equip} from './characters/engine.mjs';
+import {visibleCharacters} from './characters/catalog.mjs';
 import { Board, project, tileAt, zoomCamera, fitBoardCamera } from './model.mjs';
 import { loadArtwork, render } from './render.mjs';
 
@@ -43,11 +44,12 @@ function newCharacter(id) {
   for(const [slot,equipmentId] of Object.entries(art.catalog.characters[id].recommendedAccessories || {}))equip(art.catalog,instance,equipmentId,slot);
   return instance;
 }
-function unitName(unit) {return art?.catalog.characters[unit.character?.characterId]?.name || '개나리용사';}
+function unitName(unit) {return art?.catalog.characters[unit.character?.characterId]?.name || '용사';}
 function seed() {
   board.reset();
-  board.spawn(2, 2, newCharacter('gynari-warrior'));
-  const second = board.spawn(5, 3, newCharacter('sprout-healer')); second.facing = 1;
+  const ids=art?visibleCharacters(art.catalog).map(([id])=>id):[];
+  if(ids[0]) board.spawn(2, 2, newCharacter(ids[0]));
+  if(ids[1]) {const second=board.spawn(5, 3, newCharacter(ids[1]));second.facing=1;}
   view.selected = null; view.tile = null; view.hover = null; view.mode = 'move';
   previousBusy = false; previousHits = 0;
   refresh();
@@ -226,7 +228,7 @@ seed(); resize();
 
 loadArtwork().then(loaded => {
   art = loaded;
-  $('character-type').replaceChildren(...Object.entries(art.catalog.characters).map(([id,def])=>new Option(def.name,id)));
+  $('character-type').replaceChildren(...visibleCharacters(art.catalog).map(([id,def])=>new Option(def.name,id)));
   seed();
   $('loading').hidden = true;
   notify('전장 준비 완료 · 용사를 선택하거나 빈칸에 소환해보세요.');

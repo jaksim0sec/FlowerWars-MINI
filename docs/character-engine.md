@@ -8,7 +8,7 @@
 import {loadCatalog} from './src/characters/catalog.mjs';
 import {createCharacter, equip, unequip, drawCharacter} from './src/characters/engine.mjs';
 const catalog = await loadCatalog();
-const hero = createCharacter(catalog, 'sprout-healer'); // 양손 모두 빈 상태
+const hero = createCharacter(catalog, 'clover-mage'); // 양손 모두 빈 상태
 // recommendedWeapon은 표시용 추천 정보이며 생성 시 장착하지 않습니다.
 equip(catalog, hero, 'clover_staff', 'left');
 equip(catalog, hero, 'basic_sword', 'right'); // 서로 다른 무기
@@ -25,6 +25,8 @@ ctx.restore();
 ```
 
 `equipment`, `appearance.parts`, `appearance.animations`, `animation`은 인스턴스 소유입니다. 기본 애셋과 정의는 카탈로그에서 공유하고 렌더러는 수정하지 않습니다. `appearance.parts`는 리그의 파츠 이름을 같은 캐릭터 이미지 목록의 다른 이름으로 매핑합니다. `animation`에는 state, elapsed(초), facing, phase, 선택적 attackVector가 있습니다. UI/시뮬레이션이 시간을 갱신합니다.
+
+캐릭터 등록 정보의 `hidden: true`는 소환·연구실·편집기와 초기 배치에서 제외합니다. 표시 목록은 `visibleCharacters(catalog)`로 얻습니다. 카탈로그는 숨긴 리그와 이미지를 보존하므로 이전 데이터와 렌더링 API는 계속 사용할 수 있습니다. 현재 개나리용사와 새싹힐러가 이 상태입니다.
 
 왼손/오른손은 캐릭터 기준이며 좌우 반전에도 유지됩니다. 양손 무기를 한 손에서 교체하거나 해제하면 이전 공유 장착을 두 손에서 함께 제거합니다. 유효하지 않은 장착 요청은 기존 장비를 유지한 채 오류를 냅니다.
 

@@ -3,12 +3,14 @@
     "gynari-warrior": {
       "name": "개나리용사",
       "rig": "units/gynari-warrior/rig.json",
-      "recommendedWeapon": "basic_sword"
+      "recommendedWeapon": "basic_sword",
+      "hidden": true
     },
     "sprout-healer": {
       "name": "새싹힐러",
       "rig": "units/sprout-healer/rig.json",
-      "recommendedWeapon": "sprout_staff"
+      "recommendedWeapon": "sprout_staff",
+      "hidden": true
     },
     "shield-guard": {
       "name": "방패수호자",

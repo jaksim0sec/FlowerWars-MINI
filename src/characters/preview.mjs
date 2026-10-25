@@ -1,9 +1,9 @@
-import {loadCatalog} from './catalog.mjs';
+import {loadCatalog,visibleCharacters} from './catalog.mjs';
 import {createCharacter,equip,unequip,drawCharacter} from './engine.mjs';
 const status=document.querySelector('#status');
 try {
  const catalog=await loadCatalog(),cards=[];
- for(const [id,def] of Object.entries(catalog.characters)) {
+ for(const [id,def] of visibleCharacters(catalog)) {
   const card=document.querySelector('#card').content.firstElementChild.cloneNode(true);
   card.dataset.character=id;card.querySelector('h2').textContent=def.name;
   const c=card.querySelector('canvas');c.setAttribute('aria-label',`${def.name} 미리보기`);

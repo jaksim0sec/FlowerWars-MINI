@@ -1,4 +1,4 @@
-"""Eight-type catalog, selected pack physical assembly and summon regressions."""
+"""Six visible heroes, selected pack physical assembly and summon regressions."""
 import os
 from playwright.sync_api import sync_playwright
 BASE=os.environ.get('BASE_URL','http://127.0.0.1:8002')
@@ -8,7 +8,7 @@ with sync_playwright() as p:
  page=b.new_page(viewport={'width':1280,'height':900});errors=[]
  page.on('pageerror',lambda e:errors.append(str(e)))
  page.goto(BASE+'/characters.html');page.get_by_text('각 캐릭터의 동작과 장비',exact=False).wait_for()
- assert page.locator('#cards article').count()==8
+ assert page.locator('#cards article').count()==6
  for id in NEW:
   card=page.locator(f'[data-character="{id}"]');card.locator('.recommended').click()
   for state in ['idle','walk','attack','hit']:
@@ -29,10 +29,10 @@ with sync_playwright() as p:
  }''')
  assert not failures,'\n'.join(failures)
  page.goto(BASE);page.get_by_text('전장 준비 완료',exact=False).wait_for()
- assert page.locator('#character-type option').count()==8
+ assert page.locator('#character-type option').count()==6
  for id in NEW:
   page.locator('#reset').click();page.locator('#character-type').select_option(id);page.locator('#board').focus();page.keyboard.press('Escape');page.keyboard.press('ArrowRight');page.keyboard.press('s');page.keyboard.press('Enter')
   assert page.locator('#unit-count').inner_text()=='용사 3'
   assert '3' in page.locator('#selection-name').inner_text()
  assert not errors,errors
- b.close();print('PASS selected pack: 8 catalog types, 6 summons, both facings, 4 animations, physical head/limb overlap')
+ b.close();print('PASS selected pack: 6 visible types, 6 summons, both facings, 4 animations, physical head/limb overlap')

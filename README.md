@@ -1,12 +1,12 @@
 # 도라가미 · 첫 번째 전장
 
-승인된 잔디·흙 입체 타일과 개나리용사 파츠로 만든 플레이 가능한 2.5D 전장입니다. 별도 패키지 설치·빌드·백엔드 없이 정적 호스팅으로 실행합니다.
+승인된 잔디·흙 입체 타일과 파츠 조립 캐릭터로 만든 플레이 가능한 2.5D 전장입니다. 별도 패키지 설치·빌드·백엔드 없이 정적 호스팅으로 실행합니다.
 
 Vercel에서는 Framework Preset을 **Other**, Output Directory를 **.**으로 설정하고 Build Command를 비웁니다. 저장소 루트의 `index.html`이 진입점입니다. GitHub Pages 등 일반 정적 호스팅도 사용할 수 있습니다. 모든 게임 이미지가 저장소에 포함되어 외부 이미지 호스트나 API 키가 필요하지 않습니다. 로컬 미리보기는 기존 정적 파일 미리보기 도구에서 저장소 루트를 열면 됩니다. ES 모듈과 이미지 설정을 불러오므로 `file://`로 직접 열지는 않습니다.
 
 플레이 방법:
 
-- **소환**을 누르고 빈칸을 선택합니다. 시작 시 개나리용사와 새싹힐러가 배치됩니다. 캐릭터 선택으로 소환할 종류를 바꿀 수 있습니다.
+- **소환**을 누르고 빈칸을 선택합니다. 시작 시 방패수호자와 꽃잎학자가 배치됩니다. 캐릭터 선택으로 소환할 종류를 바꿀 수 있습니다. 기존 개나리용사·새싹힐러는 숨김 상태로 보관하며 현재 목록에는 새 캐릭터 6종을 표시합니다.
 - 용사를 선택하고 빈칸을 누르면 다른 용사를 피해 한 칸씩 걸어갑니다.
 - **공격**을 누른 뒤 다른 용사를 선택합니다. 멀리 있으면 인접한 칸까지 이동한 뒤 검을 휘두릅니다. 검의 명중과 상대의 피격 반응이 연결됩니다.
 - 마우스/한 손가락 드래그로 보드 이동, 휠/두 손가락 핀치로 확대·축소합니다. 오른쪽 버튼으로 확대, 축소, 전장 맞춤을 할 수도 있습니다.
@@ -37,6 +37,7 @@ BASE_URL=https://your-static-host.example python3 tests/rig-browser.py
 BASE_URL=https://your-static-host.example python3 tests/characters-browser.py
 BASE_URL=https://your-static-host.example python3 tests/rig-editor-browser.py
 BASE_URL=https://your-static-host.example python3 tests/equipment-grips-browser.py
+BASE_URL=https://your-static-host.example python3 tests/character-visibility-browser.py
 ```
 
 브라우저 검증은 기본적으로 `/usr/bin/chromium`을 사용합니다. 다른 설치 경로는 `CHROMIUM`, 호스팅 주소는 `BASE_URL` 환경 변수로 지정할 수 있습니다. 데스크톱과 모바일 터치에서 소환·선택·실제 보행·공격·피격·드래그·핀치·초기화, 지형 변경, 이미지 누락 안내를 검사합니다. 모바일 레이아웃 검증은 다섯 화면 크기에서 확대·이동해도 전장이 헤더·조작부 영역을 침범하지 않는지, 화면 높이가 바뀌어도 배치가 유지되는지 검사합니다.

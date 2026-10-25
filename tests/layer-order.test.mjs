@@ -19,12 +19,12 @@ test('screen-left arm is immediately behind the torso, except the banner bearer'
   }
  }
 });
-test('a shield is above every character part on either hand, without moving its grip',()=>{
- for(const id of Object.keys(catalog.characters))for(const side of ['left','right'])for(const state of ['idle','walk','attack','hit'])for(const facing of [-1,1]){
+test('a shield or book is above every character part on either hand, without moving its grip',()=>{
+ for(const equipmentId of ['shield_guard_shield','scholar_book'])for(const id of Object.keys(catalog.characters))for(const side of ['left','right'])for(const state of ['idle','walk','attack','hit'])for(const facing of [-1,1]){
   const c=createCharacter(catalog,id);Object.assign(c.animation,{state,elapsed:.2,facing});
-  equip(catalog,c,'shield_guard_shield',side);
+  equip(catalog,c,equipmentId,side);
   const l=layoutCharacter(catalog,c,.2),index=l.draws.findIndex(d=>d.socket===side);
-  assert.ok(l.draws.every((d,i)=>!d.part||i<index),`${id}/${side}/${state}: shield hidden behind a body part`);
-  assert.deepEqual(l.equipmentDraws[side].matrix.slice(4),l.sockets[side].matrix.slice(4),'shield grip moved');
+  assert.ok(l.draws.every((d,i)=>!d.part||i<index),`${id}/${side}/${state}: ${equipmentId} hidden behind a body part`);
+  assert.deepEqual(l.equipmentDraws[side].matrix.slice(4),l.sockets[side].matrix.slice(4),'equipment grip moved');
  }
 });

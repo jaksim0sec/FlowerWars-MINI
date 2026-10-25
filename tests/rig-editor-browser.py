@@ -10,26 +10,26 @@ with sync_playwright() as p:
  page.goto(BASE+'/rig-editor.html');page.get_by_text('원본에서 시작',exact=True).wait_for()
  page.locator('#x').fill('300');page.locator('#x').press('Tab');page.wait_for_timeout(250)
  with page.expect_download() as info:page.locator('#export-one').click()
- dl=info.value;dl.save_as(str(WORK/'editor-one.json'));data=json.load(open(str(WORK/'editor-one.json')));assert data['characters']['gynari-warrior']['parts']['head']['x']==300
+ dl=info.value;dl.save_as(str(WORK/'editor-one.json'));data=json.load(open(str(WORK/'editor-one.json')));assert data['characters']['shield-guard']['parts']['head']['x']==300
  page.locator('#undo').click();assert float(page.locator('#x').input_value())!=300
  page.locator('#redo').click();assert float(page.locator('#x').input_value())==300
- page.locator('#done').click();assert page.locator('#character').input_value()=='sprout-healer'
+ page.locator('#done').click();assert page.locator('#character').input_value()=='scholar'
  page.locator('#target').select_option('group:neck');page.locator('#rotation').fill('12');page.locator('#rotation').press('Tab')
  with page.expect_download() as info:page.locator('#export-all').click()
- info.value.save_as(str(WORK/'editor-all.json'));all=json.load(open(str(WORK/'editor-all.json')));assert len(all['characters'])==8;assert 'gynari-warrior' in all['completed']
+ info.value.save_as(str(WORK/'editor-all.json'));all=json.load(open(str(WORK/'editor-all.json')));assert len(all['characters'])==6;assert 'shield-guard' in all['completed']
  page.locator('#target').select_option('group:neck')
  box=page.locator('#editor-canvas').bounding_box();page.mouse.move(box['x']+box['width']*.5,box['y']+box['height']*.45);page.mouse.down();page.mouse.move(box['x']+box['width']*.5+35,box['y']+box['height']*.45+15,steps=5);page.mouse.up();assert page.locator('#target').input_value()=='group:neck';assert abs(float(page.locator('#x').input_value()))>5
  page.wait_for_timeout(250)
  page.screenshot(path=str(WORK/'editor-desktop.png'),full_page=True)
- page.reload();page.get_by_text('이전 작업 복원됨',exact=True).wait_for();assert page.locator('#character').input_value()=='sprout-healer'
- page.locator('#import').set_input_files(str(WORK/'editor-all.json'));page.get_by_text('8종의 수정 데이터를 불러왔습니다.',exact=True).wait_for()
- page.locator('#character').select_option('gynari-warrior');page.locator('#target').select_option('part:head');page.locator('#guides').uncheck()
+ page.reload();page.get_by_text('이전 작업 복원됨',exact=True).wait_for();assert page.locator('#character').input_value()=='scholar'
+ page.locator('#import').set_input_files(str(WORK/'editor-all.json'));page.get_by_text('6종의 수정 데이터를 불러왔습니다.',exact=True).wait_for()
+ page.locator('#character').select_option('shield-guard');page.locator('#target').select_option('part:head');page.locator('#guides').uncheck()
  page.locator('#rotation').fill('15');page.locator('#rotation').press('Tab');before=page.locator('#editor-canvas').screenshot()
  pivot=float(page.locator('#pivot-x').input_value());page.locator('#pivot-x').fill(str(pivot+30));page.locator('#pivot-x').press('Tab');after=page.locator('#editor-canvas').screenshot()
  difference=ImageStat.Stat(ImageChops.difference(Image.open(io.BytesIO(before)).convert('RGB'),Image.open(io.BytesIO(after)).convert('RGB')))
  assert max(difference.mean)<.2, difference.mean
  page.locator('#target').select_option('group:upper');assert float(page.locator('#pivot-x').input_value())>100;assert float(page.locator('#pivot-y').input_value())>100
- page.locator('#recommended').click();page.locator('#holding-mode').select_option('both');assert page.locator('[data-slot="right"]').is_disabled();page.locator('#target').select_option('equipment:basic_sword:left')
+ page.locator('#recommended').click();page.locator('[data-slot="left"]').select_option('basic_sword');page.locator('#holding-mode').select_option('both');assert page.locator('[data-slot="right"]').is_disabled();page.locator('#target').select_option('equipment:basic_sword:left')
  with page.expect_download() as info:page.locator('#export-one').click()
  info.value.save_as(str(WORK/'two-hand.json'));page.locator('#import').set_input_files(str(WORK/'two-hand.json'));page.get_by_text('1종의 수정 데이터를 불러왔습니다.',exact=True).wait_for()
  assert page.locator('#holding-mode').input_value()=='both';assert page.locator('[data-slot="right"]').is_disabled()

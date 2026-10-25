@@ -1,4 +1,4 @@
-import {loadCatalog} from './catalog.mjs';
+import {loadCatalog,visibleCharacters} from './catalog.mjs';
 import {createCharacter,equip,unequip,drawCharacter,layoutCharacter,multiply,point} from './engine.mjs';
 import {editPart,exportEdits,validateEdits,nodesOf,groupAdjustment} from './rig-edit-model.mjs';
 const $=id=>document.getElementById(id),KEY='doragami-rig-editor-v1',RAD=Math.PI/180;
@@ -121,7 +121,7 @@ for(const [key,direction]of [['backward',-1],['forward',1]])$(key).addEventListe
 $('undo').addEventListener('click',()=>{if(!undo.length)return;redo.push(snapshot());applyBundle(undo.pop());targetOptions();progress();historyButtons();persist();});$('redo').addEventListener('click',()=>{if(!redo.length)return;undo.push(snapshot());applyBundle(redo.pop());targetOptions();progress();historyButtons();persist();});
 $('reset').addEventListener('click',()=>{checkpoint();catalog.characters[id].rig=structuredClone(original.characters[id]);completed=completed.filter(k=>k!==id);targetOptions();progress();persist();message('이 캐릭터를 원본으로 복원했습니다. 되돌리기로 취소할 수 있습니다.');});
 $('export-one').addEventListener('click',()=>download([id]));$('export-all').addEventListener('click',()=>download(ids));
-$('import').addEventListener('change',async()=>{const file=$('import').files[0];if(!file)return;try{if(file.size>4*1024*1024)throw new Error('JSON 파일은 4MB 이하로 선택하세요.');const data=validateEdits(JSON.parse(await file.text()),catalog);checkpoint();applyBundle(data);if(!data.preview)instances.clear();showCharacter(ids.includes(data.activeCharacter)?data.activeCharacter:Object.keys(data.characters)[0]||id);persist();message(`${Object.keys(data.characters).length}종의 수정 데이터를 불러왔습니다.`);}catch(e){message(`불러오기 실패: ${e.message}`);}finally{$('import').value='';}});
+$('import').addEventListener('change',async()=>{const file=$('import').files[0];if(!file)return;try{if(file.size>4*1024*1024)throw new Error('JSON 파일은 4MB 이하로 선택하세요.');const data=validateEdits(JSON.parse(await file.text()),catalog);checkpoint();applyBundle(data);if(!data.preview)instances.clear();showCharacter(ids.includes(data.activeCharacter)?data.activeCharacter:ids.find(key=>Object.hasOwn(data.characters,key))||id);persist();message(`${Object.keys(data.characters).length}종의 수정 데이터를 불러왔습니다.`);}catch(e){message(`불러오기 실패: ${e.message}`);}finally{$('import').value='';}});
 let refURL;$('reference').addEventListener('change',()=>{const file=$('reference').files[0];if(!file)return;if(refURL)URL.revokeObjectURL(refURL);refURL=URL.createObjectURL(file);$('reference-image').src=refURL;$('reference-image').hidden=false;});
 canvas.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();checkpoint();const step=e.shiftKey?10:1;moveBy(e.key==='ArrowLeft'?-step:e.key==='ArrowRight'?step:0,e.key==='ArrowUp'?-step:e.key==='ArrowDown'?step:0);fields();persist();});
 function render(now){const dt=last?Math.min((now-last)/1000,.05):0;last=now;
@@ -138,7 +138,7 @@ function render(now){const dt=last?Math.min((now-last)/1000,.05):0;last=now;
  }
  requestAnimationFrame(render);
 }
-try{catalog=await loadCatalog();ids=Object.keys(catalog.characters);original=snapshot();let restored=false,resume=ids[0];
+try{catalog=await loadCatalog();ids=visibleCharacters(catalog).map(([key])=>key);original=snapshot();let restored=false,resume=ids[0];
  try{const saved=localStorage.getItem(KEY);if(saved){const savedData=validateEdits(JSON.parse(saved),catalog);applyBundle(savedData);if(ids.includes(savedData.activeCharacter))resume=savedData.activeCharacter;restored=true;}}catch{message('이전 임시 저장을 복원하지 못했습니다. JSON을 불러오거나 원본에서 편집하세요.');}
  for(const key of ids)$('character').add(new Option(catalog.characters[key].name,key));showCharacter(resume);ready=true;$('save-state').textContent=restored?'이전 작업 복원됨':'원본에서 시작';requestAnimationFrame(render);
 }catch(e){message(e.message);$('save-state').textContent='불러오기 실패';}
