@@ -36,6 +36,7 @@ BASE_URL=https://your-static-host.example python3 tests/mobile-layout.py
 BASE_URL=https://your-static-host.example python3 tests/rig-browser.py
 BASE_URL=https://your-static-host.example python3 tests/characters-browser.py
 BASE_URL=https://your-static-host.example python3 tests/rig-editor-browser.py
+BASE_URL=https://your-static-host.example python3 tests/equipment-grips-browser.py
 ```
 
 브라우저 검증은 기본적으로 `/usr/bin/chromium`을 사용합니다. 다른 설치 경로는 `CHROMIUM`, 호스팅 주소는 `BASE_URL` 환경 변수로 지정할 수 있습니다. 데스크톱과 모바일 터치에서 소환·선택·실제 보행·공격·피격·드래그·핀치·초기화, 지형 변경, 이미지 누락 안내를 검사합니다. 모바일 레이아웃 검증은 다섯 화면 크기에서 확대·이동해도 전장이 헤더·조작부 영역을 침범하지 않는지, 화면 높이가 바뀌어도 배치가 유지되는지 검사합니다.

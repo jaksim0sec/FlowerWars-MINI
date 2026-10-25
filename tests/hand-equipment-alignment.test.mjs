@@ -24,11 +24,20 @@ test('recommended banner, bow and staff keep an upright grip frame through motio
   const c=createCharacter(catalog,id),entry=manifest.characters[id],side=entry.recommendedHand||'left';
   Object.assign(c.animation,{state,elapsed:.2});equip(catalog,c,entry.recommendedWeapon,side);
   const m=layoutCharacter(catalog,c,.2).equipmentDraws[side].matrix;
-  assert.ok(Math.abs(Math.atan2(m[1],m[0]))<.5,`${id}/${state}: weapon tipped sideways`);
+  assert.ok(Math.abs(Math.atan2(-m[2],m[3]))<.5,`${id}/${state}: weapon tipped sideways`);
  }
  const c=createCharacter(catalog,'banner-bearer');equip(catalog,c,'banner_bearer_banner','both');
  const m=layoutCharacter(catalog,c,0).equipmentDraws.left.matrix;
- assert.ok(Math.abs(Math.atan2(m[1],m[0]))<.1,'two-handed banner lost its upright primary grip');
+ assert.ok(Math.abs(Math.atan2(-m[2],m[3]))<.1,'two-handed banner lost its upright primary grip');
+});
+test('a banner faces away from the body while its pole stays on the same grip',()=>{
+ const c=createCharacter(catalog,'banner-bearer');equip(catalog,c,'banner_bearer_banner','left');
+ const l=layoutCharacter(catalog,c,0),d=l.equipmentDraws.left,e=equipment.banner_bearer_banner;
+ const grip=point(d.matrix),cloth=point(d.matrix,(.8-e.grip[0])*e.w,(.5-e.grip[1])*e.h);
+ assert.ok(cloth[0]<grip[0]-100,'banner cloth is hidden behind the face');
+ assert.deepEqual(grip,point(l.sockets.left.matrix));
+ equip(catalog,c,'banner_bearer_banner','right');const right=layoutCharacter(catalog,c,0).equipmentDraws.right;
+ assert.ok(point(right.matrix,100,0)[0]>point(right.matrix)[0],'right-hand banner should face right');
 });
 test('socket orientation changes equipment without displacing its painted palm',()=>{
  const rig={parts:{arm:{x:10,y:20,w:100,h:100,origin:[.5,.2],rotation:.9}},sockets:{left:{part:'arm',group:'arm',grip:[.3,.8],rotation:-.9}},nodes:[{id:'arm',children:[{socket:'left'},{part:'arm'}]}],animations:{}};

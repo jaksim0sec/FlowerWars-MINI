@@ -101,7 +101,8 @@ export function layoutCharacter(catalog, instance, time=0) {
     const socket=sockets[side];
     const equipmentVars=channels(rig,instance,time,[e]);
     const rotation=(e.socketRotations?.[side] ?? e.rotation ?? 0)+value(e.motion||0,equipmentVars)+(attachment.overrides.rotation||0);
-    const matrix=multiply(socket.matrix,multiply(translate(...(e.offset || [0,0])),rotate(rotation)));
+    const mirror=e.socketMirrors?.[side] ? [-1,0,0,1,0,0] : I();
+    const matrix=multiply(socket.matrix,multiply(translate(...(e.offset || [0,0])),multiply(rotate(rotation),mirror)));
     equipmentDraws[side]={equipmentId:attachment.equipmentId,matrix,w:e.w,h:e.h,grip:e.grip};
     if(attachment.hand==='both') {
       const other=side==='left'?'right':'left', secondary=sockets[other];
