@@ -104,9 +104,12 @@ function runOrder(board,s){
    if(!enemies.length){s.order=null;return;}
    const lead=commander(board,s);
    for(const u of units){
-     // The commander does not pursue focus targets into the front line;
-     // automatic point-blank defence remains available if enemies arrive.
-     if(u.id===lead?.id){if(u.command)board.cancelCommand(u);continue;}
+     // Keep the leader back while fighters remain. The last surviving
+     // soldier can still receive an explicit focus order.
+     if(units.length>1&&u.id===lead?.id){
+       if(u.command)board.cancelCommand(u);
+       continue;
+     }
      if(u.command?.type==='attack'&&board.unit(u.command.target)?.health.current>0)continue;
      if(u.state!=='idle'||u.step)continue;
      const sorted=[...enemies].sort((a,b)=>(Math.abs(a.x-u.x)+Math.abs(a.y-u.y))-(Math.abs(b.x-u.x)+Math.abs(b.y-u.y))||a.id-b.id);
