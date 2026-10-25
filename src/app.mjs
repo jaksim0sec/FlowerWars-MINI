@@ -193,6 +193,7 @@ function selectUnit(unit){
   syncSquadRoster();
 }
 function seed() {
+  clearTimeout(feedbackTimer);$('command-feedback').hidden=true;cancelLongPress();
   board.width=BOARD_COLUMNS;board.height=BOARD_ROWS;board.reset();movementScenario=null;
   $('movement-start').disabled=true;
   const ids=art?visibleCharacters(art.catalog).map(([id])=>id):[];
@@ -459,6 +460,7 @@ function updateMovementStats() {
 }
 $('movement-setup').addEventListener('click',()=>{
   if(!art)return;
+  clearTimeout(feedbackTimer);$('command-feedback').hidden=true;
   movementScenario=setupMovementScenario(board,$('movement-scenario').value,$('movement-count').value,characterForSlot,{combat:$('movement-combat').checked,statsFor:character=>character.testStats||art.catalog.characters[character.characterId].testCombat,seed:$('movement-seed').value,mirror:$('movement-mirror').checked,movementFor,capabilitiesFor:c=>art.catalog.characters[c.characterId].capabilities||[]});
   cancelLongPress();view.selected=null;selectedSquadId=null;commandPanelOpen=false;squadQuickCommand=false;view.tile=null;view.hover=null;view.mode='move';previousHits=0;previousBusy=false;syncSquadRoster();
   $('movement-start').disabled=false;fit();updateMovementStats();notify('배치 완료 · 동시 이동으로 시작');
