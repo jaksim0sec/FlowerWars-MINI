@@ -1,7 +1,8 @@
+import {armyFormation} from './test-formation.mjs';
 // Deterministic, opt-in test settings. Uses the same Board commands as gameplay.
 export function setupMovementScenario(board,type,count,makeCharacter,options={}) {
   count=Math.min(1000,Math.max(2,Math.floor(Number(count)||16)));
-  if(!['crossing','bottleneck','obstacles','crowd','skirmish'].includes(type))type='crossing';
+  if(!['crossing','bottleneck','obstacles','crowd','skirmish','formation'].includes(type))type='crossing';
   const opposing=type==='crossing'||type==='crowd';
   board.height=Math.max(16,Math.ceil(Math.sqrt(count)*2)+4);
   const rows=Math.floor((board.height-3)/2)+1;
@@ -9,6 +10,8 @@ export function setupMovementScenario(board,type,count,makeCharacter,options={})
   board.width=Math.max(14,(opposing?4:6)*band+10,Math.ceil(Math.sqrt(count)*2)+6);
   const pairColumns=Math.ceil(Math.sqrt(Math.ceil(count/2)));
   if(type==='skirmish'){board.width=Math.max(14,3*pairColumns+2);board.height=Math.max(16,3*Math.ceil(count/2/pairColumns)+2);}
+  const formation=type==='formation'?armyFormation(Math.ceil(count/2)):null;
+  if(formation){board.width=2*(2+formation.depth*2)+5;board.height=formation.rows*2+4;}
   board.reset();
   const w=board.width,h=board.height,middle=Math.floor(w/2),orders=[];
   const wall=(x,y)=>board.setObstacle(x,y,{blocked:true,kind:'test-wall',attackable:false});
@@ -21,9 +24,12 @@ export function setupMovementScenario(board,type,count,makeCharacter,options={})
     const right=opposing&&i%2===1,k=opposing?Math.floor(i/2):i;
     let x=1+2*(k%band),y=1+2*Math.floor(k/band);
     if(type==='skirmish'){const pair=Math.floor(i/2);x=1+3*(pair%pairColumns)+i%2;y=1+3*Math.floor(pair/pairColumns);}
-    const character=makeCharacter(i);
+    const slot=formation?.slots[Math.floor(i/2)];
+    if(slot){const front=2+formation.depth*2;x=i%2?w-1-front+slot.depth*2:front-slot.depth*2;y=2+slot.row*2;}
+    const character=makeCharacter(i,slot);
     const unit=board.spawn(right?w-1-x:x,y,character,{team:i%2?'B':'A',autoCombat:false,stats:{range:1,rangeShape:'king',...options.statsFor?.(character,i)}});
     if(!unit)throw new Error('테스트 배치가 겹칩니다.');
+    if(slot)unit.facing=i%2?-1:1;
     orders.push({id:unit.id,x:type==='skirmish'?(i%2?1:w-2):(right?x:w-1-x),y});
   }
   return {type,count,orders,combat:!!options.combat,started:false,startTime:null};

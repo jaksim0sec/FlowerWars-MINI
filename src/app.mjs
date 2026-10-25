@@ -1,7 +1,7 @@
 import {characterRadius,onScreen} from './character-render-cache.mjs';
 import {setupMovementScenario,startMovementScenario,movementStats} from './movement-scenarios.mjs';
 import {healthLabel} from './characters/vitality.mjs';
-import {createCharacter,equip} from './characters/engine.mjs';
+import {createCharacter,equip,unequip} from './characters/engine.mjs';
 import {visibleCharacters} from './characters/catalog.mjs';
 import { Board, BOARD_COLUMNS, BOARD_ROWS, project, tileAt, zoomCamera, fitBoardCamera } from './model.mjs';
 import { loadArtwork, render } from './render.mjs';
@@ -50,7 +50,7 @@ function newCharacter(id) {
   for(const [slot,equipmentId] of Object.entries(art.catalog.characters[id].recommendedAccessories || {}))equip(art.catalog,instance,equipmentId,slot);
   return instance;
 }
-function unitName(unit) {return art?.catalog.characters[unit.character?.characterId]?.name || '용사';}
+function unitName(unit) {return unit.character?.testName || art?.catalog.characters[unit.character?.characterId]?.name || '용사';}
 function seed() {
   board.width=BOARD_COLUMNS;board.height=BOARD_ROWS;board.reset();movementScenario=null;
   $('movement-start').disabled=true;
@@ -241,7 +241,7 @@ function updateMovementStats() {
 $('movement-setup').addEventListener('click',()=>{
   if(!art)return;
   const ids=visibleCharacters(art.catalog).map(([id])=>id);
-  movementScenario=setupMovementScenario(board,$('movement-scenario').value,$('movement-count').value,i=>newCharacter(ids[Math.floor(i/2)%ids.length]),{combat:$('movement-combat').checked,statsFor:character=>art.catalog.characters[character.characterId].testCombat});
+  movementScenario=setupMovementScenario(board,$('movement-scenario').value,$('movement-count').value,(i,slot)=>{const c=newCharacter(slot?.characterId||ids[Math.floor(i/2)%ids.length]);if(slot?.weapon){for(const key of Object.keys(c.equipment))unequip(c,key);equip(art.catalog,c,slot.weapon,'left');c.testName=slot.name;c.testStats=slot.stats;}return c;},{combat:$('movement-combat').checked,statsFor:character=>character.testStats||art.catalog.characters[character.characterId].testCombat});
   view.selected=null;view.tile=null;view.hover=null;view.mode='move';previousHits=0;previousBusy=false;
   $('movement-start').disabled=false;fit();updateMovementStats();notify('배치 완료 · 동시 이동으로 시작');
 });
