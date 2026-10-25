@@ -104,7 +104,7 @@ function issueSquadAction(action){
  }else notify('분대 명령을 실행할 수 없습니다.');
  refresh();
 }
-function selectSquad(id){
+function selectSquad(id,trigger=null){
  const squad=squadsFor(board).get(id);if(!squad)return;
  // A second commander card can be the focus/follow target directly.
  if(view.mode==='squad-target'){
@@ -114,25 +114,30 @@ function selectSquad(id){
   if(id===source?.id){cancelSquadTarget();}
   else {notify('명령에 맞는 대상 분대를 선택하세요.');return;}
  }
- const isSameOpen=selectedSquadId===id&&commandPanelOpen;
  selectedSquadId=id;
  const lead=board.unit(squad.leaderId);
  const unit=lead?.health.current>0?lead:squad.memberIds.map(member=>board.unit(member)).find(u=>u?.health.current>0);
  view.selected=unit?.id??null;view.tile=unit?{x:unit.x,y:unit.y}:null;
- commandPanelOpen=!isSameOpen;
+ // The commander icon always opens its squad's orders; only ×/outside/Esc closes.
+ commandPanelOpen=true;
+ if(trigger){
+   const rect=trigger.getBoundingClientRect();
+   $('squad-tools').style.setProperty('--squad-anchor-x',Math.round(rect.left+rect.width/2)+'px');
+ }
  $('debug-tools').open=false;
  refresh();syncSquadRoster();
 }
 function rosterButton(squad){
   const button=document.createElement('button');button.type='button';button.className='squad-card';button.dataset.squadId=squad.id;
+  const portrait=document.createElement('span');portrait.className='squad-portrait';
   const avatar=document.createElement('img');avatar.className='squad-avatar';avatar.src=commanderAvatar;avatar.alt='';avatar.width=44;avatar.height=44;
-  const body=document.createElement('span');body.className='squad-card-body';
-  const heading=document.createElement('span');heading.className='squad-card-heading';
   const team=document.createElement('span');team.className='squad-card-team team-'+squad.team.toLowerCase();team.textContent=squad.team+'팀';
+  portrait.append(avatar,team);
+  const body=document.createElement('span');body.className='squad-card-body';
   const title=document.createElement('strong');title.className='squad-card-title';title.textContent=squad.name;
   const status=document.createElement('small');status.className='squad-card-status';
-  heading.append(team,title);body.append(heading,status);button.append(avatar,body);
-  button.addEventListener('click',()=>selectSquad(squad.id));
+  body.append(title,status);button.append(portrait,body);
+  button.addEventListener('click',()=>selectSquad(squad.id,button));
   return button;
 }
 /** Stable buttons and thumbnails: only status changes on combat updates. */
@@ -148,10 +153,12 @@ function syncSquadRoster(){
     const echelon=squad.platoonIndex!=null?'제'+(squad.platoonIndex+1)+'소대 · ':'';
     const label=echelon+(summary.commanderAlive?'기수 ':'기수 전사 ')+summary.alive+'/'+squad.memberIds.length;
     const status=button.querySelector('.squad-card-status');
-    if(status.textContent!==label)status.textContent=label;
-    button.classList.toggle('is-selected',squad.id===selectedSquadId);
+    const remaining=summary.alive+'/'+squad.memberIds.length;
+    if(status.textContent!==remaining)status.textContent=remaining;
+    const active=squad.id===selectedSquadId&&commandPanelOpen;
+    button.classList.toggle('is-selected',active);
     button.classList.toggle('is-leader-down',!summary.commanderAlive);
-    button.setAttribute('aria-pressed',String(squad.id===selectedSquadId));
+    button.setAttribute('aria-pressed',String(active));
     button.setAttribute('aria-label',squad.team+'팀 '+squad.name+', '+label+'. 분대 명령 열기');
   }
   for(const [id,button] of rosterCards)if(!current.has(id)){button.remove();rosterCards.delete(id);}
