@@ -44,7 +44,7 @@ export function registerPlacedGroup(board,memberIds,{kind='squad',name='',team='
  const anchor={x:units[0].x,y:units[0].y},sign=team==='B'?-1:1;
  const blueprint={format:'doragami-unit-group',version:1,kind,name:name||(kind==='platoon'?'혼성 소대':'혼성 분대'),members:units.map(u=>({characterId:u.character?.characterId||null,role:u.formationRole||null,name:u.character?.testName,weapon:u.character?.testName?Object.values(u.character.equipment).find(a=>a)?.equipmentId:undefined,offset:{x:(u.x-anchor.x)*sign,y:u.y-anchor.y},stats:{maxHealth:u.health.max,damage:u.damage,attackPeriod:u.combat.period,range:u.combat.range,rangeShape:u.combat.shape,preferredRange:u.combat.preferredRange,lineOfSight:u.combat.lineOfSight,searchInterval:u.combat.searchInterval},movement:{...u.movement},capabilities:[...u.capabilities]}))};
  const r=registry(board),id=`${kind}-${r.next++}`,group={id,kind,name:blueprint.name,team,anchor,blueprint,memberIds:[...memberIds]};
- units.forEach((u,i)=>{u.groupId=id;u.memberIndex=i;});r.groups.set(id,group);return group;
+ units.forEach((u,i)=>{u.groupId=id;u.memberIndex=i;});r.groups.set(id,group);attachSquads(board,group);return group;
 }
 
 /** Sub-squads retain the parent group's ID and roster; no board/model changes. */
