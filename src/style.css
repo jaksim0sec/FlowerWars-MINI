@@ -408,3 +408,31 @@ body{display:block;}
  .squad-tools{bottom:calc(68px + env(safe-area-inset-bottom));max-height:min(214px,52dvh);}
  .squad-aim{bottom:calc(69px + env(safe-area-inset-bottom));}
 }
+
+/* Lightweight confirmation of a map-issued squad order, no modal/toast blocking */
+.command-feedback[hidden]{display:none!important;}
+.command-feedback{
+ position:fixed;z-index:6;pointer-events:none;touch-action:none;
+ width:30px;height:30px;border:2px solid #c4a04d;border-radius:50%;
+ transform:translate(-50%,-50%);box-shadow:0 0 0 3px #fff1c344;
+}
+.command-feedback[data-kind="focus"]{border-color:#b75a2c;box-shadow:0 0 0 3px #fbe0ce66;}
+.command-feedback.command-feedback-playing{animation:squad-command-pulse .6s ease-out both;}
+@keyframes squad-command-pulse{
+ 0%{opacity:.95;transform:translate(-50%,-50%) scale(.58);}
+ 60%{opacity:.85;}
+ 100%{opacity:0;transform:translate(-50%,-50%) scale(1.55);}
+}
+/* The drawn face may be small, but the actual finger hit area stays generous. */
+.squad-card{touch-action:manipulation;}
+.squad-roster-list{touch-action:pan-x pan-y;}
+@media(prefers-reduced-motion:reduce){
+ .command-feedback.command-feedback-playing{animation:none;opacity:.75;}
+}
+
+/* Tiny visual controls, but forgiving tap targets on actual touch devices. */
+@media(pointer:coarse){
+ .squad-action-grid button{min-height:41px;}
+ .squad-compact-row .squad-option-row button{min-height:29px;}
+ #squad-special{min-height:32px;}
+}
