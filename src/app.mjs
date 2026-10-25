@@ -20,7 +20,7 @@ let lastDraw=0,visibleCount=0,lastCamera='',cameraChanged=0,lastVisual='',camera
 let fitted = true,lastBoardSize='';
 let movementScenario=null,lastLabUpdate=0,lastSquadUpdate=0,lastSelectedSquad='';
 let selectedSquadId=null,lastRosterUpdate=0,rosterEpoch=null,commanderAvatar='',rosterCards=new Map(),commandPanelOpen=false;
-let squadQuickCommand=false,longPressTimer=null,longPressPointer=null,longPressConsumed=false,feedbackTimer=null;
+let squadQuickCommand=false,longPressTimer=null,longPressPointer=null,longPressConsumed=false,feedbackTimer=null,squadHintSeen=false;
 const squadSpecial={assault:['assault','돌파'],defense:['fortify','방어진 구축'],ranged:['firing-line','사격 위치 확보'],mobile:['flank','우회 기동'],support:['support-focus','지원 집중'],mixed:['reform','전열 정비']};
 const pointers = new Map();
 let origin = null, gestureMoved = false;
@@ -139,6 +139,7 @@ function selectSquad(id,trigger=null){
  }
  $('debug-tools').open=false;
  refresh();syncSquadRoster();
+ if(!squadHintSeen){squadHintSeen=true;notify('기수 선택 후: 빈 칸 터치 = 이동 · 적 터치 = 공격 · 드래그 = 화면 이동');}
 }
 function rosterButton(squad){
   const button=document.createElement('button');button.type='button';button.className='squad-card';button.dataset.squadId=squad.id;
@@ -374,7 +375,7 @@ canvas.addEventListener('pointerdown', event => {
         },460);
       }
     }
-  }else{gestureMoved=true;cancelLongPress();}
+  }else{gestureMoved=true;longPressConsumed=false;cancelLongPress();}
 });
 
 const midpoint = points => ({ x: (points[0].x + points[1].x) / 2, y: (points[0].y + points[1].y) / 2 });
@@ -384,6 +385,7 @@ canvas.addEventListener('pointermove', event => {
   if (!pointers.has(event.pointerId)) { view.hover = pick(p); return; }
   const before = [...pointers.values()];
   pointers.set(event.pointerId, p);
+  if(pointers.size>1)longPressConsumed=false;
   if(origin&&Math.hypot(p.x-origin.x,p.y-origin.y)>8)cancelLongPress();
   if(longPressConsumed)return; // long-press is command selection, never a pan
   if (pointers.size > 1) {
