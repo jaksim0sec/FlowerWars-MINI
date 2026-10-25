@@ -175,11 +175,11 @@ function syncSquadRoster(){
     const echelon=squad.platoonIndex!=null?'제'+(squad.platoonIndex+1)+'소대 · ':'';
     const label=echelon+(summary.leaderAlive?'기수 지휘 ':summary.commanderAlive?'임시 지휘 ':'전멸 ')+summary.alive+'/'+squad.memberIds.length;
     const status=button.querySelector('.squad-card-status');
-    const remaining=summary.alive+'/'+squad.memberIds.length;
+    const remaining=(summary.leaderAlive?'':summary.commanderAlive?'대리 ':'전멸 ')+summary.alive+'/'+squad.memberIds.length;
     if(status.textContent!==remaining)status.textContent=remaining;
     const active=squad.id===selectedSquadId&&(commandPanelOpen||squadQuickCommand);
     button.classList.toggle('is-selected',active);
-    button.classList.toggle('is-leader-down',!summary.leaderAlive);
+    button.classList.toggle('is-leader-down',!summary.commanderAlive);
     button.setAttribute('aria-pressed',String(active));
     button.setAttribute('aria-label',squad.team+'팀 '+squad.name+', '+label+'. 분대 명령 열기');
   }
