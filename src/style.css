@@ -429,3 +429,10 @@ body{display:block;}
 @media(prefers-reduced-motion:reduce){
  .command-feedback.command-feedback-playing{animation:none;opacity:.75;}
 }
+
+/* Tiny visual controls, but forgiving tap targets on actual touch devices. */
+@media(pointer:coarse){
+ .squad-action-grid button{min-height:41px;}
+ .squad-compact-row .squad-option-row button{min-height:29px;}
+ #squad-special{min-height:32px;}
+}
