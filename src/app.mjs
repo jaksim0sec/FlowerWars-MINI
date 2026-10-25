@@ -1,3 +1,4 @@
+import {characterRadius,onScreen} from './character-render-cache.mjs';
 import {setupMovementScenario,startMovementScenario,movementStats} from './movement-scenarios.mjs';
 import {healthLabel} from './characters/vitality.mjs';
 import {createCharacter,equip} from './characters/engine.mjs';
@@ -66,7 +67,8 @@ function refresh(invalidate=true) {
   if(invalidate)dirty=true;
   let unit = board.unit(view.selected);
   if(unit?.health.current<=0){view.selected=null;view.tile=null;unit=null;}
-  text('selection-health',unit?`체력 ${unit.health.current} / ${unit.health.max} · ${healthLabel(unit.health)}`:'');
+  text('selection-health',unit?`${unit.team?unit.team+' · ':''}체력 ${unit.health.current} / ${unit.health.max} · ${healthLabel(unit.health)}`:'');
+  text('selection-combat',unit?.team?`공격 ${unit.damage} · 공속 ${(1/unit.combat.period).toFixed(2)}회/초`:'');$('selection-combat').hidden=!unit?.team;
   text('unit-count', `용사 ${board.units.filter(u=>u.health.current>0).length}`);
   text('zoom-value', `${Math.round(camera.scale * 100)}%`);
   $('summon').setAttribute('aria-label',`${$('character-type').selectedOptions[0].textContent} 소환`);
@@ -77,7 +79,7 @@ function refresh(invalidate=true) {
   if (unit) {
     text('selection-name', `${unitName(unit)} ${unit.id}`);
     const action = { idle: '대기', walk: '이동 중', attack: '공격 중', hit: '피격', death:'쓰러짐' }[unit.state];
-    text('selection-detail', `${unit.x + 1}, ${unit.y + 1} · ${unit.waitReason?'경로 대기':action}${unit.hits ? ` · 피격 ${unit.hits}회` : ''}`);
+    text('selection-detail', `${unit.x + 1}, ${unit.y + 1} · ${unit.waitReason==='combat'?'교전 대기':unit.waitReason?'경로 대기':action}${unit.hits ? ` · 피격 ${unit.hits}회` : ''}`);
   } else if (view.tile) {
     text('selection-name', `${view.tile.x + 1}, ${view.tile.y + 1}번 칸`);
     text('selection-detail', board.terrain[view.tile.y][view.tile.x] === 'grass' ? '잔디 블럭' : '흙 블럭');
@@ -234,18 +236,18 @@ $('terrain').addEventListener('click', () => {
 function updateMovementStats() {
   if(!movementScenario){text('movement-stats','배치 → 동시 이동 · 기존 전장 교체');return;}
   const s=movementStats(board,movementScenario);
-  text('movement-stats',`이동 ${s.moving} · 대기 ${s.waiting} · 도착 ${s.arrived}/${s.total}\nBFS ${s.fieldBuilds} · 우회 ${s.detours} · 탐색 ${s.lastExpansions}/2048`);
+  text('movement-stats',`A ${s.teams.A} · B ${s.teams.B} · 공격 ${s.attacking} · 퇴장 ${s.casualties}\n이동 ${s.moving} · 대기 ${s.waiting} · 도착 ${s.arrived}/${s.total}\nBFS ${s.fieldBuilds} · 우회 ${s.detours} · 탐색 ${s.lastExpansions}/2048`);
 }
 $('movement-setup').addEventListener('click',()=>{
   if(!art)return;
   const ids=visibleCharacters(art.catalog).map(([id])=>id);
-  movementScenario=setupMovementScenario(board,$('movement-scenario').value,$('movement-count').value,i=>newCharacter(ids[i%ids.length]));
+  movementScenario=setupMovementScenario(board,$('movement-scenario').value,$('movement-count').value,i=>newCharacter(ids[Math.floor(i/2)%ids.length]),{combat:$('movement-combat').checked,statsFor:character=>art.catalog.characters[character.characterId].testCombat});
   view.selected=null;view.tile=null;view.hover=null;view.mode='move';previousHits=0;previousBusy=false;
   $('movement-start').disabled=false;fit();updateMovementStats();notify('배치 완료 · 동시 이동으로 시작');
 });
 $('movement-start').addEventListener('click',()=>{
   const count=startMovementScenario(board,movementScenario);$('movement-start').disabled=true;
-  refresh();updateMovementStats();notify(`${count}개체 동시 이동 · 막히면 대기·우회`);
+  refresh();updateMovementStats();notify(`${count}개체 시작 · ${movementScenario.combat?'A/B 주변 8칸 자동 공격':'이동만 · 대기·우회'}`);
 });
 $('movement-default').addEventListener('click',()=>{seed();fit();updateMovementStats();notify('기본 전장 복원');});
 $('movement-lab').addEventListener('toggle',updateMovementStats);
@@ -282,7 +284,10 @@ function frame(now) {
     if(visual!==lastVisual){lastVisual=visual;dirty=true;}
     const cameraMoving=now-cameraChanged<120;
     if(!cameraMoving&&!cameraSettled)dirty=true;
-    const active=board.busy||board.effects.length>0||cameraMoving;
+    const active=cameraMoving||board.units.some(u=>{
+      if(u.state==='idle')return false;
+      const p=project(u.visualX,u.visualY);return onScreen(p.x,p.y,u.character?characterRadius(art.catalog,u.character):250,camera,width,height);
+    })||board.effects.some(e=>{const p=project(e.x,e.y);return onScreen(p.x,p.y-54,50,camera,width,height);});
     if(dirty||active||(visibleCount>0&&now-lastDraw>=1000/30-1)){
       const result=render(ctx,art,board,view,camera,width,height,dpr,{cameraMoving});visibleCount=result.visibleUnits;lastDraw=now;dirty=false;if(!cameraMoving)cameraSettled=true;
     }

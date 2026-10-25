@@ -9,3 +9,5 @@
 리그의 선택적 `vitality`에서 `headDroop`(기본 .07 rad), `criticalSway`(.065 rad), `fallAngle`(.62 rad), `scatter`(22 리그 단위), `parts.<파츠 이름>.delay`(초)를 바꿀 수 있습니다. 설정이 없으면 공통 기본값으로 작동합니다. 보드와 독립된 `layoutCharacter`/`drawCharacter`에서도 같은 연출을 사용할 수 있습니다. 외부 UI는 `advanceHealth`를 호출하고 사망 시 `animation.state='death'`, `elapsed`, `deathDirection`을 제공합니다.
 
 검증은 `tests/health.test.mjs`와 `tests/health-browser.py`에 있으며, 기존 비율·손잡이·레이어 테스트도 유지합니다. 실제 6종 엔진 렌더링은 [연출 미리보기](health-death-preview.gif)에서 확인할 수 있습니다.
+
+A/B 테스트 교전의 최대 체력·피해·공속은 `assets/characters.json`의 `testCombat`을 명시적으로 적용합니다. 자동 교전 중 이미 시작한 공격은 살아 있는 동안 피격으로 취소하지 않습니다. 자동 이동 명령도 유지하며, 사망은 기존과 동일하게 모든 행동을 중단합니다. 자세한 설정은 [테스트 교전](test-combat.md)을 참고하세요.

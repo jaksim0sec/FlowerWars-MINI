@@ -19,3 +19,9 @@ test('1000-unit setting uses unique valid positions/goals and begins in parallel
  for(let i=0;i<6000;i++)b.update(.02);
  assert.equal(movementStats(b,s).arrived,1000,'temporary yields must not leave a unit stranded far from its route');
 });
+test('test factions are assigned before start, then optional combat activates on start',()=>{
+ const b=new Board(),s=setupMovementScenario(b,'skirmish',16,()=>null,{combat:true,statsFor:()=>({maxHealth:60,damage:25,attackPeriod:.65})});
+ assert.equal(s.type,'skirmish');assert.equal(s.combat,true);assert.equal(b.units.filter(u=>u.team==='A').length,8);assert.equal(b.units.filter(u=>u.team==='B').length,8);
+ b.update(1);assert.equal(b.combatStats.attacks,0);assert.ok(b.units.every(u=>u.health.current===60));
+ startMovementScenario(b,s);b.update(.5);assert.ok(b.combatStats.hits>0);assert.ok(movementStats(b,s).teams.A>0);b.update(5);assert.ok(movementStats(b,s).casualties>0);
+});

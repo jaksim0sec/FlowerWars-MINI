@@ -31,7 +31,8 @@ export class Navigation {
     if(f.head===f.tail){f.complete=true;f.queue=null;this.pending=null;}
   }
   field(x,y,adjacent=false) {
-    const key=`${x},${y},${adjacent?1:0}`;
+    const reach=adjacent===true?{shape:'manhattan',range:1}:adjacent;
+    const key=`${x},${y},${reach?.shape||'point'},${reach?.range||0}`;
     if(this.fields.has(key)) {
       const f=this.fields.get(key);this.fields.delete(key);this.fields.set(key,f);this.stats.cacheHits++;this.work();return f;
     }
@@ -42,12 +43,16 @@ export class Navigation {
     if(this.fields.size>=capacity)this.fields.delete(this.fields.keys().next().value);
     if(!this.board.obstacles.size) {
       // Empty terrain has an exact O(1) Manhattan distance; no map-sized BFS.
-      const f={complete:true,at:index=>Math.max(0,Math.abs(index%this.board.width-x)+Math.abs(Math.floor(index/this.board.width)-y)-(adjacent?1:0))};
+      const f={complete:true,at:index=>{const dx=Math.abs(index%this.board.width-x),dy=Math.abs(Math.floor(index/this.board.width)-y);const r=reach?.range||0;return reach?.shape==='king'?Math.max(0,dx-r)+Math.max(0,dy-r):Math.max(0,dx+dy-r);}};
       this.fields.set(key,f);return f;
     }
     const size=this.board.width*this.board.height;
     const f={distance:new Int32Array(size).fill(-1),queue:new Int32Array(size),head:0,tail:0,complete:false};
-    const goal=this.index(x,y),seeds=adjacent?this.neighbors(goal):[goal];
+    const goal=this.index(x,y),seeds=reach?[]:[goal];
+    if(reach)for(let dy=-reach.range;dy<=reach.range;dy++)for(let dx=-reach.range;dx<=reach.range;dx++) {
+      if(!this.board.inside(x+dx,y+dy)||(reach.shape!=='king'&&Math.abs(dx)+Math.abs(dy)>reach.range))continue;
+      seeds.push(this.index(x+dx,y+dy));
+    }
     for(const n of seeds)if(n>=0&&!this.blocked(n)){f.distance[n]=0;f.queue[f.tail++]=n;}
     f.at=index=>f.distance[index];
     this.fields.set(key,f);this.pending=f;this.stats.fieldBuilds++;this.work();return f;
@@ -100,18 +105,21 @@ export class Navigation {
     u.retryAt=this.board.time+delay+(u.id%4)*.025;
   }
   plan(u) {
-    const b=this.board,command=u.command;
-    if(!command||u.step||!['idle','walk'].includes(u.state)||b.time<(u.retryAt||0))return;
+    const b=this.board;
+    if(u.step||!['idle','walk'].includes(u.state))return;
+    if(b.tryAutoAttack(u))return;
+    const command=u.command;
+    if(!command||b.time<(u.retryAt||0))return;
     let {x,y}=command;
     if(command.type==='attack') {
       const target=b.unit(command.target);
       if(!target||target.health.current<=0){b.cancelCommand(u);return;}
       x=target.x;y=target.y;
-      if(Math.abs(x-u.x)+Math.abs(y-u.y)===1){b.beginAttack(u);return;}
+      if(b.inAttackRange(u,target,false)){b.beginAttack(u);return;}
     } else if(u.x===x&&u.y===y){b.cancelCommand(u);return;}
     const start=this.index(u.x,u.y),routeKey=`${x},${y},${b.obstacleRevision}`;
     if(u.guideKey!==routeKey) {
-      const field=this.field(x,y,command.type==='attack');
+      const field=this.field(x,y,command.type==='attack'?{shape:u.combat.shape,range:u.combat.range}:false);
       if(!field||field.at(start)<0) {
         if(field?.complete){b.cancelCommand(u);u.waitReason='unreachable';}
         else this.wait(u,'planning',NAV_INTERVAL);

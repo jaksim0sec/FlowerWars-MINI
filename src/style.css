@@ -103,3 +103,9 @@ body{display:block;}
 .movement-buttons button{flex:1;background:#e7d9b7;border-radius:7px;min-height:34px;font-size:11px;padding:4px;}
 #movement-stats{display:block;white-space:pre-line;font-size:10px;line-height:1.7;color:var(--muted);font-variant-numeric:tabular-nums;}
 @media(max-height:440px){.movement-lab{max-height:calc(100dvh - 150px);overflow:auto;}}
+
+.combat-toggle{display:flex;align-items:center;gap:5px;margin-top:9px;font-size:11px;}
+.combat-toggle input{accent-color:#6a633d;margin:0;width:15px;height:15px;}
+.combat-toggle span{margin-left:auto;color:var(--muted);font-size:10px;}
+.team-a{color:#3983b8;}.team-b{color:#c86232;}
+#selection-combat{font-size:9px;}

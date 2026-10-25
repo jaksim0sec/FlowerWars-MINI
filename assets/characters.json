@@ -15,24 +15,52 @@
     "shield-guard": {
       "name": "방패수호자",
       "rig": "units/shield-guard/rig.json",
-      "recommendedWeapon": "shield_guard_shield"
+      "recommendedWeapon": "shield_guard_shield",
+      "testCombat": {
+        "maxHealth": 180,
+        "damage": 38,
+        "attackPeriod": 1.25,
+        "range": 1,
+        "rangeShape": "king"
+      }
     },
     "scholar": {
       "name": "꽃잎학자",
       "rig": "units/scholar/rig.json",
-      "recommendedWeapon": "scholar_book"
+      "recommendedWeapon": "scholar_book",
+      "testCombat": {
+        "maxHealth": 85,
+        "damage": 24,
+        "attackPeriod": 1.1,
+        "range": 1,
+        "rangeShape": "king"
+      }
     },
     "banner-bearer": {
       "name": "깃발기수",
       "rig": "units/banner-bearer/rig.json",
       "recommendedWeapon": "banner_bearer_banner",
-      "previewScale": 0.5
+      "previewScale": 0.5,
+      "testCombat": {
+        "maxHealth": 130,
+        "damage": 26,
+        "attackPeriod": 0.95,
+        "range": 1,
+        "rangeShape": "king"
+      }
     },
     "clover-mage": {
       "name": "클로버마법사",
       "rig": "units/clover-mage/rig.json",
       "recommendedWeapon": "clover_mage_staff",
-      "recommendedHand": "right"
+      "recommendedHand": "right",
+      "testCombat": {
+        "maxHealth": 90,
+        "damage": 42,
+        "attackPeriod": 1.35,
+        "range": 1,
+        "rangeShape": "king"
+      }
     },
     "archer": {
       "name": "잎새궁수",
@@ -42,11 +70,25 @@
       "recommendedAccessories": {
         "back": "archer_quiver",
         "waist": "archer_side_pouch"
+      },
+      "testCombat": {
+        "maxHealth": 80,
+        "damage": 22,
+        "attackPeriod": 0.7,
+        "range": 1,
+        "rangeShape": "king"
       }
     },
     "scout": {
       "name": "꽃잎정찰병",
-      "rig": "units/scout/rig.json"
+      "rig": "units/scout/rig.json",
+      "testCombat": {
+        "maxHealth": 75,
+        "damage": 14,
+        "attackPeriod": 0.45,
+        "range": 1,
+        "rangeShape": "king"
+      }
     }
   },
   "equipment": "equipment/catalog.json"
