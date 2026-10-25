@@ -113,6 +113,9 @@ export function layoutCharacter(catalog, instance, time=0) {
       secondary.matrix=multiply(translate(dx,dy),secondary.matrix);
     }
   }
+  // Foreground equipment stays above the authored body layers on either hand.
+  const layer=draw=>catalog.equipment[equipmentDraws[draw.socket]?.equipmentId]?.drawLayer==='foreground'?1:0;
+  draws.sort((a,b)=>layer(a)-layer(b));
   return {draws,sockets,equipmentDraws,groups,vars};
 }
 export function drawCharacter(ctx,catalog,instance,time=0,{scale}={}) {

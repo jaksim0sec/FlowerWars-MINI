@@ -241,9 +241,6 @@
           ],
           "children": [
             {
-              "part": "body"
-            },
-            {
               "id": "leftArm",
               "transforms": [
                 {
@@ -266,6 +263,9 @@
                   "clip": "palm_clip"
                 }
               ]
+            },
+            {
+              "part": "body"
             },
             {
               "id": "rightArm",

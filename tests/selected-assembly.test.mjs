@@ -12,12 +12,13 @@ test('manual artwork sizing stays close to its source aspect inside the warrior 
   for(const p of Object.values(r.parts))assert.ok(Math.abs((p.w/p.file_dimensions[0])/(p.h/p.file_dimensions[1])-1)<.10,`${id}: stretched source aspect ratio`);
  }
 });
-test('book hand, shield and raised banner arm have reference painter order',async()=>{
+test('book palm mask, shield socket and raised banner arm retain their local painter order',async()=>{
  const get=async id=>JSON.parse(await readFile(new URL(`../assets/units/${id}/rig.json`,import.meta.url)));
  for(const id of ['shield-guard','scholar','banner-bearer']){
   const r=await get(id),upper=r.nodes[1].children.find(n=>n.id==='upper').children;
   const arm=upper.find(n=>n.id==='leftArm');
-  assert.ok(upper.findIndex(n=>n.part==='body')<upper.indexOf(arm),`${id}: arm hidden by torso`);
+  const body=upper.findIndex(n=>n.part==='body');
+  assert.equal(upper.indexOf(arm),id==='banner-bearer'?body+1:body-1,`${id}: incorrect torso/arm order`);
   if(id==='scholar'){
    assert.equal(arm.children[1].socket,'left');
    assert.equal(arm.children[2].clip,'palm_clip','only the palm belongs above the book');
