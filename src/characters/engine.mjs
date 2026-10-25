@@ -65,26 +65,30 @@ export function layoutCharacter(catalog, instance, time=0) {
     Object.assign(slotNodes,states[instance.equipment[slot]?'equipped':'empty'] || {});
   }
   const vars=channels(rig,instance,time,[]);
-  const draws=[],sockets={};
+  const draws=[],sockets={},groups={};
   function visit(nodes,parent,ancestors=[]) {
     for(const node of nodes) {
       const override=pose?.nodes?.[node.id] || slotNodes[node.id] || {};
-      let m=parent;
-      for(const op of override.transforms || node.transforms || []) {
+      let m=parent,editorBase=parent;
+      const operations=override.transforms ? [...override.transforms,...(node.transforms || []).filter(op=>op.editorAdjustment)] : node.transforms || [];
+      for(const op of operations) {
+        if(op.editorAdjustment)editorBase=m;
         if(op.translate) m=multiply(m,translate(...op.translate.map(x=>value(x,vars))));
         if(op.rotate!==undefined) {const pivot=op.pivot||[0,0];m=multiply(m,multiply(translate(...pivot),multiply(rotate(value(op.rotate,vars)),translate(-pivot[0],-pivot[1]))));}
+        if(op.scale) {const pivot=op.pivot||[0,0],s=op.scale.map(x=>value(x,vars));m=multiply(m,multiply(translate(...pivot),multiply([s[0],0,0,s[1],0,0],translate(-pivot[0],-pivot[1]))));}
       }
+      if(node.id) groups[node.id]={matrix:m,parentMatrix:parent,editorBase};
       const lineage=[...ancestors,node.id];
       if(node.children) visit(node.children,m,lineage);
       if(node.socket) {
         const s=rig.sockets[node.socket],p=rig.parts[s.part];
-        sockets[node.socket]={matrix:multiply(m,translate(p.x+p.w*s.grip[0],p.y+p.h*s.grip[1])),ancestors:lineage};
+        sockets[node.socket]={matrix:multiply(m,multiply(translate(p.x+p.w*p.origin[0],p.y+p.h*p.origin[1]),multiply(rotate(p.rotation||0),translate((s.grip[0]-p.origin[0])*p.w,(s.grip[1]-p.origin[1])*p.h)))),ancestors:lineage};
         draws.push({socket:node.socket,ancestors:lineage});
       }
       if(node.part) {
         const p=rig.parts[node.part];
         const matrix=multiply(m,multiply(translate(p.x+p.w*p.origin[0],p.y+p.h*p.origin[1]+value(node.dy,vars)),rotate((p.rotation||0)+value(node.rotation,vars))));
-        draws.push({part:node.part,matrix,clip:node.clip?p[node.clip]:p.clip,ancestors:lineage});
+        draws.push({part:node.part,matrix,parentMatrix:m,clip:node.clip?p[node.clip]:p.clip,ancestors:lineage});
       }
     }
   }
@@ -96,7 +100,7 @@ export function layoutCharacter(catalog, instance, time=0) {
     const socket=sockets[side];
     const equipmentVars=channels(rig,instance,time,[e]);
     const rotation=(e.socketRotations?.[side] ?? e.rotation ?? 0)+value(e.motion||0,equipmentVars)+(attachment.overrides.rotation||0);
-    const matrix=multiply(socket.matrix,rotate(rotation));
+    const matrix=multiply(socket.matrix,multiply(translate(...(e.offset || [0,0])),rotate(rotation)));
     equipmentDraws[side]={equipmentId:attachment.equipmentId,matrix,w:e.w,h:e.h,grip:e.grip};
     if(attachment.hand==='both') {
       const other=side==='left'?'right':'left', secondary=sockets[other];
@@ -107,7 +111,7 @@ export function layoutCharacter(catalog, instance, time=0) {
       secondary.matrix=multiply(translate(dx,dy),secondary.matrix);
     }
   }
-  return {draws,sockets,equipmentDraws,vars};
+  return {draws,sockets,equipmentDraws,groups,vars};
 }
 export function drawCharacter(ctx,catalog,instance,time=0,{scale}={}) {
   const def=catalog.characters[instance.characterId],rig=def.rig;

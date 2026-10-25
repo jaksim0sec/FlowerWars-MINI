@@ -1,0 +1,21 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>도라가미 · 리그 편집기</title><link rel="stylesheet" href="./src/characters/rig-editor.css"></head><body>
+<header><a href="./characters.html">← 캐릭터 연구실</a><h1>리그 편집기</h1><span id="save-state" role="status">준비 중…</span></header>
+<nav aria-label="캐릭터 순서"><button id="previous" aria-label="이전 캐릭터">←</button><select id="character" aria-label="편집할 캐릭터"></select><button id="next" aria-label="다음 캐릭터">→</button><span id="progress"></span><button id="done">조정 완료 · 다음</button></nav>
+<main>
+<section class="stage-area"><div class="stage-tools"><label>동작 <select id="state"><option value="idle">대기</option><option value="walk">이동</option><option value="attack">공격</option><option value="hit">피격</option></select></label><button id="play" aria-pressed="false">재생</button><label>방향 <select id="facing"><option value="-1">왼쪽</option><option value="1">오른쪽</option></select></label><label class="check"><input id="guides" type="checkbox" checked>가이드</label></div>
+<div class="stage"><canvas id="editor-canvas" aria-label="캐릭터 파츠 편집 화면" tabindex="0"></canvas></div>
+<div class="stage-tools"><label class="wide">시간 <input id="time" type="range" min="0" max="2" step=".01" value="0"></label><output id="time-value">0.00초</output><label>확대 <input id="zoom" type="range" min=".3" max="1.5" step=".05" value=".85"></label></div>
+<div class="modes" role="group" aria-label="드래그 모드"><button data-mode="move" aria-pressed="true">위치 이동</button><button data-mode="rotate" aria-pressed="false">회전</button><button data-mode="pivot" aria-pressed="false">회전축 이동</button><button id="undo" disabled>되돌리기</button><button id="redo" disabled>다시 실행</button></div>
+<p class="hint">파츠를 선택하고 화면에서 드래그하거나 오른쪽 값을 조정하세요. ‘머리 전체’는 얼굴과 장식을 함께 움직입니다.</p>
+</section>
+<aside>
+<label>조정 대상 <select id="target"></select></label>
+<div class="fields"><label><span id="label-x">X 위치</span><input id="x" type="number" step="1"></label><label><span id="label-y">Y 위치</span><input id="y" type="number" step="1"></label><label><span id="label-w">너비</span><input id="w" type="number" min="1" step="1"></label><label><span id="label-h">높이</span><input id="h" type="number" min="1" step="1"></label><label>회전 각도 °<input id="rotation" type="number" step="1"></label><label class="check"><input id="aspect" type="checkbox" checked>가로세로 비율 고정</label><label><span id="label-px">회전축 X (파츠 안)</span><input id="pivot-x" type="number" step="1"></label><label><span id="label-py">회전축 Y (파츠 안)</span><input id="pivot-y" type="number" step="1"></label></div>
+<label class="check"><input id="preserve-pivot" type="checkbox" checked>회전축만 옮길 때 그림 위치 유지</label>
+<label>레이어 대상<select id="layer-entry"></select></label><div class="row"><button id="backward">한 칸 뒤로</button><button id="forward">한 칸 앞으로</button></div>
+<details open><summary>장비 미리보기</summary><label>잡는 방식<select id="holding-mode"><option value="single">손마다 장착</option><option value="both">한 장비를 양손으로</option></select></label><div id="equipment-slots"></div><div class="row"><button id="recommended">권장 장비</button><button id="bare">모두 해제</button></div></details>
+<details><summary>비교용 레퍼런스</summary><label class="file">이미지 선택<input id="reference" type="file" accept="image/*"></label><img id="reference-image" alt="사용자가 고른 비교 이미지" hidden><p class="hint">선택한 이미지는 이 브라우저에서만 표시됩니다.</p></details>
+<div class="actions"><button id="export-one">이 캐릭터 JSON 내보내기</button><button id="export-all" class="primary">전체 JSON 내보내기</button><label class="file">JSON 불러오기<input id="import" type="file" accept="application/json,.json"></label><button id="reset">이 캐릭터 원본 복원</button></div>
+<p id="message" role="status" aria-live="polite"></p><p class="hint">수정값은 브라우저에 임시 저장됩니다. 다른 기기에서 이어 하거나 최종 전달할 때는 JSON을 내보내세요.</p>
+</aside>
+</main><script type="module" src="./src/characters/rig-editor.mjs"></script></body></html>

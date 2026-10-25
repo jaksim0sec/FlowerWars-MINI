@@ -24,6 +24,8 @@ Vercel에서는 Framework Preset을 **Other**, Output Directory를 **.**으로 �
 - `assets/`: 기존 승인 이미지와 리그 메타데이터. 검은 손과 독립된 이미지로 유지합니다.
 - `legacy/index.html`: 이전 게임 원본 보관.
 
+직접 파츠를 조정하려면 캐릭터 연구실의 **리그 직접 조정 · JSON 내보내기**를 엽니다. `rig-editor.html`에서 순서대로 캐릭터를 편집하고 개별·전체 JSON을 저장할 수 있습니다. 사용법과 적용 방법은 `docs/rig-editor.md`를 참고하세요.
+
 검증:
 
 ```sh
@@ -33,6 +35,7 @@ BASE_URL=https://your-static-host.example python3 tests/browser.py
 BASE_URL=https://your-static-host.example python3 tests/mobile-layout.py
 BASE_URL=https://your-static-host.example python3 tests/rig-browser.py
 BASE_URL=https://your-static-host.example python3 tests/characters-browser.py
+BASE_URL=https://your-static-host.example python3 tests/rig-editor-browser.py
 ```
 
 브라우저 검증은 기본적으로 `/usr/bin/chromium`을 사용합니다. 다른 설치 경로는 `CHROMIUM`, 호스팅 주소는 `BASE_URL` 환경 변수로 지정할 수 있습니다. 데스크톱과 모바일 터치에서 소환·선택·실제 보행·공격·피격·드래그·핀치·초기화, 지형 변경, 이미지 누락 안내를 검사합니다. 모바일 레이아웃 검증은 다섯 화면 크기에서 확대·이동해도 전장이 헤더·조작부 영역을 침범하지 않는지, 화면 높이가 바뀌어도 배치가 유지되는지 검사합니다.
