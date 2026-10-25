@@ -1,5 +1,5 @@
 import {registerPlacedGroup} from './unit-groups.mjs';
-import {armyFormation} from './test-formation.mjs';
+import {battalionFormation} from './test-formation.mjs';
 // Deterministic, opt-in test settings. Uses the same Board commands as gameplay.
 export function setupMovementScenario(board,type,count,makeCharacter,options={}) {
   count=Math.min(1000,Math.max(2,Math.floor(Number(count)||16)));
@@ -11,7 +11,7 @@ export function setupMovementScenario(board,type,count,makeCharacter,options={})
   board.width=Math.max(14,(opposing?4:6)*band+10,Math.ceil(Math.sqrt(count)*2)+6);
   const pairColumns=Math.ceil(Math.sqrt(Math.ceil(count/2)));
   if(type==='skirmish'){board.width=Math.max(14,3*pairColumns+2);board.height=Math.max(16,3*Math.ceil(count/2/pairColumns)+2);}
-  const formation=type==='formation'?armyFormation(Math.ceil(count/2)):null;
+  const formation=type==='formation'?battalionFormation(Math.ceil(count/2)):null;
   if(formation){board.width=2*(2+formation.depth*2)+5;board.height=formation.rows*2+4;}
   if(options.seed!=null)board.seed=Number(options.seed)>>>0;
   board.navigationOrientation=options.mirror?-1:1;
@@ -34,12 +34,18 @@ export function setupMovementScenario(board,type,count,makeCharacter,options={})
     const unit=board.spawn(options.mirror?w-1-spawnX:spawnX,y,character,{team:i%2?'B':'A',autoCombat:false,movement:options.movementFor?.(character,i),capabilities:options.capabilitiesFor?.(character,i),stats:{range:1,rangeShape:'king',...options.statsFor?.(character,i)}});
     if(!unit)throw new Error('테스트 배치가 겹칩니다.');
     unit.formationRole=slot?.role||null;
+    if(slot){
+      unit.formationSquadIndex=slot.squadIndex;
+      unit.formationSquadType=slot.squadType;
+      unit.formationSquadLabel=slot.squadLabel;
+      unit.formationPlatoonIndex=slot.platoonIndex;
+    }
     if(slot)unit.facing=(i%2?-1:1)*(options.mirror?-1:1);
     const goalX=type==='skirmish'?(i%2?1:w-2):(right?x:w-1-x);
     orders.push({id:unit.id,x:options.mirror?w-1-goalX:goalX,y});
   }
   const groups=[];
-  if(type==='formation')for(const team of ['A','B']){const members=board.units.filter(u=>u.team===team).map(u=>u.id);const g=registerPlacedGroup(board,members,{kind:'platoon',name:`${team} 혼성 소대`,team});if(g)groups.push(g.id);}
+  if(type==='formation')for(const team of ['A','B']){const members=board.units.filter(u=>u.team===team).map(u=>u.id);const g=registerPlacedGroup(board,members,{kind:'battalion',name:`${team} 제1대대`,team});if(g)groups.push(g.id);}
   return {type,count,orders,groupIds:groups,combat:!!options.combat,started:false,startTime:null};
 }
 export function startMovementScenario(board,scenario) {
