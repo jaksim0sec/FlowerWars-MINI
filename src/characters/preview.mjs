@@ -34,7 +34,7 @@ try {
   }
   for(const cls of ['left','right','mode'])select(cls).addEventListener('change',update);
   select('state').addEventListener('change',()=>{instance.animation.state=select('state').value;instance.animation.elapsed=0;});
-  select('facing').addEventListener('change',()=>instance.animation.facing=Number(select('facing').value));instance.animation.facing=1;
+  select('facing').addEventListener('change',()=>instance.animation.facing=Number(select('facing').value));instance.animation.facing=-1;
   select('clear').addEventListener('click',()=>{select('left').value=select('right').value='';select('mode').value='single';update();});
   select('recommended').addEventListener('click',()=>{select('mode').value='single';select('left').value=select('right').value='';select(def.recommendedHand || 'left').value=def.recommendedWeapon||'';update();for(const [slot,key] of Object.entries(def.recommendedAccessories || {})){accessorySelects[slot].value=key;equip(catalog,instance,key,slot);}});
   update();document.querySelector('#cards').append(card);

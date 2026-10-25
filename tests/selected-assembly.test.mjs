@@ -4,9 +4,9 @@ import {readFile} from 'node:fs/promises';
 // Ratios measured against the supplied assembled previews. The banner's torso
 // includes its cape; the guard's visible head is contained in the crown source.
 const expected={
- 'shield-guard':{head:1.66,arm:.61},scholar:{head:1.18,arm:.44},
- 'banner-bearer':{head:.59,arm:.29},'clover-mage':{head:1.25,arm:.52},
- archer:{head:1.29,arm:.54},scout:{head:1.29,arm:.42}
+ 'shield-guard':{head:1.47,arm:.43},scholar:{head:1.08,arm:.44},
+ 'banner-bearer':{head:.59,arm:.29},'clover-mage':{head:1.13,arm:.45},
+ archer:{head:1.29,arm:.44},scout:{head:1.22,arm:.44}
 };
 test('individual silhouettes preserve reference head and near-arm proportions',async()=>{
  for(const [id,want] of Object.entries(expected)){
@@ -32,7 +32,7 @@ test('book hand, shield and raised banner arm have reference painter order',asyn
   if(id==='shield-guard')assert.equal(arm.children.at(-1).socket,'left','shield must occlude forearm');
  }
 });
-test('scout far boot is visible below the tunic in the standing pose',async()=>{
+test('scout preserves the supplied side-view silhouette instead of exposing a second boot',async()=>{
  const r=JSON.parse(await readFile(new URL('../assets/units/scout/rig.json',import.meta.url)));
- assert.ok(r.parts.leg_back.y+r.parts.leg_back.h>r.parts.body.y+r.parts.body.h+20,'far boot is completely occluded by the tunic');
+ assert.ok(r.parts.leg_back.y+r.parts.leg_back.h<r.parts.body.y+r.parts.body.h,'far boot was pulled out of the source side-view pose');
 });

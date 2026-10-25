@@ -44,8 +44,12 @@ The sprout healer uses its independent WebP artwork and rig. Its sprout staff is
 
 ## Reference proportion calibration (2026-10-25)
 
-`units/reference-poses.json` defines each of the six supplied reference poses individually: head/body/arm sizes, shoulder origins, resting arm angles and equipment positions. The mage, archer, scholar and scout use larger face circles positioned under their own crowns. The banner hand is raised to its pole; the mage and archer forearms extend toward their equipment instead of hanging down. Source aspect ratios remain unchanged.
+`units/reference-poses.json` defines each of the six supplied reference poses individually: head/body/arm sizes, shoulder origins, resting arm angles and equipment positions. Face circles and limb lengths are individually aligned to their source assembly, rather than enlarged to compensate for placement errors. The banner hand is raised to its pole; the mage and archer forearms extend toward their equipment instead of hanging down. Source aspect ratios remain unchanged.
 
 The scholar draws the full forearm behind the book and only its clipped palm in front. The guard draws the shield over its forearm; the banner arm sits in front of the torso. Equipment grip coordinates are computed from the actual rotated palm, with resting arm rotation compensated on the equipment so the staff, bow and pole stay at the reference angle. These definitions are reapplied by `scripts/register_assets.py` and are not engine-specific character branches.
 
 `docs/rig-comparison.jpg` shows the supplied reference on the left and actual Canvas rendering on the right for all six. Regenerate with `BASE_URL=http://127.0.0.1:8003 python3 scripts/compare_reference_rigs.py EXTRACTED_PACK`. Unit tests constrain individual head/body and near-arm/body ratios and painter order, while browser tests still inspect physical attachment overlap and animation behavior.
+
+## Original assembly correction
+
+The previous larger face circles, oversized near forearms and exposed scout far boot were speculative corrections and have been revised against the supplied source assembly. `reference-poses.json` v3 restores per-character source proportions and the scout side-view occlusion. The preview now labels and displays the unmirrored source orientation as left (-1); right (1) mirrors it. Original PNG artwork remains unchanged.

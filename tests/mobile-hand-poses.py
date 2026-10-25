@@ -9,6 +9,7 @@ with sync_playwright() as p:
  page.goto(BASE+'/characters.html');page.get_by_text('각 캐릭터의 동작과 장비',exact=False).wait_for()
  for id in ['banner-bearer','clover-mage','archer']:
   card=page.locator(f'[data-character="{id}"]')
+  assert card.locator('.facing').input_value()=='-1','default left direction must preserve the source orientation'
   side='left' if id=='banner-bearer' else 'right'
   # Capture rig-space positions via the same catalog and instance APIs used by UI.
   data=page.evaluate('''async ({id,side})=>{
