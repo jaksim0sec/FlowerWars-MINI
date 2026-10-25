@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {Board} from '../src/model.mjs';
 import {FlagMatch} from '../src/flag-match.mjs';
 import {squadsFor} from '../src/unit-groups.mjs';
+import {survey,deployment,attackLane} from '../src/bot-strategy.mjs';
 test('automatic armies obey the 500 cap and deploy on their own half',()=>{
  const b=new Board(),m=new FlagMatch(b,{count:900});assert.deepEqual(m.counts,{A:500,B:500});assert.equal(b.units.length,1000);
  assert.ok(b.units.every(u=>m.inTerritory(u.team,u)));assert.equal(new Set(b.units.map(u=>u.y*b.width+u.x)).size,1000);
@@ -28,4 +29,21 @@ test('a dead soldier cannot capture and simultaneous flag arrivals draw fairly',
 });
 test('reset invalidates the match without retaining capture state',()=>{
  const b=new Board(),m=new FlagMatch(b,{count:12});b.reset();m.update(400);assert.equal(b.match,null);assert.equal(b.units.length,0);assert.equal(b.movementPolicy,undefined);
+});
+test('bot prepares through ordinary movement orders and stays in its own half',()=>{
+ const b=new Board(),m=new FlagMatch(b,{count:72}),before=new Map(b.units.filter(u=>u.team==='B').map(u=>[u.id,{x:u.x,y:u.y}]));
+ for(let i=0;i<120;i++){b.update(.05);m.update(.05);}
+ assert.equal(m.phase,'preparation');
+ assert.ok(m.squadIds.B.every(id=>squadsFor(b).get(id).order?.type==='fortify'));
+ assert.ok(b.units.some(u=>u.team==='B'&&(u.x!==before.get(u.id).x||u.y!==before.get(u.id).y)));
+ assert.ok(b.units.every(u=>m.inTerritory(u.team,u)));assert.equal(b.combatStats.hits,0);
+});
+test('strategic deployment reacts to player concentration and separates combat roles',()=>{
+ const b=new Board(100,100);for(let i=0;i<12;i++)b.spawn(25+i,15,null,{team:'A'});
+ const top=survey(b,{x:95,y:50});assert.equal(top.strongest,0);assert.notEqual(top.weakest,0);
+ const guard={type:'defense',matchIndex:0},mage={type:'support',matchIndex:5},mobile={type:'mobile',matchIndex:3};
+ assert.ok(deployment(guard,top).x<deployment(mage,top).x,'frontline protects support');
+ assert.ok(deployment(mobile,top).y>30,'mobile unit chooses the weaker flank');assert.ok(Number.isInteger(attackLane(mobile,top)));
+ for(const u of b.units){u.y=80;u.visualY=80;}const bottom=survey(b,{x:95,y:50});
+ assert.equal(bottom.strongest,2);assert.notDeepEqual(deployment(guard,top),deployment(guard,bottom));
 });

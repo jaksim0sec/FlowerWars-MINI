@@ -1,5 +1,6 @@
 import {createFormationGroup,placeGroup,squadsFor} from './unit-groups.mjs';
 import {orderSquad} from './squad-orders.mjs';
+import {survey,deployment,attackLane} from './bot-strategy.mjs';
 
 export const PREPARATION_SECONDS=300;
 export const ARMY_LIMIT=500;
@@ -14,6 +15,7 @@ export class FlagMatch{
   this.epoch=board.byId;this.phase='preparation';this.remaining=PREPARATION_SECONDS;this.winner=null;
   this.flags={A:{x:4,y:50},B:{x:95,y:50}};this.counts={A:0,B:0};this.squadIds={A:[],B:[]};
   this.elapsed=0;this.nextStatus=0;this.nextDecision=0;this.cursor=0;this.decisions=0;this.statusRevision=0;
+  this.nextSurvey=0;this.strategy=null;
   this.limit=Math.max(1,Math.min(ARMY_LIMIT,Math.floor(Number(count)||ARMY_LIMIT)));
   board.match=this;
   // Broad symmetric passages: terrain is shared, the middle is a deployment
@@ -57,9 +59,10 @@ export class FlagMatch{
   this.elapsed+=dt;
   if(this.phase==='preparation'){this.remaining=Math.max(0,this.remaining-dt);if(this.remaining<=1e-8)this.start();}
   if(this.elapsed>=this.nextStatus){this.nextStatus=this.elapsed+.25;this.refreshStatus();}
-  if(this.phase==='battle'&&this.elapsed>=this.nextDecision){
+  if(this.phase!=='finished'&&this.elapsed>=this.nextSurvey){this.strategy=survey(this.board,this.flags.B);this.nextSurvey=this.elapsed+(this.phase==='preparation'?3:1.5);}
+  if(this.phase!=='finished'&&this.elapsed>=this.nextDecision){
    // Three of at most 42 bot squads per slice; each squad thinks about once/s.
-   this.nextDecision=this.elapsed+.08;
+   this.nextDecision=this.elapsed+(this.phase==='preparation'?.25:.08);
    for(let i=0;i<3&&this.squadIds.B.length;i++)this.think(this.squadIds.B[this.cursor++%this.squadIds.B.length]);
   }
  }
@@ -81,6 +84,22 @@ export class FlagMatch{
   const units=s.memberIds.map(id=>b.unit(id)).filter(u=>u?.health.current>0);if(!units.length)return;
   this.decisions++;
   const center={x:Math.round(units.reduce((n,u)=>n+u.x,0)/units.length),y:Math.round(units.reduce((n,u)=>n+u.y,0)/units.length)};
+  const plan=this.strategy||survey(b,this.flags.B);
+  if(this.phase==='preparation'){
+   const goal=deployment(s,plan);
+   if(!samePoint(s.order?.target,goal)){
+    orderSquad(b,s.id,'fortify',goal);
+    // Deploy facing the opposing half, even when repositioning rearward.
+    s.order.forward={x:-1,y:0};s.order.facing=-1;s.order.dirty=true;
+   }
+   return;
+  }
+  const intruder=b.unit(plan.intruderId);
+  if(intruder?.health.current>0&&(s.type==='defense'||center.x>75)){
+   const target=intruder.squadId?{squadId:intruder.squadId}:{unitId:intruder.id};
+   if(s.order?.type!=='focus'||s.order.target?.squadId!==target.squadId||s.order.target?.unitId!==target.unitId)orderSquad(b,s.id,'focus',target);
+   return;
+  }
   const enemyIds=new Set();for(const uid of b.spatial.candidates(center.x,center.y,9)){
    const u=b.unit(uid);if(u?.health.current>0&&u.team==='A'&&Math.max(Math.abs(u.x-center.x),Math.abs(u.y-center.y))<=9)enemyIds.add(u.squadId);
   }
@@ -89,12 +108,24 @@ export class FlagMatch{
    return (Math.abs(aa.x-center.x)+Math.abs(aa.y-center.y))-(Math.abs(cc.x-center.x)+Math.abs(cc.y-center.y));
   })[0];
   if(enemy){if(s.order?.type!=='focus'||s.order.target?.squadId!==enemy.id)orderSquad(b,s.id,'focus',{squadId:enemy.id});return;}
+  const health=units.reduce((n,u)=>n+u.health.current,0)/units.reduce((n,u)=>n+u.health.max,0);
+  if(health<.35&&s.type!=='defense'){
+   const goal={x:84,y:Math.max(10,Math.min(90,attackLane(s,plan)))};
+   if(s.order?.type!=='retreat')orderSquad(b,s.id,'retreat',goal);
+   return;
+  }
   if(s.order?.type==='focus'&&s.order.phase!=='complete'&&s.order.phase!=='target-lost'){
    const target=squadsFor(b).get(s.order.target?.squadId);if(target?.memberIds.some(id=>b.unit(id)?.health.current>0))return;
   }
-  const defend=s.matchIndex%6===0;
+  const defend=s.type==='defense'&&Math.floor(s.matchIndex/6)%2===0;
+  if(s.type==='mobile'&&center.x>25){
+   // Complete the chosen flank; do not restart it on every decision tick.
+   if(s.order?.type==='flank'&&['moving','flanking'].includes(s.order.phase))return;
+   const goal={x:center.x>53?42:16,y:attackLane(s,plan)};
+   orderSquad(b,s.id,'flank',goal);return;
+  }
   const goal=defend?{x:86,y:42+(Math.floor(s.matchIndex/6)%5)*4}:
-    center.x>53?{x:51,y:12+(s.matchIndex%10)*8}:
+    center.x>53?{x:51,y:attackLane(s,plan)}:
     center.x>20?{x:16,y:36+(s.matchIndex%7)*4}:this.flags.A;
   if(!samePoint(s.order?.target,goal)||['complete','target-lost'].includes(s.order?.phase))orderSquad(b,s.id,defend?'fortify':'advance',goal);
  }
