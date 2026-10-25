@@ -34,7 +34,7 @@ export function placeGroup(board,blueprint,anchor,options={}){
  if(!free())return null;
  const r=registry(board),id=`${blueprint.kind}-${r.next++}`;
  const group={id,name:blueprint.name,kind:blueprint.kind,team:options.team||'A',anchor:{...anchor},blueprint:structuredClone(blueprint),memberIds:[]};
- for(let i=0;i<positions.length;i++){const u=board.spawn(positions[i].x,positions[i].y,prepared[i].character,prepared[i].settings);u.groupId=id;u.memberIndex=i;u.facing=sign;group.memberIds.push(u.id);}
+ for(let i=0;i<positions.length;i++){const u=board.spawn(positions[i].x,positions[i].y,prepared[i].character,prepared[i].settings);u.groupId=id;u.memberIndex=i;u.formationRole=blueprint.members[i].role||null;u.facing=sign;group.memberIds.push(u.id);}
  r.groups.set(id,group);attachSquads(board,group);return group;
 }
 
