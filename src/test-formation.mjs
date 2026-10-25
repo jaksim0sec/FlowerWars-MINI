@@ -31,7 +31,7 @@ export function armyFormation(count){
 const battalionSquadPatterns=[
  {type:'defense',label:'철벽대',roles:['banner','guard','guard','guard','guard','guard','guard','guard','scout','scout','archer','archer']},
  {type:'assault',label:'돌격대',roles:['banner','scout','scout','scout','scout','guard','guard','scout','scout','autumn','guard','healer']},
- {type:'ranged',label:'궁병대',roles:['banner','archer','archer','archer','archer','guard','guard','archer','archer','archer','guard','scout']},
+ {type:'ranged',label:'궁병대',roles:['banner','archer','archer','archer','guard','guard','guard','archer','archer','archer','archer','scout']},
  {type:'mobile',label:'기동대',roles:['banner','scout','scout','scout','scout','scout','scout','scout','scout','scout','archer','archer']},
  {type:'mixed',label:'혼성대',roles:['banner','guard','guard','guard','scout','scout','scout','scout','archer','archer','archer','healer']},
  {type:'support',label:'지원대',roles:['banner','healer','healer','healer','healer','scholar','scholar','scholar','guard','guard','guard','scout']}
