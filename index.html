@@ -20,10 +20,16 @@
       <span class="tool-divider"></span><button id="fit" aria-label="전장 맞춤" title="전장 맞춤">⌖</button>
     </div>
   </main>
+  <section id="match-hud" aria-label="깃발 점령전" hidden>
+    <div class="match-topline"><strong id="match-phase">준비</strong><output id="match-timer">5:00</output><span id="match-armies"></span></div>
+    <div class="match-actions"><button id="match-skip">준비 스킵 · 전투 시작</button><button id="match-charge" hidden>전군 깃발로 진격</button><button id="match-home">내 깃발</button><button id="match-enemy">적 깃발</button></div>
+  </section>
+  <section id="match-result" aria-label="전투 결과" hidden><strong id="match-result-title"></strong><p id="match-result-detail"></p><button id="match-restart">다시 준비</button></section>
   <div id="command-feedback" class="command-feedback" aria-hidden="true" hidden></div>
   <details id="debug-tools" class="debug-tools">
     <summary aria-label="개발 및 디버그 도구">⚙ 디버그</summary>
     <div class="debug-content"><div class="debug-close-row"><strong>전장 도구</strong><button id="debug-close" type="button" aria-label="디버그 닫기">×</button></div>
+      <button id="match-start" type="button">플레이어 vs 봇 · 500명 깃발전</button>
       <label class="debug-legacy"><input type="checkbox" id="legacy-controls-toggle"> 기존 하단 조작 바 표시</label>
   <details id="movement-lab" class="movement-lab">
     <summary>이동 테스트</summary>

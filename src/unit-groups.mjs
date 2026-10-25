@@ -25,6 +25,7 @@ export function createFormationGroup(count=8,kind='squad',name='',type='mixed'){
 }
 export function placeGroup(board,blueprint,anchor,options={}){
  if(blueprint?.format!=='doragami-unit-group'||blueprint.version!==1||!Array.isArray(blueprint.members)||!blueprint.members.length||blueprint.members.length>1024)return null;
+ if(board.match&&board.units.filter(u=>u.team===(options.team||'A')&&u.health.current>0).length+blueprint.members.length>board.match.limit)return null;
  const sign=options.team==='B'?-1:1,seen=new Set();
  const positions=blueprint.members.map(m=>({x:anchor.x+m.offset?.x*sign,y:anchor.y+m.offset?.y}));
  const free=()=>positions.every(p=>{const key=p.y*board.width+p.x;if(!board.inside(p.x,p.y)||board.occupied(p.x,p.y)||board.navigation.blocked(key))return false;return true;});

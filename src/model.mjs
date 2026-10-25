@@ -25,8 +25,8 @@ export function tileAt(px, py, width, height) {
   return x >= 0 && y >= 0 && x < width && y < height ? { x, y } : null;
 }
 
-export function zoomCamera(camera, anchor, factor) {
-  const scale = Math.min(2.4, Math.max(0.1, camera.scale * factor));
+export function zoomCamera(camera, anchor, factor, minScale=.1) {
+  const scale = Math.min(2.4, Math.max(minScale, camera.scale * factor));
   const ratio = scale / camera.scale;
   return { x: anchor.x - (anchor.x - camera.x) * ratio,
     y: anchor.y - (anchor.y - camera.y) * ratio, scale };
@@ -51,6 +51,8 @@ export class Board {
   }
 
   reset() {
+    if(this.movementPolicy?.matchOwner)this.movementPolicy=this.movementPolicy.previousPolicy;
+    this.match=null;
     this.terrainRevision=(this.terrainRevision||0)+1;
     this.decisionEpoch=0;
     this.units = []; this.byId=new Map(); this.cells=new Map(); this.reservations=new Map();
@@ -103,6 +105,7 @@ export class Board {
     if(u.state==='attack'){u.strike=null;u.impacted=false;u.elapsed=0;u.state=u.step?'walk':'idle';}
   }
   spawn(x, y, character = null, options={}) {
+    if(this.match&&(!options.team||this.units.filter(u=>u.team===options.team&&u.health.current>0).length>=this.match.limit))return null;
     if (!this.inside(x, y) || this.navigation.blocked(y*this.width+x) || this.occupied(x, y)) return null;
     const health=character?.health||createHealth();
     if(Number.isFinite(options.stats?.maxHealth)&&options.stats.maxHealth>0)health.current=health.max=options.stats.maxHealth;
@@ -121,6 +124,7 @@ export class Board {
   }
   move(id,x,y,{replace=false,direct=false}={}) {
     const u=this.unit(id);
+    if(this.match?.phase==='finished'||this.match?.phase==='preparation'&&u&&!this.match.inTerritory(u.team,{x,y}))return false;
     if(!u||u.health.current<=0||!replace&&(u.state!=='idle'||u.step)||!this.inside(x,y)||this.navigation.blocked(y*this.width+x)||u.x===x&&u.y===y&&!u.step)return false;
     const field=direct?null:this.navigation.field(x,y);
     if(field?.complete&&field.at(u.y*this.width+u.x)<0)return false;
@@ -128,6 +132,7 @@ export class Board {
     u.command={type:'move',x,y,flow,direct};this.flows[flow]++;this.navigation.plan(u);return true;
   }
   attack(id,targetId,{replace=false}={}) {
+    if(this.match&&this.match.phase!=='battle')return false;
     const u=this.unit(id),target=this.unit(targetId);
     if(!u||!target||u===target||u.team&&u.team===target.team||u.health.current<=0||target.health.current<=0||!replace&&(u.state!=='idle'||u.step))return false;
     if(replace)this.interrupt(u);else this.cancelCommand(u);u.target=targetId;u.command={type:'attack',target:targetId};this.navigation.plan(u);return true;
@@ -141,6 +146,7 @@ export class Board {
   inAttackRange(u,target,physical=true){return inAttackRange(u,target,physical);}
   tryAutoAttack(u){return tryAutoAttack(this,u);}
   beginAttack(u,targetId=u.target,automatic=false) {
+    if(this.match&&this.match.phase!=='battle')return false;
     const target=this.unit(targetId);
     if(!target||target.health.current<=0||u.health.current<=0||u.step||!inAttackRange(u,target,false)||u.team&&u.team===target.team)return false;
     if(this.time+1e-9<u.combat.nextAttackAt)return false;
@@ -169,6 +175,7 @@ export class Board {
     return true;
   }
   update(dt) {
+    if(this.match?.phase==='finished')return;
     if(!Number.isFinite(dt)||dt<=0)return;
     // Bound event integration, keeping impacts/arrivals consistent for large dt.
     while(dt>1e-9){const slice=Math.min(dt,.05);this.advance(slice);dt-=slice;}

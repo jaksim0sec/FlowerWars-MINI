@@ -10,6 +10,7 @@ export function drawCommandOverlay(ctx,board,view,scale=1){
  const selected=new Set(view.selectedSquadIds||[]);
  const ids=[...squadsFor(board).values()].filter(s=>selected.has(s.id)||s.order&&!['wait','complete'].includes(s.order.phase)).map(s=>s.id);
  for(const id of ids){
+  if(board.match&&!selected.has(id))continue;
   const s=squadsFor(board).get(id);if(!s)continue;
   const units=s.memberIds.map(id=>board.unit(id)).filter(u=>u?.health.current>0);
   if(!units.length)continue;

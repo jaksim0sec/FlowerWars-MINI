@@ -5,6 +5,7 @@ import {loadCatalog, loadImage} from './characters/catalog.mjs';
 import {createCharacter, equip, drawCharacter} from './characters/engine.mjs';
 import { project, HALF_W, HALF_H } from './model.mjs';
 import {drawCommandOverlay} from './command-overlay.mjs';
+import {drawMatchOverlay,drawDistantSoldier} from './match-overlay.mjs';
 
 const TILE_BASE = new URL('../assets/world/tiles/', import.meta.url);
 export async function loadArtwork() {
@@ -78,6 +79,7 @@ export function render(ctx, art, board, view, camera, width, height, dpr, option
   drawTerrain(ctx,art,board,camera,width,height,dpr,options.cameraMoving);
   ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.translate(camera.x,camera.y);ctx.scale(camera.scale,camera.scale);
+  drawMatchOverlay(ctx,board.match,camera.scale);
   drawCommandOverlay(ctx,board,view,camera.scale);
 
   if(board.obstacles?.size)for(const {x,y} of visibleTiles(board,camera,width,height)) {
@@ -112,7 +114,9 @@ export function render(ctx, art, board, view, camera, width, height, dpr, option
       ctx.strokeStyle = unit.id === view.selected ? '#fff3ae' : '#b96335';
       ctx.lineWidth = unit.id === view.selected ? 2.5 : 1.5; ctx.stroke();
     }
-    if(unit.character) {
+    if(unit.character&&board.match&&camera.scale<.28){
+      drawDistantSoldier(ctx,art,unit,drawCharacter);
+    }else if(unit.character) {
       Object.assign(unit.character.animation,{state:unit.state,elapsed:combatAnimationElapsed(unit),facing:unit.facing,phase:unit.id,attackVector:unit.attackVector,deathDirection:unit.deathDirection});
       const pose=cachedPose(art.catalog,unit.character,board.time,camera.scale);if(pose.computed)posedUnits++;
       drawCharacter(ctx,art.catalog,unit.character,board.time,{layout:pose.layout});
