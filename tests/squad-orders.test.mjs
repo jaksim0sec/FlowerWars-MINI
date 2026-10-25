@@ -20,13 +20,13 @@ test('manual group becomes flag-led squads with unchanged parent group',()=>{
  board.reset();assert.equal(groupsFor(board).size,0);assert.equal(squadsFor(board).size,0);
 });
 
-test('formation test armies retain two parent platoons and get flagged sub-squads',()=>{
+test('formation test armies retain two parent battalions and get flagged specialist squads',()=>{
  const board=new Board();
  const scenario=setupMovementScenario(board,'formation',64,()=>null);
  assert.equal(scenario.groupIds.length,2);
  for(const groupId of scenario.groupIds){
    const g=groupsFor(board).get(groupId);
-   assert.equal(g.memberIds.length,32);assert.equal(g.squads.length,3);
+   assert.equal(g.kind,'battalion');assert.equal(g.memberIds.length,32);assert.equal(g.squads.length,3);assert.equal(g.platoons.length,1);assert.deepEqual(g.squads.map(id=>squadsFor(board).get(id).type),['defense','assault','ranged']);
    for(const id of g.squads){
      const s=squadsFor(board).get(id);
      assert.equal(board.unit(s.leaderId).formationRole,'banner');

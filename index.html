@@ -22,12 +22,12 @@
   </main>
   <details id="debug-tools" class="debug-tools">
     <summary aria-label="개발 및 디버그 도구">⚙ 디버그</summary>
-    <div class="debug-content">
+    <div class="debug-content"><div class="debug-close-row"><strong>전장 도구</strong><button id="debug-close" type="button" aria-label="디버그 닫기">×</button></div>
       <label class="debug-legacy"><input type="checkbox" id="legacy-controls-toggle"> 기존 하단 조작 바 표시</label>
   <details id="movement-lab" class="movement-lab">
     <summary>이동 테스트</summary>
     <div class="movement-options">
-      <label>상황<select id="movement-scenario"><option value="formation">양군 전투 진형</option><option value="skirmish">A/B 근접 교전</option><option value="crossing">교차·맞대향</option><option value="bottleneck">한 칸 병목</option><option value="obstacles">장애물 우회</option><option value="crowd">대규모 이동</option></select></label>
+      <label>상황<select id="movement-scenario"><option value="formation">양군 대대 전투 편성</option><option value="skirmish">A/B 근접 교전</option><option value="crossing">교차·맞대향</option><option value="bottleneck">한 칸 병목</option><option value="obstacles">장애물 우회</option><option value="crowd">대규모 이동</option></select></label>
       <label>개체 수<select id="movement-count"><option value="16">16</option><option value="64" selected>64</option><option value="256">256</option><option value="1000">1,000</option></select></label>
     </div>
     <div class="movement-options"><label>재현 시드<input id="movement-seed" type="number" value="1" min="0" step="1"></label><label class="mirror-toggle"><input id="movement-mirror" type="checkbox"> 좌우 교환</label></div>
@@ -52,18 +52,39 @@
     <div class="squad-roster-head"><strong>분대 지휘</strong><output id="squad-roster-count">0</output></div>
     <div id="squad-roster-list" class="squad-roster-list" role="list"></div>
   </aside>
-  <details id="squad-tools" class="squad-tools" hidden><summary>분대 명령</summary>
-    <strong id="squad-name"></strong><small id="squad-status"></small>
-    <div class="squad-controls">
-      <label>명령<select id="squad-command">
-        <option value="move">이동</option><option value="advance">진격</option><option value="hold">사수</option><option value="focus">집중 공격</option>
-        <option value="rally">집결</option><option value="retreat">후퇴</option><option value="follow">추종</option><option value="wait">대기</option>
-      </select></label>
-      <label>태세<select id="squad-stance"><option value="aggressive">적극</option><option value="balanced">균형</option><option value="avoid">회피</option></select></label>
-      <label>진형<select id="squad-formation"><option value="line">횡대</option><option value="column">종대</option><option value="dense">밀집</option><option value="spread">산개</option></select></label>
+  <section id="squad-tools" class="squad-tools" role="region" aria-label="분대 명령" hidden>
+    <div class="squad-panel-head">
+      <div class="squad-panel-identity"><strong id="squad-name">분대 지휘</strong><small id="squad-status"></small></div>
+      <button id="squad-close" type="button" aria-label="분대 명령 닫기">×</button>
     </div>
-    <button id="squad-execute">명령 실행</button><small>목표가 필요한 명령은 전장에서 칸이나 상대 분대를 선택하세요.</small>
-  </details>
+    <div class="squad-action-grid" role="group" aria-label="분대 행동">
+      <button type="button" data-squad-action="move"><span aria-hidden="true">➜</span><small>이동</small></button>
+      <button type="button" data-squad-action="advance"><span aria-hidden="true">⚔</span><small>진격</small></button>
+      <button type="button" data-squad-action="hold"><span aria-hidden="true">⬟</span><small>사수</small></button>
+      <button type="button" data-squad-action="focus"><span aria-hidden="true">◎</span><small>집중 공격</small></button>
+      <button type="button" data-squad-action="rally"><span aria-hidden="true">↺</span><small>집결</small></button>
+      <button type="button" data-squad-action="retreat"><span aria-hidden="true">↩</span><small>후퇴</small></button>
+      <button type="button" data-squad-action="follow"><span aria-hidden="true">⇥</span><small>추종</small></button>
+      <button type="button" data-squad-action="wait"><span aria-hidden="true">Ⅱ</span><small>대기</small></button>
+    </div>
+    <div class="squad-mini-label">전투 태세 <small>누르면 즉시 적용</small></div>
+    <div class="squad-option-row" role="group" aria-label="전투 태세">
+      <button type="button" data-squad-stance="aggressive"><span aria-hidden="true">⚔</span> 적극</button>
+      <button type="button" data-squad-stance="balanced"><span aria-hidden="true">◇</span> 균형</button>
+      <button type="button" data-squad-stance="avoid"><span aria-hidden="true">◌</span> 회피</button>
+    </div>
+    <div class="squad-mini-label">진형</div>
+    <div class="squad-option-row" role="group" aria-label="진형 선택">
+      <button type="button" data-squad-formation="line"><span aria-hidden="true">☷</span> 횡대</button>
+      <button type="button" data-squad-formation="column"><span aria-hidden="true">⋮</span> 종대</button>
+      <button type="button" data-squad-formation="dense"><span aria-hidden="true">▦</span> 밀집</button>
+      <button type="button" data-squad-formation="spread"><span aria-hidden="true">⠿</span> 산개</button>
+    </div>
+    <button type="button" id="squad-special" data-squad-action="reform"><span aria-hidden="true">✦</span> <span id="squad-special-label">전열 정비</span></button>
+  </section>
+  <div id="squad-aim" class="squad-aim" hidden role="status">
+    <span id="squad-aim-label">명령할 목표를 선택하세요</span><button type="button" id="squad-aim-cancel">취소</button>
+  </div>
 
   <p id="notice" role="status" aria-live="polite">전장을 준비하고 있어요…</p>
   <footer id="legacy-controls" class="command-area" hidden>

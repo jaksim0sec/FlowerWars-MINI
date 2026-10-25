@@ -50,18 +50,51 @@ export function registerPlacedGroup(board,memberIds,{kind='squad',name='',team='
 /** Sub-squads retain the parent group's ID and roster; no board/model changes. */
 function attachSquads(board,group){
  const r=registry(board),units=group.memberIds.map(id=>board.unit(id)).filter(Boolean);
- const leaders=units.filter(u=>u.character?.characterId==='banner-bearer'||u.formationRole==='banner');
- const count=Math.ceil(units.length/12),troops=units.filter(u=>!leaders.includes(u));
- const squads=Array.from({length:count},(_,i)=>({
+ const indexed=units.length>0&&units.every(u=>Number.isInteger(u.formationSquadIndex));
+ let squads;
+ if(indexed){
+  // Scenario battalions keep each specialized 12-member squad intact, not
+  // a sequential mixture of all the infantry in one giant parent formation.
+  const buckets=new Map();
+  for(const u of units){const index=u.formationSquadIndex;if(!buckets.has(index))buckets.set(index,[]);buckets.get(index).push(u);}
+  squads=[...buckets].sort(([a],[b])=>a-b).map(([index,members])=>{
+   const leader=members.find(u=>u.formationRole==='banner'||u.character?.characterId==='banner-bearer');
+   const platoonIndex=members[0].formationPlatoonIndex??Math.floor(index/4);
+   return {
+    id:group.id+':'+(index+1),groupId:group.id,
+    name:`${index+1}분대 · ${members[0].formationSquadLabel||'혼성대'}`,
+    team:group.team,type:members[0].formationSquadType||'mixed',
+    platoonIndex,platoonId:group.id+':p'+(platoonIndex+1),
+    leaderId:leader?.id??null,memberIds:members.map(u=>u.id),
+    stance:'balanced',formation:'line',order:null
+   };
+  });
+ }else{
+  const leaders=units.filter(u=>u.character?.characterId==='banner-bearer'||u.formationRole==='banner');
+  const count=Math.ceil(units.length/12),troops=units.filter(u=>!leaders.includes(u));
+  squads=Array.from({length:count},(_,i)=>({
    id:group.id+':'+(i+1),groupId:group.id,
    name:count===1?group.name:group.name+' · '+(i+1)+'분대',team:group.team,
    type:group.blueprint.squadType||'mixed',leaderId:leaders[i]?.id??null,
    memberIds:leaders[i]?[leaders[i].id]:[],stance:'balanced',formation:'line',order:null
- }));
- for(const u of [...troops,...leaders.slice(count)]){
+  }));
+  for(const u of [...troops,...leaders.slice(count)]){
    const squad=squads.find(s=>s.memberIds.length<12);
    if(squad)squad.memberIds.push(u.id);
+  }
  }
- for(const s of squads){for(const id of s.memberIds){const u=board.unit(id);if(u)u.squadId=s.id;}r.squads.set(s.id,s);}
- group.squads=squads.map(s=>s.id);group.commanderId=squads[0]?.leaderId??null;
+ for(const squad of squads){
+  for(const id of squad.memberIds){const u=board.unit(id);if(u)u.squadId=squad.id;}
+  r.squads.set(squad.id,squad);
+ }
+ group.squads=squads.map(squad=>squad.id);group.commanderId=squads[0]?.leaderId??null;
+ if(indexed){
+  const platoons=new Map();
+  for(const squad of squads){
+   const i=squad.platoonIndex;
+   if(!platoons.has(i))platoons.set(i,{id:squad.platoonId,name:`제${i+1}소대`,squadIds:[]});
+   platoons.get(i).squadIds.push(squad.id);
+  }
+  group.platoons=[...platoons.values()];
+ }
 }
