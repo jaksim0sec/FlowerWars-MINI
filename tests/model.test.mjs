@@ -17,17 +17,17 @@ test('zoom preserves the world point underneath a cursor and clamps limits', () 
   assert.equal(zoomCamera(camera, { x: 0, y: 0 }, 0.001).scale, 0.1);
 });
 
-test('default battlefield has five columns and sixteen rows', () => {
+test('default battlefield has ten columns and sixteen rows', () => {
   const board = new Board();
   assert.equal(board.width, BOARD_COLUMNS);
   assert.equal(board.height, BOARD_ROWS);
   assert.equal(board.terrain.length, 16);
-  assert.equal(board.terrain[0].length, 5);
-  assert.equal(board.inside(4, 15), true);
-  assert.equal(board.inside(5, 15), false);
+  assert.equal(board.terrain[0].length, 10);
+  assert.equal(board.inside(9, 15), true);
+  assert.equal(board.inside(10, 15), false);
 });
 
-test('fit uses the actual 5 by 16 field bounds including unit heads and sidewalls', () => {
+test('fit uses the actual 10 by 16 field bounds including unit heads and sidewalls', () => {
   const left = -BOARD_ROWS * HALF_W, right = BOARD_COLUMNS * HALF_W;
   const top = -126, bottom = (BOARD_COLUMNS + BOARD_ROWS - 1) * HALF_H + 22;
   for (const [width, height] of [[375,494],[320,400],[844,170],[1280,700]]) {

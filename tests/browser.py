@@ -6,7 +6,7 @@ BASE = os.environ.get('BASE_URL', 'http://127.0.0.1:8000')
 
 def point(page, x, y):
     field = page.locator('#board').bounding_box()
-    columns, rows = 5, 16
+    columns, rows = 10, 16
     left, right = -rows * 72, columns * 72
     top, bottom = -126, (columns + rows - 1) * 42 + 22
     scale = max(.1, min((field['width'] - 32) / (right - left), (field['height'] - 32) / (bottom - top), 1.1))

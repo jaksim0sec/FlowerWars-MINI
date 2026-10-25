@@ -1,7 +1,7 @@
 import {createHealth,advanceHealth,DEATH_DURATION} from './characters/vitality.mjs';
 export const HALF_W = 72;
 export const HALF_H = 42;
-export const BOARD_COLUMNS = 5;
+export const BOARD_COLUMNS = 10;
 export const BOARD_ROWS = 16;
 export const STEP_TIME = 0.34;
 export const IMPACT_TIME = 0.3;
