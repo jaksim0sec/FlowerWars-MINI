@@ -4,6 +4,7 @@ import {drawTerrain,visibleTiles} from './terrain-render.mjs';
 import {loadCatalog, loadImage} from './characters/catalog.mjs';
 import {createCharacter, equip, drawCharacter} from './characters/engine.mjs';
 import { project, HALF_W, HALF_H } from './model.mjs';
+import {drawCommandOverlay} from './command-overlay.mjs';
 
 const TILE_BASE = new URL('../assets/world/tiles/', import.meta.url);
 export async function loadArtwork() {
@@ -77,6 +78,7 @@ export function render(ctx, art, board, view, camera, width, height, dpr, option
   drawTerrain(ctx,art,board,camera,width,height,dpr,options.cameraMoving);
   ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.translate(camera.x,camera.y);ctx.scale(camera.scale,camera.scale);
+  drawCommandOverlay(ctx,board,view,camera.scale);
 
   if(board.obstacles?.size)for(const {x,y} of visibleTiles(board,camera,width,height)) {
     const obstacle=board.obstacles.get(y*board.width+x);if(!obstacle||obstacle.blocked===false)continue;

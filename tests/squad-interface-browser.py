@@ -33,9 +33,11 @@ with sync_playwright() as p:
         assert page.locator('.squad-card').evaluate("(e)=>parseFloat(getComputedStyle(e).borderTopWidth)")==0
         assert page.locator('.squad-card').bounding_box()['width']<=80
         page.locator('.squad-card').click()
-        assert page.locator('#squad-tools').is_visible()
-        # The squad icon is an open action, not a misleading open/close toggle.
+        assert page.locator('#command-dock').is_visible()
+        # Selection stays active while the command controls are used.
         page.locator('.squad-card').click()
+        assert page.locator('#command-dock').is_visible()
+        page.locator('#selection-options').click()
         assert page.locator('#squad-tools').is_visible()
         palette=page.locator('#squad-tools').bounding_box()
         assert palette['width']<=242 and palette['height']<=242, palette
@@ -47,13 +49,13 @@ with sync_playwright() as p:
         page.locator('[data-squad-action="hold"]').click()
         assert page.locator('#squad-tools').is_hidden()
         page.locator('.squad-card').click()
-        assert page.locator('#squad-tools').is_visible()
+        assert page.locator('#command-dock').is_visible()
         page.locator('[data-squad-action="advance"]').click()
         assert page.locator('#squad-tools').is_hidden()
         assert page.locator('#squad-aim').is_visible()
         page.locator('#squad-aim-cancel').click()
         assert page.locator('#squad-aim').is_hidden()
-        page.locator('.squad-card').click()
+        page.locator('#selection-options').click()
         page.locator('#squad-close').click()
         assert page.locator('#squad-tools').is_hidden()
         page.locator('#debug-tools > summary').click()
@@ -72,4 +74,4 @@ with sync_playwright() as p:
         assert not errors,errors
         page.close()
     browser.close()
-print('PASS frameless portraits, one-click squad orders, compact palette, immediate actions and mobile dock')
+print('PASS persistent portraits, shared quick orders, compact options, immediate actions and mobile dock')

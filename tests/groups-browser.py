@@ -7,4 +7,4 @@ with sync_playwright() as p:
  for _ in range(8):page.keyboard.press('ArrowRight')
  for _ in range(10):page.keyboard.press('ArrowDown')
  page.keyboard.press('Enter');assert page.locator('#unit-count').inner_text()=='용사 10';assert '제1분대' in page.locator('#selection-name').inner_text();assert '1개 부대' in page.locator('#group-status').inner_text()
- page.locator('#reset').click();assert '0개 부대' in page.locator('#group-status').inner_text();assert page.locator('#unit-count').inner_text()=='용사 2';assert not errors,errors;b.close();print('PASS named squad placement, shared group selection and reset')
+ page.locator('#reset').click();assert '0개 부대' in page.locator('#group-status').text_content();assert page.locator('#unit-count').inner_text()=='용사 2';assert not errors,errors;b.close();print('PASS named squad placement, shared group selection and reset')

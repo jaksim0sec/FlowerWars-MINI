@@ -83,7 +83,7 @@ export class Navigation {
       return position;
     };
     const opposite={east:'west',west:'east',south:'north',north:'south'}[u.command.flow];
-    const traffic=b.flows[opposite]>0&&!u.combat.auto;
+    const traffic=b.flows[opposite]>0&&!u.combat.auto&&!u.command.direct;
     if(traffic&&Math.abs(dx)>=Math.abs(dy)&&Math.abs(dx)>=4) {
       const lane=laneFor(py,b.height,dx*b.navigationOrientation);
       vertical(lane);horizontal(x);vertical(y);
@@ -107,6 +107,24 @@ export class Navigation {
         previous.set(n,cell);queue.push(n);
       }
     }
+    return null;
+  }
+  recover(u,start){
+    // Local rejoining cannot see around a long stationary rank. Continue a
+    // wider occupancy-aware search across ticks, charging the shared budget.
+    const key=`${start}:${u.guideKey}`;
+    if(u.recovery?.key!==key)u.recovery={key,queue:[start],head:0,previous:new Map([[start,-1]]),goals:new Set(u.guide)};
+    const search=u.recovery;let work=0;
+    while(search.head<search.queue.length&&this.remaining>0&&work++<256){
+      const cell=search.queue[search.head++];this.consume();
+      if(cell!==start&&search.goals.has(cell)&&this.free(cell,u)){
+        const path=[];let n=cell;
+        while(n!==start){path.push(this.coords(n));n=search.previous.get(n);}
+        u.recovery=null;this.stats.detours++;return path.reverse();
+      }
+      for(const n of this.neighbors(cell,u))if(this.free(n,u)&&!search.previous.has(n)&&search.previous.size<8192){search.previous.set(n,cell);search.queue.push(n);}
+    }
+    if(search.head>=search.queue.length){u.recovery=null;u.recoveryRetryAt=this.board.time+1;}
     return null;
   }
   wait(u,reason,delay=.24) {
@@ -171,7 +189,11 @@ export class Navigation {
         // A detour must rejoin a future route cell, never its origin. This
         // prevents sideways oscillation and preserves static obstacle guidance.
         const potential=new Map(u.guide.map((cell,i)=>[cell,u.guide.length-i]));
-        const route=this.detour(u,{at:cell=>cell===start?u.guide.length+1:(potential.get(cell)??-1)},start);
+        const route=u.recovery?null:this.detour(u,{at:cell=>cell===start?u.guide.length+1:(potential.get(cell)??-1)},start);
+        if(route?.length){next=route.shift();u.route=route;}
+      }
+      if(!next&&waited>=.24&&(!blocker?.command||waited>=1)&&b.time>=(u.recoveryRetryAt||0)){
+        const route=this.recover(u,start);
         if(route?.length){next=route.shift();u.route=route;}
       }
       if(!next&&!blocker&&waited>=.5) {
@@ -204,7 +226,7 @@ export class Navigation {
   }
   keepDistance(u){
     const b=this.board,preferred=u.combat.preferredRange,target=b.unit(u.combat.targetId);
-    if(u.command?.type==='attack'||!u.combat.auto||!(preferred>1)||!target||target.health.current<=0||target.team===u.team||b.time<(u.combat.spacingAt||0))return false;
+    if(u.command?.type==='attack'||u.combat.holdPosition||!u.combat.auto||!(preferred>1)||!target||target.health.current<=0||target.team===u.team||b.time<(u.combat.spacingAt||0))return false;
     const metric=(x,y)=>u.combat.shape==='king'?Math.max(Math.abs(x-target.visualX),Math.abs(y-target.visualY)):Math.abs(x-target.visualX)+Math.abs(y-target.visualY);
     const distance=metric(u.x,u.y);
     if(distance>=preferred)return false;

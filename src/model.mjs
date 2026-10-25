@@ -96,7 +96,11 @@ export class Board {
     if(info)this.obstacles.set(index,{...info});else this.obstacles.delete(index);
     this.obstacleRevision++;this.navigation.invalidate();return true;
   }
-  cancelCommand(u) { if(u.command?.flow)this.flows[u.command.flow]--;if(u.state==='walk'&&!u.step)u.state='idle';u.command=null;u.target=null;u.guide=[];u.guideKey=null;u.yieldUntil=0;u.route=[];u.path=[];u.waitReason=null;u.retryAt=0;u.waitSince=null; }
+  cancelCommand(u) { if(u.command?.flow)this.flows[u.command.flow]--;if(u.state==='walk'&&!u.step)u.state='idle';u.command=null;u.target=null;u.guide=[];u.guideKey=null;u.recovery=null;u.yieldUntil=0;u.route=[];u.path=[];u.waitReason=null;u.retryAt=0;u.waitSince=null; }
+  interrupt(u){
+    this.cancelCommand(u);
+    if(u.state==='attack'){u.strike=null;u.impacted=false;u.elapsed=0;u.state=u.step?'walk':'idle';}
+  }
   spawn(x, y, character = null, options={}) {
     if (!this.inside(x, y) || this.navigation.blocked(y*this.width+x) || this.occupied(x, y)) return null;
     const health=character?.health||createHealth();
@@ -113,18 +117,18 @@ export class Board {
     if(!outer)nav.startCollection();
     try{return callback();}finally{if(!outer)nav.commit();}
   }
-  move(id,x,y) {
+  move(id,x,y,{replace=false,direct=false}={}) {
     const u=this.unit(id);
-    if(!u||u.health.current<=0||u.state!=='idle'||u.step||!this.inside(x,y)||this.navigation.blocked(y*this.width+x)||u.x===x&&u.y===y)return false;
+    if(!u||u.health.current<=0||!replace&&(u.state!=='idle'||u.step)||!this.inside(x,y)||this.navigation.blocked(y*this.width+x)||u.x===x&&u.y===y&&!u.step)return false;
     const field=this.navigation.field(x,y);
     if(field?.complete&&field.at(u.y*this.width+u.x)<0)return false;
-    this.cancelCommand(u);const flow=Math.abs(x-u.x)>=Math.abs(y-u.y)?(x>u.x?'east':'west'):(y>u.y?'south':'north');
-    u.command={type:'move',x,y,flow};this.flows[flow]++;this.navigation.plan(u);return true;
+    if(replace)this.interrupt(u);else this.cancelCommand(u);const flow=Math.abs(x-u.x)>=Math.abs(y-u.y)?(x>u.x?'east':'west'):(y>u.y?'south':'north');
+    u.command={type:'move',x,y,flow,direct};this.flows[flow]++;this.navigation.plan(u);return true;
   }
-  attack(id,targetId) {
+  attack(id,targetId,{replace=false}={}) {
     const u=this.unit(id),target=this.unit(targetId);
-    if(!u||!target||u===target||u.team&&u.team===target.team||u.health.current<=0||target.health.current<=0||u.state!=='idle'||u.step)return false;
-    this.cancelCommand(u);u.target=targetId;u.command={type:'attack',target:targetId};this.navigation.plan(u);return true;
+    if(!u||!target||u===target||u.team&&u.team===target.team||u.health.current<=0||target.health.current<=0||!replace&&(u.state!=='idle'||u.step))return false;
+    if(replace)this.interrupt(u);else this.cancelCommand(u);u.target=targetId;u.command={type:'attack',target:targetId};this.navigation.plan(u);return true;
   }
   beginStep(u,next) {
     u.state='walk';u.elapsed=0;u.step={...next,elapsed:0,duration:u.movement.stepTime};u.path=[next];
@@ -153,7 +157,7 @@ export class Board {
     const u=this.unit(id);if(!u||u.health.current<=0||!Number.isFinite(amount)||amount<=0)return false;
     u.health.current=Math.max(0,u.health.current-amount);u.hits++;
     const committed=u.state==='attack'&&u.strike&&u.health.current>0;
-    const resume=u.combat.auto&&u.team&&u.command?.type==='move'&&u.health.current>0;
+    const resume=u.team&&u.command&&u.health.current>0;
     if(!committed){
       if(!resume)this.cancelCommand(u);
       u.elapsed=0;u.state=u.health.current<=0?'death':'hit';u.strike=null;

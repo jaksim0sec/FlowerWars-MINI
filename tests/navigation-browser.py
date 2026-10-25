@@ -25,7 +25,7 @@ with sync_playwright() as p:
  select(page,8,2);assert '개나리 방패병 1' in page.locator('#selection-name').inner_text()
  select(page,3,11);assert '개나리소환사 2' in page.locator('#selection-name').inner_text()
  print('PASS simultaneous manual commands and offscreen completion')
- page.locator('#movement-lab summary').click();page.locator('#movement-combat').uncheck();page.select_option('#movement-scenario','bottleneck');page.select_option('#movement-count','16');page.locator('#movement-setup').click()
+ page.locator('#debug-tools > summary').click();page.locator('#movement-lab summary').click();page.locator('#movement-combat').uncheck();page.select_option('#movement-scenario','bottleneck');page.select_option('#movement-count','16');page.locator('#movement-setup').click()
  assert page.locator('#unit-count').inner_text()=='용사 16';assert '도착 0/16' in page.locator('#movement-stats').inner_text()
  page.locator('#movement-start').click();page.wait_for_timeout(500)
  assert page.locator('#movement-start').is_disabled();assert '대기' in page.locator('#movement-stats').inner_text()
