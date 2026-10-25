@@ -41,7 +41,10 @@ export function setupMovementScenario(board,type,count,makeCharacter,options={})
       unit.formationPlatoonIndex=slot.platoonIndex;
     }
     if(slot)unit.facing=(i%2?-1:1)*(options.mirror?-1:1);
-    const goalX=type==='skirmish'?(i%2?1:w-2):(right?x:w-1-x);
+    // Ordinary soldiers advance toward the enemy; a flag commander takes
+    // only a few cautious steps forward, staying behind its own front line.
+    const goalX=slot?.role==='banner'?x+(i%2?-3:3):
+      type==='skirmish'?(i%2?1:w-2):(right?x:w-1-x);
     orders.push({id:unit.id,x:options.mirror?w-1-goalX:goalX,y});
   }
   const groups=[];

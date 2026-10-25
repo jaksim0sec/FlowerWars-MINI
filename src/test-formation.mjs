@@ -53,7 +53,10 @@ export function battalionFormation(count){
   const size=Math.min(12,count-index*12),lane=index%lanes,band=Math.floor(index/lanes);
   const members=plan.roles.slice(0,size).sort((a,b)=>rankRole[a]-rankRole[b]);
   for(let j=0;j<members.length;j++){
-   const role=members[j],depth=band*5+Math.floor(j/4)+(plan.type==='ranged'||plan.type==='support'?1:0),row=lane*4+j%4;
+   const role=members[j],
+     // The flag stays a full rank behind archers/support as well as infantry.
+     depth=band*5+(role==='banner'?4:Math.floor(j/4)+(plan.type==='ranged'||plan.type==='support'?1:0)),
+     row=lane*4+j%4;
    slots.push({...structuredClone(roles[role]||battalionExtraRoles[role]),depth,row,
      squadIndex:index,squadType:plan.type,squadLabel:plan.label,platoonIndex:Math.floor(index/4)});
    maxDepth=Math.max(maxDepth,depth);
