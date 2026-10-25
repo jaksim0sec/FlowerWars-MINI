@@ -23,10 +23,22 @@ with sync_playwright() as p:
         page.get_by_text('전장 준비 완료',exact=False).wait_for()
         assert page.locator('#legacy-controls').is_hidden()
         assert not page.locator('#debug-tools').get_attribute('open')
+        assert page.locator('#squad-roster').is_hidden()
+        assert page.locator('#squad-tools').is_hidden()
         place_squad(page)
         assert page.locator('.squad-card').count()==1
+        assert page.locator('.squad-roster-head').count()==0
+        assert page.locator('#squad-roster').evaluate("(e)=>getComputedStyle(e).backgroundColor")=='rgba(0, 0, 0, 0)'
+        assert page.locator('.squad-card').evaluate("(e)=>getComputedStyle(e).backgroundColor")=='rgba(0, 0, 0, 0)'
+        assert page.locator('.squad-card').evaluate("(e)=>parseFloat(getComputedStyle(e).borderTopWidth)")==0
+        assert page.locator('.squad-card').bounding_box()['width']<=80
         page.locator('.squad-card').click()
         assert page.locator('#squad-tools').is_visible()
+        # The squad icon is an open action, not a misleading open/close toggle.
+        page.locator('.squad-card').click()
+        assert page.locator('#squad-tools').is_visible()
+        palette=page.locator('#squad-tools').bounding_box()
+        assert palette['width']<=242 and palette['height']<=242, palette
         assert '제1분대' in page.locator('#squad-name').inner_text()
         page.locator('[data-squad-stance="aggressive"]').click()
         assert page.locator('[data-squad-stance="aggressive"]').get_attribute('aria-pressed')=='true'
@@ -60,4 +72,4 @@ with sync_playwright() as p:
         assert not errors,errors
         page.close()
     browser.close()
-print('PASS icon commands, instant stance/formation, targeted cancel, close and responsive dock')
+print('PASS frameless portraits, one-click squad orders, compact palette, immediate actions and mobile dock')
