@@ -59,3 +59,14 @@ test('accessory slots reject hand equipment and remain independent of hands',()=
  assert.equal(c.equipment.back.equipmentId,'archer_quiver');assert.throws(()=>equip(real,c,'archer_quiver','left'));assert.throws(()=>equip(real,c,'basic_sword','back'));
  unequip(c,'both');assert.equal(c.equipment.back.equipmentId,'archer_quiver');unequip(c,'back');assert.equal(c.equipment.waist.equipmentId,'archer_side_pouch');
 });
+
+test('empty hands use a relaxed arm pose instead of retaining the equipment grip pose',()=>{
+ for(const [id,side] of [['banner-bearer','left'],['clover-mage','right'],['archer','right']]){
+  const c=createCharacter(real,id),hand=side==='left'?'hand_back':'hand_front';
+  const empty=layoutCharacter(real,c,0).draws.find(x=>x.part===hand).matrix;
+  equip(real,c,id==='banner-bearer'?'banner_bearer_banner':id==='archer'?'archer_bow':'clover_mage_staff',side);
+  const holding=layoutCharacter(real,c,0).draws.find(x=>x.part===hand).matrix;
+  assert.notDeepEqual(empty,holding,`${id}: an empty hand is still posed around a missing weapon`);
+  unequip(c,side);assert.deepEqual(layoutCharacter(real,c,0).draws.find(x=>x.part===hand).matrix,empty);
+ }
+});

@@ -60,11 +60,15 @@ export function layoutCharacter(catalog, instance, time=0) {
   const unique=[...new Set(Object.values(instance.equipment).filter(Boolean))];
   const shared=unique.find(x=>x.hand==='both');
   const pose=shared ? rig.twoHandedPoses[catalog.equipment[shared.equipmentId].twoHandedPose] : null;
+  const slotNodes={};
+  for(const [slot,states] of Object.entries(rig.slotPoses || {})){
+    Object.assign(slotNodes,states[instance.equipment[slot]?'equipped':'empty'] || {});
+  }
   const vars=channels(rig,instance,time,[]);
   const draws=[],sockets={};
   function visit(nodes,parent,ancestors=[]) {
     for(const node of nodes) {
-      const override=pose?.nodes?.[node.id] || {};
+      const override=pose?.nodes?.[node.id] || slotNodes[node.id] || {};
       let m=parent;
       for(const op of override.transforms || node.transforms || []) {
         if(op.translate) m=multiply(m,translate(...op.translate.map(x=>value(x,vars))));

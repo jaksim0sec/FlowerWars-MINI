@@ -106,6 +106,14 @@ def apply_reference_pose(rig, unit_id, equipment):
             item['grip']=[round((gx-ex)/item['w'],6),round((gy-ey)/item['h'],6)]
             item['rotation']=-angle
         else:slot['grip']=[round((x-p['x'])/p['w'],5),round((y-p['y'])/p['h'],5)]
+    rig['slotPoses']={}
+    for side,empty in spec.get('emptyHands',{}).items():
+        p=rig['parts']['hand_back' if side=='left' else 'hand_front']
+        pivot=[p['x']+p['w']*p['origin'][0],p['y']+p['h']*p['origin'][1]]
+        rig['slotPoses'][side]={'empty':{side+'Arm':{'transforms':[
+            {'translate':[v*f for v in empty.get('offset',[0,0])]},
+            {'pivot':pivot,'rotate':['+',empty['angle'],['state','walk',['*','stride',.04 if side=='left' else -.04],0]]}
+        ]}}}
     rig['version']=rig.get('version',1)+1
     rig['note']='Reference-matched rig positions and painter order; source PNGs unmodified.'
 

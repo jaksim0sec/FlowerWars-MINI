@@ -52,3 +52,9 @@ ctx.restore();
 `drawWarrior`는 예전의 검을 든 개나리용사 호출을 유지하는 호환 어댑터입니다. 신규 UI는 이 어댑터 대신 `drawCharacter`를 사용합니다. 개나리용사의 파츠 크기·목·손목·검 연결점·레이어는 기존 회귀 테스트로 검증합니다.
 
 새싹힐러는 원격 main에 추가된 독립 WebP 원화 파츠와 리그 좌표를 사용합니다. 녹색 잎·로브 SVG는 대체 외형 제작 자료로 보존합니다. 리그·크기·장식·애니메이션 변형은 별도 설정이며 지팡이는 완전히 독립된 장비입니다. 치유 수치·체력 시스템은 이 렌더링 엔진의 책임에 포함하지 않습니다.
+
+## Empty-hand and equipped poses
+
+`rig.slotPoses` selects node transform overrides per equipment slot: `{ "right": { "empty": { "rightArm": { "transforms": [...] } }, "equipped": {...} } }`. Empty hands can rest down rather than retaining a staff/bow grip angle. A two-handed equipment pose takes precedence over slot overrides. Switching equipment does not overwrite animation or shared rig data. The selected-pack registration script derives these transforms from each character's `emptyHands` definition in `reference-poses.json`.
+
+`docs/mobile-neutral.jpg` records the actual 390px mobile portrait canvases, unarmed, in the preview's default facing. This complements the equipped reference comparison; neither view substitutes for testing the other. `tests/mobile-hand-poses.py` checks lower empty-hand positions, equip/clear restoration, both facings and all four animation states. The scout's standing far boot is placed below the tunic so it is not completely occluded.

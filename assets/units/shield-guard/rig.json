@@ -319,5 +319,6 @@
   "worldTranslate": [
     "lungeX",
     "lungeY"
-  ]
+  ],
+  "slotPoses": {}
 }

@@ -32,3 +32,7 @@ test('book hand, shield and raised banner arm have reference painter order',asyn
   if(id==='shield-guard')assert.equal(arm.children.at(-1).socket,'left','shield must occlude forearm');
  }
 });
+test('scout far boot is visible below the tunic in the standing pose',async()=>{
+ const r=JSON.parse(await readFile(new URL('../assets/units/scout/rig.json',import.meta.url)));
+ assert.ok(r.parts.leg_back.y+r.parts.leg_back.h>r.parts.body.y+r.parts.body.h+20,'far boot is completely occluded by the tunic');
+});

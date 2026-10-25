@@ -211,6 +211,15 @@
       "armAngles": {
         "left": 0.72,
         "right": 0
+      },
+      "emptyHands": {
+        "left": {
+          "angle": 0,
+          "offset": [
+            -30,
+            25
+          ]
+        }
       }
     },
     "clover-mage": {
@@ -281,6 +290,15 @@
       "armAngles": {
         "left": 0,
         "right": -0.55
+      },
+      "emptyHands": {
+        "right": {
+          "angle": 0,
+          "offset": [
+            0,
+            0
+          ]
+        }
       }
     },
     "archer": {
@@ -375,6 +393,15 @@
       "armAngles": {
         "left": 0,
         "right": -0.55
+      },
+      "emptyHands": {
+        "right": {
+          "angle": 0,
+          "offset": [
+            0,
+            0
+          ]
+        }
       }
     },
     "scout": {
@@ -384,7 +411,7 @@
       "parts": {
         "leg_back": [
           176.5019,
-          508.5081,
+          562,
           0.737
         ],
         "leg_front": [

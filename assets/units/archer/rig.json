@@ -344,5 +344,41 @@
   "worldTranslate": [
     "lungeX",
     "lungeY"
-  ]
+  ],
+  "slotPoses": {
+    "right": {
+      "empty": {
+        "rightArm": {
+          "transforms": [
+            {
+              "translate": [
+                0.0,
+                0.0
+              ]
+            },
+            {
+              "pivot": [
+                596.5200000000001,
+                857.67004
+              ],
+              "rotate": [
+                "+",
+                0,
+                [
+                  "state",
+                  "walk",
+                  [
+                    "*",
+                    "stride",
+                    -0.04
+                  ],
+                  0
+                ]
+              ]
+            }
+          ]
+        }
+      }
+    }
+  }
 }
