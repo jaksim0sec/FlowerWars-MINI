@@ -34,7 +34,20 @@
   <details id="group-tools" class="group-tools"><summary>소대/분대 배치</summary>
     <div class="movement-options"><label>단위<select id="group-kind"><option value="squad">분대</option><option value="platoon">소대</option></select></label><label>병력<select id="group-size"><option>8</option><option>16</option><option>32</option><option>64</option></select></label></div>
     <div class="movement-options"><label>이름<input id="group-name" placeholder="혼성 분대" maxlength="24"></label><label>진영<select id="group-team"><option>A</option><option>B</option></select></label></div>
+    <label>분대 유형<select id="group-type"><option value="mixed">혼성대</option><option value="assault">돌격대</option><option value="defense">철벽대</option><option value="ranged">궁병대</option><option value="mobile">기동대</option><option value="support">지원대</option></select></label>
     <button id="group-place">묶음 배치</button><small id="group-status">0개 부대 등록</small>
+  </details>
+  <details id="squad-tools" class="squad-tools" hidden><summary>분대 명령</summary>
+    <strong id="squad-name"></strong><small id="squad-status"></small>
+    <div class="squad-controls">
+      <label>명령<select id="squad-command">
+        <option value="move">이동</option><option value="advance">진격</option><option value="hold">사수</option><option value="focus">집중 공격</option>
+        <option value="rally">집결</option><option value="retreat">후퇴</option><option value="follow">추종</option><option value="wait">대기</option>
+      </select></label>
+      <label>태세<select id="squad-stance"><option value="aggressive">적극</option><option value="balanced">균형</option><option value="avoid">회피</option></select></label>
+      <label>진형<select id="squad-formation"><option value="line">횡대</option><option value="column">종대</option><option value="dense">밀집</option><option value="spread">산개</option></select></label>
+    </div>
+    <button id="squad-execute">명령 실행</button><small>목표가 필요한 명령은 전장에서 칸이나 상대 분대를 선택하세요.</small>
   </details>
   <details id="field-tools" class="field-tools"><summary>전장 설정</summary>
     <div class="movement-options"><label>가로 칸<input id="board-columns" type="number" min="4" max="256" value="10"></label><label>세로 칸<input id="board-rows" type="number" min="4" max="256" value="16"></label></div>
