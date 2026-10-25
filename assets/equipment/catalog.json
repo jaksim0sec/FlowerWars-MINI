@@ -236,30 +236,14 @@
     "twoHandedPose": "hold",
     "socketMirrors": {
       "left": true,
-      "right": false
+      "right": true
     },
     "socketRotations": {
       "left": -0.12,
-      "right": 0.12
+      "right": -2.89
     },
     "animation": {
-      "weapon": [
-        "state",
-        "attack",
-        [
-          "*",
-          [
-            "atan2",
-            "vectorY",
-            [
-              "abs",
-              "vectorX"
-            ]
-          ],
-          "bowAim"
-        ],
-        0
-      ]
+      "weapon": 0
     },
     "rigAnimation": {
       "attackShift": 0,
@@ -367,10 +351,6 @@
       "arrowWidth": 7,
       "arrowheadColor": "#e8e9d6",
       "fletchingColor": "#d8a349"
-    },
-    "socketFacingSigns": {
-      "left": 1,
-      "right": -1
     },
     "socketMotionSigns": {
       "left": -1,

@@ -97,7 +97,7 @@
       "name": "낙옆궁수",
       "rig": "units/archer/rig.json",
       "recommendedWeapon": "archer_bow",
-      "recommendedHand": "right",
+      "recommendedHand": "left",
       "recommendedAccessories": {
         "back": "archer_quiver",
         "waist": "archer_side_pouch"

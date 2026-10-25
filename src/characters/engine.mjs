@@ -126,7 +126,7 @@ export function layoutCharacter(catalog, instance, time=0) {
     const rotation=(e.socketRotations?.[side] ?? e.rotation ?? 0)+(rig.equipmentRotations?.[attachment.equipmentId]?.[side]||0)+value(e.motion||0,equipmentVars)*(e.socketMotionSigns?.[side]??1)+(attachment.overrides.rotation||0);
     const mirror=e.socketMirrors?.[side] ? [-1,0,0,1,0,0] : I();
     const matrix=multiply(socket.matrix,multiply(translate(...(e.offset || [0,0])),multiply(rotate(rotation),mirror)));
-    equipmentDraws[side]={equipmentId:attachment.equipmentId,matrix,w:e.w,h:e.h,grip:e.grip,clip:e.clip,facingSign:e.socketFacingSigns?.[side]};
+    equipmentDraws[side]={equipmentId:attachment.equipmentId,matrix,w:e.w,h:e.h,grip:e.grip,clip:e.clip};
     if(e.bow){
       const b=e.bow,local=([x,y])=>[(x-e.grip[0])*e.w,(y-e.grip[1])*e.h];
       const other=side==='left'?'right':'left',supportSocket=!instance.equipment[other]&&equipmentPoses.some(p=>p.supportFree)?other:null;
@@ -141,8 +141,8 @@ export function layoutCharacter(catalog, instance, time=0) {
       // Combat vectors are projected world vectors. Undo the root facing and
       // equipment affine transform so the visual release follows the same ray.
       const vector=instance.animation.attackVector;
-      if(vector&&(vector.x||vector.y)&&t>=b.releaseAt){
-        const flip=instance.animation.facing*(e.socketFacingSigns?.[side]||1)===1?-1:1;
+      if(vector&&(vector.x||vector.y)){
+        const flip=instance.animation.facing===1?-1:1;
         const x=vector.x*flip,y=vector.y;
         const v=[(matrix[3]*x-matrix[2]*y)/det,(-matrix[1]*x+matrix[0]*y)/det],norm=Math.hypot(...v);
         direction=v.map(n=>n/norm);
@@ -202,8 +202,7 @@ export function drawCharacter(ctx,catalog,instance,time=0,{scale,layout}={}) {
   ctx.save();
   ctx.translate(...(rig.worldTranslate || [0,0]).map(expr=>value(expr,vars)));
   const s=scale ?? rig.scale;
-  const facing=instance.animation.facing*(Object.values(equipmentDraws).find(e=>e.facingSign)?.facingSign||1);
-  ctx.scale(facing===1?-s:s,s);ctx.translate(-rig.foot[0],-rig.foot[1]);
+  ctx.scale(instance.animation.facing===1?-s:s,s);ctx.translate(-rig.foot[0],-rig.foot[1]);
   for(const draw of draws) {
     const equipment=draw.socket && equipmentDraws[draw.socket];
     if(draw.socket && !equipment) continue;

@@ -15,7 +15,7 @@ test('a bow stays upright while aiming, drawing, releasing and recovering instea
  const c=archer(),angles=[0,.10,.20,.29,.30,.34,.48,.65].map(t=>{
   const l=pose(c,t),d=l.equipmentDraws.right;
   assert.ok(distance(point(d.matrix),point(l.sockets.right.matrix))<1e-8,'painted grip detaches');
-  return Math.atan2(d.matrix[1],d.matrix[0]);
+  return Math.atan2(-d.matrix[2],d.matrix[3]);
  });
  assert.ok(Math.max(...angles)-Math.min(...angles)<.4,`bow slashes through ${angles}`);
 });
@@ -100,4 +100,21 @@ test('the drawn string fades together with dropped bow artwork on death',()=>{
 test('released arrows originate on the bow grip even for steep isometric target rays',()=>{
  const c=archer();Object.assign(c.animation,{attackVector:{x:0,y:168},facing:1});const b=pose(c,.34).equipmentDraws.right.bow;
  assert.ok(Math.abs(b.arrowTail[0]*b.direction[1]-b.arrowTail[1]*b.direction[0])<1e-8,'released shaft misses the bow grip');
+});
+
+test('equipment never changes the character root facing, head or quiver orientation',()=>{
+ const renderCatalog={...catalog,characters:{archer:{rig,images:Object.fromEntries(Object.keys(rig.parts).map(k=>[k,k]))}},equipment:{...catalog.equipment,archer_bow:{...catalog.equipment.archer_bow,image:'bow'}}};
+ for(const facing of [-1,1])for(const side of [null,'left','right']){
+  const c=side?archer(side):createCharacter(catalog,'archer');c.animation.facing=facing;const ctx=new ArrowCanvas(),scales=[];
+  ctx.scale=function(x,y){scales.push([x,y]);this.transform(x,0,0,y,0,0);};drawCharacter(ctx,renderCatalog,c,0);
+  assert.deepEqual(scales[0],[facing===1?-rig.scale:rig.scale,rig.scale],`${side}/${facing}: gear flips the body`);
+ }
+});
+
+test('loaded arrows aim along the attack vector before release on both hands and facings',()=>{
+ const renderCatalog={...catalog,characters:{archer:{rig,images:Object.fromEntries(Object.keys(rig.parts).map(k=>[k,k]))}},equipment:{...catalog.equipment,archer_bow:{...catalog.equipment.archer_bow,image:'bow'}}};
+ for(const side of ['left','right'])for(const[x,y]of [[144,0],[-144,0],[144,84],[-144,-84]]){
+  const c=archer(side);Object.assign(c.animation,{state:'attack',elapsed:.28,facing:x<0?-1:1,attackVector:{x,y}});const ctx=new ArrowCanvas();drawCharacter(ctx,renderCatalog,c,.28);
+  const[tail,tip]=ctx.arrows[0],dx=tip[0]-tail[0],dy=tip[1]-tail[1];assert.ok((dx*x+dy*y)/(Math.hypot(dx,dy)*Math.hypot(x,y))>.999999,`${side}/${x},${y}: loaded arrow aims backwards`);
+ }
 });
