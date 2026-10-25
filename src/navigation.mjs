@@ -248,7 +248,10 @@ export class Navigation {
         }
       }
     }
-    if(!next){this.wait(u,'traffic',Math.min(.65,.16+(b.time-(u.waitSince??b.time))*.15));return;}
+    if(!next){
+      const delay=command.direct?(blocker?.step?Math.max(.04,Math.min(.12,blocker.step.duration-blocker.step.elapsed+.01)):.12):Math.min(.65,.16+(b.time-(u.waitSince??b.time))*.15);
+      this.wait(u,'traffic',delay);return;
+    }
     this.requestStep(u,next);
   }
   requestStep(u,next){

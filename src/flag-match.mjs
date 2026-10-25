@@ -1,6 +1,7 @@
-import {createFormationGroup,placeGroup,squadsFor} from './unit-groups.mjs';
-import {orderSquad} from './squad-orders.mjs';
+import {placeGroup,squadsFor} from './unit-groups.mjs';
+import {orderSquad,orderSquads} from './squad-orders.mjs';
 import {survey,deployment,attackLane} from './bot-strategy.mjs';
+import {deploymentBlueprint} from './deployment-layout.mjs';
 
 export const PREPARATION_SECONDS=300;
 export const ARMY_LIMIT=500;
@@ -17,30 +18,36 @@ export class FlagMatch{
   this.elapsed=0;this.nextStatus=0;this.nextDecision=0;this.cursor=0;this.decisions=0;this.statusRevision=0;
   this.nextSurvey=0;this.strategy=null;
   this.limit=Math.max(1,Math.min(ARMY_LIMIT,Math.floor(Number(count)||ARMY_LIMIT)));
+  this.reserve={A:this.limit,B:this.limit};this.makeCharacter=makeCharacter;this.optionsFor=optionsFor;
   board.match=this;
   // Broad symmetric passages: terrain is shared, the middle is a deployment
   // boundary during preparation rather than an invisible permanent wall.
   for(const x of [46,53])for(let y=10;y<90;y++)if(y%20>=4&&y%20<=13)board.setObstacle(x,y,{kind:'stone-wall',blocked:true});
-  for(const team of ['A','B']){
-   let remaining=this.limit,index=0;
-   while(remaining>0){
-    const size=Math.min(12,remaining),type=TYPES[index%TYPES.length],col=index%5,row=Math.floor(index/5);
-    const blueprint=createFormationGroup(Math.max(2,size),'squad',`${index+1}분대`,type);blueprint.members=blueprint.members.slice(0,size);
-    const group=placeGroup(board,blueprint,{x:team==='A'?10+col*8:89-col*8,y:8+row*10},{team,autoCombat:false,makeCharacter,optionsFor});
-    if(!group)throw new Error('전투 부대 배치 공간이 부족합니다.');
-    const s=squadsFor(board).get(group.squads[0]);s.platoonIndex=Math.floor(index/4);s.platoonId=team+':match:p'+s.platoonIndex;s.matchIndex=index;
-    this.squadIds[team].push(s.id);remaining-=size;index++;
-   }
-  }
   const previousPolicy=board.movementPolicy;
   board.movementPolicy={matchOwner:this,previousPolicy,beforeStep:context=>{
    if(board.match===this&&this.phase==='preparation'&&!this.inTerritory(context.unit.team,context.to))return 'wait';
    return previousPolicy?.beforeStep?.(context)||'move';
   }};
-  for(const s of squadsFor(board).values()){
-   const leader=board.unit(s.leaderId);if(leader)orderSquad(board,s.id,'fortify',{x:leader.x,y:leader.y});
-  }
   this.refreshStatus();
+ }
+ deploy(team,type,anchor){
+  if(this.phase!=='preparation'||!(team in this.reserve)||!TYPES.includes(type)||this.reserve[team]<=0)return null;
+  const index=this.squadIds[team].length,size=Math.min(12,this.reserve[team]);
+  const blueprint=deploymentBlueprint(size,type,`${index+1}분대`),sign=team==='B'?-1:1;
+  if(blueprint.members.some(m=>!this.inTerritory(team,{x:anchor.x+m.offset.x*sign,y:anchor.y+m.offset.y})))return null;
+  const group=placeGroup(this.board,blueprint,anchor,{team,autoCombat:false,makeCharacter:this.makeCharacter,optionsFor:this.optionsFor});
+  if(!group)return null;
+  const s=squadsFor(this.board).get(group.squads[0]);s.platoonIndex=Math.floor(index/4);s.platoonId=team+':match:p'+s.platoonIndex;s.matchIndex=index;
+  this.squadIds[team].push(s.id);this.reserve[team]-=size;this.refreshStatus();return s;
+ }
+ deployBot(){
+  if(!this.reserve.B)return false;
+  const index=this.squadIds.B.length,type=TYPES[index%TYPES.length],plan=this.strategy||survey(this.board,this.flags.B),wanted=deployment({type,matchIndex:index},plan);
+  for(let radius=0;radius<=32;radius+=4)for(let dx=-radius;dx<=radius;dx+=4)for(let dy=-radius;dy<=radius;dy+=4){
+   if(Math.max(Math.abs(dx),Math.abs(dy))!==radius)continue;
+   if(this.deploy('B',type,{x:Math.round(wanted.x+dx),y:Math.round(wanted.y+dy)}))return true;
+  }
+  return false;
  }
  inTerritory(team,p){return team==='A'?p.x<50:p.x>=50;}
  canCommand(team,action,target){
@@ -50,6 +57,8 @@ export class FlagMatch{
  }
  start(){
   if(this.phase!=='preparation')return false;
+  // Finish the bot's direct placement before skipping the preparation clock.
+  while(this.reserve.B>0)if(!this.deployBot())break;
   this.phase='battle';this.remaining=0;this.statusRevision++;
   for(const u of this.board.units)if(u.health.current>0){u.combat.auto=true;u.retryAt=0;u.waitReason=null;}
   this.nextDecision=this.elapsed;return true;
@@ -63,18 +72,20 @@ export class FlagMatch{
   if(this.phase!=='finished'&&this.elapsed>=this.nextDecision){
    // Three of at most 42 bot squads per slice; each squad thinks about once/s.
    this.nextDecision=this.elapsed+(this.phase==='preparation'?.25:.08);
+   if(this.phase==='preparation'){for(let i=0;i<3&&this.reserve.B;i++)if(!this.deployBot())break;return;}
    for(let i=0;i<3&&this.squadIds.B.length;i++)this.think(this.squadIds.B[this.cursor++%this.squadIds.B.length]);
   }
  }
  refreshStatus(){
-  const counts={A:0,B:0},captures=new Set();
+  const counts={A:0,B:0},sums={A:{x:0,y:0},B:{x:0,y:0}},captures=new Set();
   for(const u of this.board.units){
    if(u.health.current<=0)continue;
-   if(u.team in counts)counts[u.team]++;
+   if(u.team in counts){counts[u.team]++;sums[u.team].x+=u.visualX;sums[u.team].y+=u.visualY;}
    if(this.phase==='battle'&&!u.healing&&u.team in this.flags){const flag=this.flags[u.team==='A'?'B':'A'];if(Math.max(Math.abs(u.visualX-flag.x),Math.abs(u.visualY-flag.y))<=1.25)captures.add(u.team);}
   }
   if(counts.A!==this.counts.A||counts.B!==this.counts.B)this.statusRevision++;
   this.counts=counts;
+  this.centers={A:counts.A?{x:sums.A.x/counts.A,y:sums.A.y/counts.A}:null,B:counts.B?{x:sums.B.x/counts.B,y:sums.B.y/counts.B}:null};
   if(captures.size){this.winner=captures.size===2?'draw':[...captures][0];this.phase='finished';this.statusRevision++;
    for(const u of this.board.units){this.board.interrupt(u);u.combat.auto=false;}
   }
@@ -86,12 +97,6 @@ export class FlagMatch{
   const center={x:Math.round(units.reduce((n,u)=>n+u.x,0)/units.length),y:Math.round(units.reduce((n,u)=>n+u.y,0)/units.length)};
   const plan=this.strategy||survey(b,this.flags.B);
   if(this.phase==='preparation'){
-   const goal=deployment(s,plan);
-   if(!samePoint(s.order?.target,goal)){
-    orderSquad(b,s.id,'fortify',goal);
-    // Deploy facing the opposing half, even when repositioning rearward.
-    s.order.forward={x:-1,y:0};s.order.facing=-1;s.order.dirty=true;
-   }
    return;
   }
   const intruder=b.unit(plan.intruderId);
@@ -131,6 +136,6 @@ export class FlagMatch{
  }
  charge(){
   if(this.phase!=='battle')return;
-  for(const id of this.squadIds.A)orderSquad(this.board,id,'advance',this.flags.B);
+  orderSquads(this.board,this.squadIds.A,'advance',this.flags.B);
  }
 }

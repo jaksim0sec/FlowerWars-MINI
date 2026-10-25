@@ -218,6 +218,7 @@ export class Board {
         }
         if(u.elapsed+1e-9>=strike.duration){
           u.strike=null;u.elapsed=0;
+          if(strike.healing)u.waitReason=null;
           if(strike.automatic){u.target=null;u.state=u.command?'walk':'idle';}
           else {u.state='idle';this.cancelCommand(u);}
         }

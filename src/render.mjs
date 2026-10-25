@@ -91,6 +91,12 @@ export function render(ctx, art, board, view, camera, width, height, dpr, option
     const p = project(view.hover.x, view.hover.y);
     diamond(ctx, p.x, p.y, '#fff4b521', '#fff3c281');
   }
+  if(view.mode==='deploy'&&view.hover&&board.match?.phase==='preparation'&&view.deployment){
+    for(const member of view.deployment.members){const x=view.hover.x+member.offset.x,y=view.hover.y+member.offset.y;
+      const valid=board.inside(x,y)&&board.match.inTerritory('A',{x,y})&&!board.navigation.blocked(y*board.width+x)&&!board.occupied(x,y);
+      const p=project(x,y);diamond(ctx,p.x,p.y,valid?'#5aabd04a':'#d6686055',valid?'#4c8fba':'#cc6254',5);
+    }
+  }
   if (view.tile) {
     const p = project(view.tile.x, view.tile.y);
     diamond(ctx, p.x, p.y, '#ffd45d23', '#fff1a8');

@@ -1,5 +1,6 @@
 import {squadTapIntent} from './gesture-commands.mjs';
 import {FlagMatch} from './flag-match.mjs';
+import {deploymentBlueprint} from './deployment-layout.mjs';
 import {icon,typeLabels} from './ui-icons.mjs';
 import {createFormationGroup,placeGroup,groupsFor,squadOf,squadsFor} from './unit-groups.mjs';
 import {configureSquad,orderSquad,orderSquads,updateSquadOrders,squadSummary,SQUAD_ACTIONS} from './squad-orders.mjs';
@@ -154,6 +155,7 @@ function selectSquad(id,trigger=null,additive=false){
   if(id===source?.id)cancelSquadTarget();else {notify('명령에 맞는 대상 분대를 선택하세요.');return;}
  }
  if(board.match&&squad.team!=='A'){if(selectedSquads.size&&board.match.phase==='battle')commitSquadTarget(activeSquad(),'focus',{squadId:id});else notify('상대 봇 부대입니다. 내 부대를 먼저 선택하세요.');return;}
+ if(view.mode==='deploy')view.mode='move';
  const current=selectedCommandSquads()[0];
  if(additive&&current&&current.team!==squad.team){notify('같은 진영의 분대만 함께 선택할 수 있습니다.');return;}
  if(!additive)selectedSquads.clear();
@@ -259,25 +261,37 @@ function seed() {
 function startMatch(){
  if(!art)return;
  new FlagMatch(board,{count:500,makeCharacter:(slot,i)=>characterForSlot(i,slot),optionsFor:c=>({stats:c.testStats||art.catalog.characters[c.characterId].testCombat,movement:movementFor(c),capabilities:art.catalog.characters[c.characterId].capabilities||[]})});
- movementScenario=null;view.selected=null;view.tile=null;view.hover=null;view.mode='move';view.commandSquadIds=null;selectedSquads.clear();selectedSquadId=null;commandPanelOpen=false;squadQuickCommand=false;
+ movementScenario=null;view.selected=null;view.tile=null;view.hover=null;view.mode='deploy';view.deployType='defense';view.commandSquadIds=null;selectedSquads.clear();selectedSquadId=null;commandPanelOpen=false;squadQuickCommand=false;
+ view.deployment=deploymentBlueprint(12,'defense','배치');
  syncSelectionView();syncSquadRoster();$('debug-tools').open=false;fit();updateMatchHud();refresh();
- notify('5분 준비 · 파란 진영이 내 부대입니다. 준비가 끝나면 전투 시작을 누르세요.');
+ notify('병종을 고르고 파란 진영을 터치해 배치하세요.');
 }
 function updateMatchHud(){
  const m=board.match;$('match-hud').hidden=!m;
+ $('deployment-tools').hidden=!m||m.phase!=='preparation';
  $('match-result').hidden=!m||m.phase!=='finished';
  document.body.classList.toggle('in-match',!!m);
  for(const id of ['group-place','summon','board-resize','combat-enable','combat-disable','group-team'])$(id).disabled=!!m;
  if(!m)return;
  text('match-phase',m.phase==='preparation'?'병력 준비':m.phase==='battle'?'깃발 점령전':'전투 종료');
  const seconds=Math.ceil(m.remaining);text('match-timer',m.phase==='preparation'?Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0'):'');
- text('match-armies',`나 ${m.counts.A}/500 · 봇 ${m.counts.B}/500`);
+ text('match-armies',m.phase==='preparation'?`배치 ${m.counts.A}/500 · 봇 ${m.counts.B}/500`:`나 ${m.counts.A} · 봇 ${m.counts.B}`);
+ text('deployment-reserve',`예비 ${m.reserve.A}명 · ${Math.min(12,m.reserve.A)}명씩 배치`);
+ $('deployment-tools').classList.toggle('is-deploying',view.mode==='deploy');
+ text('deployment-toggle',view.mode==='deploy'?'지휘 모드':'병력 배치');
+ for(const button of document.querySelectorAll('[data-deploy-type]')){button.disabled=m.reserve.A<=0;button.setAttribute('aria-pressed',String(button.dataset.deployType===view.deployType));}
+ if(m.phase!=='preparation'&&view.mode==='deploy')view.mode='move';
  $('match-skip').hidden=m.phase!=='preparation';$('match-charge').hidden=m.phase!=='battle';
  if(m.phase==='finished'){text('match-result-title',m.winner==='draw'?'무승부':m.winner==='A'?'승리':'패배');text('match-result-detail',m.winner==='draw'?'양군이 동시에 상대 깃발에 도착했습니다.':m.winner==='A'?'상대 깃발 지점에 도달했습니다.':'봇이 내 깃발 지점에 도달했습니다.');}
 }
 function locateFlag(team){const m=board.match;if(!m)return;const p=project(m.flags[team].x,m.flags[team].y);camera.scale=Math.max(camera.scale,.22);camera.x=width/2-p.x*camera.scale;camera.y=height*.43-p.y*camera.scale;fitted=false;refresh();}
 $('match-start').addEventListener('click',startMatch);$('match-restart').addEventListener('click',startMatch);
-$('match-skip').addEventListener('click',()=>{if(board.match?.start()){updateMatchHud();notify('전투 시작 · 상대 깃발에 도달하면 승리합니다.');}});
+$('match-skip').addEventListener('click',()=>{if(!board.match?.counts.A){notify('내 진영에 병력을 먼저 배치하세요.');return;}if(board.match?.start()){updateMatchHud();notify('전투 시작 · 상대 깃발에 도달하면 승리합니다.');}});
+$('deployment-toggle').addEventListener('click',()=>{view.mode=view.mode==='deploy'?'move':'deploy';updateMatchHud();refresh();});
+for(const button of document.querySelectorAll('[data-deploy-type]')){
+ button.innerHTML=icon(button.dataset.deployType)+'<span>'+button.textContent+'</span>';
+ button.addEventListener('click',()=>{view.deployType=button.dataset.deployType;view.mode='deploy';view.deployment=deploymentBlueprint(Math.min(12,board.match.reserve.A),view.deployType,'배치');selectUnit(null);updateMatchHud();refresh();});
+}
 $('match-charge').addEventListener('click',()=>{board.match?.charge();notify('전군 진격 · 부대를 선택해 개별 전술을 지휘할 수 있습니다.');});
 $('match-home').addEventListener('click',()=>locateFlag('A'));$('match-enemy').addEventListener('click',()=>locateFlag('B'));
 
@@ -296,7 +310,7 @@ function refresh(invalidate=true) {
   $('summon').setAttribute('aria-pressed', String(view.mode === 'summon'));
   $('attack').setAttribute('aria-pressed', String(view.mode === 'attack'));
   $('attack').disabled = !unit || unit.state!=='idle' || !!unit.step;
-  canvas.classList.toggle('summoning', ['summon','group','squad-target'].includes(view.mode));
+  canvas.classList.toggle('summoning', ['summon','group','squad-target','deploy'].includes(view.mode));
   text('group-status',`${groupsFor(board).size}개 부대 등록`);
   const squad=activeSquad();
   $('squad-tools').hidden=!squad||!commandPanelOpen;
@@ -378,6 +392,14 @@ function activate(p, keyboardTile = null, additive=false) {
   if (!art) return;
   if(board.match&&['group','summon'].includes(view.mode)){view.mode='move';return;}
   const tile = keyboardTile || pick(p);
+  if(view.mode==='deploy'&&board.match?.phase==='preparation'){
+    if(!tile)return;
+    const squad=board.match.deploy('A',view.deployType||'defense',tile);
+    if(!squad){notify('내 진영의 빈 공간에 배치하세요. 겹침·장애물·예비 병력을 확인하세요.');return;}
+    view.deployment=board.match.reserve.A?deploymentBlueprint(Math.min(12,board.match.reserve.A),view.deployType,'배치'):null;
+    if(!board.match.reserve.A)view.mode='move';
+    syncSquadRoster();updateMatchHud();refresh();return;
+  }
   const target = keyboardTile ? board.at(tile.x, tile.y) : pickUnit(p) || (tile && board.at(tile.x, tile.y));
   if(view.mode==='squad-target'){
     const s=squadsFor(board).get(view.squadId),action=view.squadOrder;
@@ -646,7 +668,7 @@ loadArtwork().then(loaded => {
   $('character-type').replaceChildren(...visibleCharacters(art.catalog).map(([id,def])=>new Option(def.name,id)));
   commanderAvatar=makeCommanderAvatar();startMatch();
   $('loading').hidden = true;$('movement-setup').disabled=false;
-  notify('전장 준비 완료 · 양군 500명 자동 편성 · 준비 5분 / 스킵 가능');
+  notify('전장 준비 완료 · 병종 선택 후 내 진영에 직접 배치 · 준비 5분');
 }).catch(error => {
   text('loading', error.message); notify('에셋을 확인해주세요. 원본 이미지가 필요합니다.');
 });

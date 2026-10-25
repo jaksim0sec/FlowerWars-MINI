@@ -8,8 +8,16 @@ with sync_playwright() as p:
         page=browser.new_page(viewport={'width':width,'height':height},has_touch=width<700,is_mobile=width<700)
         errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
         page.goto(BASE);page.get_by_text('전장 준비 완료',exact=False).wait_for()
-        assert page.locator('#match-armies').text_content()=='나 500/500 · 봇 500/500'
-        assert page.locator('.squad-card').count()==42
+        assert page.locator('#match-armies').text_content().startswith('배치 0/500')
+        assert page.locator('.squad-card').count()==0
+        assert page.locator('#deployment-tools').is_visible()
+        page.locator('[data-deploy-type="defense"]').click()
+        page.locator('#board').focus();page.keyboard.press('ArrowRight')
+        for _ in range(19):page.keyboard.press('ArrowRight')
+        for _ in range(20):page.keyboard.press('ArrowDown')
+        page.keyboard.press('Enter')
+        assert page.locator('.squad-card').count()==1
+        assert '488' in page.locator('#deployment-reserve').text_content()
         assert page.locator('#match-skip').is_visible()
         assert page.locator('#match-charge').is_hidden()
         assert page.locator('#match-timer').text_content().startswith(('5:','4:'))
@@ -26,4 +34,4 @@ with sync_playwright() as p:
         assert not errors,errors
         page.close()
     browser.close()
-print('PASS 500v500 entry, player roster, preparation, skip, charge and responsive HUD')
+print('PASS empty deployment, manual placement, reserves, skip, charge and responsive HUD')

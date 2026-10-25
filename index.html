@@ -24,6 +24,10 @@
     <div class="match-topline"><strong id="match-phase">준비</strong><output id="match-timer">5:00</output><span id="match-armies"></span></div>
     <div class="match-actions"><button id="match-skip">준비 스킵 · 전투 시작</button><button id="match-charge" hidden>전군 깃발로 진격</button><button id="match-home">내 깃발</button><button id="match-enemy">적 깃발</button></div>
   </section>
+  <section id="deployment-tools" aria-label="예비 병력 배치" hidden>
+    <div class="deployment-head"><strong id="deployment-reserve">예비 500명</strong><span>병종 선택 → 내 진영 터치</span><button id="deployment-toggle">지휘 모드</button></div>
+    <div class="deployment-types"><button data-deploy-type="defense">방패</button><button data-deploy-type="assault">돌격</button><button data-deploy-type="ranged">궁병</button><button data-deploy-type="mobile">기동</button><button data-deploy-type="mixed">혼성</button><button data-deploy-type="support">지원</button></div>
+  </section>
   <section id="match-result" aria-label="전투 결과" hidden><strong id="match-result-title"></strong><p id="match-result-detail"></p><button id="match-restart">다시 준비</button></section>
   <div id="command-feedback" class="command-feedback" aria-hidden="true" hidden></div>
   <details id="debug-tools" class="debug-tools">

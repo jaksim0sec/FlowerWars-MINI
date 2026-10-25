@@ -6,6 +6,14 @@ export function drawMatchOverlay(ctx,match,scale){
   ctx.beginPath();[[x1,-.5],[x2,-.5],[x2,99.5],[x1,99.5]].forEach(([x,y],i)=>{const p=project(x,y);if(i)ctx.lineTo(p.x,p.y);else ctx.moveTo(p.x,p.y);});ctx.closePath();ctx.fillStyle=fill;ctx.fill();
  };
  polygon(-.5,49.5,'#397bb011');polygon(49.5,99.5,'#cc723311');
+ if(scale<.22)for(const [team,center]of Object.entries(match.centers||{})){
+  if(!center)continue;
+  const p=project(center.x,center.y);ctx.save();ctx.translate(p.x,p.y);ctx.scale(1/scale,1/scale);
+  ctx.globalAlpha=.13;ctx.strokeStyle=team==='A'?'#206eac':'#b64d24';ctx.fillStyle=ctx.strokeStyle;ctx.lineWidth=4;ctx.lineJoin='round';ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(-18,34);ctx.lineTo(-18,-39);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(-18,-37);ctx.bezierCurveTo(4,-51,20,-21,43,-35);ctx.lineTo(43,4);ctx.bezierCurveTo(18,18,4,-12,-18,2);ctx.closePath();ctx.fill();
+  ctx.globalAlpha=.35;ctx.font='700 11px system-ui';ctx.textAlign='center';ctx.fillText(team==='A'?'A · 내 부대':'B · 봇',10,51);ctx.restore();
+ }
  const a=project(49.5,-.5),b=project(49.5,99.5);
  ctx.save();ctx.strokeStyle=match.phase==='preparation'?'#fff4d9':'#fff4d966';ctx.lineWidth=1.5/scale;ctx.setLineDash([6/scale,6/scale]);ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();ctx.setLineDash([]);
  for(const [team,flag]of Object.entries(match.flags)){

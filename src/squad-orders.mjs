@@ -178,5 +178,5 @@ export function updateSquadOrders(board){for(const s of squadsFor(board).values(
 export function squadSummary(board,id){
  const s=squadsFor(board).get(id);if(!s)return null;
  const units=alive(board,s);
- return {...s,alive:units.length,commanderAlive:!!commander(board,s),leaderAlive:(originalCommander(board,s)?.health.current||0)>0,actingCommanderId:commander(board,s)?.id??null,moving:units.filter(u=>u.step).length,waiting:units.filter(u=>u.waitReason&&u.waitReason!=='combat').length};
+ return {...s,alive:units.length,commanderAlive:!!commander(board,s),leaderAlive:(originalCommander(board,s)?.health.current||0)>0,actingCommanderId:commander(board,s)?.id??null,moving:units.filter(u=>u.step).length,waiting:units.filter(u=>u.command&&['planning','traffic','replanning','yielding','condition'].includes(u.waitReason)).length};
 }
