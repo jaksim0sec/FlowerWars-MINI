@@ -1,4 +1,5 @@
-import {createFormationGroup,placeGroup,groupsFor} from './unit-groups.mjs';
+import {createFormationGroup,placeGroup,groupsFor,squadOf,squadsFor} from './unit-groups.mjs';
+import {configureSquad,orderSquad,updateSquadOrders,squadSummary} from './squad-orders.mjs';
 import {characterRadius,onScreen} from './character-render-cache.mjs';
 import {setupMovementScenario,startMovementScenario,movementStats} from './movement-scenarios.mjs';
 import {healthLabel} from './characters/vitality.mjs';
@@ -16,7 +17,8 @@ let width = 0, height = 0, dpr = 1, art = null;
 let lastFrame = 0, previousBusy = false, previousHits = 0;
 let lastDraw=0,visibleCount=0,lastCamera='',cameraChanged=0,lastVisual='',cameraSettled=true;
 let fitted = true,lastBoardSize='';
-let movementScenario=null,lastLabUpdate=0;
+let movementScenario=null,lastLabUpdate=0,lastSquadUpdate=0,lastSelectedSquad='';
+const squadSpecial={assault:['assault','돌파'],defense:['fortify','방어진 구축'],ranged:['firing-line','사격 위치 확보'],mobile:['flank','우회 기동'],support:['support-focus','지원 집중'],mixed:['reform','전열 정비']};
 const pointers = new Map();
 let origin = null, gestureMoved = false;
 
@@ -61,7 +63,7 @@ function seed() {
   if(ids[0]) board.spawn(2, 2, newCharacter(ids[0]));
   if(ids[1]) {const second=board.spawn(3, 5, newCharacter(ids[1]));second.facing=1;}
   view.selected = null; view.tile = null; view.hover = null; view.mode = 'move';
-  previousBusy = false; previousHits = 0;
+  previousBusy = false; previousHits = 0;lastSelectedSquad='';
   refresh();
 }
 
@@ -79,8 +81,26 @@ function refresh(invalidate=true) {
   $('summon').setAttribute('aria-pressed', String(view.mode === 'summon'));
   $('attack').setAttribute('aria-pressed', String(view.mode === 'attack'));
   $('attack').disabled = !unit || unit.state!=='idle' || !!unit.step;
-  canvas.classList.toggle('summoning', ['summon','group'].includes(view.mode));
+  canvas.classList.toggle('summoning', ['summon','group','squad-target'].includes(view.mode));
   text('group-status',`${groupsFor(board).size}개 부대 등록`);
+  const squad=squadOf(board,unit);
+  $('squad-tools').hidden=!squad;
+  if(squad){
+    const summary=squadSummary(board,squad.id);
+    text('squad-name',squad.name);
+    text('squad-status',`${summary.alive}/${squad.memberIds.length}명 · ${summary.commanderAlive?'기수 지휘':'지휘관 전사'} · ${squad.order?.source||'대기'}`);
+    $('squad-execute').disabled=!summary.commanderAlive;
+    if(lastSelectedSquad!==squad.id){
+      lastSelectedSquad=squad.id;
+      $('squad-stance').value=squad.stance;$('squad-formation').value=squad.formation;
+      const select=$('squad-command'),selected=select.value;
+      const base=[['move','이동'],['advance','진격'],['hold','사수'],['focus','집중 공격'],['rally','집결'],['retreat','후퇴'],['follow','추종'],['wait','대기']];
+      const options=[...base,squadSpecial[squad.type]||squadSpecial.mixed];
+      select.replaceChildren(...options.map(([v,label])=>new Option(label,v)));
+      select.value=options.some(([v])=>v===selected)?selected:'advance';
+    }
+  }else lastSelectedSquad='';
+
   if (unit) {
     text('selection-name', `${unitName(unit)} ${unit.id}${unit.groupId?' · '+groupsFor(board).get(unit.groupId)?.name:''}`);
     const action = { idle: '대기', walk: '이동 중', attack: '공격 중', hit: '피격', death:'쓰러짐' }[unit.state];
@@ -126,12 +146,21 @@ function activate(p, keyboardTile = null) {
   if (!art) return;
   const tile = keyboardTile || pick(p);
   const target = keyboardTile ? board.at(tile.x, tile.y) : pickUnit(p) || (tile && board.at(tile.x, tile.y));
-  if(view.mode==='group'){
+  if(view.mode==='squad-target'){
+    const s=squadsFor(board).get(view.squadId),action=view.squadOrder;
+    if(!s){view.mode='move';refresh();return;}
+    const other=target&&squadOf(board,target),aim=
+      action==='focus'?target&&target.team!==s.team?{squadId:other?.id,unitId:other?undefined:target.id}:null:
+      ['follow','support-focus'].includes(action)?other&&other.team===s.team?{squadId:other.id}:null:
+      tile?{x:tile.x,y:tile.y}:null;
+    if(!aim||!orderSquad(board,s.id,action,aim)){notify('명령 대상이나 지휘관을 확인하세요.');return;}
+    view.mode='move';view.squadOrder=null;notify(`${s.name} · ${$('squad-command').selectedOptions[0].textContent} 명령`);
+  } else if(view.mode==='group'){
     if(!tile)return;
-    const blueprint=createFormationGroup($('group-size').value,$('group-kind').value,$('group-name').value);
+    const blueprint=createFormationGroup($('group-size').value,$('group-kind').value,$('group-name').value,$('group-type').value);
     const group=placeGroup(board,blueprint,tile,{team:$('group-team').value,makeCharacter:(slot,i)=>characterForSlot(i,slot),optionsFor:c=>({stats:c.testStats||art.catalog.characters[c.characterId].testCombat,movement:movementFor(c),capabilities:art.catalog.characters[c.characterId].capabilities||[]})});
     if(!group){notify('부대 전체가 들어갈 빈 공간을 선택하세요. 앞줄 위치가 기준입니다.');return;}
-    view.selected=group.memberIds[0];view.tile=tile;view.mode='move';notify(`${group.name} · ${group.memberIds.length}명 일괄 배치`);
+    view.selected=group.commanderId||group.memberIds[0];view.tile=tile;view.mode='move';notify(`${group.name} · ${group.memberIds.length}명 일괄 배치`);
   } else if (view.mode === 'summon') {
     if (!tile) return;
     const unit = board.spawn(tile.x, tile.y,newCharacter($('character-type').value));
@@ -259,7 +288,7 @@ $('movement-start').addEventListener('click',()=>{
   const count=startMovementScenario(board,movementScenario);$('movement-start').disabled=true;
   refresh();updateMovementStats();notify(`${count}개체 시작 · ${movementScenario.combat?'A/B 주변 8칸 자동 공격':'이동만 · 대기·우회'}`);
 });
-for(const id of ['group-tools','movement-lab','field-tools'])$(id).addEventListener('toggle',()=>{if($(id).open)for(const other of ['group-tools','movement-lab','field-tools'])if(other!==id)$(other).open=false;});
+for(const id of ['group-tools','movement-lab','field-tools','squad-tools'])$(id).addEventListener('toggle',()=>{if($(id).open)for(const other of ['group-tools','movement-lab','field-tools','squad-tools'])if(other!==id)$(other).open=false;});
 $('board-resize').addEventListener('click',()=>{
   if(!board.resize(Number($('board-columns').value),Number($('board-rows').value))){notify('4~256칸의 정수 크기를 입력하세요. 병력·이동 목표가 잘리는 축소는 불가합니다.');return;}
   if(view.tile&&!board.inside(view.tile.x,view.tile.y))view.tile=null;view.hover=null;fit();notify(`${board.width} × ${board.height}칸 · 기존 병력 유지`);
@@ -267,6 +296,18 @@ $('board-resize').addEventListener('click',()=>{
 $('combat-enable').addEventListener('click',()=>{const n=board.setAutoCombat(true);refresh();notify(`${n}명 공격 활성 · 무진영 병력은 A/B 자동 배정`);});
 $('combat-disable').addEventListener('click',()=>{board.setAutoCombat(false);refresh();notify('자동 공격 중지 · 진행 중인 타격은 마무리합니다.');});
 $('group-place').addEventListener('click',()=>{if(!art)return;view.mode='group';notify('앞줄 기준 칸을 선택하세요. 부대 전체를 함께 배치합니다.');refresh();});
+$('squad-execute').addEventListener('click',()=>{
+ const s=squadOf(board,board.unit(view.selected));if(!s)return;
+ const action=$('squad-command').value;
+ if(['move','advance','focus','retreat','follow','assault','flank','support-focus'].includes(action)){
+   view.squadId=s.id;view.squadOrder=action;view.mode='squad-target';
+   notify(['focus'].includes(action)?'공격할 적 분대를 선택하세요.':['follow','support-focus'].includes(action)?'따라갈 아군 분대를 선택하세요.':'분대가 이동할 위치를 선택하세요.');
+ }else if(orderSquad(board,s.id,action)){notify(s.name+' · '+$('squad-command').selectedOptions[0].textContent+' 명령');}
+ else notify('기수가 없거나 분대에 명령할 수 없습니다.');
+ refresh();
+});
+$('squad-stance').addEventListener('change',()=>{const s=squadOf(board,board.unit(view.selected));if(s)configureSquad(board,s.id,{stance:$('squad-stance').value});});
+$('squad-formation').addEventListener('change',()=>{const s=squadOf(board,board.unit(view.selected));if(s)configureSquad(board,s.id,{formation:$('squad-formation').value});});
 $('movement-default').addEventListener('click',()=>{seed();fit();updateMovementStats();notify('기본 전장 복원');});
 $('movement-lab').addEventListener('toggle',updateMovementStats);
 $('zoom-in').addEventListener('click', () => { camera = zoomCamera(camera, { x: width / 2, y: height / 2 }, 1.2); fitted = false; refresh(); });
@@ -290,6 +331,7 @@ function frame(now) {
   lastFrame = now;
   if (art) {
     board.update(dt);
+    if(now-lastSquadUpdate>=500){updateSquadOrders(board);lastSquadUpdate=now;}
     const hits = board.units.reduce((n, u) => n + u.hits, 0);
     if (hits > previousHits) notify('공격이 명중했어요! 상대 용사가 충격에 반응합니다.');
     else if (previousBusy && !board.busy && !board.units.some(u=>u.command)) notify('동작 완료 · 다음 이동이나 공격을 선택하세요.');
