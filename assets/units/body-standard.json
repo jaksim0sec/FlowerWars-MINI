@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "reference": "gynari-warrior",
+  "headWidth": 548,
+  "jaw": [
+    505,
+    835
+  ],
+  "torsoHeight": 358,
+  "torsoTop": 801,
+  "bootWidth": 115,
+  "bootCenters": [
+    407.5,
+    618
+  ],
+  "armHeight": 185,
+  "characters": {
+    "shield-guard": {
+      "nearArmHeight": 200,
+      "shoulders": [
+        0.12,
+        0.88
+      ],
+      "crownWidth": 655,
+      "crownTop": 259
+    },
+    "scholar": {
+      "shoulders": [
+        0.12,
+        0.88
+      ],
+      "crownWidth": 730,
+      "crownTop": 259
+    },
+    "banner-bearer": {
+      "shoulders": [
+        0.28,
+        0.72
+      ],
+      "crownWidth": 655,
+      "crownTop": 259,
+      "torsoFraction": 0.87
+    },
+    "clover-mage": {
+      "shoulders": [
+        0.2,
+        0.8
+      ],
+      "crownWidth": 655,
+      "crownTop": 259
+    },
+    "archer": {
+      "shoulders": [
+        0.2,
+        0.8
+      ],
+      "crownWidth": 655,
+      "crownTop": 259
+    },
+    "scout": {
+      "shoulders": [
+        0.12,
+        0.88
+      ],
+      "crownWidth": 600,
+      "crownTop": 230,
+      "bootInset": 30,
+      "torsoHeight": 366
+    }
+  },
+  "equipmentHeights": {
+    "shield_guard_shield": 600,
+    "scholar_book": 257,
+    "banner_bearer_banner": 900,
+    "clover_mage_staff": 600,
+    "archer_bow": 700
+  }
+}

@@ -117,6 +117,66 @@ def apply_reference_pose(rig, unit_id, equipment):
     rig['version']=rig.get('version',1)+1
     rig['note']='Reference-matched rig positions and painter order; source PNGs unmodified.'
 
+def apply_body_standard(rig, unit_id, equipment):
+    """Source imagery describes appearance; the warrior defines physical anatomy.
+
+    A hidden reference limb is not a smaller/missing limb. Keep two equal-scale
+    arms and two short boots, then apply authored holding/empty-hand poses.
+    """
+    standard=read(ROOT/'assets/units/body-standard.json')
+    cfg=standard['characters'][unit_id]
+    source=read(ROOT/'assets/units/reference-poses.json')['characters'][unit_id]
+    parts=rig['parts'];head=parts['head'];crown=parts['head_deco']
+    old_head=dict(head);mult=standard['headWidth']/head['w']
+    old_jaw=[head['x']+head['w']*.5,head['y']+head['h']]
+    jaw=standard['jaw']
+    for p in [head,crown]:
+        p['x']=jaw[0]+(p['x']-old_jaw[0])*mult
+        p['y']=jaw[1]+(p['y']-old_jaw[1])*mult
+        p['w']*=mult;p['h']*=mult
+    crown_source=source['parts']['head_deco'];face_source=source['parts']['head']
+    face_fraction=(face_source[0]+head['file_dimensions'][0]*face_source[2]*.5-crown_source[0])/(crown['file_dimensions'][0]*crown_source[2])
+    crown['w']=cfg['crownWidth'];crown['h']=crown['w']*crown['file_dimensions'][1]/crown['file_dimensions'][0]
+    crown['x']=505-face_fraction*crown['w'];crown['y']=cfg['crownTop']
+    if unit_id!='scholar':crown['asset']='head_deco_overlay.png'
+    if unit_id=='shield-guard':crown['x']=185
+    body=parts['body'];body['h']=cfg.get('torsoHeight',standard['torsoHeight'])/cfg.get('torsoFraction',1);body['w']=body['h']*body['file_dimensions'][0]/body['file_dimensions'][1]
+    body.update(x=505-body['w']/2,y=standard['torsoTop'])
+    for i,name in enumerate(['leg_back','leg_front']):
+        p=parts[name];p['w']=standard['bootWidth'];p['h']=p['w']*p['file_dimensions'][1]/p['file_dimensions'][0]
+        p.update(x=standard['bootCenters'][i]-p['w']/2+cfg.get('bootInset',0)*(1 if i==0 else -1),y=1228-p['h'])
+    for i,(side,name) in enumerate([('left','hand_back'),('right','hand_front')]):
+        p=parts[name];p['h']=cfg.get('nearArmHeight',standard['armHeight']) if side=='right' else standard['armHeight']
+        p['w']=p['h']*p['file_dimensions'][0]/p['file_dimensions'][1]
+        p['origin']=source['armOrigins'][side]
+        sx=body['x']+body['w']*cfg['shoulders'][i];sy=body['y']+body['h']*.25
+        p['x']=sx-p['w']*p['origin'][0];p['y']=sy-p['h']*p['origin'][1]
+        rig['sockets'][side]['grip']=[.28,.8] if side=='left' else [.72,.8]
+    rig['neck']=jaw;rig['slotPoses']={}
+    def visit(nodes):
+        for n in nodes:
+            if n.get('id')=='neck':
+                n['transforms'][0]['pivot']=jaw
+                n['children']=[{'part':'head'},{'part':'head_deco'}]
+            if n.get('id') in ('leftArm','rightArm'):
+                side=n['id'][:-3];p=parts['hand_back' if side=='left' else 'hand_front']
+                pivot=[p['x']+p['w']*p['origin'][0],p['y']+p['h']*p['origin'][1]]
+                n['transforms'][0]['pivot']=pivot
+                rig['twoHandedPoses']['hold']['nodes'][n['id']]['transforms'][0]['pivot']=pivot
+                if side in source.get('emptyHands',{}):
+                    rig['slotPoses'][side]={'empty':{n['id']:{'transforms':[{'pivot':pivot,'rotate':['state','walk',['*','stride',.04 if side=='left' else -.04],0]}]}}}
+            visit(n.get('children',[]))
+    visit(rig['nodes'])
+    for slot,grip in [('back',[.12,.25]),('waist',[.15,.75])]:
+        if slot in rig['sockets']:rig['sockets'][slot]['grip']=grip
+    for eid,entry in source['equipment'].items():
+        e=equipment[eid]
+        if eid in standard['equipmentHeights']:
+            ratio=e['w']/e['h'];e['h']=standard['equipmentHeights'][eid];e['w']=e['h']*ratio
+    rig['bodyStandard']='../body-standard.json'
+    rig['note']='Warrior-based head, torso and short-boot anatomy; two comparable arms and two complete legs. Source art defines costume, not limb scale.'
+    rig['version']=4
+
 def register(source):
  manifest=read(source/'manifest.json');catalog=read(ROOT/'assets/characters.json');equipment=read(ROOT/'assets/equipment/catalog.json')
  base=read(ROOT/'assets/units/gynari-warrior/rig.json')
@@ -165,6 +225,7 @@ def register(source):
    for dx in range(1,13):
     expanded[:,dx:] |= erased[:,:-dx];expanded[:,:-dx] |= erased[:,dx:]
    pixels[expanded,3]=0
+   if id=='shield-guard':pixels[int(im.height*.48):,:int(im.width*.15),3]=0
    Image.fromarray(pixels).save(target/'head_deco_overlay.png')
    rig['parts']['head_deco']['asset']='head_deco_overlay.png'
   rig['parts']['head_deco']['front_clip']=[[0,0],[1,0],[1,1],[0,1]]
@@ -203,6 +264,7 @@ def register(source):
     if id in ['archer','clover-mage']:info['recommendedHand']='right'
   apply_reference_layout(rig,id,equipment)
   apply_reference_pose(rig,id,equipment)
+  apply_body_standard(rig,id,equipment)
   write(target/'rig.json',rig);catalog['characters'][id]=info
   write(target/'source.json',entry)
  write(ROOT/'assets/characters.json',catalog);write(ROOT/'assets/equipment/catalog.json',equipment)

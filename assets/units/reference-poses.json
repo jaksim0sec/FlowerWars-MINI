@@ -1,7 +1,7 @@
 {
   "version": 3,
   "source": "flowerwars_selected_merged.zip",
-  "notes": "Corrected against original assembled source and supplied compact hero lineup. Removed earlier speculative face/forearm enlargement and restored the scout side-view silhouette.",
+  "notes": "Source costume and equipment pose references only. Physical head, torso, bilateral arms and two-leg proportions are defined by body-standard.json relative to the warrior.",
   "characters": {
     "shield-guard": {
       "center": 220,

@@ -52,4 +52,10 @@ The scholar draws the full forearm behind the book and only its clipped palm in 
 
 ## Original assembly correction
 
-The previous larger face circles, oversized near forearms and exposed scout far boot were speculative corrections and have been revised against the supplied source assembly. `reference-poses.json` v3 restores per-character source proportions and the scout side-view occlusion. The preview now labels and displays the unmirrored source orientation as left (-1); right (1) mirrors it. Original PNG artwork remains unchanged.
+The preview labels the unmirrored source orientation as left (-1); right (1) mirrors it. Original PNG artwork remains unchanged.
+
+## Warrior-based physical frame
+
+The user's clarified standard takes precedence over source perspective: most heroes have warrior-like head/torso/leg proportions, the two arms have similar physical size, and the scout has two complete legs. `units/body-standard.json` is applied after `reference-poses.json` by the registration script. Source reference occlusion no longer shrinks one arm or hides a leg inside the torso. Cape margins are handled separately from torso-core height.
+
+See `docs/body-standard.jpg` for all eight characters rendered at a common scale and ground. Automated checks cover the warrior-relative frame, bilateral arm dimensions, physical head/arm/boot overlap, and equipment continuity across poses.
