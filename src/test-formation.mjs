@@ -24,3 +24,40 @@ export function armyFormation(count){
  }
  return {slots,rows,depth:Math.max(...slots.map(s=>s.depth))};
 }
+
+
+/** Scenario-only field battalion. 12 fighters = one named, specialised squad;
+ * four squads = one platoon. Existing armyFormation remains unchanged. */
+const battalionSquadPatterns=[
+ {type:'defense',label:'철벽대',roles:['banner','guard','guard','guard','guard','guard','guard','guard','scout','scout','archer','archer']},
+ {type:'assault',label:'돌격대',roles:['banner','guard','guard','guard','scout','scout','scout','scout','scout','scout','autumn','healer']},
+ {type:'ranged',label:'궁병대',roles:['banner','guard','guard','guard','scout','archer','archer','archer','archer','archer','archer','archer']},
+ {type:'mobile',label:'기동대',roles:['banner','scout','scout','scout','scout','scout','scout','scout','scout','scout','archer','archer']},
+ {type:'mixed',label:'혼성대',roles:['banner','guard','guard','guard','scout','scout','scout','scout','archer','archer','archer','healer']},
+ {type:'support',label:'지원대',roles:['banner','guard','guard','guard','scout','healer','healer','healer','healer','scholar','scholar','scholar']}
+];
+const battalionExtraRoles={
+ healer:{role:'healer',characterId:'clover-mage'},
+ scholar:{role:'support',characterId:'scholar'}
+};
+const rankRole={guard:0,autumn:1,scout:2,banner:3,archer:4,healer:5,scholar:6};
+
+/** Test-only layout: adjacent 4-row squad blocks, front-line before archers.
+ * Both armies share the same slots, mirrored by movement-scenarios. */
+export function battalionFormation(count){
+ count=Math.max(1,Math.floor(Number(count)||1));
+ const squadCount=Math.ceil(count/12),lanes=Math.max(3,Math.min(squadCount,Math.ceil(Math.sqrt(squadCount)*1.25)));
+ const slots=[];let maxDepth=0;
+ for(let index=0;index<squadCount;index++){
+  const plan=battalionSquadPatterns[index%battalionSquadPatterns.length];
+  const size=Math.min(12,count-index*12),lane=index%lanes,band=Math.floor(index/lanes);
+  const members=plan.roles.slice(0,size).sort((a,b)=>rankRole[a]-rankRole[b]);
+  for(let j=0;j<members.length;j++){
+   const role=members[j],depth=band*5+Math.floor(j/4)+(plan.type==='ranged'||plan.type==='support'?1:0),row=lane*4+j%4;
+   slots.push({...structuredClone(roles[role]||battalionExtraRoles[role]),depth,row,
+     squadIndex:index,squadType:plan.type,squadLabel:plan.label,platoonIndex:Math.floor(index/4)});
+   maxDepth=Math.max(maxDepth,depth);
+  }
+ }
+ return {slots,rows:lanes*4,depth:maxDepth,squadCount,platoonCount:Math.ceil(squadCount/4)};
+}
