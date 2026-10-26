@@ -97,7 +97,7 @@ export class BotCommand{
   // nearby forces, preserving IDs, units and all normal movement rules.
   const total=[...states.values()].reduce((n,s)=>n+s.count,0);
   let guardStrength=live.filter(o=>o.role==='guard').reduce((n,o)=>n+o.liveIds.reduce((v,id)=>v+states.get(id).count,0),0);
-  const homeDanger=flagEnemy>=2||(rearEnemy>=Math.max(4,total*.05)&&forwardDefenders<Math.max(total*.45,rearEnemy*3));
+  const homeDanger=m.elapsed-(m.flags.B.lastHitAt??-Infinity)<6||flagEnemy>=2||(rearEnemy>=Math.max(4,total*.05)&&forwardDefenders<Math.max(total*.45,rearEnemy*3));
   const required=homeDanger?Math.max(1,total*.35):0;
   for(const op of [...live].filter(o=>o.role!=='guard').sort((a,c)=>this.center(c).x-this.center(a).x)){
    if(guardStrength>=required)break;

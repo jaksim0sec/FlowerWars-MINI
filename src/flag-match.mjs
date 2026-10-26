@@ -148,7 +148,9 @@ export class FlagMatch{
  }
  damageFlag(team,amount){
   const flag=this.flags[team];if(this.phase!=='battle'||!flag||flag.health.current<=0||!Number.isFinite(amount)||amount<=0)return false;
-  flag.health.current=Math.max(0,flag.health.current-amount);this.statusRevision++;return true;
+  flag.health.current=Math.max(0,flag.health.current-amount);flag.lastHitAt=this.elapsed;
+  if(team==='B')this.command.nextRefresh=0;
+  this.statusRevision++;return true;
  }
  think(id){
   if(this.phase!=='battle')return;

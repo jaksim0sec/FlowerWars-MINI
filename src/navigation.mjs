@@ -162,6 +162,7 @@ export class Navigation {
   plan(u) {
     const b=this.board;
     if(u.step||!['idle','walk'].includes(u.state))return;
+    if(u.state==='walk')u.state='idle';
     if(tryHeal(b,u))return;
     if(this.keepDistance(u))return;
     if(b.unit(u.id)!==u||u.health.current<=0||u.step||!['idle','walk'].includes(u.state))return;

@@ -27,6 +27,7 @@ export function reformFormation(board,squad,units,lead){
  o.phase='forming';
  const active=board.unit(o.activeReformId);
  if(active&&active.health.current>0){
+  if(active.state==='attack'&&active.strike)return;
   if(active.step||active.command&&board.time-(active.waitSince??board.time)<1.5)return;
   if(active.command)board.interrupt(active);
   o.reformFailed=null;
@@ -39,7 +40,7 @@ export function reformFormation(board,squad,units,lead){
  const candidates=lead&&pending.some(u=>u.id===lead.id)?[lead]:pending;
  o.reformFailed??=new Set();
  for(const u of candidates){
-  if(o.reformFailed.has(u.id))continue;
+  if(o.reformFailed.has(u.id)||u.state==='attack'&&u.strike)continue;
   const goal=o.goals.get(u.id);if(!goal)continue;
   const route=pathTo(board,u,goal);
   if(route===undefined)return;

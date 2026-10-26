@@ -182,7 +182,7 @@ function runOrder(board,s,replace=false){
    }
    o.goals=new Map(planned.map(([u,p])=>[u.id,p]));
    if(o.type==='rally'){
-    for(const u of units){board.interrupt(u);u.reformSearch=null;}
+    for(const u of units){if(u.state!=='attack'||!u.strike)board.interrupt(u);u.reformSearch=null;}
     o.activeReformId=null;o.reformBuffer=null;o.reformFailed=null;
    }
    o.previous=anchor;o.lastMembers=units.length;o.dirty=false;
@@ -232,6 +232,7 @@ function runOrder(board,s,replace=false){
    u.combat.holdPosition=defensive&&at;
    if(at){arrived++;if(u.command)board.cancelCommand(u);continue;}
    if(!p||u.command?.type==='move'&&u.command.x===p.x&&u.command.y===p.y)continue;
+   if(u.state==='attack'&&u.strike)continue;
    if(!replace&&u.command?.type!=='move'&&(u.state!=='idle'||u.step))continue;
    board.move(u.id,p.x,p.y,{replace:replace||u.command?.type==='move',direct:true});
  }});

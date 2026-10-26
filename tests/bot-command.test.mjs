@@ -72,3 +72,8 @@ test('penetration transitions to a rear attack only after the raiders pass the o
  units.forEach((u,i)=>{u.x=u.visualX=8+i%4;u.y=u.visualY=50+Math.floor(i/4);b.cells.set(u.y*100+u.x,u.id);b.spatial.move(u);});
  m.command.refresh();assert.equal(m.command.planFor(op).stage,'rear-attack');assert.ok(m.command.events.some(e=>e.type==='rear-attack'));
 });
+test('flag damage alone recalls reinforcements without multiple intruders',()=>{
+ const {m}=game();assert.equal(m.command.mode,'advance');
+ m.command.nextRefresh=99;m.damageFlag('B',1);assert.equal(m.command.nextRefresh,0);
+ m.command.refresh();assert.equal(m.command.mode,'contract');assert.ok(m.command.registry.get('guard').size>0);
+});
