@@ -103,7 +103,7 @@
         "waist": "archer_side_pouch"
       },
       "testCombat": {
-        "maxHealth": 80,
+        "maxHealth": 65,
         "damage": 22,
         "attackPeriod": 1.4,
         "range": 4,
