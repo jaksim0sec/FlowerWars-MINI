@@ -69,7 +69,7 @@ function notify(message) { text('notice', message);$('notice').classList.add('vi
 
 function fit() {
   camera = fitBoardCamera(width, height, board.width, board.height);
-  if(board.match){const center=project(49.5,49.5);camera.scale=Math.max(.02,Math.min((width-32)/14400,(height-220)/8400,.5));camera.x=width/2-center.x*camera.scale;camera.y=(height-20)/2-center.y*camera.scale;}
+  if(board.match){const center=project(49.5,49.5);camera.scale=Math.max(.02,Math.min((width-32)/(width<=700?10000:14400),(height-220)/8400,.5));camera.x=width/2-center.x*camera.scale;camera.y=(height-20)/2-center.y*camera.scale;}
   fitted = true;
   refresh();
 }
@@ -284,12 +284,12 @@ function updateMatchHud(){
  document.body.classList.toggle('in-match',!!m);
  for(const id of ['group-place','summon','board-resize','combat-enable','combat-disable','group-team','terrain'])$(id).disabled=!!m;
  if(!m)return;
- text('match-phase',m.phase==='preparation'?'병력 준비':m.phase==='battle'?'깃발 공성전':'전투 종료');
+ text('match-phase',m.phase==='preparation'?'준비':m.phase==='battle'?'깃발 공성전':'전투 종료');
  const seconds=Math.ceil(m.remaining);text('match-timer',m.phase==='preparation'?Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0'):'');
- text('match-armies',m.phase==='preparation'?`배치 ${m.counts.A}/${m.limit} · 봇 ${m.counts.B}/${m.limit}`:`나 ${m.counts.A} · 봇 ${m.counts.B}`);
+ text('match-armies',m.phase==='preparation'?`나 ${m.counts.A}/${m.limit} · 적 ${m.counts.B}/${m.limit}`:`나 ${m.counts.A} · 적 ${m.counts.B}`);
  text('deployment-reserve',`예비 ${m.reserve.A}명 · ${Math.min(12,m.reserve.A)}명씩 배치`);
  $('deployment-tools').classList.toggle('is-deploying',view.mode==='deploy');
- text('deployment-toggle',view.mode==='deploy'?'지휘 모드':'병력 배치');
+ text('deployment-toggle',view.mode==='deploy'?'완료':'배치');
  for(const button of document.querySelectorAll('[data-deploy-type]')){button.disabled=m.reserve.A<=0;button.setAttribute('aria-pressed',String(button.dataset.deployType===view.deployType));}
  if(m.phase!=='preparation'&&view.mode==='deploy')view.mode='move';
  $('match-skip').hidden=m.phase!=='preparation';$('match-charge').hidden=m.phase!=='battle';

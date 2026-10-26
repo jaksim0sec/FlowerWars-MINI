@@ -9,29 +9,29 @@
   <link rel="stylesheet" href="./src/style.css">
 <link rel="manifest" href="./manifest.json"><link rel="apple-touch-icon" href="./assets/icons/icon-192.png"></head>
 <body>
-  <header class="masthead">
+  <header class="masthead" hidden>
     <div class="chapter"><a href="./characters.html">캐릭터 연구실</a><span id="unit-count">용사 2</span></div>
   </header>
   <main id="battlefield">
     <canvas id="board" tabindex="0" role="application" aria-label="도라가미 전장. 드래그로 이동, 휠 또는 두 손가락으로 확대. 방향키로 타일 탐색, Enter로 선택, S로 소환 모드, A로 공격 이동, M 이동, R 후퇴, H 사수, X 정지. Shift로 분대 추가 선택, 우클릭으로 이동 또는 공격."></canvas>
     <div id="loading" role="status">전장을 준비하고 있어요…</div>
-    <div class="camera-tools" aria-label="전장 보기">
+    <div hidden class="camera-tools" aria-label="전장 보기">
       <button id="zoom-in" aria-label="확대">+</button><output id="zoom-value" aria-label="확대 비율">100%</output><button id="zoom-out" aria-label="축소">−</button>
       <span class="tool-divider"></span><button id="fit" aria-label="전장 맞춤" title="전장 맞춤">⌖</button>
     </div>
   </main>
   <section id="match-hud" aria-label="깃발 공성전" hidden>
     <div class="match-topline"><strong id="match-phase">준비</strong><output id="match-timer">5:00</output><span id="match-armies"></span></div>
-    <small title="길: 이동 +20% · X: 진입 불가">길은 빠르게 · X는 진입 불가</small>
-    <div class="match-actions"><button id="match-skip">준비 스킵 · 전투 시작</button><button id="match-charge" hidden>전군 깃발로 진격</button><button id="match-home">내 깃발</button><button id="match-enemy">적 깃발</button></div>
+    <small hidden title="길: 이동 +20% · X: 진입 불가">길은 빠르게 · X는 진입 불가</small>
+    <div class="match-actions"><button id="match-skip">전투 시작</button><button id="match-charge" hidden>총공격</button><button hidden id="match-home">내 깃발</button><button hidden id="match-enemy">적 깃발</button></div>
   </section>
   <section id="deployment-tools" aria-label="예비 병력 배치" hidden>
-    <div class="deployment-head"><strong id="deployment-reserve">예비 200명</strong><span>병종 선택 → 내 진영 터치</span><button id="deployment-toggle">지휘 모드</button></div>
+    <div class="deployment-head"><strong hidden id="deployment-reserve">예비 200명</strong><span hidden>병종 선택 → 내 진영 터치</span><button id="deployment-toggle">지휘 모드</button></div>
     <div class="deployment-types"><button data-deploy-type="defense">방패</button><button data-deploy-type="assault">돌격</button><button data-deploy-type="ranged">궁병</button><button data-deploy-type="mobile">기동</button><button data-deploy-type="mixed">혼성</button><button data-deploy-type="support">지원</button></div>
   </section>
   <section id="match-result" aria-label="전투 결과" hidden><strong id="match-result-title"></strong><p id="match-result-detail"></p><button id="match-restart">다시 준비</button></section>
   <div id="command-feedback" class="command-feedback" aria-hidden="true" hidden></div>
-  <details id="debug-tools" class="debug-tools">
+  <details hidden id="debug-tools" class="debug-tools">
     <summary aria-label="개발 및 디버그 도구">⚙ 디버그</summary>
     <div class="debug-content"><div class="debug-close-row"><strong>전장 도구</strong><button id="debug-close" type="button" aria-label="디버그 닫기">×</button></div>
       <button id="match-start" type="button">플레이어 vs 봇 · 200명 깃발 공성전</button>

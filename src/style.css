@@ -642,3 +642,50 @@ body{display:block;}
  #command-state{white-space:normal;overflow-wrap:anywhere;}
  .in-match #notice{left:8px;right:auto;top:108px;bottom:auto;transform:none;max-width:108px;padding:5px;font-size:9px;}
 }
+
+/* Battlefield-first HUD: one top strip, a troop ribbon, contextual commands. */
+.masthead[hidden],.camera-tools[hidden],#debug-tools[hidden],#match-hud>small[hidden],.match-actions button[hidden],.deployment-head>[hidden]{display:none!important;}
+body.in-match{display:block;background:#eee2bd;}
+.in-match #battlefield{position:fixed;inset:0;background:radial-gradient(ellipse at 50% 38%,#fff7dc,#eddfb8 75%,#d5bc83);}
+#match-hud{top:max(12px,env(safe-area-inset-top));left:12px;right:12px;transform:none;width:max-content;max-width:calc(100vw - 24px);margin:auto;display:flex;align-items:center;gap:12px;padding:6px 7px 6px 16px;border:1px solid #fff9e4;border-radius:22px;background:#fff9e9ed;box-shadow:0 3px 16px #6f4d1e18;}
+.match-topline{padding:0;gap:10px;background:none;border-radius:0;flex-wrap:nowrap;white-space:nowrap;}
+#match-phase{font-size:12px;}#match-timer{font-size:22px;font-weight:850;color:#a36b21;}
+#match-timer:empty{display:none;}#match-armies{font-size:11px;color:#756140;}
+.match-actions{display:contents;}
+.match-actions button{min-height:40px;padding:6px 14px;border-radius:17px;background:#edc56b;color:#4d3417;font-size:12px;font-weight:800;white-space:nowrap;box-shadow:inset 0 0 0 1px #b6883938;}
+.squad-roster{position:fixed;left:12px;right:12px;top:auto;bottom:calc(10px + env(safe-area-inset-bottom));width:auto;height:104px;max-height:104px;padding:0;background:none;border:0;transform:none;pointer-events:none;}
+.squad-roster-list{display:flex;flex-direction:row;align-items:flex-end;gap:16px;width:100%;height:100%;overflow-x:auto;overflow-y:hidden;padding:0 0 4px;touch-action:pan-x;scrollbar-width:thin;pointer-events:auto;}
+.platoon-group{display:flex;flex-direction:column;gap:5px;flex-shrink:0;}
+.platoon-heading{height:24px;justify-content:flex-start;}
+.platoon-pick{flex:none;writing-mode:horizontal-tb;min-height:24px;max-height:24px;max-width:none;min-width:0;flex-direction:row;padding:3px 10px;border-radius:12px;background:#72592fbe;color:#fff9e7;font-size:11px;}
+.platoon-pick>span{writing-mode:horizontal-tb;}.platoon-fold{width:24px;height:24px;padding:4px;}
+.platoon-squads{flex-direction:row;gap:8px;padding:0;border:0;}
+.squad-card,.squad-card:hover,.squad-card.is-selected{grid-template-columns:48px 1fr;gap:7px;width:150px;min-width:150px;max-width:150px;height:68px;min-height:68px;padding:7px 9px;border:1px solid #fff6dd;border-radius:16px;background:#fff8e8ed;box-shadow:0 3px 10px #62461916;}
+.squad-card.is-selected{background:#ffe7a5;border:2px solid #ad7b2e;box-shadow:0 0 0 2px #fff5d9b0;}
+.squad-portrait{width:45px;height:48px;}.squad-avatar{width:45px;height:45px;}.squad-card-team{font-size:8px;right:-2px;bottom:0;}
+.squad-card-title{font-size:12px;}.squad-card-status{font-size:10px;max-width:84px;}.squad-card .squad-role{left:37px;top:44px;}
+.squad-card .squad-activity{left:auto;right:5px;top:4px;padding:3px;border-radius:50%;background:#fffdf3;}.squad-card .squad-activity .ui-icon{width:14px;height:14px;}
+#deployment-tools,#deployment-tools:not(.is-deploying){left:12px;right:auto;top:calc(72px + env(safe-area-inset-top));bottom:auto;transform:none;width:auto;max-width:calc(100vw - 24px);display:flex;align-items:center;gap:6px;}
+.deployment-head{order:2;padding:0;background:none;}.deployment-head button{min-width:44px;min-height:44px;padding:7px 10px;border-radius:16px;font-size:11px;}
+.deployment-types{margin:0;gap:5px;}.deployment-types button{min-width:40px;min-height:52px;border:1px solid #fff6dd;border-radius:15px;background:#fff9e9ed;box-shadow:0 2px 8px #62461912;}
+.command-dock{left:auto;right:12px;top:auto;bottom:calc(124px + env(safe-area-inset-bottom))!important;transform:none;width:290px;max-width:calc(100vw - 24px);padding:8px;background:none;border:0;box-shadow:none;backdrop-filter:none;}
+.command-selection-row{padding:7px 9px;border-radius:17px;background:#fff9e9ed;box-shadow:0 2px 10px #62461912;}.command-selection-row>div{max-width:190px;}
+.command-dock.is-expanded .selection-actions{justify-content:flex-end;margin:6px 0;}.selection-actions button{background:#fff9e9ed;border:0;border-radius:14px;min-height:36px;}
+.command-dock.is-expanded .quick-orders{grid-template-columns:repeat(5,48px);gap:4px;justify-content:end;}.command-help{display:none;}
+.squad-tools{left:auto;right:12px;width:290px;max-width:calc(100vw - 24px);top:auto;bottom:calc(312px + env(safe-area-inset-bottom));max-height:calc(100dvh - 390px);border-radius:20px;background:#fff9e9f5;}
+.in-match #notice,.in-match .squad-aim{left:12px;right:auto;top:calc(134px + env(safe-area-inset-top));bottom:auto;transform:none;max-width:min(340px,calc(100vw - 24px));font-size:10px;border-radius:14px;}
+@media(max-width:360px){
+ #match-hud{gap:6px;padding-left:10px;}.match-topline{gap:6px;}#match-phase{font-size:11px;}#match-timer{font-size:19px;}#match-armies{font-size:10px;}.match-actions button{padding:6px 9px;font-size:11px;}
+ .squad-card,.squad-card:hover,.squad-card.is-selected{width:138px;min-width:138px;max-width:138px;grid-template-columns:42px 1fr;gap:5px;}
+ .deployment-types{gap:3px;}.deployment-types button{min-width:37px;}.deployment-head button{padding:7px;}
+}
+@media(max-height:520px){.squad-roster{height:80px;max-height:80px;}.squad-card,.squad-card:hover,.squad-card.is-selected{height:50px;min-height:50px;}.squad-avatar{width:32px;height:32px;}.squad-portrait{height:34px;}.command-dock{bottom:calc(94px + env(safe-area-inset-bottom))!important;}.squad-tools{bottom:calc(94px + env(safe-area-inset-bottom));right:12px;max-height:calc(100dvh - 170px);}}
+/* Formation editing replaces the command tray instead of stacking two panels. */
+.in-match:has(#squad-tools:not([hidden])) #command-dock{display:none;}
+.squad-tools{bottom:calc(124px + env(safe-area-inset-bottom));max-height:calc(100dvh - 210px);}
+@media(max-height:520px){
+ .squad-tools{left:auto;right:12px;bottom:calc(94px + env(safe-area-inset-bottom));max-height:calc(100dvh - 170px);}
+ .command-dock{padding:6px;}.command-selection-row{padding:4px 7px;}
+ .command-dock.is-expanded .selection-actions{margin:4px 0;}.selection-actions button{min-height:30px;}
+ .command-dock .quick-orders button{min-height:50px;gap:2px;}.command-dock .quick-orders button>.ui-icon{width:36px;height:36px;padding:8px;}
+}
