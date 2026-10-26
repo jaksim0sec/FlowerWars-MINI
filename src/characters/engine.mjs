@@ -98,8 +98,9 @@ export function layoutCharacter(catalog, instance, time=0) {
       // Retimed to the simulation's impact; special weapons keep a smaller
       // body accent so bows stay aimed and spears keep their straight thrust.
       if(vars.state==='attack'&&(node.id==='upper'||node.id==='neck')){
-        const weight=unique.some(a=>a.equipmentId==='basic_sword')?1:0;
-        const head=node.id==='neck',pivot=rig.neck||rig.foot;
+        const head=node.id==='neck';
+        const weight=unique.some(a=>a.equipmentId==='basic_sword')?1:(vars[head?'attackHeadWeight':'attackBodyWeight']??0);
+        const pivot=rig.neck||rig.foot;
         if(!head)m=multiply(m,translate(value('attackBodyX',vars)*weight,value('attackBodyY',vars)*weight));
         m=multiply(m,multiply(translate(...pivot),multiply(rotate(value(head?'headRock':'bodyRock',vars)*weight),translate(-pivot[0],-pivot[1]))));
       }
