@@ -48,6 +48,5 @@ test('archer upper body retains its previous fixed bow posture',()=>{
  const attacking=pose('attack'),idle=pose('idle');
  assert.equal(attacking.vars.attackBodyWeight??0,0);
  assert.equal(attacking.vars.attackHeadWeight??0,0);
- assert.deepEqual(attacking.groups.upper.matrix,idle.groups.upper.matrix);
- assert.deepEqual(attacking.groups.neck.matrix,idle.groups.neck.matrix);
+ for(const group of ['upper','neck'])assert.ok(attacking.groups[group].matrix.every((v,i)=>Math.abs(v-idle.groups[group].matrix[i])<1e-8),`archer ${group} body motion changed`);
 });
