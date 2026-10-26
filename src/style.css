@@ -689,3 +689,39 @@ body.in-match{display:block;background:#eee2bd;}
  .command-dock.is-expanded .selection-actions{margin:4px 0;}.selection-actions button{min-height:30px;}
  .command-dock .quick-orders button{min-height:50px;gap:2px;}.command-dock .quick-orders button>.ui-icon{width:36px;height:36px;padding:8px;}
 }
+
+/* Tinted glass, troop symbols, and short composited panel transitions. */
+#match-hud{margin:0;right:auto;left:12px;background:rgba(224,204,158,.62);border-color:#80663830;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
+.command-selection-row,.squad-tools,.selection-actions button,.deployment-types button{background:rgba(224,204,158,.62);border-color:#80663830;}
+.command-selection-row>div{background:transparent;box-shadow:none;}
+.squad-tools,.command-selection-row{backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
+.command-dock .quick-orders button>.ui-icon{background:rgba(224,204,158,.62)!important;box-shadow:inset 0 0 0 1px #80663828;}
+.command-dock .quick-orders button[aria-pressed=true]>.ui-icon{background:#d9b967b8!important;}
+.match-actions button,.deployment-head button{background:#d9b967b8;}
+.selection-actions button[aria-pressed=true],.squad-tools .squad-option-row button[aria-pressed=true]{background:#d9b967b8;}
+.squad-tools .squad-option-row button{background:#d8c9a37a;}
+.platoon-fold{background:#cdbb8b66;}
+.squad-roster{height:94px;max-height:94px;}
+.squad-card,.squad-card:hover,.squad-card.is-selected{--troop-accent:#80612e;grid-template-columns:34px 1fr;width:142px;min-width:142px;max-width:142px;height:60px;min-height:60px;gap:8px;padding:7px 9px;border:1px solid #80663830;border-radius:14px;background:#d9c99e9e;box-shadow:0 2px 8px #392e1512;text-decoration:none;}
+.squad-card[data-type=defense]{--troop-accent:#506b50;}.squad-card[data-type=ranged]{--troop-accent:#95623d;}.squad-card[data-type=mobile]{--troop-accent:#697e39;}.squad-card[data-type=support]{--troop-accent:#597d75;}
+.squad-card.is-selected{background:#e9ca7dc9;border-color:#8e6a2e;box-shadow:inset 3px 0 #9e752c;}
+.squad-emblem{display:grid;place-items:center;align-self:center;width:34px;height:34px;border-radius:11px;background:#57451f14;color:var(--troop-accent);}
+.squad-emblem .ui-icon{width:24px;height:24px;}
+.squad-card-body{gap:0;}.squad-card-title,.squad-card.is-selected .squad-card-title{font-size:11px;text-decoration:none;line-height:15px;}
+.squad-kind{font-size:9px;line-height:12px;color:var(--troop-accent);font-weight:700;}
+.squad-card-status{max-width:92px;font-size:9px;line-height:14px;color:#615235;}
+.squad-card .squad-role{display:none;}.squad-card .squad-activity{background:#dacba17a;right:4px;top:4px;padding:2px;}
+.squad-card .squad-activity .ui-icon{width:11px;height:11px;}
+button{transition:background-color .16s ease,border-color .16s ease,box-shadow .16s ease,scale .14s ease;}
+button:not(:disabled):active{scale:.96;}
+#command-dock,#squad-tools,#deployment-tools,.quick-orders,.selection-actions{transition:opacity .18s ease,translate .18s ease,display .18s allow-discrete;opacity:1;translate:0 0;}
+#command-dock[hidden],#squad-tools[hidden],#deployment-tools[hidden],.quick-orders[hidden],.selection-actions[hidden]{opacity:0;translate:0 7px;pointer-events:none;}
+.in-match:has(#squad-tools:not([hidden])) #command-dock{opacity:0;pointer-events:none;}
+@starting-style{#command-dock:not([hidden]),#squad-tools:not([hidden]),#deployment-tools:not([hidden]),.quick-orders:not([hidden]),.selection-actions:not([hidden]){opacity:0;translate:0 7px;}}
+@media(max-height:520px){.squad-roster{height:80px;max-height:80px;}.squad-card,.squad-card:hover,.squad-card.is-selected{height:50px;min-height:50px;padding-block:3px;}.squad-kind{display:none;}}
+@media(prefers-reduced-motion:reduce){#command-dock,#squad-tools,#deployment-tools,.quick-orders,.selection-actions,button{transition:none;translate:none;}}
+.command-dock:not(.is-expanded) .quick-orders,.command-dock:not(.is-expanded) .selection-actions{opacity:0;translate:0 7px;pointer-events:none;}
+.platoon-squads{transition:opacity .18s ease,translate .18s ease,display .18s allow-discrete;opacity:1;translate:0 0;}
+.platoon-squads[hidden]{opacity:0;translate:0 5px;pointer-events:none;}
+@starting-style{.platoon-squads:not([hidden]){opacity:0;translate:0 5px;}}
+@media(prefers-reduced-motion:reduce){.platoon-squads{transition:none;translate:none;}}

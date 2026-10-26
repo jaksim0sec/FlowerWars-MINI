@@ -7,7 +7,7 @@ import {configureSquad,orderSquad,orderSquads,updateSquadOrders,squadSummary,SQU
 import {characterRadius,onScreen} from './character-render-cache.mjs';
 import {setupMovementScenario,startMovementScenario,movementStats} from './movement-scenarios.mjs';
 import {healthLabel} from './characters/vitality.mjs';
-import {createCharacter,equip,unequip,drawCharacter} from './characters/engine.mjs';
+import {createCharacter,equip,unequip} from './characters/engine.mjs';
 import {visibleCharacters} from './characters/catalog.mjs';
 import { Board, BOARD_COLUMNS, BOARD_ROWS, project, tileAt, zoomCamera as modelZoomCamera, fitBoardCamera } from './model.mjs';
 import { loadArtwork, render } from './render.mjs';
@@ -44,7 +44,6 @@ let fitted = true,lastBoardSize='';
 let movementScenario=null,lastLabUpdate=0,lastSquadUpdate=0,lastSelectedSquad='';
 let lastMatchHud=0,lastMatchRefresh=0;
 let selectedSquadId=null,lastRosterUpdate=0,rosterEpoch=null,rosterCards=new Map(),commandPanelOpen=false;
-const squadPortraits=new Map();
 const selectedSquads=new Set();
 let additiveSelection=false,ordersExpanded=true;
 let squadQuickCommand=false,longPressTimer=null,longPressPointer=null,longPressConsumed=false,feedbackTimer=null,squadHintSeen=false;
@@ -101,23 +100,11 @@ function movementFor(c){if(c.testMovement)return {...c.testMovement};const profi
 function unitName(unit) {return unit.character?.testName || art?.catalog.characters[unit.character?.characterId]?.name || '용사';}
 function activeSquad(){return (selectedSquadId&&squadsFor(board).get(selectedSquadId))||squadOf(board,board.unit(view.selected));}
 
-/** Cached portraits show the squad's dominant troop using its actual rig. */
-function makeCommanderAvatar(characterId='banner-bearer'){
-  try{
-    const canvas=document.createElement('canvas');canvas.width=144;canvas.height=144;
-    const portrait=canvas.getContext('2d');portrait.scale(2,2);portrait.translate(36,106);
-    drawCharacter(portrait,art.catalog,newCharacter(characterId),0);
-    return canvas.toDataURL('image/png');
-  }catch(error){
-    console.warn('기수 초상 생성 실패:',error);
-    return new URL('../assets/units/banner-bearer/head_deco_overlay.png',import.meta.url).href;
-  }
-}
 const squadActionLabels=Object.fromEntries(Object.entries(SQUAD_ACTIONS).map(([key,def])=>[key,def.label]));
 const targetedSquadActions=new Set(Object.entries(SQUAD_ACTIONS).filter(([,def])=>def.target).map(([key])=>key));
 function selectedCommandSquads(){return [...selectedSquads].map(id=>squadsFor(board).get(id)).filter(Boolean);}
 function syncSelectionView(){view.selectedSquadIds=[...selectedSquads];dirty=true;}
-function closeSquadPanel(){commandPanelOpen=false;refresh();}
+function closeSquadPanel(){const restore=$('squad-tools').contains(document.activeElement);commandPanelOpen=false;refresh();if(restore)$('selection-options').focus({preventScroll:true});}
 function cancelSquadTarget(){
  if(view.mode==='squad-target'){view.mode='move';view.squadId=null;view.squadOrder=null;view.commandSquadIds=null;}
  $('squad-aim').hidden=true;refresh();
@@ -177,20 +164,16 @@ function selectSquad(id,trigger=null,additive=false){
 function rosterButton(squad){
   const button=document.createElement('button');button.type='button';button.className='squad-card';button.dataset.squadId=squad.id;
   const portrait=document.createElement('span');portrait.className='squad-portrait';
-  const counts=new Map();
-  for(const id of squad.memberIds){const u=board.unit(id),kind=u?.character?.characterId;if(kind&&kind!=='banner-bearer')counts.set(kind,(counts.get(kind)||0)+1);}
-  const primary=[...counts].sort((a,b)=>b[1]-a[1])[0]?.[0]||'banner-bearer';
-  if(!squadPortraits.has(primary))squadPortraits.set(primary,makeCommanderAvatar(primary));
-  const avatar=document.createElement('img');avatar.className='squad-avatar';avatar.src=squadPortraits.get(primary);avatar.alt='';avatar.width=44;avatar.height=44;
-  const team=document.createElement('span');team.className='squad-card-team team-'+squad.team.toLowerCase();team.textContent=squad.team+'팀';
-  portrait.append(avatar,team);
+  portrait.classList.add('squad-emblem');portrait.innerHTML=icon(squad.type);
+  button.dataset.type=squad.type;
   const body=document.createElement('span');body.className='squad-card-body';
   const title=document.createElement('strong');title.className='squad-card-title';title.textContent=squad.name;
   const status=document.createElement('small');status.className='squad-card-status';
   const badges=document.createElement('span');badges.className='squad-badges';
   const role=document.createElement('span');role.className='squad-role';role.innerHTML=icon(squad.type);role.title=typeLabels[squad.type]||'혼성';
   const activity=document.createElement('span');activity.className='squad-activity';badges.append(role,activity);body.append(badges);
-  body.append(title,status);button.append(portrait,body);
+  const kind=document.createElement('span');kind.className='squad-kind';kind.textContent=typeLabels[squad.type]||'혼성';
+  body.append(title,kind,status);button.append(portrait,body);
   button.addEventListener('click',event=>selectSquad(squad.id,button,event.shiftKey||event.ctrlKey||event.metaKey));
   button.addEventListener('dblclick',()=>locateSelection());
   let press=null,start=null,consumed=false;
@@ -325,6 +308,8 @@ function refresh(invalidate=true) {
   text('group-status',`${groupsFor(board).size}개 부대 등록`);
   const squad=activeSquad();
   $('squad-tools').hidden=!squad||!commandPanelOpen;
+  $('squad-tools').inert=$('squad-tools').hidden;
+  $('command-dock').inert=!$('squad-tools').hidden;
   $('squad-aim').hidden=view.mode!=='squad-target';
   if(squad){
     const summary=squadSummary(board,squad.id);
@@ -660,7 +645,7 @@ $('selection-locate').innerHTML=icon('fit')+'<span class="control-label">부대 
 $('selection-locate').addEventListener('click',locateSelection);
 $('selection-add').addEventListener('click',()=>{additiveSelection=!additiveSelection;refresh();});
 $('selection-clear').addEventListener('click',()=>{cancelSquadTarget();selectUnit(null);refresh();});
-$('selection-options').addEventListener('click',()=>{commandPanelOpen=!commandPanelOpen;refresh();});
+$('selection-options').addEventListener('click',()=>{commandPanelOpen=!commandPanelOpen;refresh();if(commandPanelOpen)$('squad-tools').querySelector('[data-squad-formation][aria-pressed="true"]')?.focus({preventScroll:true});});
 $('selection-platoon').addEventListener('click',()=>{
  const selected=selectedCommandSquads();if(!selected.length)return;
  additiveSelection=false;
