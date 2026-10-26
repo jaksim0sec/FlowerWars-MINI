@@ -98,6 +98,7 @@ export function tryAutoAttack(board,actor) {
     }
   }
   if(!target){if(actor.waitReason==='combat')actor.waitReason=null;return false;}
+  if(actor.combat.charge&&actor.command?.type==='move'&&board.time+1e-9<actor.combat.nextAttackAt)return false;
   actor.waitReason='combat';
   if(board.time+1e-9>=actor.combat.nextAttackAt)board.beginAttack(actor,target.id,true);
   return true; // Remain engaged instead of walking through the local enemy.

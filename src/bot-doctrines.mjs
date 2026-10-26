@@ -23,12 +23,13 @@ export function createRecruitmentCatalog(blueprints,profiles={}){
   for(const member of blueprint.members){
    if(member.role==='banner')continue;
    const p=profiles[member.characterId]||{},stats=member.stats||p.testCombat||{},movement=member.movement||p.testMovement||{};
+   const speedMultiplier=member.battle?.speedMultiplier||1;
    const healing=member.role==='healer'||member.capabilities?.includes('heal')||p.capabilities?.includes('heal')||stats.healAmount>0;
    features.heal+=healing?1:0;
    features.fire+=!healing&&(stats.range>1||member.role==='archer')?1:0;
    features.tank+=member.role==='guard'?1:Math.max(0,((stats.maxHealth||100)-110)/100);
    features.melee+=!healing&&!(stats.range>1||member.role==='archer')?1:0;
-   features.speed+=movement.stepTime?Math.max(0,.42/movement.stepTime-1):member.role==='scout'?1:0;
+   features.speed+=movement.stepTime?Math.max(0,.42/movement.stepTime*speedMultiplier-1):member.role==='scout'?speedMultiplier:0;
   }
   const n=Math.max(1,blueprint.members.length-1);for(const key in features)features[key]/=n;
   return [blueprint.squadType,{blueprint,features}];

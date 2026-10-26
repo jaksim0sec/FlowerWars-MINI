@@ -114,12 +114,15 @@ export class Board {
   spawn(x, y, character = null, options={}) {
     if(this.match&&(!options.team||this.units.filter(u=>u.team===options.team&&u.health.current>0).length>=this.match.limit))return null;
     if (!this.inside(x, y) || this.navigation.blocked(y*this.width+x) || this.occupied(x, y)) return null;
+    const battle=options.battle||Object.values(character?.equipment||{}).find(a=>a?.battle)?.battle;
+    if(battle)options={...options,stats:{...options.stats,damage:(options.stats?.damage||25)*(battle.damageMultiplier||1),attackPeriod:battle.attackPeriod||options.stats?.attackPeriod},movement:{...options.movement,stepTime:(options.movement?.stepTime||.34)/(battle.speedMultiplier||1)}};
     const health=character?.health||createHealth();
     if(Number.isFinite(options.stats?.maxHealth)&&options.stats.maxHealth>0)health.current=health.max=options.stats.maxHealth;
     const u = { character, health, priorityKey:mix(this.seed^Math.imul(this.nextId,0x9e3779b9)),movement:movementOptions(options.movement),capabilities:[...(options.capabilities||[])],team:options.team||null,combat:combatOptions(options),strike:null,
       damage:Number.isFinite(options.stats?.damage)&&options.stats.damage>0?options.stats.damage:25, id: this.nextId++, x, y, visualX: x, visualY: y,
       state: 'idle', elapsed: 0, facing: -1, path: [], target: null, command:null, step:null, route:[], waitReason:null, hits: 0, impacted: false };
     u.healing=healingOptions(options,character);
+    if(battle)Object.assign(u.combat,{movingPoise:!!battle.movingPoise,charge:!!battle.charge,activeDuration:battle.activeDuration,impactTime:battle.impactTime});
     this.units.push(u);this.byId.set(u.id,u);this.cells.set(y*this.width+x,u.id);this.spatial.add(u);
     return u;
   }
@@ -168,7 +171,7 @@ export class Board {
     if(this.time+1e-9<u.combat.nextAttackAt)return false;
     u.target=targetId;u.facing=project(target.visualX-u.visualX,target.visualY-u.visualY).x>=0?1:-1;
     u.attackVector=project(target.visualX-u.visualX,target.visualY-u.visualY);
-    u.strike={target:targetId,automatic,duration:u.combat.period,impactTime:u.combat.period*IMPACT_TIME/BASE_ATTACK_DURATION};
+    u.strike={target:targetId,automatic,duration:u.combat.activeDuration||u.combat.period,impactTime:u.combat.impactTime??u.combat.period*IMPACT_TIME/BASE_ATTACK_DURATION};
     u.combat.nextAttackAt=this.time+u.combat.period;
     u.state='attack';u.elapsed=0;u.impacted=false;u.waitReason=null;this.combatStats.attacks++;return true;
   }
@@ -181,6 +184,8 @@ export class Board {
     const u=this.unit(id);if(!u||u.health.current<=0||!Number.isFinite(amount)||amount<=0)return false;
     if(u.structure==='flag')return this.match?.damageFlag(u.team,amount)||false;
     u.health.current=Math.max(0,u.health.current-amount);u.hits++;
+    // Poise protects locomotion, never health or a lethal hit.
+    if(u.health.current>0&&u.combat.movingPoise&&u.step)return true;
     const attacker=this.unit(attackerId);
     if(u.health.current>0&&u.combat.auto&&u.command?.type!=='attack'&&!u.healing&&u.formationRole!=='banner'&&attacker?.team&&u.team&&attacker.team!==u.team&&Math.max(Math.abs(attacker.x-u.x),Math.abs(attacker.y-u.y))<=6){
       const previous=u.combat.retaliation;

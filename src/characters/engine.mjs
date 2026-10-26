@@ -21,7 +21,7 @@ export function equip(catalog, instance, equipmentId, hand) {
   if(hand!=='both' && item.hands===2) throw new Error('Equipment requires both hands');
   if(item.slot ? item.slot!==hand : !['left','right','both'].includes(hand)) throw new Error('Equipment slot mismatch');
   unequip(instance,hand);
-  const attachment={equipmentId, hand, overrides:{}};
+  const attachment={equipmentId, hand, overrides:{},...(item.battle?{battle:structuredClone(item.battle)}:{})};
   for(const slot of hand==='both'?['left','right']:[hand]) instance.equipment[slot]=attachment;
 }
 const I=()=>[1,0,0,1,0,0];
@@ -125,7 +125,15 @@ export function layoutCharacter(catalog, instance, time=0) {
     const equipmentVars=!e.animation?vars:Object.keys(e.animation).length===1&&Object.hasOwn(e.animation,'weapon')?{...vars,weapon:value(e.animation.weapon,vars)}:channels(rig,instance,time,[e]);
     const rotation=(e.socketRotations?.[side] ?? e.rotation ?? 0)+(rig.equipmentRotations?.[attachment.equipmentId]?.[side]||0)+value(e.motion||0,equipmentVars)*(e.socketMotionSigns?.[side]??1)+(attachment.overrides.rotation||0);
     const mirror=e.socketMirrors?.[side] ? [-1,0,0,1,0,0] : I();
-    const matrix=multiply(socket.matrix,multiply(translate(...(e.offset || [0,0])),multiply(rotate(rotation),mirror)));
+    let matrix=multiply(socket.matrix,multiply(translate(...(e.offset || [0,0])),multiply(rotate(rotation),mirror)));
+    if(e.thrust){
+      const a=instance.animation,v=a.attackVector;
+      const angle=a.state==='attack'&&v?Math.atan2(v.x*(a.facing===1?-1:1),-v.y):a.state==='walk'?-1.0:-.12;
+      // Aim the shaft through the palm; the authored body lunge supplies the
+      // forward thrust, so the weapon never slides out of the gripping hand.
+      const sx=Math.hypot(socket.matrix[0],socket.matrix[1]),sy=Math.hypot(socket.matrix[2],socket.matrix[3]);
+      matrix=multiply(translate(socket.matrix[4],socket.matrix[5]),multiply(rotate(angle+(attachment.overrides.rotation||0)),[sx,0,0,sy,0,0]));
+    }
     equipmentDraws[side]={equipmentId:attachment.equipmentId,matrix,w:e.w,h:e.h,grip:e.grip,clip:e.clip};
     if(e.bow){
       const b=e.bow,local=([x,y])=>[(x-e.grip[0])*e.w,(y-e.grip[1])*e.h];

@@ -7,13 +7,14 @@ export function squadOf(board,unit){return unit?.squadId?squadsFor(board).get(un
 
 /** Plain JSON template, independent of board/camera/character instances. */
 const types={
- assault:['banner-bearer',...Array(7).fill('scout'),...Array(3).fill('shield-guard'),'clover-mage'],
+ assault:['banner-bearer',...Array(10).fill('scout'),'clover-mage'],
  defense:['banner-bearer',...Array(10).fill('shield-guard'),'clover-mage'],
  ranged:['banner-bearer',...Array(7).fill('archer'),...Array(3).fill('shield-guard'),'scout'],
  mobile:['banner-bearer',...Array(9).fill('scout'),...Array(2).fill('archer')],
  support:['banner-bearer',...Array(4).fill('clover-mage'),...Array(3).fill('scholar'),...Array(3).fill('shield-guard'),'scout'],
  mixed:['banner-bearer',...Array(4).fill('scout'),...Array(3).fill('shield-guard'),...Array(3).fill('archer'),'clover-mage']
 };
+export const SPEAR_BATTLE={damageMultiplier:1.5,speedMultiplier:1.5,attackPeriod:3.2,impactTime:.07,activeDuration:.32,movingPoise:true,charge:true};
 const roles={'banner-bearer':'banner','scout':'scout','shield-guard':'guard','archer':'archer','clover-mage':'healer','scholar':'support'};
 export function availableSquadBlueprints(){return Object.keys(types).map(type=>createFormationGroup(12,'squad','',type));}
 export function createFormationGroup(count=8,kind='squad',name='',type='mixed'){
@@ -21,6 +22,10 @@ export function createFormationGroup(count=8,kind='squad',name='',type='mixed'){
  const formation=armyFormation(count),center=Math.floor(formation.rows/2);
  if(type!=='mixed'&&types[type])for(let i=0;i<formation.slots.length;i++){
    const id=types[type][i%12];formation.slots[i]={...formation.slots[i],characterId:id,role:roles[id],weapon:undefined,stats:undefined};
+ }
+ if(type==='assault')for(const slot of formation.slots){
+  slot.battle={speedMultiplier:1.5};
+  if(slot.characterId==='scout'){slot.weapon='ribbon_spear';slot.battle={...SPEAR_BATTLE};}
  }
  return {format:'doragami-unit-group',version:1,kind,name:name.trim()||(kind==='platoon'?'혼성 소대':'혼성 분대'),squadType:types[type]?type:'mixed',members:formation.slots.map(({depth,row,...slot})=>({...structuredClone(slot),offset:{x:-depth,y:row-center}}))};
 }
@@ -32,7 +37,7 @@ export function placeGroup(board,blueprint,anchor,options={}){
  const free=()=>positions.every(p=>{const key=p.y*board.width+p.x;if(!board.inside(p.x,p.y)||board.occupied(p.x,p.y)||board.navigation.blocked(key))return false;return true;});
  for(const p of positions){const k=`${p.x},${p.y}`;if(seen.has(k))return null;seen.add(k);}
  if(!free())return null;
- const prepared=blueprint.members.map((member,i)=>{const character=options.makeCharacter?.(member,i)||null;return {character,settings:{stats:member.stats,movement:member.movement,capabilities:member.capabilities,...options.optionsFor?.(character,member,i),team:options.team||'A',autoCombat:options.autoCombat??true}};});
+ const prepared=blueprint.members.map((member,i)=>{const character=options.makeCharacter?.(member,i)||null;return {character,settings:{battle:member.battle,stats:member.stats,movement:member.movement,capabilities:member.capabilities,...options.optionsFor?.(character,member,i),team:options.team||'A',autoCombat:options.autoCombat??true}};});
  if(!free())return null;
  const r=registry(board),id=`${blueprint.kind}-${r.next++}`;
  const group={id,name:blueprint.name,kind:blueprint.kind,team:options.team||'A',anchor:{...anchor},blueprint:structuredClone(blueprint),memberIds:[]};

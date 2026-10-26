@@ -14,7 +14,8 @@ function army(type,count=144){
 test('bot recruits mobile attackers against ranged armies and more archers against shield armies',()=>{
  const ranged=army('ranged',240),shields=army('defense',240);
  const count=(force,type)=>force.squads.filter(s=>s.type===type).length;
- assert.ok(count(ranged,'mobile')>count(shields,'mobile'),'ranged opponents should change recruitment');
+ const mobility=force=>force.squads.reduce((sum,s)=>sum+force.match.recruitment.get(s.type).features.speed,0);
+ assert.ok(mobility(ranged)>mobility(shields),'ranged opponents should recruit faster attackers');
  assert.ok(count(shields,'ranged')>count(ranged,'ranged'),'shield opponents require more ranged firepower');
 });
 test('full bot operations pair frontline, firepower and healing in one lane',()=>{
