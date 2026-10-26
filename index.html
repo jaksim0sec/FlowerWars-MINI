@@ -70,40 +70,26 @@
       <button id="squad-close" type="button" aria-label="분대 명령 닫기">×</button>
     </div>
     <div class="squad-compact-row">
-      <span class="squad-row-label">태세</span>
-      <div class="squad-option-row" role="group" aria-label="전투 태세">
-        <button type="button" data-squad-stance="aggressive"><span aria-hidden="true">⚔</span> 적극</button>
-        <button type="button" data-squad-stance="balanced"><span aria-hidden="true">◇</span> 균형</button>
-        <button type="button" data-squad-stance="avoid"><span aria-hidden="true">◌</span> 회피</button>
-      </div>
-    </div>
-    <div class="squad-compact-row">
       <span class="squad-row-label">진형</span>
       <div class="squad-option-row" role="group" aria-label="진형 선택">
-        <button type="button" data-squad-formation="line"><span aria-hidden="true">☷</span> 횡대</button>
-        <button type="button" data-squad-formation="column"><span aria-hidden="true">⋮</span> 종대</button>
-        <button type="button" data-squad-formation="dense"><span aria-hidden="true">▦</span> 밀집</button>
-        <button type="button" data-squad-formation="spread"><span aria-hidden="true">⠿</span> 산개</button>
+        <button type="button" data-squad-formation="line" title="넓은 전열로 교전">횡대</button>
+        <button type="button" data-squad-formation="column" title="좁은 길로 이동">종대</button>
+        <button type="button" data-squad-formation="square" title="사방을 둘러싸는 배치">방진</button>
+        <button type="button" data-squad-formation="spread" title="간격을 벌린 배치">산개</button>
       </div>
     </div>
-    <div class="squad-extra-actions" aria-label="추가 전술">
-      <button data-squad-action="rally">기수 집결</button><button data-squad-action="follow">아군 추종</button><button data-squad-action="firing-line">사격진 구축</button>
-    </div>
+    <small class="formation-help">횡대: 넓게 · 종대: 좁게 · 방진: 사방 · 산개: 간격</small>
   </section>
   <section id="command-dock" class="command-dock" aria-label="선택 부대 지휘" hidden>
     <div class="command-selection-row"><div><strong id="command-selection"></strong><small id="command-state" aria-live="polite"></small></div><button id="orders-toggle" aria-expanded="true" aria-label="명령 펼치기">명령</button><button id="selection-clear" aria-label="부대 선택 해제">×</button></div>
     <div class="selection-actions"><button id="selection-add" aria-pressed="false">＋ 추가 선택</button><button id="selection-platoon">소대 선택</button><button id="selection-locate">부대 보기</button><button id="selection-options" aria-expanded="false">태세·진형</button></div>
     <div class="quick-orders" role="group" aria-label="빠른 명령">
-      <button data-squad-action="move"><span aria-hidden="true">➜</span>이동<kbd>M</kbd></button>
-      <button data-squad-action="advance"><span aria-hidden="true">⚔</span>공격 이동<kbd>A</kbd></button>
-      <button data-squad-action="focus"><span aria-hidden="true">◎</span>집중 공격</button>
-      <button data-squad-action="flank"><span aria-hidden="true">⤴</span>우회 기동</button>
-      <button data-squad-action="fortify"><span aria-hidden="true">▥</span>방어진 구축</button>
-      <button data-squad-action="retreat"><span aria-hidden="true">↩</span>후퇴<kbd>R</kbd></button>
-      <button data-squad-action="hold"><span aria-hidden="true">⬟</span>현 위치 사수<kbd>H</kbd></button>
-      <button data-squad-action="wait"><span aria-hidden="true">Ⅱ</span>정지<kbd>X</kbd></button>
+      <button data-squad-action="advance">이동</button>
+      <button data-squad-action="focus">공격</button>
+      <button data-squad-action="flank">우회</button>
+      <button data-squad-action="hold">사수</button>
+      <button data-squad-action="rally">집결</button>
     </div>
-    <button id="orders-more" type="button" aria-expanded="false">추가 전술</button>
     <small class="command-help">분대 선택 → 명령 → 목표 · Shift/추가 선택으로 묶기 · 우클릭 이동/공격</small>
   </section>
   <div id="squad-aim" class="squad-aim" hidden role="status">

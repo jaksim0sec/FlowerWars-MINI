@@ -607,3 +607,16 @@ body{display:block;}
 #deployment-tools:not(.is-deploying){top:95px;left:12px;bottom:auto;transform:none;width:auto;}
 #deployment-tools:not(.is-deploying) .deployment-head span{display:none;}
 @media(max-width:700px){#deployment-tools{left:8px;right:8px;bottom:calc(92px + env(safe-area-inset-bottom));transform:none;width:auto;}#deployment-tools:not(.is-deploying){top:132px;left:8px;right:auto;bottom:auto;} .deployment-head span{display:none;}}
+
+/* Five direct orders, close enough to scan and reach as one group. */
+.command-dock{width:280px;}
+.command-dock.is-expanded .quick-orders{grid-template-columns:repeat(5,48px);justify-content:end;gap:4px;margin-top:6px;}
+.command-dock .quick-orders button{display:flex;order:0;min-height:62px;min-width:44px;gap:4px;padding:0!important;}
+.command-dock .quick-orders button>.ui-icon{box-sizing:border-box;width:44px;height:44px;padding:10px;background:#fff9edf5!important;box-shadow:0 1px 5px #40331d18;border-radius:50%;}
+.command-dock .quick-orders button>.icon-label{font-size:10px;font-weight:650;}
+.command-dock .quick-orders button[aria-pressed=true]>.ui-icon{background:#f0cf83!important;}
+.squad-tools .squad-option-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;width:100%;}
+.squad-tools .squad-option-row button{flex-direction:column;min-height:64px;padding:6px 2px;gap:4px;border-radius:13px;font-size:11px;}
+.squad-tools .squad-option-row .ui-icon{width:30px;height:30px;}
+.squad-tools .formation-help{font-size:10px;line-height:1.5;margin:8px 0 2px;}
+@media(max-width:700px){.command-dock{width:280px;}.squad-tools{bottom:calc(250px + env(safe-area-inset-bottom));}}

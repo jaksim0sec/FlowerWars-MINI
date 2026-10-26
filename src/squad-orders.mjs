@@ -4,12 +4,12 @@ import {coverPlan,moveUnderCover} from './commander-cover.mjs';
 
 export const SQUAD_ACTIONS={
  move:{label:'이동',target:true,hint:'교전보다 이동 우선'},
- advance:{label:'공격 이동',target:true,hint:'경로의 적과 교전하며 전진'},
- focus:{label:'집중 공격',target:true,hint:'선택한 적을 추적·공격'},
- flank:{label:'우회 공격',target:true,hint:'적 선택 → 측면 우회 후 집중 공격 · 지면 선택은 우회 이동'},
+ advance:{label:'이동',target:true,hint:'목표로 이동하며 마주친 적과 자동 교전'},
+ focus:{label:'공격',target:true,hint:'선택한 적을 추적·공격'},
+ flank:{label:'우회',target:true,hint:'적 선택 → 측면 우회 후 공격 · 지면 선택은 우회 이동'},
  fortify:{label:'방어진 구축',target:true,hint:'목표에 방패 전열을 세우고 사수'},
  retreat:{label:'후퇴',target:true,hint:'교전을 끊고 지정 위치로 철수'},
- hold:{label:'현 위치 사수',hint:'이동 중단·제자리 교전'},
+ hold:{label:'사수',hint:'이동을 멈추고 현재 위치에서 적과 교전'},
  wait:{label:'정지',hint:'이동과 공격 중단'},
  rally:{label:'집결',hint:'기수 주변에 재집결'},
  follow:{label:'아군 추종',target:true,hint:'다른 아군 분대를 따라 이동'},
@@ -17,7 +17,7 @@ export const SQUAD_ACTIONS={
 };
 const ALIASES={assault:'advance','support-focus':'follow',reform:'rally'};
 const STANCES=new Set(['aggressive','balanced','avoid']);
-const FORMATIONS=new Set(['line','column','dense','spread']);
+const FORMATIONS=new Set(['line','column','dense','spread','square']);
 const alive=(board,squad)=>squad.memberIds.map(id=>board.unit(id)).filter(u=>u&&u.health.current>0);
 /** The flag bearer commands while alive. After their loss, a surviving soldier
  * takes over without replacing or respawning the fallen character. */

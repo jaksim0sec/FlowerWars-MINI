@@ -435,7 +435,7 @@ function activate(p, keyboardTile = null, additive=false) {
     // squad to focus it. Tapping an ally switches selection.
     const intent=squadTapIntent(board,selectedSquadId,target,tile);
     if(intent.kind==='order'){
-      if(commitSquadTarget(activeSquad(),intent.action,intent.aim)){
+      if(commitSquadTarget(activeSquad(),intent.action==='move'?'advance':intent.action,intent.aim)){
         view.tile=tile;
         showCommandFeedback(target?{x:target.x,y:target.y}:tile,intent.action);
         notify((squadsFor(board).get(selectedSquadId)?.name||'분대')+' · '+squadActionLabels[intent.action]+' 명령');
@@ -461,7 +461,7 @@ function activate(p, keyboardTile = null, additive=false) {
   } else if (tile) {
     view.tile = tile;
     if (view.selected && view.mode === 'move') {
-      if(selectedSquads.size){commitSquadTarget(activeSquad(),'move',tile);return;}
+      if(selectedSquads.size){commitSquadTarget(activeSquad(),'advance',tile);return;}
       if (board.move(view.selected, tile.x, tile.y)) notify('한 걸음씩 이동하고 있어요.');
       else notify('선택한 용사의 동작이나 이동 경로를 확인하세요.');
     } else if (view.mode === 'attack') notify('공격할 용사를 선택하세요.');
@@ -558,7 +558,7 @@ canvas.addEventListener('keydown', event => {
     notify(`${view.tile.x + 1}, ${view.tile.y + 1}번 칸${u ? ` · ${unitName(u)} ${u.id}` : ''}. Enter로 선택`);
     refresh();
   } else if (event.key === 'Enter' && view.tile) { event.preventDefault(); activate(null, view.tile); }
-  else if(selectedSquads.size&&({m:'move',a:'advance',r:'retreat',h:'hold',x:'wait'})[event.key.toLowerCase()]){event.preventDefault();issueSquadAction(({m:'move',a:'advance',r:'retreat',h:'hold',x:'wait'})[event.key.toLowerCase()]);}
+  else if(selectedSquads.size&&({m:'advance',a:'advance',r:'advance',h:'hold',x:'hold'})[event.key.toLowerCase()]){event.preventDefault();issueSquadAction(({m:'advance',a:'advance',r:'advance',h:'hold',x:'hold'})[event.key.toLowerCase()]);}
   else if (event.key.toLowerCase() === 's') setMode('summon');
   else if (event.key.toLowerCase() === 'a' && view.selected && !$('attack').disabled) setMode('attack');
   else if (event.key === 'Escape') {
@@ -600,15 +600,14 @@ function quickOrder(p){
  if(view.mode==='squad-target'){activate(p);return;}
  const unit=pickUnit(p),tile=pick(p),other=unit&&squadOf(board,unit);
  const enemy=unit&&unit.team&&unit.team!==source.team;
- commitSquadTarget(source,enemy?'focus':'move',enemy?(other?{squadId:other.id}:{unitId:unit.id}):tile);
+ commitSquadTarget(source,enemy?'focus':'advance',enemy?(other?{squadId:other.id}:{unitId:unit.id}):tile);
 }
 $('command-dock').addEventListener('click',event=>{
  const action=event.target.closest('[data-squad-action]');if(action&&!action.disabled)issueSquadAction(action.dataset.squadAction);
 });
-$('orders-more').addEventListener('click',()=>{const open=$('command-dock').classList.toggle('show-extra');$('orders-more').setAttribute('aria-expanded',String(open));$('orders-more').textContent=open?'접기':'추가 전술';});
 for(const button of document.querySelectorAll('[data-squad-action]')){const def=SQUAD_ACTIONS[button.dataset.squadAction];button.innerHTML=icon(button.dataset.squadAction)+'<span class="icon-label">'+def.label+'</span>';button.title=def.label+' · '+def.hint;button.setAttribute('aria-label',def.label);}
 for(const [attribute,prefix] of [['data-squad-stance',''],['data-squad-formation','']])for(const button of document.querySelectorAll('['+attribute+']')){const label=button.textContent.trim();button.innerHTML=icon(button.getAttribute(attribute))+'<span>'+label.replace(/^[^가-힣]+/,'')+'</span>';}
-for(const [id,name,label] of [['selection-add','plus','추가 선택'],['selection-platoon','platoon','소대 선택'],['selection-options','options','태세·진형'],['orders-toggle','chevron','명령'],['selection-clear','close','선택 해제'],['squad-close','close','닫기'],['zoom-in','plus','확대'],['zoom-out','zoom','축소'],['fit','fit','전장 맞춤']]){const button=$(id);button.innerHTML=icon(name)+'<span class="control-label">'+label+'</span>';button.title=label;button.setAttribute('aria-label',label);}
+for(const [id,name,label] of [['selection-add','plus','추가 선택'],['selection-platoon','platoon','소대 선택'],['selection-options','square','진형'],['orders-toggle','chevron','명령'],['selection-clear','close','선택 해제'],['squad-close','close','닫기'],['zoom-in','plus','확대'],['zoom-out','zoom','축소'],['fit','fit','전장 맞춤']]){const button=$(id);button.innerHTML=icon(name)+'<span class="control-label">'+label+'</span>';button.title=label;button.setAttribute('aria-label',label);}
 const debugSummary=$('debug-tools').querySelector(':scope > summary');debugSummary.innerHTML=icon('debug')+'<span>도구</span>';
 $('orders-toggle').addEventListener('click',()=>{ordersExpanded=!ordersExpanded;refresh();});
 function locateSelection(){
@@ -641,14 +640,17 @@ $('squad-tools').addEventListener('click',event=>{
  const stance=event.target.closest('[data-squad-stance]');
  if(stance){for(const squad of selectedCommandSquads())configureSquad(board,squad.id,{stance:stance.dataset.squadStance});refresh();return;}
  const formation=event.target.closest('[data-squad-formation]');
- if(formation){for(const squad of selectedCommandSquads())configureSquad(board,squad.id,{formation:formation.dataset.squadFormation});refresh();}
+ if(formation){for(const squad of selectedCommandSquads()){
+  configureSquad(board,squad.id,{formation:formation.dataset.squadFormation});
+  if(!squad.order||['hold','wait'].includes(squad.order.type))orderSquad(board,squad.id,'rally');
+ }refresh();}
 });
 document.addEventListener('pointerdown',event=>{
  if($('debug-tools').open&&!$('debug-tools').contains(event.target))$('debug-tools').open=false;
  if(commandPanelOpen&&!$('squad-tools').contains(event.target)&&!$('squad-roster').contains(event.target)&&!$('command-dock').contains(event.target))closeSquadPanel();
 });
 document.addEventListener('keydown',event=>{
- const shortcut=({m:'move',a:'advance',r:'retreat',h:'hold',x:'wait'})[event.key.toLowerCase()];
+ const shortcut=({m:'advance',a:'advance',r:'advance',h:'hold',x:'hold'})[event.key.toLowerCase()];
  if(shortcut&&selectedSquads.size&&event.target!==canvas&&!event.target.closest('input,select,textarea,[contenteditable="true"]')&&!event.ctrlKey&&!event.metaKey&&!event.altKey){event.preventDefault();issueSquadAction(shortcut);return;}
  if(event.key!=='Escape')return;
  if(view.mode==='squad-target'){event.preventDefault();event.stopPropagation();cancelSquadTarget();return;}

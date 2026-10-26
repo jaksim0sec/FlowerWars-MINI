@@ -57,7 +57,19 @@ export function planFormation(board,squad,center,units,lead,otherGoals){
  }
  for(let i=0;i<escorts.length;i++)rows.push({unit:escorts[i],depth:rank,lane:(i===0?-1:1)*gap});
  if(lead)rows.push({unit:lead,depth:rank+gap,lane:0});
- const offsets=rows.map(r=>({x:-f.x*r.depth+side.x*r.lane,y:-f.y*r.depth+side.y*r.lane}));
+ let offsets=rows.map(r=>({x:-f.x*r.depth+side.x*r.lane,y:-f.y*r.depth+side.y*r.lane}));
+ if(formation==='square'){
+  const edge=[],inside=[];
+  for(let y=-2;y<=2;y++)for(let x=-2;x<=2;x++)if(x||y)(Math.max(Math.abs(x),Math.abs(y))===2?edge:inside).push({x,y});
+  const outer=rows.filter(r=>r.unit!==lead&&band(r.unit)===0),inner=rows.filter(r=>r.unit!==lead&&band(r.unit)!==0);
+  const angular=(a,b)=>Math.atan2(a.y,a.x)-Math.atan2(b.y,b.x);
+  edge.sort(angular);inside.sort(angular);
+  const count=outer.length+inner.length,innerCount=Math.min(inner.length,Math.max(0,count-Math.max(4,outer.length)));
+  const sample=(ring,n)=>Array.from({length:n},(_,i)=>ring[Math.floor(i*ring.length/n)]);
+  const perimeter=sample(edge,count-innerCount),core=sample(inside,innerCount);
+  rows.splice(0,rows.length,...outer,...inner,...(lead?[{unit:lead}]:[]));
+  offsets=rows.map(r=>r.unit===lead?{x:0,y:0}:band(r.unit)===0?perimeter.shift():core.shift()||perimeter.shift());
+ }
  const clamp=(value,low,high)=>Math.max(low,Math.min(high,value));
  const bounds=axis=>[Math.min(...offsets.map(p=>p[axis])),Math.max(...offsets.map(p=>p[axis]))];
  const [minX,maxX]=bounds('x'),[minY,maxY]=bounds('y');
@@ -71,7 +83,7 @@ export function planFormation(board,squad,center,units,lead,otherGoals){
    const x=wanted.x+dx,y=wanted.y+dy,key=y*board.width+x,occupant=board.at(x,y),reserved=board.reservations.get(key);
    if(!board.inside(x,y)||board.navigation.blocked(key)||claimed.has(key)||occupant&&!own.has(occupant.id)||reserved&&!own.has(reserved))continue;
    // A fallback must stay behind the front for the commander.
-   if(rows[i].unit.id===lead?.id&&positions.some(p=>p&&(x-p.x)*f.x+(y-p.y)*f.y>=0))continue;
+   if(formation!=='square'&&rows[i].unit.id===lead?.id&&positions.some(p=>p&&(x-p.x)*f.x+(y-p.y)*f.y>=0))continue;
    best={x,y};claimed.add(key);break;
   }
   positions.push(best||null);

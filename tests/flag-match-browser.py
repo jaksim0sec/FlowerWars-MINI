@@ -29,7 +29,7 @@ with sync_playwright() as p:
         assert page.locator('#match-skip').is_hidden()
         assert page.locator('#match-charge').is_visible()
         page.locator('#match-charge').click();page.wait_for_timeout(700)
-        assert '공격 이동' in page.locator('#command-state').text_content()
+        assert '이동' in page.locator('#command-state').text_content()
         assert not page.evaluate('document.documentElement.scrollWidth>innerWidth')
         page.screenshot(path=f'/tmp/flag-match-{width}.png')
         assert not errors,errors

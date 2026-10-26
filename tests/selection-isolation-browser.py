@@ -68,7 +68,7 @@ with sync_playwright() as p:
 
         # Issuing a command or clearing selection must disarm an unused +.
         page.locator('#selection-add').click()
-        page.locator('#command-dock [data-squad-action="wait"]').click()
+        page.locator('#command-dock [data-squad-action="hold"]').click()
         assert page.locator('#selection-add').get_attribute('aria-pressed') == 'false'
         cards.nth(0).click()
         assert page.locator('.squad-card.is-selected').count() == 1
