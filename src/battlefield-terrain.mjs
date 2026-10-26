@@ -11,7 +11,8 @@ export function createBattlefield(board){
  for(let y=0;y<board.height;y++)for(let x=0;x<board.width;x++){
   const mx=Math.min(x,99-x),edge=Math.max(0,1-Math.max(0,mx-4)/16);
   const lanes=[20+30*edge,50,80-30*edge];
-  const road=lanes.some(lane=>Math.abs(y-lane)<=2);
+  const centerRoad=x>=48&&x<=51&&y>=17&&y<=83;
+  const road=centerRoad||lanes.some(lane=>Math.abs(y-lane)<=2);
   const clearing=[[4,50,8],[28,50,10],[49.5,50,11]].some(([cx,cy,r])=>Math.hypot(mx-cx,y-cy)<r);
   const forest=!road&&!clearing&&woods.some(([cx,cy,rx,ry])=>((mx-cx)/rx)**2+((y-cy)/ry)**2<1+Math.sin(mx*1.7+y*.8)*.12);
   board.terrain[y][x]=road?'road':forest?'forest':'grass';
