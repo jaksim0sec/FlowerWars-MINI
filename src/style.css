@@ -737,6 +737,13 @@ button:not(:disabled):active{scale:.96;}
 .commander-badge .ui-icon{width:16px;height:16px;}.squad-card-body{align-self:center;}.squad-card-title{font-size:12px;}.squad-card .squad-activity{background:#fffcf2ba;right:6px;top:5px;}
 .squad-roster{height:112px;max-height:112px;}.command-dock{bottom:calc(134px + env(safe-area-inset-bottom))!important;}.squad-tools{bottom:calc(134px + env(safe-area-inset-bottom));}
 @media(max-height:520px){.squad-roster{height:80px;max-height:80px;}.squad-card,.squad-card:hover,.squad-card.is-selected{height:50px;min-height:50px;grid-template-columns:52px 1fr;width:158px;min-width:158px;max-width:158px;}.squad-portrait,.commander-photo{height:49px;width:52px;}.commander-badge{width:20px;height:20px;bottom:3px;}.commander-badge .ui-icon{width:13px;height:13px;}.command-dock{bottom:calc(94px + env(safe-area-inset-bottom))!important;}.squad-tools{bottom:calc(94px + env(safe-area-inset-bottom));}}
+/* Compact roster leaves more of the battlefield visible. */
+.squad-card,.squad-card:hover,.squad-card.is-selected{grid-template-columns:64px 1fr;gap:5px;width:158px;min-width:158px;max-width:158px;height:68px;min-height:68px;padding-right:7px;}
+.squad-portrait,.commander-photo{width:64px;height:66px;}
+.commander-badge{width:22px;height:22px;bottom:7px;}.commander-badge .ui-icon{width:14px;height:14px;}
+.squad-roster{height:102px;max-height:102px;}.command-dock{bottom:calc(124px + env(safe-area-inset-bottom))!important;}.squad-tools{bottom:calc(124px + env(safe-area-inset-bottom));}
+.squad-card.is-wiped-out{filter:grayscale(1);opacity:.68;}
+@media(max-height:520px){.squad-roster{height:72px;max-height:72px;}.squad-card,.squad-card:hover,.squad-card.is-selected{grid-template-columns:46px 1fr;width:142px;min-width:142px;max-width:142px;height:46px;min-height:46px;}.squad-portrait,.commander-photo{width:46px;height:45px;}.command-dock{bottom:calc(86px + env(safe-area-inset-bottom))!important;}.squad-tools{bottom:calc(86px + env(safe-area-inset-bottom));}}
 /* Frosted upper HUD with brighter lettering. */
 #match-hud{background:rgba(48,53,45,.3);backdrop-filter:blur(14px) saturate(115%);-webkit-backdrop-filter:blur(14px) saturate(115%);border-color:#ffffff40;color:#fffdf7;}
 #match-phase,#match-armies{color:#fffdf7;}#match-timer{color:#ffe8b7;}

@@ -235,6 +235,7 @@ function syncSquadRoster(){
     const active=selectedSquads.has(squad.id);
     button.classList.toggle('is-selected',active);
     button.classList.toggle('is-leader-down',!summary.commanderAlive);
+    button.classList.toggle('is-wiped-out',summary.alive===0);
     button.setAttribute('aria-pressed',String(active));
     button.setAttribute('aria-label',squad.team+'팀 '+squad.name+', '+label+'. 선택 후 빠른 명령');
   }
