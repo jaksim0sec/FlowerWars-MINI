@@ -321,7 +321,7 @@ body{display:block;}
  box-shadow:none;text-align:center;transition:none;cursor:pointer;color:var(--ink);pointer-events:auto;
 }
 .squad-card:active .squad-avatar{transform:scale(.94);}
-.squad-card:focus-visible{outline:2px solid #a87b32;outline-offset:-2px;border-radius:8px;}
+.squad-card:focus-visible{outline:2px solid #d39139;outline-offset:-2px;border-radius:8px;}
 .squad-portrait{position:relative;display:flex;align-items:center;justify-content:center;width:46px;height:43px;flex:0 0 auto;}
 .squad-avatar{display:block;width:40px;height:40px;object-fit:contain;background:transparent;border:0;border-radius:0;box-shadow:none;}
 .squad-card.is-leader-down .squad-avatar{filter:grayscale(1);opacity:.56;}
@@ -368,7 +368,7 @@ body{display:block;}
  border:1px solid #b6a17c68;background:#f8f2e8;font-size:9px;white-space:nowrap;
 }
 .squad-compact-row .squad-option-row button span{font-size:11px;}
-.squad-compact-row .squad-option-row button[aria-pressed="true"]{background:#e9ca7d;border-color:#ba9347;font-weight:800;}
+.squad-compact-row .squad-option-row button[aria-pressed="true"]{background:#ffda8b;border-color:#d5a14c;font-weight:800;}
 #squad-special{display:block;width:100%;min-height:24px;padding:3px 2px;margin:5px 0 0;border-radius:6px;font-size:10px;}
 .squad-aim{z-index:6;}
 @media(max-width:700px){
@@ -422,11 +422,11 @@ body{display:block;}
 #selection-clear{width:36px;height:36px;background:transparent;border-radius:8px;font-size:24px;flex-shrink:0;}
 .selection-actions{display:flex;gap:6px;margin:6px 0;}
 .selection-actions button{min-height:32px;padding:4px 10px;border:1px solid #b6a17c68;border-radius:7px;background:#f8f2e8;font-size:11px;}
-.selection-actions button[aria-pressed="true"],#selection-options[aria-expanded="true"]{background:#e9ca7d;border-color:#ba9347;font-weight:800;}
+.selection-actions button[aria-pressed="true"],#selection-options[aria-expanded="true"]{background:#ffda8b;border-color:#d5a14c;font-weight:800;}
 .quick-orders{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;}
 .quick-orders button{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:0;min-height:54px;padding:6px 1px;border:1px solid #c7aa7e70;border-radius:8px;background:#f8eedb;font-size:10px;white-space:nowrap;}
 .quick-orders button>span{font-size:20px;line-height:1;}
-.quick-orders button[aria-pressed="true"]{background:#e9ca7d;border-color:#a87b32;box-shadow:inset 0 -2px #a87b32;}
+.quick-orders button[aria-pressed="true"]{background:#ffda8b;border-color:#d39139;box-shadow:inset 0 -2px #d39139;}
 .quick-orders kbd{position:absolute;right:4px;top:3px;color:#9d8359;font-size:8px;font-family:inherit;}
 .command-help{display:block;margin-top:7px;font-size:9px;color:#89765d;text-align:center;}
 .squad-extra-actions{display:flex;gap:4px;margin-top:8px;}
@@ -599,11 +599,11 @@ body{display:block;}
 #deployment-tools[hidden]{display:none!important;}
 #deployment-tools{position:fixed;z-index:6;left:50%;bottom:14px;transform:translateX(-50%);width:360px;max-width:calc(100vw - 16px);pointer-events:none;font-size:10px;}
 .deployment-head{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:5px 8px;background:#fff9ede8;border-radius:14px;}
-.deployment-head span{font-size:9px;color:#8d7759;}.deployment-head button{pointer-events:auto;min-height:30px;padding:3px 8px;background:#e8cf98;border-radius:12px;font-size:10px;}
+.deployment-head span{font-size:9px;color:#8d7759;}.deployment-head button{pointer-events:auto;min-height:30px;padding:3px 8px;background:#ffe1a0;border-radius:12px;font-size:10px;}
 .deployment-types{display:none;gap:5px;grid-template-columns:repeat(6,minmax(0,1fr));margin-top:6px;}
 .is-deploying .deployment-types{display:grid;}
 .deployment-types button{pointer-events:auto;min-height:49px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:5px;background:#fff9edf0;border-radius:15px;font-size:10px;}
-.deployment-types .ui-icon{width:20px;height:20px;}.deployment-types button[aria-pressed=true]{background:#edce86;}
+.deployment-types .ui-icon{width:20px;height:20px;}.deployment-types button[aria-pressed=true]{background:#ffdb88;}
 #deployment-tools:not(.is-deploying){top:95px;left:12px;bottom:auto;transform:none;width:auto;}
 #deployment-tools:not(.is-deploying) .deployment-head span{display:none;}
 @media(max-width:700px){#deployment-tools{left:8px;right:8px;bottom:calc(92px + env(safe-area-inset-bottom));transform:none;width:auto;}#deployment-tools:not(.is-deploying){top:132px;left:8px;right:auto;bottom:auto;} .deployment-head span{display:none;}}
@@ -614,7 +614,7 @@ body{display:block;}
 .command-dock .quick-orders button{display:flex;order:0;min-height:62px;min-width:44px;gap:4px;padding:0!important;}
 .command-dock .quick-orders button>.ui-icon{box-sizing:border-box;width:44px;height:44px;padding:10px;background:#fff9edf5!important;box-shadow:0 1px 5px #40331d18;border-radius:50%;}
 .command-dock .quick-orders button>.icon-label{font-size:10px;font-weight:650;}
-.command-dock .quick-orders button[aria-pressed=true]>.ui-icon{background:#f0cf83!important;}
+.command-dock .quick-orders button[aria-pressed=true]>.ui-icon{background:#ffdb88!important;}
 .squad-tools .squad-option-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;width:100%;}
 .squad-tools .squad-option-row button{flex-direction:column;min-height:64px;padding:6px 2px;gap:4px;border-radius:13px;font-size:11px;}
 .squad-tools .squad-option-row .ui-icon{width:30px;height:30px;}
@@ -652,7 +652,7 @@ body.in-match{display:block;background:#eee2bd;}
 #match-phase{font-size:12px;}#match-timer{font-size:22px;font-weight:850;color:#a36b21;}
 #match-timer:empty{display:none;}#match-armies{font-size:11px;color:#756140;}
 .match-actions{display:contents;}
-.match-actions button{min-height:40px;padding:6px 14px;border-radius:17px;background:#edc56b;color:#4d3417;font-size:12px;font-weight:800;white-space:nowrap;box-shadow:inset 0 0 0 1px #b6883938;}
+.match-actions button{min-height:40px;padding:6px 14px;border-radius:17px;background:#ffcf78;color:#4d3417;font-size:12px;font-weight:800;white-space:nowrap;box-shadow:inset 0 0 0 1px #b6883938;}
 .squad-roster{position:fixed;left:12px;right:12px;top:auto;bottom:calc(10px + env(safe-area-inset-bottom));width:auto;height:104px;max-height:104px;padding:0;background:none;border:0;transform:none;pointer-events:none;}
 .squad-roster-list{display:flex;flex-direction:row;align-items:flex-end;gap:16px;width:100%;height:100%;overflow-x:auto;overflow-y:hidden;padding:0 0 4px;touch-action:pan-x;scrollbar-width:thin;pointer-events:auto;}
 .platoon-group{display:flex;flex-direction:column;gap:5px;flex-shrink:0;}
@@ -696,15 +696,15 @@ body.in-match{display:block;background:#eee2bd;}
 .command-selection-row>div{background:transparent;box-shadow:none;}
 .squad-tools,.command-selection-row{backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
 .command-dock .quick-orders button>.ui-icon{background:rgba(224,204,158,.62)!important;box-shadow:inset 0 0 0 1px #80663828;}
-.command-dock .quick-orders button[aria-pressed=true]>.ui-icon{background:#d9b967b8!important;}
-.match-actions button,.deployment-head button{background:#d9b967b8;}
-.selection-actions button[aria-pressed=true],.squad-tools .squad-option-row button[aria-pressed=true]{background:#d9b967b8;}
-.squad-tools .squad-option-row button{background:#d8c9a37a;}
-.platoon-fold{background:#cdbb8b66;}
+.command-dock .quick-orders button[aria-pressed=true]>.ui-icon{background:#ffd681d9!important;}
+.match-actions button,.deployment-head button{background:#ffd681d9;}
+.selection-actions button[aria-pressed=true],.squad-tools .squad-option-row button[aria-pressed=true]{background:#ffd681d9;}
+.squad-tools .squad-option-row button{background:#fff0d18a;}
+.platoon-fold{background:#ffe6b47a;}
 .squad-roster{height:94px;max-height:94px;}
-.squad-card,.squad-card:hover,.squad-card.is-selected{--troop-accent:#80612e;grid-template-columns:34px 1fr;width:142px;min-width:142px;max-width:142px;height:60px;min-height:60px;gap:8px;padding:7px 9px;border:1px solid #80663830;border-radius:14px;background:#d9c99e9e;box-shadow:0 2px 8px #392e1512;text-decoration:none;}
+.squad-card,.squad-card:hover,.squad-card.is-selected{--troop-accent:#a87532;grid-template-columns:34px 1fr;width:142px;min-width:142px;max-width:142px;height:60px;min-height:60px;gap:8px;padding:7px 9px;border:1px solid #80663830;border-radius:14px;background:#fff0d1b0;box-shadow:0 2px 8px #392e1512;text-decoration:none;}
 .squad-card[data-type=defense]{--troop-accent:#506b50;}.squad-card[data-type=ranged]{--troop-accent:#95623d;}.squad-card[data-type=mobile]{--troop-accent:#697e39;}.squad-card[data-type=support]{--troop-accent:#597d75;}
-.squad-card.is-selected{background:#e9ca7dc9;border-color:#8e6a2e;box-shadow:inset 3px 0 #9e752c;}
+.squad-card.is-selected{background:#ffda8bc9;border-color:#d59a42;box-shadow:inset 3px 0 #d59a42;}
 .squad-emblem{display:grid;place-items:center;align-self:center;width:34px;height:34px;border-radius:11px;background:#57451f14;color:var(--troop-accent);}
 .squad-emblem .ui-icon{width:24px;height:24px;}
 .squad-card-body{gap:0;}.squad-card-title,.squad-card.is-selected .squad-card-title{font-size:11px;text-decoration:none;line-height:15px;}
@@ -741,3 +741,8 @@ button:not(:disabled):active{scale:.96;}
 #match-hud{background:rgba(48,53,45,.3);backdrop-filter:blur(14px) saturate(115%);-webkit-backdrop-filter:blur(14px) saturate(115%);border-color:#ffffff40;color:#fffdf7;}
 #match-phase,#match-armies{color:#fffdf7;}#match-timer{color:#ffe8b7;}
 .deployment-types button,.deployment-head button,.in-match #notice,.in-match .squad-aim{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);}
+
+/* Soft apricot and warm yellow accents. */
+.match-actions button,.deployment-head button,.deployment-types button[aria-pressed=true],.selection-actions button[aria-pressed=true],.squad-tools .squad-option-row button[aria-pressed=true]{background:linear-gradient(135deg,#ffe6a2e8,#ffd18bde);color:#67472c;border-color:#e9b76566;}
+.command-dock .quick-orders button[aria-pressed=true]>.ui-icon{background:linear-gradient(135deg,#ffe6a2e8,#ffd18bde)!important;}
+.squad-card.is-selected{background:linear-gradient(135deg,#fff3d5ed,#ffe4b9df);border-color:#e4b45b;box-shadow:inset 0 0 0 1px #f3ca8266;}

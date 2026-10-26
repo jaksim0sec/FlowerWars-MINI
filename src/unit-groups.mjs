@@ -9,19 +9,23 @@ export function squadOf(board,unit){return unit?.squadId?squadsFor(board).get(un
 const types={
  assault:['banner-bearer',...Array(10).fill('scout'),'clover-mage'],
  defense:['banner-bearer',...Array(10).fill('shield-guard'),'clover-mage'],
- ranged:['banner-bearer',...Array(7).fill('archer'),...Array(3).fill('shield-guard'),'scout'],
+ ranged:['banner-bearer',...Array(9).fill('archer'),'shield-guard','scout'],
  mobile:['banner-bearer',...Array(9).fill('scout'),...Array(2).fill('archer')],
- support:['banner-bearer',...Array(4).fill('clover-mage'),...Array(3).fill('scholar'),...Array(3).fill('shield-guard'),'scout'],
- mixed:['banner-bearer',...Array(4).fill('scout'),...Array(3).fill('shield-guard'),...Array(3).fill('archer'),'clover-mage']
+ support:['banner-bearer',...Array(4).fill('clover-mage'),...Array(3).fill('scholar'),'shield-guard',...Array(3).fill('scout')],
+ mixed:['banner-bearer',...Array(6).fill('scout'),'shield-guard',...Array(3).fill('archer'),'clover-mage']
 };
 export const SPEAR_BATTLE={damageMultiplier:2,visionRange:4,speedMultiplier:1.5,attackPeriod:3.2,impactTime:.07,activeDuration:.32,movingPoise:true,charge:true};
 const roles={'banner-bearer':'banner','scout':'scout','shield-guard':'guard','archer':'archer','clover-mage':'healer','scholar':'support'};
-export function availableSquadBlueprints(){return Object.keys(types).map(type=>createFormationGroup(type==='assault'?12:24,'squad','',type));}
+export function availableSquadBlueprints(){return Object.keys(types).map(type=>createFormationGroup(type==='assault'?6:24,'squad','',type));}
 export function createFormationGroup(count=8,kind='squad',name='',type='mixed'){
  count=Math.max(2,Math.min(128,Math.floor(Number(count)||8)));kind=kind==='platoon'?'platoon':'squad';
  const formation=armyFormation(count),center=Math.floor(formation.rows/2),squadSize=kind==='squad'&&count===24?24:12;
  if((type!=='mixed'||squadSize===24)&&types[type])for(let i=0;i<formation.slots.length;i++){
    const id=squadSize===24?(i===0?'banner-bearer':types[type][1+(i-1)%11]):types[type][i%12];formation.slots[i]={...formation.slots[i],characterId:id,role:roles[id],weapon:undefined,stats:undefined};
+ }
+ if(type!=='defense'){
+  let shields=0;
+  for(const slot of formation.slots)if(slot.characterId==='shield-guard'&&++shields>1){slot.characterId=type==='ranged'?'archer':'scout';slot.role=roles[slot.characterId];slot.weapon=undefined;}
  }
  if(type==='assault')for(const slot of formation.slots){
   slot.battle={speedMultiplier:1.5};
