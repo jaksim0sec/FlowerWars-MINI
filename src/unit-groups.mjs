@@ -46,7 +46,7 @@ export function placeGroup(board,blueprint,anchor,options={}){
  const free=()=>positions.every(p=>{const key=p.y*board.width+p.x;if(!board.inside(p.x,p.y)||board.occupied(p.x,p.y)||board.navigation.blocked(key))return false;return true;});
  for(const p of positions){const k=`${p.x},${p.y}`;if(seen.has(k))return null;seen.add(k);}
  if(!free())return null;
- const prepared=blueprint.members.map((member,i)=>{const character=options.makeCharacter?.(member,i)||null;return {character,settings:{battle:member.battle,stats:member.stats,movement:member.movement,capabilities:member.capabilities,...options.optionsFor?.(character,member,i),team:options.team||'A',autoCombat:options.autoCombat??true}};});
+ const prepared=blueprint.members.map((member,i)=>{const character=options.makeCharacter?.(member,i)||null;return {character,settings:{battle:member.battle,stats:member.stats,movement:member.movement,capabilities:member.capabilities,...options.optionsFor?.(character,member,i),unitType:member.characterId,team:options.team||'A',autoCombat:options.autoCombat??true}};});
  if(!free())return null;
  const r=registry(board),id=`${blueprint.kind}-${r.next++}`;
  const group={id,name:blueprint.name,kind:blueprint.kind,team:options.team||'A',anchor:{...anchor},blueprint:structuredClone(blueprint),memberIds:[]};

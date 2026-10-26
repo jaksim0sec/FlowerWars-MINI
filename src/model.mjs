@@ -23,7 +23,7 @@ function nearAlliedScholar(board,unit){
   if(!unit.team)return false;
   for(const id of board.spatial.candidates(unit.x,unit.y,SCHOLAR_AURA_RADIUS)){
     const scholar=board.unit(id);
-    if(scholar?.team===unit.team&&scholar.health.current>0&&scholar.character?.characterId==='scholar'&&
+    if(scholar?.team===unit.team&&scholar.health.current>0&&scholar.unitType==='scholar'&&
       Math.max(Math.abs(scholar.x-unit.x),Math.abs(scholar.y-unit.y))<=SCHOLAR_AURA_RADIUS)return true;
   }
   return false;
@@ -135,7 +135,7 @@ export class Board {
     if(battle)options={...options,stats:{...options.stats,damage:(options.stats?.damage||25)*(battle.damageMultiplier||1),attackPeriod:battle.attackPeriod||options.stats?.attackPeriod},movement:{...options.movement,stepTime:(options.movement?.stepTime||.425)/(battle.speedMultiplier||1)}};
     const health=character?.health||createHealth();
     if(Number.isFinite(options.stats?.maxHealth)&&options.stats.maxHealth>0)health.current=health.max=options.stats.maxHealth;
-    const u = { character, health, priorityKey:mix(this.seed^Math.imul(this.nextId,0x9e3779b9)),movement:movementOptions(options.movement),capabilities:[...(options.capabilities||[])],team:options.team||null,combat:combatOptions(options),strike:null,
+    const u = { character, unitType:options.unitType??character?.characterId??null, health, priorityKey:mix(this.seed^Math.imul(this.nextId,0x9e3779b9)),movement:movementOptions(options.movement),capabilities:[...(options.capabilities||[])],team:options.team||null,combat:combatOptions(options),strike:null,
       damage:Number.isFinite(options.stats?.damage)&&options.stats.damage>0?options.stats.damage:25, id: this.nextId++, x, y, visualX: x, visualY: y,
       state: 'idle', elapsed: 0, facing: -1, path: [], target: null, command:null, step:null, route:[], waitReason:null, hits: 0, impacted: false };
     u.healing=healingOptions(options,character);
