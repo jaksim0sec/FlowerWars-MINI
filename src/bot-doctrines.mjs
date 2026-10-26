@@ -1,8 +1,8 @@
 // Editable strategy data. Recruitment asks for capabilities, never character IDs.
 export const DOCTRINES=[
- {id:'envelopment',label:'양익 압박',ratios:{guard:.2,front:.4,breach:.2,mobile:.2},opening:['guard','front','mobile','breach','front'],weight:1,openingHold:0,frontCadence:3,gapHold:2,breachAhead:6},
- {id:'breakthrough',label:'일점 돌파',ratios:{guard:.2,front:.2,breach:.4,mobile:.2},opening:['guard','breach','mobile','front','breach'],weight:1,openingHold:0,frontCadence:2,gapHold:1.5,breachAhead:10},
- {id:'counterstroke',label:'방어 후 역습',ratios:{guard:.25,front:.4,breach:.15,mobile:.2},opening:['guard','front','mobile','front','breach'],weight:1,openingHold:8,frontCadence:4,gapHold:3,breachAhead:4}
+ {id:'envelopment',label:'양익 압박',ratios:{guard:0,front:.5,breach:.3,mobile:.2},opening:['front','breach','mobile','breach','front'],weight:1,openingHold:0,frontCadence:3,gapHold:2,breachAhead:6},
+ {id:'breakthrough',label:'일점 돌파',ratios:{guard:0,front:.3,breach:.5,mobile:.2},opening:['breach','front','mobile','breach','front'],weight:1,openingHold:0,frontCadence:2,gapHold:1.5,breachAhead:10},
+ {id:'counterstroke',label:'방어 후 역습',ratios:{guard:0,front:.55,breach:.2,mobile:.25},opening:['front','front','mobile','front','breach'],weight:1,openingHold:8,frontCadence:4,gapHold:3,breachAhead:4}
 ];
 export const NEEDS={
  screen:{tank:4,melee:1,fire:0,heal:0,speed:0},

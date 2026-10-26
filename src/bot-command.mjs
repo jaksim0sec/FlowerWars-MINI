@@ -65,20 +65,22 @@ export class BotCommand{
  refresh(){
   const m=this.match,b=m.board,registry=squadsFor(b);this.topology();
   const observation=survey(b,m.flags.B);m.strategy=observation;this.chooseScenario(observation);
-  const states=new Map(),enemyCounts=[0,0,0],enemyFront=[10,10,10],friendly=[0,0,0],contact=[0,0,0],gateSupport=[0,0,0],enemies=[];let homeDanger=false;
+  const states=new Map(),enemyCounts=[0,0,0],enemyFront=[10,10,10],friendly=[0,0,0],contact=[0,0,0],gateSupport=[0,0,0],enemies=[];let rearEnemy=0,flagEnemy=0,forwardDefenders=0;
   for(const u of b.units){
    if(u.health.current<=0)continue;
    const lane=laneFor(u.y);
    if(u.team==='A'){
     enemies.push(u);
     enemyCounts[lane]++;enemyFront[lane]=Math.max(enemyFront[lane],u.x);
-    if(u.x>=78||distance(u,m.flags.B)<=18)homeDanger=true;
+    if(u.x>=78)rearEnemy++;
+    if(distance(u,m.flags.B)<=10)flagEnemy++;
    }else if(u.team==='B'){
     let state=states.get(u.squadId);if(!state){state={count:0,x:0,y:0,health:0,maxHealth:0,positions:[]};states.set(u.squadId,state);}
     state.count++;state.x+=u.x;state.y+=u.y;state.health+=u.health.current;state.maxHealth+=u.health.max;
     if(u.formationRole!=='banner'&&!u.healing)state.positions.push(u.x);
     const role=registry.get(u.squadId)?.botOperation?.role;
     if(role==='front'||role==='breach'){friendly[lane]++;if(u.x<=74&&u.x>=40)gateSupport[lane]++;}
+    if(u.x<78)forwardDefenders++;
    }
   }
   for(const state of states.values()){state.x/=state.count;state.y/=state.count;state.ratio=state.health/state.maxHealth;state.positions.sort((a,b)=>a-b);state.forwardX=state.positions[Math.floor(state.positions.length*.6)]??state.x;}
@@ -95,7 +97,8 @@ export class BotCommand{
   // nearby forces, preserving IDs, units and all normal movement rules.
   const total=[...states.values()].reduce((n,s)=>n+s.count,0);
   let guardStrength=live.filter(o=>o.role==='guard').reduce((n,o)=>n+o.liveIds.reduce((v,id)=>v+states.get(id).count,0),0);
-  const required=Math.max(1,total*(homeDanger?.3:.1));
+  const homeDanger=flagEnemy>=2||(rearEnemy>=Math.max(4,total*.05)&&forwardDefenders<Math.max(total*.45,rearEnemy*3));
+  const required=homeDanger?Math.max(1,total*.35):0;
   for(const op of [...live].filter(o=>o.role!=='guard').sort((a,c)=>this.center(c).x-this.center(a).x)){
    if(guardStrength>=required)break;
    op.baseRole??=op.role;op.promotedAt=m.elapsed;op.role='guard';op.mission='guard';op.stage='defend';guardStrength+=op.liveIds.reduce((n,id)=>n+states.get(id).count,0);
