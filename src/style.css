@@ -685,7 +685,7 @@ body.in-match{display:block;background:#eee2bd;}
 .squad-tools{bottom:calc(124px + env(safe-area-inset-bottom));max-height:calc(100dvh - 210px);}
 @media(max-height:520px){
  .squad-tools{left:auto;right:12px;bottom:calc(94px + env(safe-area-inset-bottom));max-height:calc(100dvh - 170px);}
- .command-dock{padding:6px;}.command-selection-row{padding:4px 7px;}
+ .command-dock{padding:0 6px;}.command-selection-row{padding:4px 7px;}
  .command-dock.is-expanded .selection-actions{margin:4px 0;}.selection-actions button{min-height:30px;}
  .command-dock .quick-orders button{min-height:50px;gap:2px;}.command-dock .quick-orders button>.ui-icon{width:36px;height:36px;padding:8px;}
 }
