@@ -20,7 +20,7 @@
       "recommendedWeapon": "shield_guard_shield",
       "testCombat": {
         "maxHealth": 280,
-        "damage": 38,
+        "damage": 22,
         "attackPeriod": 1.25,
         "range": 1,
         "rangeShape": "king"

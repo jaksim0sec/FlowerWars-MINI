@@ -433,7 +433,7 @@
     "battle": {
       "damageMultiplier": 2,
       "speedMultiplier": 1.5,
-      "attackPeriod": 3.2,
+      "attackPeriod": 2.4,
       "impactTime": 0.07,
       "activeDuration": 0.32,
       "movingPoise": true,
