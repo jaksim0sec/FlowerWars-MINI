@@ -19,7 +19,7 @@ const fullSquads={
  ranged:['banner-bearer',...Array(14).fill('archer'),...Array(7).fill('shield-guard'),...Array(2).fill('clover-mage')],
  support:['banner-bearer',...Array(5).fill('clover-mage'),...Array(6).fill('scholar'),...Array(8).fill('shield-guard'),...Array(4).fill('scout')]
 };
-export const SPEAR_BATTLE={damageMultiplier:2,visionRange:4,speedMultiplier:1.5,attackPeriod:2.4,impactTime:.07,activeDuration:.32,movingPoise:true,charge:true,chargeDistance:4,chargeDamageMultiplier:2};
+export const SPEAR_BATTLE={damageMultiplier:2,visionRange:4,speedMultiplier:1.5,attackPeriod:2.4,impactTime:.07,activeDuration:.32,movingPoise:true,charge:true,chargeDistance:4,chargeDamageMultiplier:3};
 const roles={'banner-bearer':'banner','scout':'scout','shield-guard':'guard','archer':'archer','clover-mage':'healer','scholar':'support'};
 export function availableSquadBlueprints(){return Object.keys(types).map(type=>createFormationGroup(type==='assault'?6:24,'squad','',type));}
 export function createFormationGroup(count=8,kind='squad',name='',type='mixed'){

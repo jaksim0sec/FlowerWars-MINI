@@ -4,7 +4,7 @@ export function healingOptions(options,character){
  const stats=options.stats||{};
  const healer=['clover-mage','sprout-healer'].includes(character?.characterId)||options.capabilities?.includes('heal');
  if(!healer&&!(stats.healAmount>0))return null;
- return {amount:stats.healAmount||24,range:stats.healRange||3,period:stats.healPeriod||1.5,nextAt:0};
+ return {amount:stats.healAmount||10,range:stats.healRange||3,period:stats.healPeriod||1.5,nextAt:0};
 }
 export function tryHeal(board,actor){
  const h=actor.healing;
