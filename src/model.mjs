@@ -123,7 +123,7 @@ export class Board {
       state: 'idle', elapsed: 0, facing: -1, path: [], target: null, command:null, step:null, route:[], waitReason:null, hits: 0, impacted: false };
     u.healing=healingOptions(options,character);
     if(battle)Object.assign(u.combat,{movingPoise:!!battle.movingPoise,charge:!!battle.charge,visionRange:battle.visionRange||0,activeDuration:battle.activeDuration,impactTime:battle.impactTime});
-    if(battle?.charge){u.combat.chargeSteps=0;u.combat.chargeDistance=battle.chargeDistance??4;u.combat.chargeDamageMultiplier=battle.chargeDamageMultiplier??1.5;}
+    if(battle?.charge){u.combat.chargeSteps=0;u.combat.chargeDistance=battle.chargeDistance??4;u.combat.chargeDamageMultiplier=battle.chargeDamageMultiplier??2;}
     this.units.push(u);this.byId.set(u.id,u);this.cells.set(y*this.width+x,u.id);this.spatial.add(u);
     return u;
   }

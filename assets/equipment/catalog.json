@@ -439,7 +439,7 @@
       "movingPoise": true,
       "charge": true,
       "chargeDistance": 4,
-      "chargeDamageMultiplier": 1.5,
+      "chargeDamageMultiplier": 2,
       "visionRange": 4
     },
     "rigAnimation": {
