@@ -2,6 +2,7 @@ import {squadsFor} from './unit-groups.mjs';
 import {planFormation,settleFormation,repairOccupiedSeats} from './formation-planner.mjs';
 import {coverPlan,moveUnderCover} from './commander-cover.mjs';
 import {reformFormation} from './formation-reform.mjs';
+import {unequip} from './characters/engine.mjs';
 
 export const SQUAD_ACTIONS={
  move:{label:'이동',target:true,hint:'교전보다 이동 우선'},
@@ -20,6 +21,14 @@ const ALIASES={assault:'advance','support-focus':'follow',reform:'rally'};
 const STANCES=new Set(['aggressive','balanced','avoid']);
 const FORMATIONS=new Set(['line','column','dense','spread','square']);
 const alive=(board,squad)=>squad.memberIds.map(id=>board.unit(id)).filter(u=>u&&u.health.current>0);
+/** A promoted soldier keeps their own body and combat stats, but carries the unit flag. */
+function giveActingCommanderBanner(unit){
+ const character=unit?.character;
+ if(!character?.equipment||!Object.hasOwn(character.equipment,'left'))return;
+ if(character.equipment.left?.equipmentId==='banner_bearer_banner')return;
+ unequip(character,'left');
+ character.equipment.left={equipmentId:'banner_bearer_banner',hand:'left',overrides:{}};
+}
 /** The flag bearer commands while alive. After their loss, a surviving soldier
  * takes over without replacing or respawning the fallen character. */
 const originalCommander=(board,squad)=>board.unit(squad.leaderId);
@@ -27,9 +36,10 @@ const commander=(board,squad)=>{
  const leader=originalCommander(board,squad);
  if(leader?.health.current>0)return leader;
  const incumbent=board.unit(squad.actingLeaderId);
- if(incumbent?.health.current>0)return incumbent;
+ if(incumbent?.health.current>0){giveActingCommanderBanner(incumbent);return incumbent;}
  const successor=alive(board,squad).sort((a,b)=>a.id-b.id)[0]||null;
  squad.actingLeaderId=successor?.id??null;
+ if(successor)giveActingCommanderBanner(successor);
  return successor;
 };
 function slots(board,squad,center,formation=squad.formation){
@@ -135,7 +145,7 @@ function runOrder(board,s,replace=false){
    const enemies=enemyUnits(board,s,o.target);
    if(!enemies.length){for(const u of units)board.interrupt(u);o.phase='complete';return;}
    const lead=commander(board,s);
-   const protectedLeader=lead?.formationRole==='banner'||lead?.character?.characterId==='banner-bearer';
+   const protectedLeader=lead?.formationRole==='banner'||lead?.character?.characterId==='banner-bearer'||s.actingLeaderId===lead?.id;
    if(board.time>=(o.coverAt||0)){o.cover=protectedLeader?coverPlan(board,s,units,lead):new Map();o.coverAt=board.time+.6;}
    board.batchCommands(()=>{for(const u of units){
      if(u.healing){if(u.command?.type==='attack')board.interrupt(u);continue;}
