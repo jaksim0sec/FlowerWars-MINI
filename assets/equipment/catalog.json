@@ -438,6 +438,8 @@
       "activeDuration": 0.32,
       "movingPoise": true,
       "charge": true,
+      "chargeDistance": 4,
+      "chargeDamageMultiplier": 1.5,
       "visionRange": 4
     },
     "rigAnimation": {
