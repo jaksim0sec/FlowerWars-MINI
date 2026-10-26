@@ -642,8 +642,7 @@ $('squad-tools').addEventListener('click',event=>{
  const formation=event.target.closest('[data-squad-formation]');
  if(formation){for(const squad of selectedCommandSquads()){
   configureSquad(board,squad.id,{formation:formation.dataset.squadFormation});
-  if(!squad.order||['hold','wait'].includes(squad.order.type))orderSquad(board,squad.id,'rally');
- }refresh();}
+ }notify(`${formation.textContent.trim()} · 진형 변경`);syncSquadRoster();refresh();}
 });
 document.addEventListener('pointerdown',event=>{
  if($('debug-tools').open&&!$('debug-tools').contains(event.target))$('debug-tools').open=false;

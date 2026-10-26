@@ -619,4 +619,11 @@ body{display:block;}
 .squad-tools .squad-option-row button{flex-direction:column;min-height:64px;padding:6px 2px;gap:4px;border-radius:13px;font-size:11px;}
 .squad-tools .squad-option-row .ui-icon{width:30px;height:30px;}
 .squad-tools .formation-help{font-size:10px;line-height:1.5;margin:8px 0 2px;}
+#squad-close{display:flex;align-items:center;justify-content:center;width:30px;height:30px;min-width:30px;padding:5px;overflow:hidden;}
+#squad-close .control-label{display:none;}
+#squad-close .ui-icon{width:20px;height:20px;}
+.squad-panel-identity{min-width:0;}
+.squad-tools .squad-row-label{display:none;}
+.squad-tools .squad-compact-row{display:block;}
+.squad-tools .squad-option-row{box-sizing:border-box;}
 @media(max-width:700px){.command-dock{width:280px;}.squad-tools{bottom:calc(250px + env(safe-area-inset-bottom));}}

@@ -49,14 +49,12 @@ export function planFormation(board,squad,center,units,lead,otherGoals){
  const support=fighters.filter(u=>!guards.includes(u)&&!melee.includes(u));
  const escortPool=melee.length>=2?melee:guards.length>=3?guards:[];
  const escorts=escortPool.slice().sort((a,b)=>distance(a,lead)-distance(b,lead)||a.id-b.id).slice(0,2);
- const rows=[];let rank=0;
- for(const group of [guards,melee,support]){
-  const members=group.filter(u=>!escorts.includes(u));
-  for(let i=0;i<members.length;i++)rows.push({unit:members[i],depth:rank+Math.floor(i/width)*gap,lane:(i%width-Math.floor(Math.min(width,members.length-Math.floor(i/width)*width)/2))*gap});
-  rank+=Math.ceil(members.length/width)*gap;
+ const ordered=[...guards,...melee,...support],rows=[];
+ for(let i=0;i<ordered.length;i++){
+  const rowWidth=Math.min(width,ordered.length-Math.floor(i/width)*width);
+  rows.push({unit:ordered[i],depth:Math.floor(i/width)*gap,lane:(i%width-Math.floor(rowWidth/2))*gap});
  }
- for(let i=0;i<escorts.length;i++)rows.push({unit:escorts[i],depth:rank,lane:(i===0?-1:1)*gap});
- if(lead)rows.push({unit:lead,depth:rank+gap,lane:0});
+ if(lead)rows.push({unit:lead,depth:Math.ceil(ordered.length/width)*gap,lane:0});
  let offsets=rows.map(r=>({x:-f.x*r.depth+side.x*r.lane,y:-f.y*r.depth+side.y*r.lane}));
  if(formation==='square'){
   const edge=[],inside=[];

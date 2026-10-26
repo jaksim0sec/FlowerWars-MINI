@@ -40,7 +40,10 @@ function slots(board,squad,center,formation=squad.formation){
 export function configureSquad(board,id,{stance,formation}={}){
  const s=squadsFor(board).get(id);if(!s)return false;
  if(stance&&STANCES.has(stance))s.stance=stance;
- if(formation&&FORMATIONS.has(formation))s.formation=formation;
+ if(formation&&FORMATIONS.has(formation)){
+  s.formation=formation;
+  if(!s.order||['hold','wait'].includes(s.order.type))return orderSquad(board,id,'rally');
+ }
  if(s.order){s.order.dirty=true;runOrder(board,s,true);}
  return true;
 }
@@ -156,12 +159,41 @@ function runOrder(board,s,replace=false){
  const anchor=center.x+','+center.y+','+s.formation;
  if(anchor!==o.previous||units.length!==o.lastMembers||o.dirty){
    replace=true;
-   o.goals=new Map(slots(board,s,center,o.type==='rally'?'dense':s.formation).map(([u,p])=>[u.id,p]));
+   o.goals=new Map(slots(board,s,center,s.formation).map(([u,p])=>[u.id,p]));
    o.previous=anchor;o.lastMembers=units.length;o.dirty=false;
  }
  settleFormation(units,o.goals);
+ // An arrived teammate can seal the last empty seat on all four sides.
+ // Temporarily open one passing bay, rather than wait forever on that seat.
+ o.passing??=new Map();
+ const occupiedGoals=new Set([...o.goals.values()].map(p=>p.x+','+p.y));
+ for(const u of units){
+  const goal=o.goals.get(u.id);
+  if(!goal||u.waitReason!=='traffic'||board.time-(u.waitSince??board.time)<.6||board.time<(o.nextPassingAt||0))continue;
+  const directions=[[1,0],[-1,0],[0,1],[0,-1]];
+  let opened=false;
+  for(const [dx,dy]of [[0,0],...directions]){
+   const blocker=board.at(goal.x+dx,goal.y+dy);
+   if(!blocker||blocker.squadId!==s.id||blocker.id===u.id||blocker.state!=='idle'||blocker.step||o.passing.has(blocker.id))continue;
+   if(blocker.command&&(blocker.command.type!=='move'||blocker.waitReason!=='traffic'))continue;
+   for(const [bx,by]of directions){
+    const x=blocker.x+bx,y=blocker.y+by;
+    if(!board.inside(x,y)||board.occupied(x,y)||board.navigation.blocked(y*board.width+x)||occupiedGoals.has(x+','+y))continue;
+    if(board.move(blocker.id,x,y,{replace:true,direct:true})){
+     o.passing.set(blocker.id,{for:u.id,until:board.time+1.5});opened=true;break;
+    }
+   }
+   if(opened)break;
+  }
+  if(opened)o.nextPassingAt=board.time+.4;
+ }
  let arrived=0;
  board.batchCommands(()=>{for(const u of units){
+   const passing=o.passing.get(u.id);
+   if(passing){const waiting=board.unit(passing.for),goal=o.goals.get(passing.for);
+    if(board.time<passing.until&&waiting&&goal&&(waiting.x!==goal.x||waiting.y!==goal.y))continue;
+    o.passing.delete(u.id);
+   }
    const p=o.goals.get(u.id),at=p&&u.x===p.x&&u.y===p.y&&!u.step;
    const defensive=['fortify','firing-line'].includes(o.type);
 

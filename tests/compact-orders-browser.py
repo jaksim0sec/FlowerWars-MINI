@@ -22,6 +22,9 @@ with sync_playwright() as p:
         assert '집결' in page.locator('#command-state').text_content()
         page.locator('#orders-toggle').click();page.locator('#selection-options').click()
         assert page.locator('[data-squad-stance]').count()==0
+        assert page.locator('#squad-close .control-label').is_hidden()
+        close=page.locator('#squad-close').bounding_box();panel=page.locator('#squad-tools').bounding_box()
+        assert close['x']+close['width']<=panel['x']+panel['width']
         for formation in ['line','column','square','spread']:
             button=page.locator('[data-squad-formation="'+formation+'"]')
             assert button.locator('svg rect').count()>0
