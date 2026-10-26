@@ -3,8 +3,10 @@ import assert from 'node:assert/strict';
 import {Board} from '../src/model.mjs';
 import {FlagMatch} from '../src/flag-match.mjs';
 import {squadsFor,createFormationGroup} from '../src/unit-groups.mjs';
+import {availableSquadBlueprints,createFormationGroup as squadBlueprint} from '../src/unit-groups.mjs';
+const legacyBlueprints=()=>availableSquadBlueprints().map(bp=>squadBlueprint(12,'squad','',bp.squadType));
 import {deployReserves} from './deployment-helpers.mjs';
-function game(count=240){const b=new Board(),m=new FlagMatch(b,{count,scenario:'envelopment',makeCharacter:s=>({characterId:s.characterId})});deployReserves(m,'mixed');m.start();return {b,m};}
+function game(count=240){const b=new Board(),m=new FlagMatch(b,{blueprints:legacyBlueprints(),count,scenario:'envelopment',makeCharacter:s=>({characterId:s.characterId})});deployReserves(m,'mixed');m.start();return {b,m};}
 test('every living bot squad has one registered command role and even small armies retain a flag guard',()=>{
  for(const size of [12,48,240,500]){
   const {b,m}=game(size);assert.ok(m.command);

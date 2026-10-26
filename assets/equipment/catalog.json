@@ -215,6 +215,39 @@
     "socketRotations": {
       "left": -0.02,
       "right": 0.02
+    },
+    "animation": {
+      "weapon": [
+        "state",
+        "attack",
+        [
+          "curve",
+          "elapsed",
+          [
+            [
+              0,
+              0
+            ],
+            [
+              0.22,
+              -0.12
+            ],
+            [
+              0.3,
+              0.08
+            ],
+            [
+              0.65,
+              0
+            ]
+          ]
+        ],
+        [
+          "*",
+          "wave",
+          0.01
+        ]
+      ]
     }
   },
   "archer_bow": {

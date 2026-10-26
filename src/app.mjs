@@ -1,3 +1,4 @@
+import {commanderPortrait} from './commander-portrait.mjs';
 import {squadTapIntent} from './gesture-commands.mjs';
 import {terrainNames} from './battlefield-terrain.mjs';
 import {FlagMatch} from './flag-match.mjs';
@@ -161,10 +162,20 @@ function selectSquad(id,trigger=null,additive=false){
  if(trigger){const rect=trigger.getBoundingClientRect();$('squad-tools').style.setProperty('--squad-anchor-x',Math.round(rect.left+rect.width/2)+'px');}
  $('debug-tools').open=false;refresh();syncSquadRoster();
 }
+const portraitCache=new Map();
+function portraitFor(unit){
+ const key=unit.character.characterId+JSON.stringify(unit.character.appearance);
+ if(!portraitCache.has(key))portraitCache.set(key,commanderPortrait(art.catalog,unit));
+ return portraitCache.get(key);
+}
 function rosterButton(squad){
   const button=document.createElement('button');button.type='button';button.className='squad-card';button.dataset.squadId=squad.id;
   const portrait=document.createElement('span');portrait.className='squad-portrait';
-  portrait.classList.add('squad-emblem');portrait.innerHTML=icon(squad.type);
+  const commander=board.unit(squad.leaderId)||board.unit(squadSummary(board,squad.id)?.actingCommanderId);
+  const image=document.createElement('img');image.className='commander-photo';image.alt='';
+  if(commander?.character)image.src=portraitFor(commander);
+  portrait.append(image);
+  const badge=document.createElement('span');badge.className='commander-badge';badge.innerHTML=icon(squad.type);badge.title=typeLabels[squad.type]||'혼성';portrait.append(badge);
   button.dataset.type=squad.type;
   const body=document.createElement('span');body.className='squad-card-body';
   const title=document.createElement('strong');title.className='squad-card-title';title.textContent=squad.name;
@@ -208,6 +219,8 @@ function syncSquadRoster(){
       }
       button=rosterButton(squad);rosterCards.set(squad.id,button);list.querySelector('[data-group="'+platoonKey+'"] .platoon-squads').append(button);}
     const summary=squadSummary(board,squad.id);
+    const leader=board.unit(summary.actingCommanderId),photo=button.querySelector('.commander-photo');
+    if(leader?.character&&photo){const source=portraitFor(leader);if(photo.getAttribute('src')!==source)photo.src=source;}
     const echelon=squad.platoonIndex!=null?'제'+(squad.platoonIndex+1)+'소대 · ':'';
     const label=echelon+(summary.leaderAlive?'기수 지휘 ':summary.commanderAlive?'분대 지휘 ':'전멸 ')+summary.alive+'/'+squad.memberIds.length;
     const status=button.querySelector('.squad-card-status');
@@ -270,7 +283,7 @@ function updateMatchHud(){
  text('match-phase',m.phase==='preparation'?'준비':m.phase==='battle'?'깃발 공성전':'전투 종료');
  const seconds=Math.ceil(m.remaining);text('match-timer',m.phase==='preparation'?Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0'):'');
  text('match-armies',m.phase==='preparation'?`나 ${m.counts.A}/${m.limit} · 적 ${m.counts.B}/${m.limit}`:`나 ${m.counts.A} · 적 ${m.counts.B}`);
- text('deployment-reserve',`예비 ${m.reserve.A}명 · ${Math.min(12,m.reserve.A)}명씩 배치`);
+ text('deployment-reserve',`예비 ${m.reserve.A}명 · ${Math.min(m.squadSize,m.reserve.A)}명씩 배치`);
  $('deployment-tools').classList.toggle('is-deploying',view.mode==='deploy');
  text('deployment-toggle',view.mode==='deploy'?'완료':'배치');
  for(const button of document.querySelectorAll('[data-deploy-type]')){button.disabled=m.reserve.A<=0;button.setAttribute('aria-pressed',String(button.dataset.deployType===view.deployType));}
@@ -313,6 +326,7 @@ function refresh(invalidate=true) {
   $('squad-aim').hidden=view.mode!=='squad-target';
   if(squad){
     const summary=squadSummary(board,squad.id);
+
     text('squad-name',squad.name);
     text('squad-status',`${summary.alive}/${squad.memberIds.length}명 · ${summary.leaderAlive?'기수 지휘':summary.commanderAlive?'분대 지휘':'전멸'} · ${squadActionLabels[squad.order?.source]||'대기'}`);
     for(const button of $('squad-tools').querySelectorAll('[data-squad-action]'))button.disabled=!summary.commanderAlive;

@@ -79,8 +79,8 @@ export function planFormation(board,squad,center,units,lead,otherGoals){
  if(lead)rows.push({unit:lead,depth:Math.ceil(ordered.length/width)*gap,lane:0});
  let offsets=rows.map(r=>({x:-f.x*r.depth+side.x*r.lane,y:-f.y*r.depth+side.y*r.lane}));
  if(formation==='square'){
-  const edge=[],inside=[];
-  for(let y=-2;y<=2;y++)for(let x=-2;x<=2;x++)if(x||y)(Math.max(Math.abs(x),Math.abs(y))===2?edge:inside).push({x,y});
+  const edge=[],inside=[],radius=units.length>17?3:2;
+  for(let y=-radius;y<=radius;y++)for(let x=-radius;x<=radius;x++)if(x||y)(Math.max(Math.abs(x),Math.abs(y))===radius?edge:inside).push({x,y});
   const outer=rows.filter(r=>r.unit!==lead&&band(r.unit)===0),inner=rows.filter(r=>r.unit!==lead&&band(r.unit)!==0);
   const angular=(a,b)=>Math.atan2(a.y,a.x)-Math.atan2(b.y,b.x);
   edge.sort(angular);inside.sort(angular);

@@ -725,3 +725,15 @@ button:not(:disabled):active{scale:.96;}
 .platoon-squads[hidden]{opacity:0;translate:0 5px;pointer-events:none;}
 @starting-style{.platoon-squads:not([hidden]){opacity:0;translate:0 5px;}}
 @media(prefers-reduced-motion:reduce){.platoon-squads{transition:none;translate:none;}}
+/* Neutral translucent surfaces; gold is reserved for selected actions. */
+#match-hud,.command-selection-row,.squad-tools,.selection-actions button,.deployment-types button{background:rgba(255,252,242,.76);border-color:#665d4a26;}
+.command-dock .quick-orders button>.ui-icon{background:rgba(255,252,242,.76)!important;}
+.squad-tools .squad-option-row button{background:#fffcf287;}.platoon-fold{background:#fffcf2a0;}
+.squad-card,.squad-card:hover,.squad-card.is-selected{grid-template-columns:76px 1fr;gap:8px;width:180px;min-width:180px;max-width:180px;height:78px;min-height:78px;padding:0 10px 0 0;border:1px solid #fffcf2b0;border-radius:17px;background:rgba(255,252,242,.76);box-shadow:0 2px 12px #352b1612;overflow:hidden;}
+.squad-card.is-selected{background:rgba(255,246,216,.86);border-color:#b7954c;box-shadow:inset 0 0 0 1px #b7954c55;}
+.squad-portrait{position:relative;align-self:end;grid-row:1;width:76px;height:76px;background:none;border-radius:0;}
+.commander-photo{display:block;width:76px;height:76px;object-fit:contain;object-position:center bottom;mask-image:linear-gradient(#000 65%,transparent 100%);-webkit-mask-image:linear-gradient(#000 65%,transparent 100%);}
+.commander-badge{position:absolute;right:-1px;bottom:10px;display:grid;place-items:center;width:25px;height:25px;border-radius:50%;background:#fffbebed;box-shadow:0 1px 5px #4f3b2226;color:var(--troop-accent);border:1px solid #8b785a30;}
+.commander-badge .ui-icon{width:16px;height:16px;}.squad-card-body{align-self:center;}.squad-card-title{font-size:12px;}.squad-card .squad-activity{background:#fffcf2ba;right:6px;top:5px;}
+.squad-roster{height:112px;max-height:112px;}.command-dock{bottom:calc(134px + env(safe-area-inset-bottom))!important;}.squad-tools{bottom:calc(134px + env(safe-area-inset-bottom));}
+@media(max-height:520px){.squad-roster{height:80px;max-height:80px;}.squad-card,.squad-card:hover,.squad-card.is-selected{height:50px;min-height:50px;grid-template-columns:52px 1fr;width:158px;min-width:158px;max-width:158px;}.squad-portrait,.commander-photo{height:49px;width:52px;}.commander-badge{width:20px;height:20px;bottom:3px;}.commander-badge .ui-icon{width:13px;height:13px;}.command-dock{bottom:calc(94px + env(safe-area-inset-bottom))!important;}.squad-tools{bottom:calc(94px + env(safe-area-inset-bottom));}}

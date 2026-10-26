@@ -4,10 +4,12 @@ import {Board} from '../src/model.mjs';
 import {FlagMatch} from '../src/flag-match.mjs';
 import {squadsFor} from '../src/unit-groups.mjs';
 import {survey} from '../src/bot-strategy.mjs';
+import {availableSquadBlueprints,createFormationGroup as squadBlueprint} from '../src/unit-groups.mjs';
+const legacyBlueprints=()=>availableSquadBlueprints().map(bp=>squadBlueprint(12,'squad','',bp.squadType));
 import {deployReserves} from './deployment-helpers.mjs';
 
 function army(type,count=144){
- const board=new Board(),match=new FlagMatch(board,{count,makeCharacter:m=>({characterId:m.characterId})});
+ const board=new Board(),match=new FlagMatch(board,{blueprints:legacyBlueprints(),count,makeCharacter:m=>({characterId:m.characterId})});
  deployReserves(match,type);assert.equal(match.reserve.A,0);
  match.start();return {board,match,squads:match.squadIds.B.map(id=>squadsFor(board).get(id))};
 }
@@ -33,7 +35,7 @@ test('full bot operations pair frontline, firepower and healing in one lane',()=
  }
 });
 test('bot retains reserves for later enemy deployment and skip reads the latest composition',()=>{
- const b=new Board(),m=new FlagMatch(b,{count:240,makeCharacter:s=>({characterId:s.characterId})});
+ const b=new Board(),m=new FlagMatch(b,{blueprints:legacyBlueprints(),count:240,makeCharacter:s=>({characterId:s.characterId})});
  for(let i=0;i<24;i++)m.update(.25);
  assert.ok(m.counts.B>0&&m.reserve.B>0,'initial deployment must leave room to adapt');
  const before=new Map(b.units.map(u=>[u.id,[u.x,u.y]]));

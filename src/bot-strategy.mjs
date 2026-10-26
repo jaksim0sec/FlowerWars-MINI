@@ -25,7 +25,7 @@ export function survey(board,flag){
 }
 
 /** Commit a complementary four-squad force, rather than choosing each type alone. */
-export function planOperation(plan,index,totalSquads,catalog=createRecruitmentCatalog(availableSquadBlueprints()),scenario=DOCTRINES[0],existing=[]){
+export function planOperation(plan,index,totalSquads,catalog=createRecruitmentCatalog(availableSquadBlueprints()),scenario=DOCTRINES[0],existing=[],squadsPerOperation=4){
  const e=plan.enemy,total=Math.max(1,e.total);
  const doctrine=e.ranged/total>=.35?'anti-ranged':e.shields/total>=.4?'anti-shield':e.mobile/total>=.5?'anti-mobile':'balanced';
  let role=scenario.opening[index];
@@ -33,7 +33,8 @@ export function planOperation(plan,index,totalSquads,catalog=createRecruitmentCa
  const mission=role==='guard'?'guard':role==='mobile'?'flank':'attack';
  const frontIndex=existing.filter(o=>o.role==='front').length;
  const lane=role==='guard'?1:role==='mobile'?plan.weakest:role==='front'?[1,0,2][frontIndex%3]:plan.strongest;
- const needs=[role==='mobile'?'mobile':'screen','fire',role==='mobile'?'mobile':doctrine==='anti-shield'?'fire':doctrine==='anti-ranged'?'mobile':doctrine==='anti-mobile'?'screen':'strike','support'];
+ let needs=[role==='mobile'?'mobile':'screen','fire',role==='mobile'?'mobile':doctrine==='anti-shield'?'fire':doctrine==='anti-ranged'?'mobile':doctrine==='anti-mobile'?'screen':'strike','support'];
+ if(squadsPerOperation===2)needs=role==='guard'?['screen','fire']:role==='mobile'?['mobile','support']:role==='breach'?['strike',doctrine==='anti-shield'?'fire':'support']:['screen',doctrine==='anti-shield'?'fire':'support'];
  const types=needs.map(need=>recruit(catalog,need));
  return {index,role,mission,lane,doctrine,types,needs,squadIds:[],anchor:{x:role==='guard'?81:role==='mobile'?75:56+(index%3)*10,y:LANES[lane]}};
 }

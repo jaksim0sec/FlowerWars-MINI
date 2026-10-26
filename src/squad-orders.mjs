@@ -173,7 +173,7 @@ function runOrder(board,s,replace=false){
    o.goals=new Map(planned.map(([u,p])=>[u.id,p]));
    if(o.type==='rally'){
     for(const u of units){board.interrupt(u);u.reformSearch=null;}
-    o.activeReformId=null;o.reformBuffer=null;
+    o.activeReformId=null;o.reformBuffer=null;o.reformFailed=null;
    }
    o.previous=anchor;o.lastMembers=units.length;o.dirty=false;
  }

@@ -26,6 +26,8 @@ export class FlagMatch{
   this.nextSurvey=0;this.strategy=null;
   this.botOperations=new Map();
   this.recruitment=createRecruitmentCatalog(blueprints,unitProfiles);
+  this.squadSize=Math.max(...blueprints.map(bp=>bp.members.length));
+  this.operationSize=Math.max(2,Math.min(4,Math.floor(48/this.squadSize)));
   this.command=new BotCommand(this,scenario);
   this.limit=Math.max(1,Math.min(ARMY_LIMIT,Math.floor(Number(count)||ARMY_LIMIT)));
   this.reserve={A:this.limit,B:this.limit};this.makeCharacter=makeCharacter;this.optionsFor=optionsFor;
@@ -45,12 +47,12 @@ export class FlagMatch{
  deploymentPreview(team,type){
   const template=this.recruitment.get(type)?.blueprint;
   if(!template||!this.reserve[team])return null;
-  const index=this.squadIds[team].length,size=Math.min(12,this.reserve[team],template.members.length);
-  return layoutDeployment(template,size,`${index+1}분대`,{withCommander:index%4===0});
+  const index=this.squadIds[team].length,size=Math.min(this.squadSize,this.reserve[team],template.members.length);
+  return layoutDeployment(template,size,`${index+1}분대`);
  }
  deploy(team,type,anchor){
   if(this.phase!=='preparation'||!(team in this.reserve)||!this.recruitment.has(type)||this.reserve[team]<=0)return null;
-  const index=this.squadIds[team].length,size=Math.min(12,this.reserve[team],this.recruitment.get(type).blueprint.members.length);
+  const index=this.squadIds[team].length,size=Math.min(this.squadSize,this.reserve[team],this.recruitment.get(type).blueprint.members.length);
   const blueprint=this.deploymentPreview(team,type),sign=team==='B'?-1:1;
   if(blueprint.members.some(m=>!this.inTerritory(team,{x:anchor.x+m.offset.x*sign,y:anchor.y+m.offset.y})))return null;
   const group=placeGroup(this.board,blueprint,anchor,{team,autoCombat:false,makeCharacter:this.makeCharacter,optionsFor:this.optionsFor});
@@ -60,11 +62,11 @@ export class FlagMatch{
  }
  deployBot(){
   if(!this.reserve.B)return false;
-  const index=this.squadIds.B.length,groupIndex=Math.floor(index/4),slot=index%4;
+  const index=this.squadIds.B.length,groupIndex=Math.floor(index/this.operationSize),slot=index%this.operationSize;
   let operation=this.botOperations.get(groupIndex);
   if(!operation){
    const observation=survey(this.board,this.flags.B);this.command.chooseScenario(observation);
-   operation=planOperation(observation,groupIndex,Math.ceil(this.limit/12),this.recruitment,this.command.scenario,[...this.botOperations.values()]);
+   operation=planOperation(observation,groupIndex,Math.ceil(this.limit/this.squadSize),this.recruitment,this.command.scenario,[...this.botOperations.values()],this.operationSize);
    if(!this.placeOperation(operation))return false;
    this.botOperations.set(groupIndex,operation);
   }
@@ -77,9 +79,9 @@ export class FlagMatch{
   // retain nearby reserved positions instead of individually spilling outward.
   const footprints=[];
   let remaining=this.reserve.B;
-  for(let slot=0;slot<4;slot++){
-   const size=Math.min(12,remaining,this.recruitment.get(operation.types[slot]).blueprint.members.length);if(size<=0)break;remaining-=size;
-   for(const member of layoutDeployment(this.recruitment.get(operation.types[slot]).blueprint,size,'',{withCommander:slot===0}).members)
+  for(let slot=0;slot<operation.types.length;slot++){
+   const size=Math.min(this.squadSize,remaining,this.recruitment.get(operation.types[slot]).blueprint.members.length);if(size<=0)break;remaining-=size;
+   for(const member of layoutDeployment(this.recruitment.get(operation.types[slot]).blueprint,size,'').members)
     footprints.push({x:(slot%2)*7-member.offset.x,y:(slot<2?-4:4)+member.offset.y});
   }
   const wanted=operation.anchor;

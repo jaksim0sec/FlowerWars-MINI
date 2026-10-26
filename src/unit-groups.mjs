@@ -16,18 +16,18 @@ const types={
 };
 export const SPEAR_BATTLE={damageMultiplier:1.5,speedMultiplier:1.5,attackPeriod:3.2,impactTime:.07,activeDuration:.32,movingPoise:true,charge:true};
 const roles={'banner-bearer':'banner','scout':'scout','shield-guard':'guard','archer':'archer','clover-mage':'healer','scholar':'support'};
-export function availableSquadBlueprints(){return Object.keys(types).map(type=>createFormationGroup(12,'squad','',type));}
+export function availableSquadBlueprints(){return Object.keys(types).map(type=>createFormationGroup(24,'squad','',type));}
 export function createFormationGroup(count=8,kind='squad',name='',type='mixed'){
  count=Math.max(2,Math.min(128,Math.floor(Number(count)||8)));kind=kind==='platoon'?'platoon':'squad';
- const formation=armyFormation(count),center=Math.floor(formation.rows/2);
- if(type!=='mixed'&&types[type])for(let i=0;i<formation.slots.length;i++){
-   const id=types[type][i%12];formation.slots[i]={...formation.slots[i],characterId:id,role:roles[id],weapon:undefined,stats:undefined};
+ const formation=armyFormation(count),center=Math.floor(formation.rows/2),squadSize=kind==='squad'&&count===24?24:12;
+ if((type!=='mixed'||squadSize===24)&&types[type])for(let i=0;i<formation.slots.length;i++){
+   const id=squadSize===24?(i===0?'banner-bearer':types[type][1+(i-1)%11]):types[type][i%12];formation.slots[i]={...formation.slots[i],characterId:id,role:roles[id],weapon:undefined,stats:undefined};
  }
  if(type==='assault')for(const slot of formation.slots){
   slot.battle={speedMultiplier:1.5};
   if(slot.characterId==='scout'){slot.weapon='ribbon_spear';slot.battle={...SPEAR_BATTLE};}
  }
- return {format:'doragami-unit-group',version:1,kind,name:name.trim()||(kind==='platoon'?'혼성 소대':'혼성 분대'),squadType:types[type]?type:'mixed',members:formation.slots.map(({depth,row,...slot})=>({...structuredClone(slot),offset:{x:-depth,y:row-center}}))};
+ return {format:'doragami-unit-group',version:1,kind,squadSize,name:name.trim()||(kind==='platoon'?'혼성 소대':'혼성 분대'),squadType:types[type]?type:'mixed',members:formation.slots.map(({depth,row,...slot})=>({...structuredClone(slot),offset:{x:-depth,y:row-center}}))};
 }
 export function placeGroup(board,blueprint,anchor,options={}){
  if(blueprint?.format!=='doragami-unit-group'||blueprint.version!==1||!Array.isArray(blueprint.members)||!blueprint.members.length||blueprint.members.length>1024)return null;
@@ -78,7 +78,7 @@ function attachSquads(board,group){
   });
  }else{
   const leaders=units.filter(u=>u.character?.characterId==='banner-bearer'||u.formationRole==='banner');
-  const count=Math.ceil(units.length/12),troops=units.filter(u=>!leaders.includes(u));
+  const capacity=group.blueprint.squadSize||12,count=Math.ceil(units.length/capacity),troops=units.filter(u=>!leaders.includes(u));
   squads=Array.from({length:count},(_,i)=>({
    id:group.id+':'+(i+1),groupId:group.id,
    name:count===1?group.name:group.name+' · '+(i+1)+'분대',team:group.team,
@@ -86,7 +86,7 @@ function attachSquads(board,group){
    memberIds:leaders[i]?[leaders[i].id]:[],stance:'balanced',formation:'line',order:null
   }));
   for(const u of [...troops,...leaders.slice(count)]){
-   const squad=squads.find(s=>s.memberIds.length<12);
+   const squad=squads.find(s=>s.memberIds.length<capacity);
    if(squad)squad.memberIds.push(u.id);
   }
  }

@@ -15,7 +15,7 @@ with sync_playwright() as p:
  const b=new Board(),match=new FlagMatch(b,{makeCharacter:m=>{const c=createCharacter(catalog,m.characterId);if(m.weapon)equip(catalog,c,m.weapon,'left');return c},optionsFor:c=>({stats:catalog.characters[c.characterId].testCombat,movement:catalog.characters[c.characterId].testMovement})});
  const squad=match.deploy('A','assault',{x:20,y:20});
  const spears=squad.memberIds.map(id=>b.unit(id)).filter(u=>u.character.characterId==='scout');
- if(spears.length!==10||spears.some(u=>u.damage!==21||u.combat.period!==3.2))throw Error('live deployment did not apply the spear exactly once');
+ if(spears.length!==21||spears.some(u=>u.damage!==21||u.combat.period!==3.2))throw Error('live deployment did not apply the spear exactly once');
  const layer=document.createElement('div');layer.style='position:fixed;inset:0;z-index:9999;display:flex;background:#ede2c5';document.body.append(layer);
  for(const [state,t,facing]of [['idle',0,-1],['walk',.1,-1],['attack',.14,-1]]){
   const canvas=document.createElement('canvas');canvas.width=420;canvas.height=600;layer.append(canvas);
@@ -25,7 +25,7 @@ with sync_playwright() as p:
  }
  return spears.length;
 }''')
- assert result==10
+ assert result==21
  page.screenshot(path='/tmp/spear-poses.png');assert not errors,errors
  browser.close()
 print('PASS catalog, deployed spear equipment/stats, idle/walk/thrust rendering')

@@ -15,8 +15,9 @@ with sync_playwright() as p:
   page.locator('#command-dock').wait_for(state='hidden')
   assert page.locator('#command-dock').evaluate('(e)=>e.inert')
   assert page.locator('#squad-tools').evaluate('(e)=>e.contains(document.activeElement)')
-  assert page.locator('.squad-card img').count()==0
-  assert page.locator('.squad-emblem svg').count()>0
+  assert page.locator('.squad-card img').count()>0
+  assert page.locator('.commander-photo').first.evaluate('(e)=>e.complete&&e.naturalWidth>0')
+  assert page.locator('.commander-badge svg').count()>0
   panel=page.locator('#squad-tools').bounding_box()
   assert panel['x']>=0 and panel['y']>=0 and panel['x']+panel['width']<=w
   page.locator('[data-squad-formation=column]').click()

@@ -1,27 +1,22 @@
 import {createFormationGroup} from './unit-groups.mjs';
 
-export function deploymentBlueprint(size,type,name,options){
+export function deploymentBlueprint(size,type,name){
  const blueprint=createFormationGroup(Math.max(2,size),'squad',name,type);
- return layoutDeployment(blueprint,size,name,options);
+ return layoutDeployment(blueprint,size,name);
 }
-export function layoutDeployment(template,size,name,{withCommander=true}={}){
+export function layoutDeployment(template,size,name){
  const blueprint=structuredClone(template);blueprint.name=name;
- if(!withCommander){
-  const counts=new Map();
-  for(const member of blueprint.members)if(member.role!=='banner'&&member.characterId!=='banner-bearer')counts.set(member.characterId,(counts.get(member.characterId)||0)+1);
-  const primary=[...counts].sort((a,b)=>b[1]-a[1])[0]?.[0];
-  const soldier=blueprint.members.find(m=>m.characterId===primary);
-  if(soldier)blueprint.members=blueprint.members.map(m=>m.role==='banner'||m.characterId==='banner-bearer'?structuredClone(soldier):m);
- }
+ blueprint.squadSize=Math.max(blueprint.squadSize||12,size);
  blueprint.members=blueprint.members.slice(0,size);
  const priority=m=>({guard:0,scout:1,archer:2,healer:3,support:3,banner:4}[m.role]??1);
  blueprint.members.sort((a,b)=>priority(a)-priority(b));
  const troops=blueprint.members.filter(m=>m.role!=='banner'),flags=blueprint.members.filter(m=>m.role==='banner');
+ const columns=size>12?6:4;
  let rank=0;
  for(const band of [0,1,2,3]){
   const members=troops.filter(m=>priority(m)===band);
-  members.forEach((m,i)=>{const width=Math.min(4,members.length-Math.floor(i/4)*4);m.offset={x:-(rank+Math.floor(i/4)),y:i%4-Math.floor(width/2)};});
-  rank+=Math.ceil(members.length/4);
+  members.forEach((m,i)=>{const width=Math.min(columns,members.length-Math.floor(i/columns)*columns);m.offset={x:-(rank+Math.floor(i/columns)),y:i%columns-Math.floor(width/2)};});
+  rank+=Math.ceil(members.length/columns);
  }
  flags.forEach((m,i)=>m.offset={x:-(rank+1),y:i});
  return blueprint;

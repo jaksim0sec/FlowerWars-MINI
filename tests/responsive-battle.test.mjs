@@ -31,15 +31,15 @@ test('melee troops close on an actual nearby shooter and retaliate without an ex
  assert.ok(u.hits>0);assert.ok(archer.hits>0,'melee stood still under nearby fire');
  assert.ok(u.x>5);
 });
-test('200 soldier armies replace three out of four banner bearers with rank-and-file troops',()=>{
+test('200 soldier armies use larger squads with exactly one commander in every squad',()=>{
  const b=new Board(),m=new FlagMatch(b,{count:999});deployReserves(m,'defense');
  while(m.reserve.B)assert.ok(m.deployBot());
  assert.deepEqual(m.counts,{A:200,B:200});
  for(const team of ['A','B']){
   const banners=b.units.filter(u=>u.team===team&&u.formationRole==='banner');
-  assert.equal(banners.length,Math.ceil(m.squadIds[team].length/4));
+  assert.equal(banners.length,m.squadIds[team].length);
  }
- const full=m.squadIds.A.map(id=>squadsFor(b).get(id)).filter(s=>s.memberIds.length===12);
+ const full=m.squadIds.A.map(id=>squadsFor(b).get(id)).filter(s=>s.memberIds.length===24);
  assert.ok(full.every(s=>s.memberIds.filter(id=>b.unit(id).formationRole==='guard').length>=10));
 });
 test('retaliation reacts promptly, keeps a short leash, and a new order cancels it',()=>{
@@ -68,12 +68,12 @@ test('arrived ranged formations do not alternate between spacing and returning t
 });
 test('partial troop previews exactly match actual soldiers, equipment and offsets',()=>{
  for(const type of ['mixed','defense','support']){
-  const b=new Board(),m=new FlagMatch(b,{count:20,makeCharacter:m=>({characterId:m.characterId})});
+  const b=new Board(),m=new FlagMatch(b,{count:32,makeCharacter:m=>({characterId:m.characterId})});
   assert.ok(m.deploy('A',type,{x:20,y:20}));
   const preview=m.deploymentPreview('A',type);assert.equal(preview.members.length,8);
   const anchor={x:20,y:50},s=m.deploy('A',type,anchor);assert.ok(s);
   const actual=s.memberIds.map(id=>b.unit(id));
   for(const member of preview.members)assert.ok(actual.some(u=>u.character.characterId===member.characterId&&u.x===anchor.x+member.offset.x&&u.y===anchor.y+member.offset.y));
-  assert.ok(actual.every(u=>u.formationRole!=='banner'));
+  assert.equal(actual.filter(u=>u.formationRole==='banner').length,1);
  }
 });

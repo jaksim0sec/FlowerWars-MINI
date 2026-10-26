@@ -15,7 +15,7 @@ export function createRecruitmentCatalog(blueprints,profiles={}){
  if(!Array.isArray(blueprints)||!blueprints.length)throw new Error('At least one squad blueprint is required');
  const ids=new Set();
  for(const blueprint of blueprints){
-  if(!blueprint?.squadType||!Array.isArray(blueprint.members)||!blueprint.members.length||blueprint.members.length>12)throw new Error('Squad blueprints require a type and 1–12 members');
+  if(!blueprint?.squadType||!Array.isArray(blueprint.members)||!blueprint.members.length||blueprint.members.length>24)throw new Error('Squad blueprints require a type and 1–24 members');
   if(ids.has(blueprint.squadType))throw new Error('Duplicate squad blueprint type');ids.add(blueprint.squadType);
  }
  return new Map(blueprints.map(blueprint=>{

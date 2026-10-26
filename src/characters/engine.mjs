@@ -94,6 +94,15 @@ export function layoutCharacter(catalog, instance, time=0) {
         if(op.rotate!==undefined) {const pivot=op.pivot||[0,0];m=multiply(m,multiply(translate(...pivot),multiply(rotate(value(op.rotate,vars)),translate(-pivot[0],-pivot[1]))));}
         if(op.scale) {const pivot=op.pivot||[0,0],s=op.scale.map(x=>value(x,vars));m=multiply(m,multiply(translate(...pivot),multiply([s[0],0,0,s[1],0,0],translate(-pivot[0],-pivot[1]))));}
       }
+      // y_common.css: anticipation at 55%, impact at 75%, then settle.
+      // Retimed to the simulation's impact; special weapons keep a smaller
+      // body accent so bows stay aimed and spears keep their straight thrust.
+      if(vars.state==='attack'&&(node.id==='upper'||node.id==='neck')){
+        const weight=unique.some(a=>a.equipmentId==='basic_sword')?1:0;
+        const head=node.id==='neck',pivot=rig.neck||rig.foot;
+        if(!head)m=multiply(m,translate(value('attackBodyX',vars)*weight,value('attackBodyY',vars)*weight));
+        m=multiply(m,multiply(translate(...pivot),multiply(rotate(value(head?'headRock':'bodyRock',vars)*weight),translate(-pivot[0],-pivot[1]))));
+      }
       if(node.id==='upper')m=multiply(m,translate(critical*Math.sin(time*8)*5,injury*9+critical*8));
       if(['neck','leftArm','rightArm'].includes(node.id)){
         const p=node.transforms?.find(op=>op.pivot)?.pivot||rig.neck||[0,0];
