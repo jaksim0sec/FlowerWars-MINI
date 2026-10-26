@@ -1,4 +1,4 @@
-export const terrainNames={grass:'개활지',soil:'흙',road:'길 · 이동 속도 +20%',forest:'X · 진입 불가'};
+export const terrainNames={grass:'개활지',soil:'흙',road:'길 · 이동 속도 +20%',forest:'연못 · 진입 불가'};
 export function terrainAt(board,x,y){return board.terrain[Math.round(y)]?.[Math.round(x)]||'grass';}
 export function terrainStepMultiplier(board,from,to){
  const speed=p=>terrainAt(board,p.x,p.y)==='road'?1.2:1;

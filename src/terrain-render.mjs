@@ -26,12 +26,9 @@ function paint(ctx,art,board,camera,width,height,dpr){
  const tiles=visibleTiles(board,camera,width,height);
  for(const{x,y}of tiles){
   const type=board.terrain[y][x],px=(x-y)*HALF_W,py=(x+y)*HALF_H;
-  ctx.drawImage(art.tiles[type==='road'?'soil':type==='forest'?'grass':type],px-72,py-42,144,107);
-  if(type==='forest'){
-   ctx.fillStyle='#215e46aa';ctx.beginPath();ctx.moveTo(px,py-42);ctx.lineTo(px+72,py);ctx.lineTo(px,py+42);ctx.lineTo(px-72,py);ctx.closePath();ctx.fill();
-   ctx.strokeStyle='#92b48299';ctx.lineWidth=3;ctx.beginPath();
-   ctx.moveTo(px-14,py-8);ctx.lineTo(px+14,py+8);ctx.moveTo(px+14,py-8);ctx.lineTo(px-14,py+8);ctx.stroke();
-  }
+  const obstacle=board.obstacles?.get(y*board.width+x);
+  const tile=(type==='forest'||(obstacle&&obstacle.blocked!==false))?'pond':type==='road'?'soil':type;
+  ctx.drawImage(art.tiles[tile],px-72,py-42,144,107);
  }
  return tiles.length;
 }
@@ -39,7 +36,7 @@ function paint(ctx,art,board,camera,width,height,dpr){
 export function drawTerrain(ctx,art,board,camera,width,height,dpr,interactive=false){
  let cache=caches.get(ctx);
  if(!cache){cache={canvas:document.createElement('canvas'),builds:0,tiles:0};caches.set(ctx,cache);}
- const pad=128,key=[board.width,board.height,board.terrainRevision,board.terrain,art.tiles,width,height,dpr];
+ const pad=128,key=[board.width,board.height,board.terrainRevision,board.terrain,board.obstacleRevision,art.tiles,width,height,dpr];
  const base=cache.camera;
  const covered=base&&-camera.x/camera.scale>=(-base.x-pad)/base.scale&&
   (width-camera.x)/camera.scale<=(width-base.x+pad)/base.scale&&

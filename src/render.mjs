@@ -1,6 +1,6 @@
 import {combatAnimationElapsed} from './combat.mjs';
 import {characterRadius,onScreen,cachedPose,releasePose} from './character-render-cache.mjs';
-import {drawTerrain,visibleTiles} from './terrain-render.mjs';
+import {drawTerrain} from './terrain-render.mjs';
 import {loadCatalog, loadImage} from './characters/catalog.mjs';
 import {createCharacter, equip, drawCharacter} from './characters/engine.mjs';
 import { project, HALF_W, HALF_H } from './model.mjs';
@@ -10,7 +10,7 @@ import {drawMatchOverlay,drawDistantSoldier} from './match-overlay.mjs';
 const TILE_BASE = new URL('../assets/world/tiles/', import.meta.url);
 export async function loadArtwork() {
   const catalog=await loadCatalog();
-  const tiles=Object.fromEntries(await Promise.all(['grass','soil'].map(async name=>[name,normalizeTile(await loadImage(new URL(`${name}.webp`,TILE_BASE)),name)])));
+  const tiles=Object.fromEntries(await Promise.all(['grass','soil','pond'].map(async name=>[name,normalizeTile(await loadImage(new URL(`${name}.webp`,TILE_BASE)),name)])));
   const warrior=catalog.characters['gynari-warrior'];
   return {catalog, rig:warrior.rig, parts:warrior.images, tiles};
 }
@@ -40,7 +40,7 @@ function triangle(ctx, image, source, dest) {
 function normalizeTile(image, type) {
   // Source silhouettes differ despite sharing 512x384 dimensions. Register the
   // actual seven corners, preserving both original top and stone wall textures.
-  const source = type === 'grass'
+  const source = type !== 'soil'
     ? [[256, 29], [486, 169], [256, 310], [26, 169], [486, 215], [256, 356], [26, 215]]
     : [[256, 51], [478, 185], [256, 318], [33, 185], [478, 226], [256, 359], [33, 226]];
   const dest = [[144, 0], [288, 84], [144, 168], [0, 84], [288, 128], [144, 212], [0, 128]];
@@ -82,11 +82,6 @@ export function render(ctx, art, board, view, camera, width, height, dpr, option
   drawMatchOverlay(ctx,board.match,camera.scale);
   drawCommandOverlay(ctx,board,view,camera.scale);
 
-  if(board.obstacles?.size)for(const {x,y} of visibleTiles(board,camera,width,height)) {
-    const obstacle=board.obstacles.get(y*board.width+x);if(!obstacle||obstacle.blocked===false||obstacle.kind==='forest')continue;
-    const p=project(x,y);diamond(ctx,p.x,p.y,'#423a3090','#766448',8);
-    ctx.strokeStyle='#e8d9b4';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(p.x-9,p.y-7);ctx.lineTo(p.x+9,p.y+7);ctx.moveTo(p.x+9,p.y-7);ctx.lineTo(p.x-9,p.y+7);ctx.stroke();
-  }
   if (view.hover) {
     const p = project(view.hover.x, view.hover.y);
     diamond(ctx, p.x, p.y, '#fff4b521', '#fff3c281');

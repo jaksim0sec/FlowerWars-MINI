@@ -6,7 +6,8 @@
   },
   "tiles": {
     "grass": "grass.webp",
-    "soil": "soil.webp"
+    "soil": "soil.webp",
+    "pond": "pond.webp"
   },
   "layers": {
     "surface": 0,
