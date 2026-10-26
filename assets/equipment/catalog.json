@@ -422,9 +422,9 @@
     "name": "돌격 창",
     "asset": "weapons/ribbon_spear.webp",
     "w": 500,
-    "h": 657,
+    "h": 600,
     "grip": [
-      0.5,
+      0.486,
       0.8
     ],
     "hands": 1,

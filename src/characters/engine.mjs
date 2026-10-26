@@ -137,7 +137,7 @@ export function layoutCharacter(catalog, instance, time=0) {
     let matrix=multiply(socket.matrix,multiply(translate(...(e.offset || [0,0])),multiply(rotate(rotation),mirror)));
     if(e.thrust){
       const a=instance.animation,v=a.attackVector;
-      const angle=a.state==='attack'&&v?Math.atan2(v.x*(a.facing===1?-1:1),-v.y):a.state==='walk'?-1.0:-.12;
+      const angle=a.state==='attack'&&v?Math.atan2(v.x*(a.facing===1?-1:1),-v.y):a.state==='walk'?-.55:-.48;
       // Aim the shaft through the palm; the authored body lunge supplies the
       // forward thrust, so the weapon never slides out of the gripping hand.
       const sx=Math.hypot(socket.matrix[0],socket.matrix[1]),sy=Math.hypot(socket.matrix[2],socket.matrix[3]);
