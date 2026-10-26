@@ -8,15 +8,20 @@ import {createRecruitmentCatalog} from './bot-doctrines.mjs';
 import {BotCommand} from './bot-command.mjs';
 
 export const PREPARATION_SECONDS=300;
-export const ARMY_LIMIT=500;
+export const ARMY_LIMIT=400;
+export const FLAG_HEALTH=1200;
 
 /** Simulation-only match controller. Decisions are staggered across squads;
  * spatial buckets supply local enemies; capture and counters tick at 4 Hz. */
 export class FlagMatch{
- constructor(board,{count=500,makeCharacter,optionsFor,seed=1,blueprints=availableSquadBlueprints(),unitProfiles={},scenario}={}){
+ constructor(board,{count=ARMY_LIMIT,makeCharacter,optionsFor,seed=1,blueprints=availableSquadBlueprints(),unitProfiles={},scenario}={}){
   this.board=board;board.width=100;board.height=100;board.seed=seed;board.reset();
   this.epoch=board.byId;this.phase='preparation';this.remaining=PREPARATION_SECONDS;this.winner=null;
   this.flags={A:{x:4,y:50},B:{x:95,y:50}};this.counts={A:0,B:0};this.squadIds={A:[],B:[]};
+  for(const [team,flag]of Object.entries(this.flags)){
+   Object.assign(flag,{team,id:team==='A'?-1:-2,visualX:flag.x,visualY:flag.y,structure:'flag',health:{current:FLAG_HEALTH,max:FLAG_HEALTH}});
+   board.byId.set(flag.id,flag);
+  }
   this.elapsed=0;this.nextStatus=0;this.nextDecision=0;this.cursor=0;this.decisions=0;this.statusRevision=0;
   this.nextSurvey=0;this.strategy=null;
   this.botOperations=new Map();
@@ -120,18 +125,22 @@ export class FlagMatch{
   }
  }
  refreshStatus(){
-  const counts={A:0,B:0},sums={A:{x:0,y:0},B:{x:0,y:0}},captures=new Set();
+  const counts={A:0,B:0},sums={A:{x:0,y:0},B:{x:0,y:0}};
   for(const u of this.board.units){
    if(u.health.current<=0)continue;
    if(u.team in counts){counts[u.team]++;sums[u.team].x+=u.visualX;sums[u.team].y+=u.visualY;}
-   if(this.phase==='battle'&&!u.healing&&u.team in this.flags){const flag=this.flags[u.team==='A'?'B':'A'];if(Math.max(Math.abs(u.visualX-flag.x),Math.abs(u.visualY-flag.y))<=1.25)captures.add(u.team);}
   }
   if(counts.A!==this.counts.A||counts.B!==this.counts.B)this.statusRevision++;
   this.counts=counts;
   this.centers={A:counts.A?{x:sums.A.x/counts.A,y:sums.A.y/counts.A}:null,B:counts.B?{x:sums.B.x/counts.B,y:sums.B.y/counts.B}:null};
-  if(captures.size){this.winner=captures.size===2?'draw':[...captures][0];this.phase='finished';this.statusRevision++;
+  const destroyed=Object.values(this.flags).filter(flag=>flag.health.current<=0);
+  if(this.phase==='battle'&&destroyed.length){this.winner=destroyed.length===2?'draw':destroyed[0].team==='A'?'B':'A';this.phase='finished';this.statusRevision++;
    for(const u of this.board.units){this.board.interrupt(u);u.combat.auto=false;}
   }
+ }
+ damageFlag(team,amount){
+  const flag=this.flags[team];if(this.phase!=='battle'||!flag||flag.health.current<=0||!Number.isFinite(amount)||amount<=0)return false;
+  flag.health.current=Math.max(0,flag.health.current-amount);this.statusRevision++;return true;
  }
  think(id){
   if(this.phase!=='battle')return;

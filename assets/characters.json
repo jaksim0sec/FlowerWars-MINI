@@ -19,7 +19,7 @@
       "rig": "units/shield-guard/rig.json",
       "recommendedWeapon": "shield_guard_shield",
       "testCombat": {
-        "maxHealth": 180,
+        "maxHealth": 280,
         "damage": 38,
         "attackPeriod": 1.25,
         "range": 1,
@@ -105,7 +105,7 @@
       "testCombat": {
         "maxHealth": 80,
         "damage": 22,
-        "attackPeriod": 0.7,
+        "attackPeriod": 1.4,
         "range": 4,
         "rangeShape": "king",
         "preferredRange": 3,

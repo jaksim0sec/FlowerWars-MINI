@@ -62,8 +62,9 @@ export function findLocalEnemy(board,actor) {
   board.combatStats.checks++;
   const ranged=actor.combat.range>2&&board.spatial;
   const candidates=ranged?board.spatial.candidates(actor.x,actor.y,actor.combat.range):localCandidates(board,actor);
+  function* targets(){yield* candidates;const flags=board.match?.flags;if(flags){yield flags.A.id;yield flags.B.id;}}
   const seen=new Set();let best=null,bestDistance=Infinity,bestRank=Infinity;
-  for(const id of candidates) {
+  for(const id of targets()) {
     if(ranged)board.combatStats.probes++;
     if(id==null||id===actor.id||seen.has(id))continue;seen.add(id);
     const target=board.unit(id);

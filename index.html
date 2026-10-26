@@ -20,13 +20,13 @@
       <span class="tool-divider"></span><button id="fit" aria-label="전장 맞춤" title="전장 맞춤">⌖</button>
     </div>
   </main>
-  <section id="match-hud" aria-label="깃발 점령전" hidden>
+  <section id="match-hud" aria-label="깃발 공성전" hidden>
     <div class="match-topline"><strong id="match-phase">준비</strong><output id="match-timer">5:00</output><span id="match-armies"></span></div>
     <small title="길: 이동 +20% · X: 진입 불가">길은 빠르게 · X는 진입 불가</small>
     <div class="match-actions"><button id="match-skip">준비 스킵 · 전투 시작</button><button id="match-charge" hidden>전군 깃발로 진격</button><button id="match-home">내 깃발</button><button id="match-enemy">적 깃발</button></div>
   </section>
   <section id="deployment-tools" aria-label="예비 병력 배치" hidden>
-    <div class="deployment-head"><strong id="deployment-reserve">예비 500명</strong><span>병종 선택 → 내 진영 터치</span><button id="deployment-toggle">지휘 모드</button></div>
+    <div class="deployment-head"><strong id="deployment-reserve">예비 400명</strong><span>병종 선택 → 내 진영 터치</span><button id="deployment-toggle">지휘 모드</button></div>
     <div class="deployment-types"><button data-deploy-type="defense">방패</button><button data-deploy-type="assault">돌격</button><button data-deploy-type="ranged">궁병</button><button data-deploy-type="mobile">기동</button><button data-deploy-type="mixed">혼성</button><button data-deploy-type="support">지원</button></div>
   </section>
   <section id="match-result" aria-label="전투 결과" hidden><strong id="match-result-title"></strong><p id="match-result-detail"></p><button id="match-restart">다시 준비</button></section>
@@ -34,7 +34,7 @@
   <details id="debug-tools" class="debug-tools">
     <summary aria-label="개발 및 디버그 도구">⚙ 디버그</summary>
     <div class="debug-content"><div class="debug-close-row"><strong>전장 도구</strong><button id="debug-close" type="button" aria-label="디버그 닫기">×</button></div>
-      <button id="match-start" type="button">플레이어 vs 봇 · 500명 깃발전</button>
+      <button id="match-start" type="button">플레이어 vs 봇 · 400명 깃발 공성전</button>
       <label class="debug-legacy"><input type="checkbox" id="legacy-controls-toggle"> 기존 하단 조작 바 표시</label>
   <details id="movement-lab" class="movement-lab">
     <summary>이동 테스트</summary>

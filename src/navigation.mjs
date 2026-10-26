@@ -204,7 +204,13 @@ export class Navigation {
     }
     const reached=u.guide.indexOf(start);
     if(reached>=0)u.guide.splice(0,reached+1);
-    if(!u.guide.length){b.cancelCommand(u);return;}
+    if(!u.guide.length){
+      // A moving target can be logically adjacent while its interpolated body
+      // is already outside melee range. Keep pursuit until physical contact.
+      if(command.type==='attack'){u.guideKey=null;this.wait(u,'combat',NAV_INTERVAL);}
+      else b.cancelCommand(u);
+      return;
+    }
     if(u.yieldUntil>b.time){this.wait(u,'yielding',NAV_INTERVAL);return;}
     let next=null;
     if(u.route?.length) {

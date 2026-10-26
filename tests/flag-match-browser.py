@@ -8,7 +8,7 @@ with sync_playwright() as p:
         page=browser.new_page(viewport={'width':width,'height':height},has_touch=width<700,is_mobile=width<700)
         errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
         page.goto(BASE);page.get_by_text('전장 준비 완료',exact=False).wait_for()
-        assert page.locator('#match-armies').text_content().startswith('배치 0/500')
+        assert page.locator('#match-armies').text_content().startswith('배치 0/400')
         assert page.locator('.squad-card').count()==0
         assert page.locator('#deployment-tools').is_visible()
         assert page.locator('#terrain').is_disabled(), 'match terrain must stay fixed for both teams'
@@ -18,14 +18,14 @@ with sync_playwright() as p:
         for _ in range(20):page.keyboard.press('ArrowDown')
         page.keyboard.press('Enter')
         assert page.locator('.squad-card').count()==1
-        assert '488' in page.locator('#deployment-reserve').text_content()
+        assert '388' in page.locator('#deployment-reserve').text_content()
         assert page.locator('#match-skip').is_visible()
         assert page.locator('#match-charge').is_hidden()
         assert page.locator('#match-timer').text_content().startswith(('5:','4:'))
         page.locator('.squad-card').first.click()
         assert 'A' in page.locator('#command-selection').text_content()
         page.locator('#match-skip').click()
-        assert page.locator('#match-phase').text_content()=='깃발 점령전'
+        assert page.locator('#match-phase').text_content()=='깃발 공성전'
         assert page.locator('#match-skip').is_hidden()
         assert page.locator('#match-charge').is_visible()
         page.locator('#match-charge').click();page.wait_for_timeout(700)

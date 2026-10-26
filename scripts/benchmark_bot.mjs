@@ -9,7 +9,7 @@ const board=new Board(),match=new FlagMatch(board,{unitProfiles:profiles,scenari
  makeCharacter:s=>({characterId:s.characterId}),optionsFor:c=>({stats:profiles[c.characterId].testCombat,movement:profiles[c.characterId].testMovement})});
 for(let y=6;y<94&&match.reserve.A;y+=5)for(let x=7;x<47&&match.reserve.A;x+=4)match.deploy('A','mixed',{x,y});
 if(match.reserve.A)throw Error('player army did not fit');
-match.start();if(match.counts.B!==500)throw Error('bot army did not fit');
+match.start();if(match.counts.B!==match.limit)throw Error('bot army did not fit');
 if(process.env.CHARGE!=='0')match.charge();
 const samples=[];let expansions=0;
 for(let tick=0;tick<Number(process.env.TICKS||1200)&&match.phase==='battle';tick++){

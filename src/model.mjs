@@ -131,7 +131,7 @@ export class Board {
   move(id,x,y,{replace=false,direct=false,plannedPath=null}={}) {
     const u=this.unit(id);
     if(this.match?.phase==='finished'||this.match?.phase==='preparation'&&u&&!this.match.inTerritory(u.team,{x,y}))return false;
-    if(!u||u.health.current<=0||!replace&&(u.state!=='idle'||u.step)||!this.inside(x,y)||this.navigation.blocked(y*this.width+x)||u.x===x&&u.y===y&&!u.step)return false;
+    if(!u||u.structure||u.health.current<=0||!replace&&(u.state!=='idle'||u.step)||!this.inside(x,y)||this.navigation.blocked(y*this.width+x)||u.x===x&&u.y===y&&!u.step)return false;
     if(plannedPath){
       let previous=u.y*this.width+u.x;
       if(!plannedPath.length||plannedPath.at(-1)!==y*this.width+x||!plannedPath.every(n=>{
@@ -149,7 +149,7 @@ export class Board {
   attack(id,targetId,{replace=false}={}) {
     if(this.match&&this.match.phase!=='battle')return false;
     const u=this.unit(id),target=this.unit(targetId);
-    if(!u||!target||u===target||u.team&&u.team===target.team||u.health.current<=0||target.health.current<=0||!replace&&(u.state!=='idle'||u.step))return false;
+    if(!u||u.structure||!target||u===target||u.team&&u.team===target.team||u.health.current<=0||target.health.current<=0||!replace&&(u.state!=='idle'||u.step))return false;
     if(replace)this.interrupt(u);else this.cancelCommand(u);u.target=targetId;u.command={type:'attack',target:targetId};this.navigation.plan(u);return true;
   }
   beginStep(u,next) {
@@ -163,7 +163,7 @@ export class Board {
   beginAttack(u,targetId=u.target,automatic=false) {
     if(this.match&&this.match.phase!=='battle')return false;
     const target=this.unit(targetId);
-    if(!target||target.health.current<=0||u.health.current<=0||u.step||!inAttackRange(u,target,false)||u.team&&u.team===target.team)return false;
+    if(u.structure||!target||target.health.current<=0||u.health.current<=0||u.step||!inAttackRange(u,target,false)||u.team&&u.team===target.team)return false;
     if(this.time+1e-9<u.combat.nextAttackAt)return false;
     u.target=targetId;u.facing=project(target.visualX-u.visualX,target.visualY-u.visualY).x>=0?1:-1;
     u.attackVector=project(target.visualX-u.visualX,target.visualY-u.visualY);
@@ -173,11 +173,12 @@ export class Board {
   }
 
   heal(id,amount) {
-    const u=this.unit(id);if(!u||u.health.current<=0||!Number.isFinite(amount)||amount<=0)return 0;
+    const u=this.unit(id);if(!u||u.structure||u.health.current<=0||!Number.isFinite(amount)||amount<=0)return 0;
     const gain=Math.min(amount,u.health.max-u.health.current);u.health.current+=gain;return gain;
   }
   damage(id,amount,direction=1) {
     const u=this.unit(id);if(!u||u.health.current<=0||!Number.isFinite(amount)||amount<=0)return false;
+    if(u.structure==='flag')return this.match?.damageFlag(u.team,amount)||false;
     u.health.current=Math.max(0,u.health.current-amount);u.hits++;
     const committed=u.state==='attack'&&u.strike&&u.health.current>0;
     const resume=u.team&&u.command&&u.health.current>0;
@@ -193,7 +194,7 @@ export class Board {
     if(this.match?.phase==='finished')return;
     if(!Number.isFinite(dt)||dt<=0)return;
     // Bound event integration, keeping impacts/arrivals consistent for large dt.
-    while(dt>1e-9){const slice=Math.min(dt,.05);this.advance(slice);dt-=slice;}
+    while(dt>1e-9&&this.match?.phase!=='finished'){const slice=Math.min(dt,.05);this.advance(slice);dt-=slice;}
   }
   advance(dt) {
     this.time+=dt;
@@ -241,6 +242,9 @@ export class Board {
     }
     for(const {target,damage,direction} of impacts)if(this.damage(target.id,damage,direction)){
       this.effects.push({x:target.visualX,y:target.visualY,age:0});this.combatStats.hits++;
+    }
+    if(this.match?.phase==='battle'&&Object.values(this.match.flags).some(flag=>flag.health.current<=0)){
+      this.match.refreshStatus();if(this.match.phase==='finished')return;
     }
     this.navClock+=dt;
     if(this.navClock+1e-9>=NAV_INTERVAL) {
