@@ -11,6 +11,12 @@ export const BOARD_COLUMNS = 10;
 export const BOARD_ROWS = 16;
 export const STEP_TIME = 0.34;
 export const IMPACT_TIME = 0.3;
+const OWN_FLAG_RADIUS=10;
+function nearOwnFlag(board,unit,position=unit){
+  const flag=board.match?.flags?.[unit.team];
+  return !!flag&&flag.health.current>0&&Math.max(Math.abs(position.x-flag.x),Math.abs(position.y-flag.y))<=OWN_FLAG_RADIUS;
+}
+
 
 export function project(x, y) {
   return { x: (x - y) * HALF_W, y: (x + y) * HALF_H };
@@ -158,7 +164,7 @@ export class Board {
     if(replace)this.interrupt(u);else this.cancelCommand(u);u.target=targetId;u.command={type:'attack',target:targetId};this.navigation.plan(u);return true;
   }
   beginStep(u,next) {
-    u.state='walk';u.elapsed=0;u.step={...next,elapsed:0,duration:u.movement.stepTime*terrainStepMultiplier(this,u,next)};u.path=[next];
+    u.state='walk';u.elapsed=0;u.step={...next,elapsed:0,duration:u.movement.stepTime*terrainStepMultiplier(this,u,next)/(nearOwnFlag(this,u,next)?1.05:1)};u.path=[next];
     this.reservations.set(next.y*this.width+next.x,u.id);this.spatial.move(u);
     u.facing=project(next.x-u.x,next.y-u.y).x>=0?1:-1;
   }
@@ -172,9 +178,11 @@ export class Board {
     if(this.time+1e-9<u.combat.nextAttackAt)return false;
     u.target=targetId;u.facing=project(target.visualX-u.visualX,target.visualY-u.visualY).x>=0?1:-1;
     u.attackVector=project(target.visualX-u.visualX,target.visualY-u.visualY);
-    u.strike={target:targetId,automatic,duration:u.combat.activeDuration||u.combat.period,impactTime:u.combat.impactTime??u.combat.period*IMPACT_TIME/BASE_ATTACK_DURATION};
+    const flagBuff=nearOwnFlag(this,u),period=u.combat.period/(flagBuff?1.2:1);
+    u.strike={target:targetId,automatic,duration:u.combat.activeDuration||period,impactTime:u.combat.impactTime??period*IMPACT_TIME/BASE_ATTACK_DURATION};
     if(u.combat.charge){u.strike.damageMultiplier=u.combat.chargeSteps>=u.combat.chargeDistance?u.combat.chargeDamageMultiplier:1;u.combat.chargeSteps=0;}
-    u.combat.nextAttackAt=this.time+u.combat.period;
+    if(flagBuff)u.strike.damageMultiplier=(u.strike.damageMultiplier??1)*1.1;
+    u.combat.nextAttackAt=this.time+period;
     u.state='attack';u.elapsed=0;u.impacted=false;u.waitReason=null;this.combatStats.attacks++;return true;
   }
 
