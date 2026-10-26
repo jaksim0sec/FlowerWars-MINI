@@ -22,11 +22,21 @@ test('healing status is not a path wait and clears after a cast finishes',()=>{
  const patient=b.spawn(healer.x,healer.y+2,null,{team:'A'})||b.unit(s.memberIds[0]);b.damage(patient.id,10);
  b.update(1);assert.notEqual(healer.waitReason,'healing');
 });
-test('a focus command during a flank queues the attack without discarding the route',()=>{
+test('a new focus command replaces an unfinished flank immediately',()=>{
  const b=new Board(65,35),g=placeGroup(b,createFormationGroup(8,'squad','기동','mobile'),{x:12,y:15},{team:'A'});
  const s=squadsFor(b).get(g.squads[0]),enemy=b.spawn(48,15,null,{team:'B',stats:{maxHealth:10000}});
- orderSquad(b,s.id,'flank',{x:42,y:15});const order=s.order;
- assert.ok(orderSquad(b,s.id,'focus',{unitId:enemy.id}));assert.equal(s.order,order);assert.equal(s.order.after.type,'focus');
- for(let i=0;i<1400&&s.order.type!=='focus';i++){b.update(.05);updateSquadOrders(b);}
- assert.equal(s.order.type,'focus');assert.ok(s.memberIds.some(id=>b.unit(id).command?.target===enemy.id));
+ orderSquad(b,s.id,'flank',{x:42,y:15});
+ assert.ok(orderSquad(b,s.id,'focus',{unitId:enemy.id}));
+ assert.equal(s.order.type,'focus');assert.equal(s.order.after,undefined);
+ assert.ok(s.memberIds.some(id=>b.unit(id).command?.target===enemy.id));
+});
+test('only an explicitly targeted flank chains its attack, and a move clears the chain',()=>{
+ const b=new Board(65,35),g=placeGroup(b,createFormationGroup(8,'squad','기동','mobile'),{x:12,y:15},{team:'A'});
+ const s=squadsFor(b).get(g.squads[0]),enemy=b.spawn(48,15,null,{team:'B',stats:{maxHealth:10000}});
+ orderSquad(b,s.id,'flank',{x:42,y:15,attackTarget:{unitId:enemy.id}});
+ assert.equal(s.order.after.type,'focus');
+ orderSquad(b,s.id,'advance',{x:25,y:20});
+ assert.equal(s.order.type,'advance');assert.equal(s.order.after,undefined);assert.equal(s.order.waypoints.length,0);
+ for(let i=0;i<700;i++){b.update(.05);updateSquadOrders(b);}
+ assert.equal(s.order.type,'advance');assert.equal(s.order.phase,'arrived');
 });

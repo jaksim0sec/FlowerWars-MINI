@@ -516,7 +516,7 @@ canvas.addEventListener('pointerdown', event => {
         longPressConsumed=true;gestureMoved=true;selectSquad(s.id);
       },460);}
     }
-  } else gestureMoved = true;
+  } else {cancelLongPress();gestureMoved = true;}
 });
 
 const midpoint = points => ({ x: (points[0].x + points[1].x) / 2, y: (points[0].y + points[1].y) / 2 });
@@ -549,6 +549,9 @@ function release(event, cancelled = false) {
   cancelLongPress();
   if (!pointers.has(event.pointerId)) return;
   const p = local(event);
+  // The final displacement still counts if the browser dropped/coalesced moves.
+  if(origin&&Math.hypot(p.x-origin.x,p.y-origin.y)>6)gestureMoved=true;
+  if(cancelled)gestureMoved=true;
   pointers.delete(event.pointerId);
   if (!cancelled && !gestureMoved && pointers.size === 0 && origin?.button===0) activate(p,null,event.shiftKey||event.ctrlKey||event.metaKey);
   if (!cancelled && !gestureMoved && pointers.size === 0 && origin?.button===2&&selectedSquads.size)quickOrder(p);
@@ -558,6 +561,16 @@ function release(event, cancelled = false) {
 }
 canvas.addEventListener('pointerup', e => release(e));
 canvas.addEventListener('pointercancel', e => release(e, true));
+canvas.addEventListener('lostpointercapture', e => release(e, true));
+function cancelPointers(){
+  cancelLongPress();
+  const captured=[...pointers.keys()];pointers.clear();
+  origin=null;gestureMoved=true;longPressConsumed=false;
+  canvas.classList.remove('dragging');
+  for(const id of captured)if(canvas.hasPointerCapture(id))canvas.releasePointerCapture(id);
+}
+window.addEventListener('blur',cancelPointers);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelPointers();});
 canvas.addEventListener('pointerleave', () => { view.hover = null; });
 canvas.addEventListener('contextmenu', e => e.preventDefault());
 canvas.addEventListener('wheel', event => {

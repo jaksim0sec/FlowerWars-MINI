@@ -62,10 +62,8 @@ function followLeader(board,s,target){
 export function orderSquad(board,id,action,target=null){
  const s=squadsFor(board).get(id),lead=s&&commander(board,s),type=ALIASES[action]||action,def=SQUAD_ACTIONS[type];
  if(!s||!lead||lead.health.current<=0||!def)return false;
- if(type==='focus'&&s.order?.type==='flank'&&['flanking','moving'].includes(s.order.phase)){
-   if(!enemyUnits(board,s,target).length)return false;
-   s.order.after={type:'focus',target:{...target}};return true;
- }
+ // Every explicit order replaces the previous intention. A flank only chains
+ // an attack when that target was included in the flank command itself.
  // The API still accepts untargeted defensive orders around the commander.
  if(!target&&['fortify','firing-line'].includes(type))target={x:lead.step?.x??lead.x,y:lead.step?.y??lead.y};
  if(type==='focus'){if(!enemyUnits(board,s,target).length)return false;}

@@ -110,3 +110,21 @@ test('shared edge targets fit the full group before spreading squad anchors',()=
  orders.orderSquads(b,ss.map(s=>s.id),'move',{x:0,y:0});run(b,90);safe(b);
  assert.ok(ss.every(s=>s.order.phase==='arrived'));
 });
+test('a burst of retargets retains only the latest move and never resumes old waypoints',()=>{
+ const [b,s]=squadFixture();
+ orderSquad(b,s.id,'flank',{x:42,y:15});
+ const inFlight=new Map(s.memberIds.map(id=>[id,b.unit(id).step]));
+ for(let i=0;i<80;i++){
+  assert.ok(orderSquad(b,s.id,'advance',{x:25+i%8,y:20+i%3}));
+  for(const id of s.memberIds){
+   const u=b.unit(id),p=s.order.goals.get(id);
+   if(inFlight.get(id))assert.equal(u.step,inFlight.get(id),'retarget must preserve the physical committed step');
+   assert.equal(u.command?.x,p.x);assert.equal(u.command?.y,p.y);
+  }
+  assert.equal(s.order.waypoints.length,0);assert.equal(s.order.after,undefined);
+ }
+ const latest=s.order;
+ run(b,45);safe(b);
+ assert.equal(s.order,latest);assert.equal(s.order.phase,'arrived');
+ assert.ok(s.memberIds.every(id=>!b.unit(id).command&&!b.unit(id).step));
+});
