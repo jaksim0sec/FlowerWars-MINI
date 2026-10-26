@@ -123,6 +123,7 @@ export class Board {
       state: 'idle', elapsed: 0, facing: -1, path: [], target: null, command:null, step:null, route:[], waitReason:null, hits: 0, impacted: false };
     u.healing=healingOptions(options,character);
     if(battle)Object.assign(u.combat,{movingPoise:!!battle.movingPoise,charge:!!battle.charge,visionRange:battle.visionRange||0,activeDuration:battle.activeDuration,impactTime:battle.impactTime});
+    if(battle?.charge){u.combat.chargeSteps=0;u.combat.chargeDistance=battle.chargeDistance??4;u.combat.chargeDamageMultiplier=battle.chargeDamageMultiplier??1.5;}
     this.units.push(u);this.byId.set(u.id,u);this.cells.set(y*this.width+x,u.id);this.spatial.add(u);
     return u;
   }
@@ -172,6 +173,7 @@ export class Board {
     u.target=targetId;u.facing=project(target.visualX-u.visualX,target.visualY-u.visualY).x>=0?1:-1;
     u.attackVector=project(target.visualX-u.visualX,target.visualY-u.visualY);
     u.strike={target:targetId,automatic,duration:u.combat.activeDuration||u.combat.period,impactTime:u.combat.impactTime??u.combat.period*IMPACT_TIME/BASE_ATTACK_DURATION};
+    if(u.combat.charge){u.strike.damageMultiplier=u.combat.chargeSteps>=u.combat.chargeDistance?u.combat.chargeDamageMultiplier:1;u.combat.chargeSteps=0;}
     u.combat.nextAttackAt=this.time+u.combat.period;
     u.state='attack';u.elapsed=0;u.impacted=false;u.waitReason=null;this.combatStats.attacks++;return true;
   }
@@ -223,6 +225,7 @@ export class Board {
         this.cells.delete(u.y*this.width+u.x);this.reservations.delete(p.y*this.width+p.x);
         u.x=p.x;u.y=p.y;u.visualX=u.x;u.visualY=u.y;this.cells.set(u.y*this.width+u.x,u.id);
         u.step=null;u.path=[];this.spatial.move(u);
+        if(u.combat.charge)u.combat.chargeSteps=Math.min(u.combat.chargeDistance,u.combat.chargeSteps+1);
         if(u.state==='walk'){u.state=u.command?'walk':'idle';u.elapsed=0;}
         this.movementPolicy?.onArrive?.({board:this,unit:u,at:{x:u.x,y:u.y}});
         if(u.command?.type==='move'&&u.x===u.command.x&&u.y===u.command.y){this.cancelCommand(u);if(u.state==='walk')u.state='idle';}
@@ -244,7 +247,7 @@ export class Board {
               if(gained)this.effects.push({x:target.visualX,y:target.visualY,age:0,healing:true,amount:gained});
             }
           }else if(target&&target.health.current>0&&inAttackRange(u,target)&&(!u.combat.lineOfSight||hasLineOfSight(this,u,target))) {
-            impacts.push({target,attackerId:u.id,damage:u.damage,direction:project(target.visualX-u.visualX,target.visualY-u.visualY).x>=0?1:-1});
+            impacts.push({target,attackerId:u.id,damage:u.damage*(strike.damageMultiplier??1),direction:project(target.visualX-u.visualX,target.visualY-u.visualY).x>=0?1:-1});
           }
         }
         if(u.elapsed+1e-9>=strike.duration){
