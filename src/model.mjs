@@ -18,6 +18,17 @@ function nearOwnFlag(board,unit,position=unit){
 }
 
 
+const SCHOLAR_AURA_RADIUS=4;
+function nearAlliedScholar(board,unit){
+  if(!unit.team)return false;
+  for(const id of board.spatial.candidates(unit.x,unit.y,SCHOLAR_AURA_RADIUS)){
+    const scholar=board.unit(id);
+    if(scholar?.team===unit.team&&scholar.health.current>0&&scholar.character?.characterId==='scholar'&&
+      Math.max(Math.abs(scholar.x-unit.x),Math.abs(scholar.y-unit.y))<=SCHOLAR_AURA_RADIUS)return true;
+  }
+  return false;
+}
+
 export function project(x, y) {
   return { x: (x - y) * HALF_W, y: (x + y) * HALF_H };
 }
@@ -178,7 +189,7 @@ export class Board {
     if(this.time+1e-9<u.combat.nextAttackAt)return false;
     u.target=targetId;u.facing=project(target.visualX-u.visualX,target.visualY-u.visualY).x>=0?1:-1;
     u.attackVector=project(target.visualX-u.visualX,target.visualY-u.visualY);
-    const flagBuff=nearOwnFlag(this,u),period=u.combat.period/(flagBuff?1.2:1);
+    const flagBuff=nearOwnFlag(this,u),scholarBuff=nearAlliedScholar(this,u),period=u.combat.period/((flagBuff?1.2:1)*(scholarBuff?1.1:1));
     u.strike={target:targetId,automatic,duration:u.combat.activeDuration||period,impactTime:u.combat.impactTime??period*IMPACT_TIME/BASE_ATTACK_DURATION};
     if(u.combat.charge){u.strike.damageMultiplier=u.combat.chargeSteps>=u.combat.chargeDistance?u.combat.chargeDamageMultiplier:1;u.combat.chargeSteps=0;}
     if(flagBuff)u.strike.damageMultiplier=(u.strike.damageMultiplier??1)*1.1;
