@@ -10,9 +10,9 @@ function prepared(b,options={}){
  deployReserves(m);assert.equal(m.reserve.A,0);
  while(m.reserve.B)assert.ok(m.deployBot());return m;
 }
-test('automatic armies obey the 400 cap and deploy on their own half',()=>{
- const b=new Board(),m=prepared(b,{count:900});assert.deepEqual(m.counts,{A:400,B:400});assert.equal(b.units.length,800);
- assert.ok(b.units.every(u=>m.inTerritory(u.team,u)));assert.equal(new Set(b.units.map(u=>u.y*b.width+u.x)).size,800);
+test('automatic armies obey the 200 cap and deploy on their own half',()=>{
+ const b=new Board(),m=prepared(b,{count:900});assert.deepEqual(m.counts,{A:200,B:200});assert.equal(b.units.length,400);
+ assert.ok(b.units.every(u=>m.inTerritory(u.team,u)));assert.equal(new Set(b.units.map(u=>u.y*b.width+u.x)).size,400);
  assert.equal(b.spawn(0,0,null,{team:'A'}),null);
 });
 test('small and uneven requested armies remain exact and timers transition once',()=>{

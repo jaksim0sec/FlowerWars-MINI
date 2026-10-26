@@ -1,7 +1,6 @@
 import {squadTapIntent} from './gesture-commands.mjs';
 import {terrainNames} from './battlefield-terrain.mjs';
 import {FlagMatch} from './flag-match.mjs';
-import {deploymentBlueprint} from './deployment-layout.mjs';
 import {icon,typeLabels} from './ui-icons.mjs';
 import {createFormationGroup,placeGroup,groupsFor,squadOf,squadsFor} from './unit-groups.mjs';
 import {configureSquad,orderSquad,orderSquads,updateSquadOrders,squadSummary,SQUAD_ACTIONS} from './squad-orders.mjs';
@@ -44,7 +43,8 @@ let lastDraw=0,visibleCount=0,lastCamera='',cameraChanged=0,lastVisual='',camera
 let fitted = true,lastBoardSize='';
 let movementScenario=null,lastLabUpdate=0,lastSquadUpdate=0,lastSelectedSquad='';
 let lastMatchHud=0,lastMatchRefresh=0;
-let selectedSquadId=null,lastRosterUpdate=0,rosterEpoch=null,commanderAvatar='',rosterCards=new Map(),commandPanelOpen=false;
+let selectedSquadId=null,lastRosterUpdate=0,rosterEpoch=null,rosterCards=new Map(),commandPanelOpen=false;
+const squadPortraits=new Map();
 const selectedSquads=new Set();
 let additiveSelection=false,ordersExpanded=true;
 let squadQuickCommand=false,longPressTimer=null,longPressPointer=null,longPressConsumed=false,feedbackTimer=null,squadHintSeen=false;
@@ -101,12 +101,12 @@ function movementFor(c){if(c.testMovement)return {...c.testMovement};const profi
 function unitName(unit) {return unit.character?.testName || art?.catalog.characters[unit.character?.characterId]?.name || '용사';}
 function activeSquad(){return (selectedSquadId&&squadsFor(board).get(selectedSquadId))||squadOf(board,board.unit(view.selected));}
 
-/** Render the actual flag-bearer's head once using its registered character rig. */
-function makeCommanderAvatar(){
+/** Cached portraits show the squad's dominant troop using its actual rig. */
+function makeCommanderAvatar(characterId='banner-bearer'){
   try{
     const canvas=document.createElement('canvas');canvas.width=144;canvas.height=144;
     const portrait=canvas.getContext('2d');portrait.scale(2,2);portrait.translate(36,106);
-    drawCharacter(portrait,art.catalog,createCharacter(art.catalog,'banner-bearer'),0);
+    drawCharacter(portrait,art.catalog,newCharacter(characterId),0);
     return canvas.toDataURL('image/png');
   }catch(error){
     console.warn('기수 초상 생성 실패:',error);
@@ -177,7 +177,11 @@ function selectSquad(id,trigger=null,additive=false){
 function rosterButton(squad){
   const button=document.createElement('button');button.type='button';button.className='squad-card';button.dataset.squadId=squad.id;
   const portrait=document.createElement('span');portrait.className='squad-portrait';
-  const avatar=document.createElement('img');avatar.className='squad-avatar';avatar.src=commanderAvatar;avatar.alt='';avatar.width=44;avatar.height=44;
+  const counts=new Map();
+  for(const id of squad.memberIds){const u=board.unit(id),kind=u?.character?.characterId;if(kind&&kind!=='banner-bearer')counts.set(kind,(counts.get(kind)||0)+1);}
+  const primary=[...counts].sort((a,b)=>b[1]-a[1])[0]?.[0]||'banner-bearer';
+  if(!squadPortraits.has(primary))squadPortraits.set(primary,makeCommanderAvatar(primary));
+  const avatar=document.createElement('img');avatar.className='squad-avatar';avatar.src=squadPortraits.get(primary);avatar.alt='';avatar.width=44;avatar.height=44;
   const team=document.createElement('span');team.className='squad-card-team team-'+squad.team.toLowerCase();team.textContent=squad.team+'팀';
   portrait.append(avatar,team);
   const body=document.createElement('span');body.className='squad-card-body';
@@ -222,7 +226,7 @@ function syncSquadRoster(){
       button=rosterButton(squad);rosterCards.set(squad.id,button);list.querySelector('[data-group="'+platoonKey+'"] .platoon-squads').append(button);}
     const summary=squadSummary(board,squad.id);
     const echelon=squad.platoonIndex!=null?'제'+(squad.platoonIndex+1)+'소대 · ':'';
-    const label=echelon+(summary.leaderAlive?'기수 지휘 ':summary.commanderAlive?'임시 지휘 ':'전멸 ')+summary.alive+'/'+squad.memberIds.length;
+    const label=echelon+(summary.leaderAlive?'기수 지휘 ':summary.commanderAlive?'분대 지휘 ':'전멸 ')+summary.alive+'/'+squad.memberIds.length;
     const status=button.querySelector('.squad-card-status');
     const remaining=summary.alive+'/'+squad.memberIds.length;
     const action=squad.order?.type||'wait',phase=phaseLabels[squad.order?.phase]||'대기';
@@ -267,9 +271,9 @@ function seed() {
 
 function startMatch(){
  if(!art)return;
- new FlagMatch(board,{count:400,seed:Math.floor(Math.random()*4294967296),unitProfiles:art.catalog.characters,makeCharacter:(slot,i)=>characterForSlot(i,slot),optionsFor:c=>({stats:c.testStats||art.catalog.characters[c.characterId].testCombat,movement:movementFor(c),capabilities:art.catalog.characters[c.characterId].capabilities||[]})});
+ new FlagMatch(board,{count:200,seed:Math.floor(Math.random()*4294967296),unitProfiles:art.catalog.characters,makeCharacter:(slot,i)=>characterForSlot(i,slot),optionsFor:c=>({stats:c.testStats||art.catalog.characters[c.characterId].testCombat,movement:movementFor(c),capabilities:art.catalog.characters[c.characterId].capabilities||[]})});
  movementScenario=null;view.selected=null;view.tile=null;view.hover=null;view.mode='deploy';view.deployType='defense';view.commandSquadIds=null;selectedSquads.clear();selectedSquadId=null;commandPanelOpen=false;squadQuickCommand=false;
- view.deployment=deploymentBlueprint(12,'defense','배치');
+ view.deployment=board.match.deploymentPreview('A','defense');
  syncSelectionView();syncSquadRoster();$('debug-tools').open=false;fit();updateMatchHud();refresh();
  notify('병종을 고르고 파란 진영을 터치해 배치하세요.');
 }
@@ -297,7 +301,7 @@ $('match-skip').addEventListener('click',()=>{if(!board.match?.counts.A){notify(
 $('deployment-toggle').addEventListener('click',()=>{view.mode=view.mode==='deploy'?'move':'deploy';updateMatchHud();refresh();});
 for(const button of document.querySelectorAll('[data-deploy-type]')){
  button.innerHTML=icon(button.dataset.deployType)+'<span>'+button.textContent+'</span>';
- button.addEventListener('click',()=>{view.deployType=button.dataset.deployType;view.mode='deploy';view.deployment=deploymentBlueprint(Math.min(12,board.match.reserve.A),view.deployType,'배치');selectUnit(null);updateMatchHud();refresh();});
+ button.addEventListener('click',()=>{view.deployType=button.dataset.deployType;view.mode='deploy';view.deployment=board.match.deploymentPreview('A',view.deployType);selectUnit(null);updateMatchHud();refresh();});
 }
 $('match-charge').addEventListener('click',()=>{board.match?.charge();notify('전군 진격 · 부대를 선택해 개별 전술을 지휘할 수 있습니다.');});
 $('match-home').addEventListener('click',()=>locateFlag('A'));$('match-enemy').addEventListener('click',()=>locateFlag('B'));
@@ -325,7 +329,7 @@ function refresh(invalidate=true) {
   if(squad){
     const summary=squadSummary(board,squad.id);
     text('squad-name',squad.name);
-    text('squad-status',`${summary.alive}/${squad.memberIds.length}명 · ${summary.commanderAlive?'기수 지휘':'지휘관 전사'} · ${squadActionLabels[squad.order?.source]||'대기'}`);
+    text('squad-status',`${summary.alive}/${squad.memberIds.length}명 · ${summary.leaderAlive?'기수 지휘':summary.commanderAlive?'분대 지휘':'전멸'} · ${squadActionLabels[squad.order?.source]||'대기'}`);
     for(const button of $('squad-tools').querySelectorAll('[data-squad-action]'))button.disabled=!summary.commanderAlive;
     for(const button of $('squad-tools').querySelectorAll('[data-squad-stance]'))
       button.setAttribute('aria-pressed',String(selectedCommandSquads().every(s=>button.dataset.squadStance===s.stance)));
@@ -421,7 +425,7 @@ function activate(p, keyboardTile = null, additive=false) {
     if(!tile)return;
     const squad=board.match.deploy('A',view.deployType||'defense',tile);
     if(!squad){notify('내 진영의 빈 공간에 배치하세요. 겹침·장애물·예비 병력을 확인하세요.');return;}
-    view.deployment=board.match.reserve.A?deploymentBlueprint(Math.min(12,board.match.reserve.A),view.deployType,'배치'):null;
+    view.deployment=board.match.reserve.A?board.match.deploymentPreview('A',view.deployType):null;
     if(!board.match.reserve.A)view.mode='move';
     syncSquadRoster();updateMatchHud();refresh();return;
   }
@@ -709,7 +713,7 @@ seed(); resize();
 loadArtwork().then(loaded => {
   art = loaded;
   $('character-type').replaceChildren(...visibleCharacters(art.catalog).map(([id,def])=>new Option(def.name,id)));
-  commanderAvatar=makeCommanderAvatar();startMatch();
+  startMatch();
   $('loading').hidden = true;$('movement-setup').disabled=false;
   notify('전장 준비 완료 · 병종 선택 후 내 진영에 직접 배치 · 준비 5분');
 }).catch(error => {
@@ -724,7 +728,7 @@ function frame(now) {
     board.update(dt);
     board.match?.update(wallDt);
     if(now-lastMatchHud>=250){updateMatchHud();lastMatchHud=now;}
-    if(now-lastSquadUpdate>=100&&board.match?.phase!=='finished'){updateSquadOrders(board);lastSquadUpdate=now;}
+    if(now-lastSquadUpdate>=50&&board.match?.phase!=='finished'){updateSquadOrders(board);lastSquadUpdate=now;}
     if(now-lastRosterUpdate>=700){syncSquadRoster();lastRosterUpdate=now;}
     const hits = board.units.reduce((n, u) => n + u.hits, 0);
     if (hits > previousHits&&!selectedSquads.size&&!board.match) notify('공격이 명중했어요! 상대 용사가 충격에 반응합니다.');

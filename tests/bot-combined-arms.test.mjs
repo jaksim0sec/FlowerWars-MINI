@@ -37,7 +37,7 @@ test('bot retains reserves for later enemy deployment and skip reads the latest 
  assert.ok(m.counts.B>0&&m.reserve.B>0,'initial deployment must leave room to adapt');
  const before=new Map(b.units.map(u=>[u.id,[u.x,u.y]]));
  assert.equal(deployReserves(m,'defense',12),12);
- m.start();assert.equal(m.counts.B,240);
+ m.start();assert.equal(m.counts.B,m.limit);
  for(const [id,position] of before){const u=b.unit(id);assert.deepEqual([u.x,u.y],position,'placed troops must not be shuffled');}
  const later=m.squadIds.B.slice(8).map(id=>squadsFor(b).get(id));
  assert.ok(later.filter(s=>s.type==='ranged').length>later.filter(s=>s.type==='mobile').length);

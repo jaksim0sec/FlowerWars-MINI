@@ -1,11 +1,18 @@
 import {createFormationGroup} from './unit-groups.mjs';
 
-export function deploymentBlueprint(size,type,name){
+export function deploymentBlueprint(size,type,name,options){
  const blueprint=createFormationGroup(Math.max(2,size),'squad',name,type);
- return layoutDeployment(blueprint,size,name);
+ return layoutDeployment(blueprint,size,name,options);
 }
-export function layoutDeployment(template,size,name){
+export function layoutDeployment(template,size,name,{withCommander=true}={}){
  const blueprint=structuredClone(template);blueprint.name=name;
+ if(!withCommander){
+  const counts=new Map();
+  for(const member of blueprint.members)if(member.role!=='banner'&&member.characterId!=='banner-bearer')counts.set(member.characterId,(counts.get(member.characterId)||0)+1);
+  const primary=[...counts].sort((a,b)=>b[1]-a[1])[0]?.[0];
+  const soldier=blueprint.members.find(m=>m.characterId===primary);
+  if(soldier)blueprint.members=blueprint.members.map(m=>m.role==='banner'||m.characterId==='banner-bearer'?structuredClone(soldier):m);
+ }
  blueprint.members=blueprint.members.slice(0,size);
  const priority=m=>({guard:0,scout:1,archer:2,healer:3,support:3,banner:4}[m.role]??1);
  blueprint.members.sort((a,b)=>priority(a)-priority(b));

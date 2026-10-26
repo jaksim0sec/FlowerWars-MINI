@@ -8,7 +8,7 @@ import {createRecruitmentCatalog} from './bot-doctrines.mjs';
 import {BotCommand} from './bot-command.mjs';
 
 export const PREPARATION_SECONDS=300;
-export const ARMY_LIMIT=400;
+export const ARMY_LIMIT=200;
 export const FLAG_HEALTH=1200;
 
 /** Simulation-only match controller. Decisions are staggered across squads;
@@ -42,10 +42,16 @@ export class FlagMatch{
   }};
   this.refreshStatus();
  }
+ deploymentPreview(team,type){
+  const template=this.recruitment.get(type)?.blueprint;
+  if(!template||!this.reserve[team])return null;
+  const index=this.squadIds[team].length,size=Math.min(12,this.reserve[team],template.members.length);
+  return layoutDeployment(template,size,`${index+1}분대`,{withCommander:index%4===0});
+ }
  deploy(team,type,anchor){
   if(this.phase!=='preparation'||!(team in this.reserve)||!this.recruitment.has(type)||this.reserve[team]<=0)return null;
   const index=this.squadIds[team].length,size=Math.min(12,this.reserve[team],this.recruitment.get(type).blueprint.members.length);
-  const blueprint=layoutDeployment(this.recruitment.get(type).blueprint,size,`${index+1}분대`),sign=team==='B'?-1:1;
+  const blueprint=this.deploymentPreview(team,type),sign=team==='B'?-1:1;
   if(blueprint.members.some(m=>!this.inTerritory(team,{x:anchor.x+m.offset.x*sign,y:anchor.y+m.offset.y})))return null;
   const group=placeGroup(this.board,blueprint,anchor,{team,autoCombat:false,makeCharacter:this.makeCharacter,optionsFor:this.optionsFor});
   if(!group)return null;
@@ -73,7 +79,7 @@ export class FlagMatch{
   let remaining=this.reserve.B;
   for(let slot=0;slot<4;slot++){
    const size=Math.min(12,remaining,this.recruitment.get(operation.types[slot]).blueprint.members.length);if(size<=0)break;remaining-=size;
-   for(const member of layoutDeployment(this.recruitment.get(operation.types[slot]).blueprint,size,'').members)
+   for(const member of layoutDeployment(this.recruitment.get(operation.types[slot]).blueprint,size,'',{withCommander:slot===0}).members)
     footprints.push({x:(slot%2)*7-member.offset.x,y:(slot<2?-4:4)+member.offset.y});
   }
   const wanted=operation.anchor;

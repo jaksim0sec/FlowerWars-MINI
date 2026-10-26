@@ -47,7 +47,7 @@ test('reinforced flag-defense destinations remain inside the leash after contrac
  const {b,m}=game(500),u=b.units.find(u=>u.team==='A'),original={x:u.x,y:u.y};
  const move=p=>{b.cells.delete(u.y*100+u.x);u.x=u.visualX=p.x;u.y=u.visualY=p.y;b.cells.set(p.y*100+p.x,u.id);b.spatial.move(u);};
  move({x:94,y:50});m.command.refresh();move(original);m.elapsed+=7;m.command.refresh();
- const guards=[...m.command.operations.values()].filter(o=>o.role==='guard');assert.ok(guards.length>=3);
+ const guards=[...m.command.operations.values()].filter(o=>o.role==='guard');assert.ok(guards.length>=2);
  for(const op of guards)for(const id of op.liveIds){
   const goal=m.command.planFor(op).guardGoals.get(id),count=m.command.states.get(id).count;
   assert.ok(goal);assert.ok(goal.x+Math.ceil((count-1)/2)<=99);

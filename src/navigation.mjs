@@ -166,6 +166,7 @@ export class Navigation {
     if(this.keepDistance(u))return;
     if(b.unit(u.id)!==u||u.health.current<=0||u.step||!['idle','walk'].includes(u.state))return;
     if(b.tryAutoAttack(u))return;
+    if(this.counterStep(u))return;
     const command=u.command;
     if(!command)return;
     let {x,y}=command;
@@ -270,9 +271,32 @@ export class Navigation {
     if(!this.free(this.index(next.x,next.y),u)){this.wait(u,'traffic');return;}
     this.offer(u,next);return true;
   }
+  counterStep(u){
+    const b=this.board,r=u.combat.retaliation,target=r&&b.unit(r.targetId);
+    if(!r)return false;
+    if(!target||target.health.current<=0||b.time>r.until||Math.max(Math.abs(target.x-r.x),Math.abs(target.y-r.y))>6){u.combat.retaliation=null;return false;}
+    if(u.healing||!u.combat.auto||u.combat.holdPosition||u.command?.type==='attack')return false;
+    // Short, occupancy-aware interception. No additional commands or waypoint
+    // queue; normal movement resumes when contact ends or the attacker leaves.
+    const start=this.index(u.x,u.y),queue=[{cell:start,first:null}],seen=new Set([start]);
+    const pursuer={x:u.x,command:{type:'attack',target:target.id,flow:r.approach<0?'west':'east'}};
+    for(let head=0;head<queue.length&&head<48&&this.remaining>0;head++){
+      const node=queue[head],p=this.coords(node.cell);this.consume();
+      const actor={visualX:p.x,visualY:p.y};
+      const dx=Math.abs(p.x-target.visualX),dy=Math.abs(p.y-target.visualY);
+      if(node.first&&(u.combat.shape==='king'?Math.max(dx,dy):dx+dy)<=u.combat.range+1e-6&&hasLineOfSight(b,actor,target))return !!this.requestStep(u,node.first);
+      for(const n of this.neighbors(node.cell,pursuer)){
+        if(seen.has(n)||!this.free(n,u))continue;
+        const next=this.coords(n);
+        if(Math.max(Math.abs(next.x-r.x),Math.abs(next.y-r.y))>3)continue;
+        seen.add(n);queue.push({cell:n,first:node.first||next});
+      }
+    }
+    return false;
+  }
   keepDistance(u){
     const b=this.board,preferred=u.combat.preferredRange,target=b.unit(u.combat.targetId);
-    if(u.command?.type==='attack'||u.combat.holdPosition||!u.combat.auto||!(preferred>1)||!target||target.health.current<=0||target.team===u.team||b.time<(u.combat.spacingAt||0))return false;
+    if(u.command||u.combat.formationLocked||u.combat.retaliation||u.combat.holdPosition||!u.combat.auto||!(preferred>1)||!target||target.health.current<=0||target.team===u.team||b.time<(u.combat.spacingAt||0))return false;
     const metric=(x,y)=>u.combat.shape==='king'?Math.max(Math.abs(x-target.visualX),Math.abs(y-target.visualY)):Math.abs(x-target.visualX)+Math.abs(y-target.visualY);
     const distance=metric(u.x,u.y);
     if(distance>=preferred)return false;

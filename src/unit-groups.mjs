@@ -8,7 +8,7 @@ export function squadOf(board,unit){return unit?.squadId?squadsFor(board).get(un
 /** Plain JSON template, independent of board/camera/character instances. */
 const types={
  assault:['banner-bearer',...Array(7).fill('scout'),...Array(3).fill('shield-guard'),'clover-mage'],
- defense:['banner-bearer',...Array(7).fill('shield-guard'),...Array(2).fill('scout'),...Array(2).fill('archer')],
+ defense:['banner-bearer',...Array(10).fill('shield-guard'),'clover-mage'],
  ranged:['banner-bearer',...Array(7).fill('archer'),...Array(3).fill('shield-guard'),'scout'],
  mobile:['banner-bearer',...Array(9).fill('scout'),...Array(2).fill('archer')],
  support:['banner-bearer',...Array(4).fill('clover-mage'),...Array(3).fill('scholar'),...Array(3).fill('shield-guard'),'scout'],

@@ -108,6 +108,7 @@ export class Board {
   cancelCommand(u) { if(u.command?.flow)this.flows[u.command.flow]--;if(u.state==='walk'&&!u.step)u.state='idle';u.command=null;u.target=null;u.guide=[];u.guideKey=null;u.staticSearch=null;u.recovery=null;u.yieldUntil=0;u.route=[];u.path=[];u.waitReason=null;u.retryAt=0;u.waitSince=null; }
   interrupt(u){
     this.cancelCommand(u);
+    u.combat.retaliation=null;u.combat.formationLocked=false;
     if(u.state==='attack'){u.strike=null;u.impacted=false;u.elapsed=0;u.state=u.step?'walk':'idle';}
   }
   spawn(x, y, character = null, options={}) {
@@ -176,10 +177,19 @@ export class Board {
     const u=this.unit(id);if(!u||u.structure||u.health.current<=0||!Number.isFinite(amount)||amount<=0)return 0;
     const gain=Math.min(amount,u.health.max-u.health.current);u.health.current+=gain;return gain;
   }
-  damage(id,amount,direction=1) {
+  damage(id,amount,direction=1,attackerId=null) {
     const u=this.unit(id);if(!u||u.health.current<=0||!Number.isFinite(amount)||amount<=0)return false;
     if(u.structure==='flag')return this.match?.damageFlag(u.team,amount)||false;
     u.health.current=Math.max(0,u.health.current-amount);u.hits++;
+    const attacker=this.unit(attackerId);
+    if(u.health.current>0&&u.combat.auto&&u.command?.type!=='attack'&&!u.healing&&u.formationRole!=='banner'&&attacker?.team&&u.team&&attacker.team!==u.team&&Math.max(Math.abs(attacker.x-u.x),Math.abs(attacker.y-u.y))<=6){
+      const previous=u.combat.retaliation;
+      const retained=previous?.targetId===attacker.id;
+      u.combat.retaliation={targetId:attacker.id,until:this.time+2.5,
+        x:retained?previous.x:u.x,y:retained?previous.y:u.y,
+        approach:retained?previous.approach:Math.sign(attacker.x-u.x)||Math.sign((this.width-1)/2-u.x)||this.navigationOrientation};
+      u.combat.targetId=attacker.id;u.combat.nextSearchAt=0;u.retryAt=0;
+    }
     const committed=u.state==='attack'&&u.strike&&u.health.current>0;
     const resume=u.team&&u.command&&u.health.current>0;
     if(!committed){
@@ -229,7 +239,7 @@ export class Board {
               if(gained)this.effects.push({x:target.visualX,y:target.visualY,age:0,healing:true,amount:gained});
             }
           }else if(target&&target.health.current>0&&inAttackRange(u,target)&&(!u.combat.lineOfSight||hasLineOfSight(this,u,target))) {
-            impacts.push({target,damage:u.damage,direction:project(target.visualX-u.visualX,target.visualY-u.visualY).x>=0?1:-1});
+            impacts.push({target,attackerId:u.id,damage:u.damage,direction:project(target.visualX-u.visualX,target.visualY-u.visualY).x>=0?1:-1});
           }
         }
         if(u.elapsed+1e-9>=strike.duration){
@@ -238,9 +248,9 @@ export class Board {
           if(strike.automatic){u.target=null;u.state=u.command?'walk':'idle';}
           else {u.state='idle';this.cancelCommand(u);}
         }
-      } else if(u.state==='hit'&&u.elapsed>=.36){u.state=u.command?'walk':'idle';u.elapsed=0;}
+      } else if(u.state==='hit'&&u.elapsed>=(u.combat.retaliation ? .18 : .36)){u.state=u.command?'walk':'idle';u.elapsed=0;}
     }
-    for(const {target,damage,direction} of impacts)if(this.damage(target.id,damage,direction)){
+    for(const {target,damage,direction,attackerId} of impacts)if(this.damage(target.id,damage,direction,attackerId)){
       this.effects.push({x:target.visualX,y:target.visualY,age:0});this.combatStats.hits++;
     }
     if(this.match?.phase==='battle'&&Object.values(this.match.flags).some(flag=>flag.health.current<=0)){

@@ -1,5 +1,5 @@
 import {squadsFor} from './unit-groups.mjs';
-import {planFormation,settleFormation} from './formation-planner.mjs';
+import {planFormation,settleFormation,repairOccupiedSeats} from './formation-planner.mjs';
 import {coverPlan,moveUnderCover} from './commander-cover.mjs';
 import {reformFormation} from './formation-reform.mjs';
 
@@ -135,10 +135,11 @@ function runOrder(board,s,replace=false){
    const enemies=enemyUnits(board,s,o.target);
    if(!enemies.length){for(const u of units)board.interrupt(u);o.phase='complete';return;}
    const lead=commander(board,s);
-   if(board.time>=(o.coverAt||0)){o.cover=coverPlan(board,s,units,lead);o.coverAt=board.time+.6;}
+   const protectedLeader=lead?.formationRole==='banner'||lead?.character?.characterId==='banner-bearer';
+   if(board.time>=(o.coverAt||0)){o.cover=protectedLeader?coverPlan(board,s,units,lead):new Map();o.coverAt=board.time+.6;}
    board.batchCommands(()=>{for(const u of units){
      if(u.healing){if(u.command?.type==='attack')board.interrupt(u);continue;}
-     if(units.length>1&&u.id===lead?.id){
+     if(protectedLeader&&units.length>1&&u.id===lead?.id){
        if(o.cover?.has(u.id))moveUnderCover(board,u,o.cover.get(u.id));
        else if(u.command?.type==='attack')board.cancelCommand(u);
        continue;
@@ -155,10 +156,11 @@ function runOrder(board,s,replace=false){
  if(o.waypoints.length&&o.goals.size&&units.every(u=>{const p=o.goals.get(u.id);return !p||u.x===p.x&&u.y===p.y&&!u.step;})){
    o.waypoints.shift();o.previous=null;o.phase=o.waypoints.length?'flanking':'moving';center=centerFor(board,s,o);replace=true;
  }
- const own=new Set(s.memberIds);
  if(board.time>=(o.nextOccupancyCheck||0)){
-  if([...o.goals.values()].some(p=>{const u=board.at(p.x,p.y);return u&&!own.has(u.id)&&!u.command&&!u.step;}))o.dirty=true;
-  o.nextOccupancyCheck=board.time+.75;
+  const claimed=[];
+  for(const other of squadsFor(board).values())if(other.id!==s.id&&other.team===s.team)claimed.push(...(other.order?.goals?.values()||[]));
+  repairOccupiedSeats(board,s,units,claimed);
+  o.nextOccupancyCheck=board.time+.25;
  }
  const anchor=center.x+','+center.y+','+s.formation;
  if(anchor!==o.previous||units.length!==o.lastMembers||o.dirty){
@@ -176,7 +178,13 @@ function runOrder(board,s,replace=false){
    o.previous=anchor;o.lastMembers=units.length;o.dirty=false;
  }
  settleFormation(units,o.goals);
- if(o.type==='rally'){reformFormation(board,s,units,commander(board,s));return;}
+ // Assigned seats remain authoritative after arrival as well as while moving.
+ // Otherwise idle archers sidestep automatically and get sent back every tick.
+ if(o.type==='rally'){
+  reformFormation(board,s,units,commander(board,s));
+  for(const u of units)u.combat.formationLocked=true;
+  return;
+ }
  // An arrived teammate can seal the last empty seat on all four sides.
  // Temporarily open one passing bay, rather than wait forever on that seat.
  o.passing??=new Map();
@@ -214,9 +222,10 @@ function runOrder(board,s,replace=false){
    u.combat.holdPosition=defensive&&at;
    if(at){arrived++;if(u.command)board.cancelCommand(u);continue;}
    if(!p||u.command?.type==='move'&&u.command.x===p.x&&u.command.y===p.y)continue;
-   if(!replace&&(u.state!=='idle'||u.step))continue;
-   board.move(u.id,p.x,p.y,{replace,direct:true});
+   if(!replace&&u.command?.type!=='move'&&(u.state!=='idle'||u.step))continue;
+   board.move(u.id,p.x,p.y,{replace:replace||u.command?.type==='move',direct:true});
  }});
+ for(const u of units)u.combat.formationLocked=true;
  if(!o.waypoints.length)o.phase=arrived===units.length?(['fortify','firing-line'].includes(o.type)?'holding':'arrived'):'moving';
  if(o.phase==='arrived'&&o.after){const next=o.after;s.order=null;orderSquad(board,s.id,next.type,next.target);}
 }

@@ -2,6 +2,28 @@ const distance=(a,b)=>Math.abs(a.x-b.x)+Math.abs(a.y-b.y);
 export const kindOf=u=>`${u.character?.characterId||u.formationRole||'soldier'}:${u.combat.range}:${!!u.healing}`;
 export function forwardFor(s){return s.order?.forward||{x:s.order?.facing||(s.team==='B'?-1:1),y:0};}
 
+// A temporary intruder must never relocate every seat of an existing formation.
+export function repairOccupiedSeats(board,squad,units,otherGoals=[]){
+ const goals=squad.order.goals,own=new Set(units.map(u=>u.id));
+ const claimed=new Set([...goals.values()].map(p=>p.y*board.width+p.x));
+ for(const p of otherGoals)claimed.add(p.y*board.width+p.x);
+ for(const [id,seat]of goals){
+  const occupant=board.at(seat.x,seat.y);
+  if(!occupant||own.has(occupant.id)||occupant.command||occupant.step)continue;
+  let replacement=null;
+  for(let r=1;r<=3&&!replacement;r++)for(let dx=-r;dx<=r&&!replacement;dx++)for(let dy=-r;dy<=r;dy++){
+   if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;
+   const x=seat.x+dx,y=seat.y+dy,key=y*board.width+x;
+   if(!board.inside(x,y)||claimed.has(key)||board.navigation.blocked(key)||board.occupied(x,y))continue;
+   if(squad.botOperation?.role==='guard'&&board.match&&Math.max(Math.abs(x-board.match.flags.B.x),Math.abs(y-board.match.flags.B.y))>16)continue;
+   replacement={x,y};claimed.add(key);break;
+  }
+  if(!replacement)continue;
+  goals.set(id,replacement);
+  const unit=board.unit(id);if(unit){board.interrupt(unit);unit.reformSearch=null;}
+ }
+}
+
 // Same-role positions have no personal owner: a soldier already on a matching
 // slot keeps it, including soldiers arriving through a different passing lane.
 export function settleFormation(units,goals){
