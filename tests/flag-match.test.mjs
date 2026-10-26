@@ -4,9 +4,10 @@ import {Board} from '../src/model.mjs';
 import {FlagMatch} from '../src/flag-match.mjs';
 import {squadsFor} from '../src/unit-groups.mjs';
 import {survey,deployment,attackLane} from '../src/bot-strategy.mjs';
+import {deployReserves} from './deployment-helpers.mjs';
 function prepared(b,options={}){
  const m=new FlagMatch(b,options);let i=0;
- while(m.reserve.A){assert.ok(m.deploy('A','mobile',{x:10+(i%5)*8,y:8+Math.floor(i/5)*10}));i++;}
+ deployReserves(m);assert.equal(m.reserve.A,0);
  while(m.reserve.B)assert.ok(m.deployBot());return m;
 }
 test('automatic armies obey the 500 cap and deploy on their own half',()=>{
@@ -46,7 +47,7 @@ test('both sides start empty and the bot places reserves without walking or rear
 test('manual placement spends reserves atomically and rejects overlaps and enemy territory',()=>{
  const b=new Board(),m=new FlagMatch(b,{count:24});assert.ok(m.deploy('A','defense',{x:20,y:20}));assert.equal(m.reserve.A,12);
  assert.equal(m.deploy('A','defense',{x:20,y:20}),null);assert.equal(m.deploy('A','mobile',{x:65,y:20}),null);assert.equal(m.reserve.A,12);
- assert.ok(m.deploy('A','ranged',{x:30,y:30}));assert.equal(m.reserve.A,0);assert.equal(b.units.length,24);assert.ok(b.units.every(u=>!u.step&&!u.command));
+ assert.ok(m.deploy('A','ranged',{x:30,y:50}));assert.equal(m.reserve.A,0);assert.equal(b.units.length,24);assert.ok(b.units.every(u=>!u.step&&!u.command));
  m.start();assert.equal(m.deploy('A','mobile',{x:15,y:70}),null);
 });
 test('strategic deployment reacts to player concentration and separates combat roles',()=>{

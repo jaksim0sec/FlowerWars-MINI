@@ -1,5 +1,5 @@
 import {SpatialIndex} from './spatial-index.mjs';
-import {terrainStepMultiplier,terrainDamage} from './battlefield-terrain.mjs';
+import {terrainStepMultiplier} from './battlefield-terrain.mjs';
 import {healingOptions} from './healing.mjs';
 import {mix,movementOptions} from './decision.mjs';
 import {combatOptions,inAttackRange,tryAutoAttack,hasLineOfSight,BASE_ATTACK_DURATION} from './combat.mjs';
@@ -83,6 +83,11 @@ export class Board {
   }
   setTerrain(x,y,type) {
     if(!this.inside(x,y)||!['grass','soil','road','forest'].includes(type))return false;
+    if(type==='forest'&&this.occupied(x,y))return false;
+    const key=y*this.width+x;
+    if(type==='forest')this.obstacles.set(key,{kind:'forest',blocked:true});
+    else if(this.obstacles.get(key)?.kind==='forest')this.obstacles.delete(key);
+    if(this.terrain[y][x]!==type&&(type==='forest'||this.terrain[y][x]==='forest')){this.obstacleRevision++;this.navigation.invalidate();}
     if(this.terrain[y][x]!==type){this.terrain[y][x]=type;this.terrainRevision++;}
     return true;
   }
@@ -123,14 +128,23 @@ export class Board {
     if(!outer)nav.startCollection();
     try{return callback();}finally{if(!outer)nav.commit();}
   }
-  move(id,x,y,{replace=false,direct=false}={}) {
+  move(id,x,y,{replace=false,direct=false,plannedPath=null}={}) {
     const u=this.unit(id);
     if(this.match?.phase==='finished'||this.match?.phase==='preparation'&&u&&!this.match.inTerritory(u.team,{x,y}))return false;
     if(!u||u.health.current<=0||!replace&&(u.state!=='idle'||u.step)||!this.inside(x,y)||this.navigation.blocked(y*this.width+x)||u.x===x&&u.y===y&&!u.step)return false;
+    if(plannedPath){
+      let previous=u.y*this.width+u.x;
+      if(!plannedPath.length||plannedPath.at(-1)!==y*this.width+x||!plannedPath.every(n=>{
+       const px=n%this.width,py=Math.floor(n/this.width),adjacent=Math.abs(px-previous%this.width)+Math.abs(py-Math.floor(previous/this.width))===1;
+       previous=n;return Number.isInteger(n)&&this.inside(px,py)&&adjacent&&!this.navigation.blocked(n)&&!this.occupied(px,py,u.id);
+      }))return false;
+    }
     const field=direct?null:this.navigation.field(x,y);
     if(field?.complete&&field.at(u.y*this.width+u.x)<0)return false;
     if(replace)this.interrupt(u);else this.cancelCommand(u);const flow=Math.abs(x-u.x)>=Math.abs(y-u.y)?(x>u.x?'east':'west'):(y>u.y?'south':'north');
-    u.command={type:'move',x,y,flow,direct};this.flows[flow]++;this.navigation.plan(u);return true;
+    u.command={type:'move',x,y,flow,direct};this.flows[flow]++;
+    if(plannedPath){u.guide=[...plannedPath];u.guideKey=`${x},${y},${this.obstacleRevision}`;}
+    this.navigation.plan(u);return true;
   }
   attack(id,targetId,{replace=false}={}) {
     if(this.match&&this.match.phase!=='battle')return false;
@@ -214,7 +228,7 @@ export class Board {
               if(gained)this.effects.push({x:target.visualX,y:target.visualY,age:0,healing:true,amount:gained});
             }
           }else if(target&&target.health.current>0&&inAttackRange(u,target)&&(!u.combat.lineOfSight||hasLineOfSight(this,u,target))) {
-            impacts.push({target,damage:u.damage*terrainDamage(this,u,target),direction:project(target.visualX-u.visualX,target.visualY-u.visualY).x>=0?1:-1});
+            impacts.push({target,damage:u.damage,direction:project(target.visualX-u.visualX,target.visualY-u.visualY).x>=0?1:-1});
           }
         }
         if(u.elapsed+1e-9>=strike.duration){

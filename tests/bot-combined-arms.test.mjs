@@ -4,10 +4,11 @@ import {Board} from '../src/model.mjs';
 import {FlagMatch} from '../src/flag-match.mjs';
 import {squadsFor} from '../src/unit-groups.mjs';
 import {survey} from '../src/bot-strategy.mjs';
+import {deployReserves} from './deployment-helpers.mjs';
 
 function army(type,count=144){
  const board=new Board(),match=new FlagMatch(board,{count,makeCharacter:m=>({characterId:m.characterId})});
- let i=0;while(match.reserve.A){assert.ok(match.deploy('A',type,{x:10+i%4*9,y:10+Math.floor(i/4)*12}));i++;}
+ deployReserves(match,type);assert.equal(match.reserve.A,0);
  match.start();return {board,match,squads:match.squadIds.B.map(id=>squadsFor(board).get(id))};
 }
 test('bot recruits mobile attackers against ranged armies and more archers against shield armies',()=>{
@@ -35,7 +36,7 @@ test('bot retains reserves for later enemy deployment and skip reads the latest 
  for(let i=0;i<24;i++)m.update(.25);
  assert.ok(m.counts.B>0&&m.reserve.B>0,'initial deployment must leave room to adapt');
  const before=new Map(b.units.map(u=>[u.id,[u.x,u.y]]));
- for(let i=0;i<12;i++)assert.ok(m.deploy('A','defense',{x:10+i%4*9,y:10+Math.floor(i/4)*12}));
+ assert.equal(deployReserves(m,'defense',12),12);
  m.start();assert.equal(m.counts.B,240);
  for(const [id,position] of before){const u=b.unit(id);assert.deepEqual([u.x,u.y],position,'placed troops must not be shuffled');}
  const later=m.squadIds.B.slice(8).map(id=>squadsFor(b).get(id));
@@ -48,7 +49,7 @@ const center=(b,s)=>{
 };
 function relocate(b,units,anchor){
  for(const u of units){b.interrupt(u);b.cells.delete(u.y*b.width+u.x);b.spatial.remove(u);}
- units.forEach((u,i)=>{const x=anchor.x+i%4,y=anchor.y+Math.floor(i/4);assert.equal(b.occupied(x,y),false);u.x=u.visualX=x;u.y=u.visualY=y;b.cells.set(y*b.width+x,u.id);b.spatial.add(u);});
+ units.forEach((u,i)=>{const x=anchor.x+i%4,y=anchor.y+Math.floor(i/4);assert.equal(b.occupied(x,y),false);b.setTerrain(x,y,'grass');u.x=u.visualX=x;u.y=u.visualY=y;b.cells.set(y*b.width+x,u.id);b.spatial.add(u);});
 }
 test('support advances beside its actual frontline rather than charging the distant objective',()=>{
  const {board:b,match:m,squads}=army('mixed',240),support=squads.find(s=>s.botOperation.mission==='attack'&&s.type==='support');
@@ -77,7 +78,7 @@ test('home defense intercepts intruders without recalling a distant attack opera
  const {board:b,match:m,squads}=army('mixed',240),guard=squads.find(s=>s.botOperation.mission==='guard'&&s.botSlot===0);
  const attack=squads.find(s=>s.botOperation.mission==='attack'&&s.botSlot===0);
  relocate(b,attack.memberIds.map(id=>b.unit(id)),{x:84,y:2});
- const enemy=b.units.find(u=>u.team==='A');relocate(b,[enemy],{x:94,y:50});m.strategy=survey(b,m.flags.B);
+ const enemy=b.units.find(u=>u.team==='A'),breach=[{x:95,y:50},{x:95,y:51},{x:96,y:50}].find(p=>!b.occupied(p.x,p.y));relocate(b,[enemy],breach);m.strategy=survey(b,m.flags.B);
  m.think(guard.id);m.think(attack.id);
  assert.equal(guard.order?.type,'focus');assert.equal(guard.order.target.squadId,enemy.squadId);
  assert.notEqual(attack.order?.type,'focus','distant attack force must keep its mission');

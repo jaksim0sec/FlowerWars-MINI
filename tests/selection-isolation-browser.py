@@ -30,12 +30,12 @@ with sync_playwright() as p:
         page.on('pageerror', lambda error: errors.append(str(error)))
         page.goto(BASE)
         page.get_by_text('전장 준비 완료', exact=False).wait_for()
-        for y in [20, 32, 44]:
+        for y in [20, 50, 80]:
             target_tile(page, 20, y)
         cards = page.locator('.squad-card')
         assert cards.count() == 3
         cards.nth(0).click()
-        target_tile(page, 20, 44)
+        target_tile(page, 20, 80)
         assert page.locator('.squad-card.is-selected').count() == 1
         assert cards.nth(2).get_attribute('aria-pressed') == 'true'
         cards.nth(0).click()
@@ -44,7 +44,7 @@ with sync_playwright() as p:
         assert page.locator('.squad-card.is-selected').count() == 2
         assert page.locator('#selection-add').get_attribute('aria-pressed') == 'false', \
             'additional selection must be consumed by one pick'
-        target_tile(page, 38, 70)
+        target_tile(page, 38, 50)
         first_order = cards.nth(0).locator('.squad-activity').get_attribute('title')
         second_order = cards.nth(1).locator('.squad-activity').get_attribute('title')
         assert '이동' in first_order and '이동' in second_order

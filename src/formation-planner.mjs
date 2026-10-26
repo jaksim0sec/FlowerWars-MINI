@@ -74,6 +74,19 @@ export function planFormation(board,squad,center,units,lead,otherGoals){
  const marginX=board.width>maxX-minX+2?1:0,marginY=board.height>maxY-minY+2?1:0;
  center={x:clamp(center.x,marginX-minX,board.width-1-marginX-maxX),y:clamp(center.y,marginY-minY,board.height-1-marginY-maxY)};
  const claimed=new Set(otherGoals),own=new Set(units.map(u=>u.id)),positions=[];
+ if(squad.reforming){
+  const desired={...center};let fitted=null;
+  for(let r=0;r<=14&&!fitted;r++)for(let dx=-r;dx<=r&&!fitted;dx++)for(let dy=-r;dy<=r;dy++){
+   if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;
+   const candidate={x:desired.x+dx,y:desired.y+dy};let free=true;
+   for(let x=candidate.x+minX-1;x<=candidate.x+maxX+1&&free;x++)for(let y=candidate.y+minY-1;y<=candidate.y+maxY+1;y++){
+    const key=y*board.width+x,occupant=board.at(x,y);
+    if(!board.inside(x,y)||board.navigation.blocked(key)||claimed.has(key)||occupant&&!own.has(occupant.id)){free=false;break;}
+   }
+   if(free){fitted=candidate;break;}
+  }
+  if(fitted)center=fitted;
+ }
  for(let i=0;i<rows.length;i++){
   const wanted={x:center.x+offsets[i].x,y:center.y+offsets[i].y};let best=null;
   for(let radius=0;radius<=12&&!best;radius++)for(let dx=-radius;dx<=radius&&!best;dx++)for(let dy=-radius;dy<=radius;dy++){

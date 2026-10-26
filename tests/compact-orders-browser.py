@@ -2,7 +2,7 @@ import os
 from playwright.sync_api import sync_playwright
 with sync_playwright() as p:
     browser=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox'])
-    for width,height in [(1280,800),(390,844)]:
+    for width,height in [(1280,800),(390,844),(320,568),(360,640)]:
         page=browser.new_page(viewport={'width':width,'height':height},has_touch=True)
         errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
         page.goto(os.environ.get('BASE_URL','http://127.0.0.1:8020'))
@@ -19,7 +19,7 @@ with sync_playwright() as p:
         assert '사수' in page.locator('#command-state').text_content()
         page.locator('#orders-toggle').click()
         page.locator('[data-squad-action="rally"]').click()
-        assert '집결' in page.locator('#command-state').text_content()
+        assert '형성' in page.locator('#command-state').text_content()
         page.locator('#orders-toggle').click();page.locator('#selection-options').click()
         assert page.locator('[data-squad-stance]').count()==0
         assert page.locator('#squad-close .control-label').is_hidden()
@@ -29,6 +29,13 @@ with sync_playwright() as p:
             button=page.locator('[data-squad-formation="'+formation+'"]')
             assert button.locator('svg rect').count()>0
             button.click();assert button.get_attribute('aria-pressed')=='true'
+        assert page.locator('#formation-progress').is_visible()
+        assert '형성' in page.locator('#command-state').text_content()
+        if width<700:
+            regions=[page.locator(selector).bounding_box() for selector in ['#match-hud','#squad-tools','#command-dock','#squad-roster']]
+            for box in regions:assert box['x']>=0 and box['y']>=0 and box['x']+box['width']<=width+1 and box['y']+box['height']<=height+1,box
+            for i,a in enumerate(regions):
+                for c in regions[i+1:]:assert min(a['x']+a['width'],c['x']+c['width'])<=max(a['x'],c['x']) or min(a['y']+a['height'],c['y']+c['height'])<=max(a['y'],c['y']),regions
         page.screenshot(path=f'/tmp/compact-orders-{width}.png')
         assert not errors,errors
         page.close()

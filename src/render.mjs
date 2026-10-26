@@ -83,7 +83,7 @@ export function render(ctx, art, board, view, camera, width, height, dpr, option
   drawCommandOverlay(ctx,board,view,camera.scale);
 
   if(board.obstacles?.size)for(const {x,y} of visibleTiles(board,camera,width,height)) {
-    const obstacle=board.obstacles.get(y*board.width+x);if(!obstacle||obstacle.blocked===false)continue;
+    const obstacle=board.obstacles.get(y*board.width+x);if(!obstacle||obstacle.blocked===false||obstacle.kind==='forest')continue;
     const p=project(x,y);diamond(ctx,p.x,p.y,'#423a3090','#766448',8);
     ctx.strokeStyle='#e8d9b4';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(p.x-9,p.y-7);ctx.lineTo(p.x+9,p.y+7);ctx.moveTo(p.x+9,p.y-7);ctx.lineTo(p.x-9,p.y+7);ctx.stroke();
   }

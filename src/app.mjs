@@ -48,7 +48,7 @@ let selectedSquadId=null,lastRosterUpdate=0,rosterEpoch=null,commanderAvatar='',
 const selectedSquads=new Set();
 let additiveSelection=false,ordersExpanded=true;
 let squadQuickCommand=false,longPressTimer=null,longPressPointer=null,longPressConsumed=false,feedbackTimer=null,squadHintSeen=false;
-const phaseLabels={moving:'이동 중',flanking:'측면 우회 중',attacking:'집중 공격 중',holding:'전열 사수',stopped:'정지',arrived:'도착',complete:'목표 격파','target-lost':'대상 소실'};
+const phaseLabels={forming:'진형 형성 중',moving:'이동 중',flanking:'측면 우회 중',attacking:'집중 공격 중',holding:'전열 사수',stopped:'정지',arrived:'도착',complete:'목표 격파','target-lost':'대상 소실'};
 const pointers = new Map();
 let origin = null, gestureMoved = false;
 
@@ -334,6 +334,8 @@ function refresh(invalidate=true) {
   }else lastSelectedSquad='';
 
   const selection=selectedCommandSquads(),summaries=selection.map(s=>squadSummary(board,s.id));
+  document.body.classList.toggle('has-selection',selection.length>0);
+  $('formation-progress').hidden=!selection.some(s=>s.order?.type==='rally');
   $('command-dock').hidden=!selection.length;
   $('command-dock').classList.toggle('is-expanded',ordersExpanded);
   $('orders-toggle').setAttribute('aria-expanded',String(ordersExpanded));
@@ -345,6 +347,12 @@ function refresh(invalidate=true) {
     const moving=summaries.reduce((n,s)=>n+s.moving,0),waiting=summaries.reduce((n,s)=>n+s.waiting,0);
     const queued=selection.some(s=>s.order?.after);
     text('command-state',queued?'우회 진행 → 도착 후 집중 공격':`${orderNames}${phases?' · '+phases:''}${waiting?' · 경로 대기 '+waiting+'명':''}`);
+    if(selection.some(s=>s.order?.type==='rally')){
+     const forming=summaries.filter(s=>s.order?.type==='rally'),formed=forming.reduce((n,s)=>n+s.formed,0),total=forming.reduce((n,s)=>n+s.formationTotal,0),percent=total?Math.round(formed/total*100):100;
+     const labels={line:'횡대',column:'종대',square:'방진',spread:'산개',dense:'밀집'},names=[...new Set(forming.map(s=>labels[s.formation]))].join('·');
+     $('formation-progress').value=percent;
+     text('command-state',`${names} ${forming.some(s=>s.order?.phase==='blocked')?'공간 확보 대기':percent===100?'형성 완료':'형성 중'} · ${percent}% (${formed}/${total}명)`);
+    }
     for(const button of $('command-dock').querySelectorAll('[data-squad-action]')){
       button.disabled=!summaries.some(s=>s.commanderAlive);
       button.setAttribute('aria-pressed',String(selection.every(s=>s.order?.type===button.dataset.squadAction)));

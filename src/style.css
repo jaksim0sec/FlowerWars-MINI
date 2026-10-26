@@ -627,3 +627,18 @@ body{display:block;}
 .squad-tools .squad-compact-row{display:block;}
 .squad-tools .squad-option-row{box-sizing:border-box;}
 @media(max-width:700px){.command-dock{width:280px;}.squad-tools{bottom:calc(250px + env(safe-area-inset-bottom));}}
+#formation-progress{display:block;width:100%;height:5px;margin-top:5px;accent-color:#b28a32;}
+#formation-progress[hidden]{display:none;}
+@media(max-width:700px){
+ .command-dock{right:8px;bottom:calc(96px + env(safe-area-inset-bottom))!important;width:min(280px,calc(100vw - 16px));max-width:calc(100vw - 16px);}
+ .squad-tools{left:8px;right:8px;width:auto;max-width:none;bottom:calc(268px + env(safe-area-inset-bottom));max-height:calc(100dvh - 440px);overflow:auto;}
+ .squad-tools .formation-help{display:none;}
+ #match-hud{left:124px;right:8px;max-width:none;}
+ .match-topline{flex-wrap:wrap;gap:3px 7px;white-space:normal;}
+ .match-actions{flex-wrap:wrap;}
+ #match-hud>small{display:block;font-size:8px;text-align:center;}
+ .has-selection #deployment-tools:not(.is-deploying){display:none;}
+ .squad-roster{max-height:72px;bottom:calc(8px + env(safe-area-inset-bottom));}
+ #command-state{white-space:normal;overflow-wrap:anywhere;}
+ .in-match #notice{left:8px;right:auto;top:108px;bottom:auto;transform:none;max-width:108px;padding:5px;font-size:9px;}
+}

@@ -1,13 +1,10 @@
-export const terrainNames={grass:'개활지',soil:'흙',road:'길 · 이동 속도 +20%',forest:'숲 · 이동 속도 −15% · 원거리 피해 −25%'};
+export const terrainNames={grass:'개활지',soil:'흙',road:'길 · 이동 속도 +20%',forest:'X · 진입 불가'};
 export function terrainAt(board,x,y){return board.terrain[Math.round(y)]?.[Math.round(x)]||'grass';}
 export function terrainStepMultiplier(board,from,to){
- const speed=p=>({road:1.2,forest:.85}[terrainAt(board,p.x,p.y)]||1);
+ const speed=p=>terrainAt(board,p.x,p.y)==='road'?1.2:1;
  return 2/(speed(from)+speed(to));
 }
-export function terrainDamage(board,actor,target){
- return actor.combat.range>1&&terrainAt(board,target.visualX,target.visualY)==='forest'?.75:1;
-}
-/** Three broad connecting lanes with open fighting grounds and traversable
+/** Three broad connecting lanes with open fighting grounds and impassable
  * woodland pockets. Mirror exactly so neither faction gets a terrain bonus. */
 export function createBattlefield(board){
  const woods=[[25,34,13,8],[25,66,13,8],[43,28,9,9],[43,72,9,9]];
@@ -18,6 +15,8 @@ export function createBattlefield(board){
   const clearing=[[4,50,8],[28,50,10],[49.5,50,11]].some(([cx,cy,r])=>Math.hypot(mx-cx,y-cy)<r);
   const forest=!road&&!clearing&&woods.some(([cx,cy,rx,ry])=>((mx-cx)/rx)**2+((y-cy)/ry)**2<1+Math.sin(mx*1.7+y*.8)*.12);
   board.terrain[y][x]=road?'road':forest?'forest':'grass';
+  if(forest)board.obstacles.set(y*board.width+x,{kind:'forest',blocked:true});
  }
  board.terrainRevision++;
+ board.obstacleRevision++;board.navigation.invalidate();
 }

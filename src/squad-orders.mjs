@@ -1,6 +1,7 @@
 import {squadsFor} from './unit-groups.mjs';
 import {planFormation,settleFormation} from './formation-planner.mjs';
 import {coverPlan,moveUnderCover} from './commander-cover.mjs';
+import {reformFormation} from './formation-reform.mjs';
 
 export const SQUAD_ACTIONS={
  move:{label:'이동',target:true,hint:'교전보다 이동 우선'},
@@ -35,14 +36,15 @@ function slots(board,squad,center,formation=squad.formation){
  const claimed=new Set();
  for(const other of squadsFor(board).values())if(other.id!==squad.id&&other.team===squad.team)
    for(const p of other.order?.goals?.values()||[])claimed.add(p.y*board.width+p.x);
- return planFormation(board,{...squad,formation},center,alive(board,squad),commander(board,squad),claimed);
+ return planFormation(board,{...squad,formation,reforming:squad.order?.type==='rally'},center,alive(board,squad),commander(board,squad),claimed);
 }
 export function configureSquad(board,id,{stance,formation}={}){
  const s=squadsFor(board).get(id);if(!s)return false;
  if(stance&&STANCES.has(stance))s.stance=stance;
  if(formation&&FORMATIONS.has(formation)){
+  const changed=s.formation!==formation;
   s.formation=formation;
-  if(!s.order||['hold','wait'].includes(s.order.type))return orderSquad(board,id,'rally');
+  if(changed||!s.order||['hold','wait'].includes(s.order.type))return orderSquad(board,id,'rally');
  }
  if(s.order){s.order.dirty=true;runOrder(board,s,true);}
  return true;
@@ -125,6 +127,7 @@ function centerFor(board,s,o){
 }
 function runOrder(board,s,replace=false){
  const o=s.order;if(!o)return;const units=alive(board,s);
+ if(o.type==='rally'&&board.time<(o.reformRetryAt||0))return;
  if(!units.length){s.order=null;return;}
  if(o.type==='wait'||o.type==='hold'){
    for(const u of units){if(replace)board.interrupt(u);u.combat.holdPosition=true;}
@@ -159,10 +162,20 @@ function runOrder(board,s,replace=false){
  const anchor=center.x+','+center.y+','+s.formation;
  if(anchor!==o.previous||units.length!==o.lastMembers||o.dirty){
    replace=true;
-   o.goals=new Map(slots(board,s,center,s.formation).map(([u,p])=>[u.id,p]));
+   let planned=slots(board,s,center,s.formation);
+   if(o.type==='rally'){
+    const lead=commander(board,s),seat=planned.find(([u])=>u.id===lead?.id)?.[1],anchor=lead?.step||lead;
+    if(seat&&anchor)planned=slots(board,s,{x:center.x+anchor.x-seat.x,y:center.y+anchor.y-seat.y},s.formation);
+   }
+   o.goals=new Map(planned.map(([u,p])=>[u.id,p]));
+   if(o.type==='rally'){
+    for(const u of units){board.interrupt(u);u.reformSearch=null;}
+    o.activeReformId=null;o.reformBuffer=null;
+   }
    o.previous=anchor;o.lastMembers=units.length;o.dirty=false;
  }
  settleFormation(units,o.goals);
+ if(o.type==='rally'){reformFormation(board,s,units,commander(board,s));return;}
  // An arrived teammate can seal the last empty seat on all four sides.
  // Temporarily open one passing bay, rather than wait forever on that seat.
  o.passing??=new Map();
@@ -210,5 +223,6 @@ export function updateSquadOrders(board){for(const s of squadsFor(board).values(
 export function squadSummary(board,id){
  const s=squadsFor(board).get(id);if(!s)return null;
  const units=alive(board,s);
- return {...s,alive:units.length,commanderAlive:!!commander(board,s),leaderAlive:(originalCommander(board,s)?.health.current||0)>0,actingCommanderId:commander(board,s)?.id??null,moving:units.filter(u=>u.step).length,waiting:units.filter(u=>u.command&&['planning','traffic','replanning','yielding','condition'].includes(u.waitReason)).length};
+ const matched=units.filter(u=>{const p=s.order?.goals?.get(u.id);return p&&u.x===p.x&&u.y===p.y&&!u.step;}).length;
+ return {...s,formed:matched,formationTotal:units.length,formationProgress:units.length?Math.round(matched/units.length*100):100,alive:units.length,commanderAlive:!!commander(board,s),leaderAlive:(originalCommander(board,s)?.health.current||0)>0,actingCommanderId:commander(board,s)?.id??null,moving:units.filter(u=>u.step).length,waiting:units.filter(u=>u.command&&['planning','traffic','replanning','yielding','condition'].includes(u.waitReason)).length};
 }
