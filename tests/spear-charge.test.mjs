@@ -34,7 +34,7 @@ test('equipped spear profile applies through the shared factory without blueprin
  const catalog={characters:{scout:{rig}},equipment};
  const c=createCharacter(catalog,'scout');equip(catalog,c,'ribbon_spear','left');
  const b=new Board(20,10),u=b.spawn(5,5,c,{team:'A',stats:{damage:14,attackPeriod:.45},movement:{stepTime:.28}});
- assert.equal(u.damage,21);assert.ok(Math.abs(u.movement.stepTime-.28/1.5)<1e-8);
+ assert.equal(u.damage,28);assert.ok(Math.abs(u.movement.stepTime-.28/1.5)<1e-8);
  const angles=[];
  for(const t of [0,.08,.14,.3,.5]){
   Object.assign(c.animation,{state:'attack',elapsed:t,attackVector:{x:-72,y:0}});

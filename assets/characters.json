@@ -27,7 +27,7 @@
       },
       "role": "tank",
       "testMovement": {
-        "stepTime": 0.42,
+        "stepTime": 0.525,
         "waitBeforeDetour": 0.4,
         "yieldAfter": 0.95
       }
@@ -45,7 +45,7 @@
       },
       "role": "support",
       "testMovement": {
-        "stepTime": 0.35,
+        "stepTime": 0.4375,
         "waitBeforeDetour": 0.28,
         "yieldAfter": 0.75
       }
@@ -64,7 +64,7 @@
       },
       "role": "warrior",
       "testMovement": {
-        "stepTime": 0.36,
+        "stepTime": 0.45,
         "waitBeforeDetour": 0.3,
         "yieldAfter": 0.8
       },
@@ -88,7 +88,7 @@
       },
       "role": "support",
       "testMovement": {
-        "stepTime": 0.35,
+        "stepTime": 0.4375,
         "waitBeforeDetour": 0.28,
         "yieldAfter": 0.75
       }
@@ -113,7 +113,7 @@
       },
       "role": "archer",
       "testMovement": {
-        "stepTime": 0.34,
+        "stepTime": 0.425,
         "waitBeforeDetour": 0.2,
         "yieldAfter": 0.6
       }
@@ -130,7 +130,7 @@
       },
       "role": "warrior",
       "testMovement": {
-        "stepTime": 0.28,
+        "stepTime": 0.35,
         "waitBeforeDetour": 0.12,
         "yieldAfter": 0.45
       },

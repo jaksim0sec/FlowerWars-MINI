@@ -431,13 +431,14 @@
     "motion": 0,
     "thrust": true,
     "battle": {
-      "damageMultiplier": 1.5,
+      "damageMultiplier": 2,
       "speedMultiplier": 1.5,
       "attackPeriod": 3.2,
       "impactTime": 0.07,
       "activeDuration": 0.32,
       "movingPoise": true,
-      "charge": true
+      "charge": true,
+      "visionRange": 4
     },
     "rigAnimation": {
       "weapon": 0,

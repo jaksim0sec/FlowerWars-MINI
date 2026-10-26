@@ -737,3 +737,7 @@ button:not(:disabled):active{scale:.96;}
 .commander-badge .ui-icon{width:16px;height:16px;}.squad-card-body{align-self:center;}.squad-card-title{font-size:12px;}.squad-card .squad-activity{background:#fffcf2ba;right:6px;top:5px;}
 .squad-roster{height:112px;max-height:112px;}.command-dock{bottom:calc(134px + env(safe-area-inset-bottom))!important;}.squad-tools{bottom:calc(134px + env(safe-area-inset-bottom));}
 @media(max-height:520px){.squad-roster{height:80px;max-height:80px;}.squad-card,.squad-card:hover,.squad-card.is-selected{height:50px;min-height:50px;grid-template-columns:52px 1fr;width:158px;min-width:158px;max-width:158px;}.squad-portrait,.commander-photo{height:49px;width:52px;}.commander-badge{width:20px;height:20px;bottom:3px;}.commander-badge .ui-icon{width:13px;height:13px;}.command-dock{bottom:calc(94px + env(safe-area-inset-bottom))!important;}.squad-tools{bottom:calc(94px + env(safe-area-inset-bottom));}}
+/* Frosted upper HUD with brighter lettering. */
+#match-hud{background:rgba(48,53,45,.3);backdrop-filter:blur(14px) saturate(115%);-webkit-backdrop-filter:blur(14px) saturate(115%);border-color:#ffffff40;color:#fffdf7;}
+#match-phase,#match-armies{color:#fffdf7;}#match-timer{color:#ffe8b7;}
+.deployment-types button,.deployment-head button,.in-match #notice,.in-match .squad-aim{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);}

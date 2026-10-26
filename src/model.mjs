@@ -115,14 +115,14 @@ export class Board {
     if(this.match&&(!options.team||this.units.filter(u=>u.team===options.team&&u.health.current>0).length>=this.match.limit))return null;
     if (!this.inside(x, y) || this.navigation.blocked(y*this.width+x) || this.occupied(x, y)) return null;
     const battle=options.battle||Object.values(character?.equipment||{}).find(a=>a?.battle)?.battle;
-    if(battle)options={...options,stats:{...options.stats,damage:(options.stats?.damage||25)*(battle.damageMultiplier||1),attackPeriod:battle.attackPeriod||options.stats?.attackPeriod},movement:{...options.movement,stepTime:(options.movement?.stepTime||.34)/(battle.speedMultiplier||1)}};
+    if(battle)options={...options,stats:{...options.stats,damage:(options.stats?.damage||25)*(battle.damageMultiplier||1),attackPeriod:battle.attackPeriod||options.stats?.attackPeriod},movement:{...options.movement,stepTime:(options.movement?.stepTime||.425)/(battle.speedMultiplier||1)}};
     const health=character?.health||createHealth();
     if(Number.isFinite(options.stats?.maxHealth)&&options.stats.maxHealth>0)health.current=health.max=options.stats.maxHealth;
     const u = { character, health, priorityKey:mix(this.seed^Math.imul(this.nextId,0x9e3779b9)),movement:movementOptions(options.movement),capabilities:[...(options.capabilities||[])],team:options.team||null,combat:combatOptions(options),strike:null,
       damage:Number.isFinite(options.stats?.damage)&&options.stats.damage>0?options.stats.damage:25, id: this.nextId++, x, y, visualX: x, visualY: y,
       state: 'idle', elapsed: 0, facing: -1, path: [], target: null, command:null, step:null, route:[], waitReason:null, hits: 0, impacted: false };
     u.healing=healingOptions(options,character);
-    if(battle)Object.assign(u.combat,{movingPoise:!!battle.movingPoise,charge:!!battle.charge,activeDuration:battle.activeDuration,impactTime:battle.impactTime});
+    if(battle)Object.assign(u.combat,{movingPoise:!!battle.movingPoise,charge:!!battle.charge,visionRange:battle.visionRange||0,activeDuration:battle.activeDuration,impactTime:battle.impactTime});
     this.units.push(u);this.byId.set(u.id,u);this.cells.set(y*this.width+x,u.id);this.spatial.add(u);
     return u;
   }

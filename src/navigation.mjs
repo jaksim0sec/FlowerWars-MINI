@@ -272,10 +272,20 @@ export class Navigation {
     this.offer(u,next);return true;
   }
   counterStep(u){
-    const b=this.board,r=u.combat.retaliation,target=r&&b.unit(r.targetId);
+    const b=this.board;
+    if(!u.combat.retaliation&&u.combat.visionRange&&u.combat.auto&&!u.combat.holdPosition&&u.command?.type!=='attack'&&b.time>=(u.combat.visionAt||0)){
+      u.combat.visionAt=b.time+.3;let nearest=null,best=Infinity;
+      for(const id of b.spatial.candidates(u.x,u.y,u.combat.visionRange)){
+        const enemy=b.unit(id);if(!enemy?.team||enemy.team===u.team||enemy.health.current<=0)continue;
+        const d=Math.max(Math.abs(enemy.x-u.x),Math.abs(enemy.y-u.y));
+        if(d<=u.combat.visionRange&&d<best&&hasLineOfSight(b,u,enemy)){nearest=enemy;best=d;}
+      }
+      if(nearest)u.combat.retaliation={targetId:nearest.id,x:u.x,y:u.y,until:b.time+2.5,approach:Math.sign(nearest.x-u.x)||b.navigationOrientation};
+    }
+    const r=u.combat.retaliation,target=r&&b.unit(r.targetId);
     if(!r)return false;
     if(!target||target.health.current<=0||b.time>r.until||Math.max(Math.abs(target.x-r.x),Math.abs(target.y-r.y))>6){u.combat.retaliation=null;return false;}
-    if(u.healing||!u.combat.auto||u.combat.holdPosition||u.command?.type==='attack')return false;
+    if(u.healing||!u.combat.auto||u.combat.holdPosition||u.command?.type==='attack'||b.inAttackRange(u,target))return false;
     // Short, occupancy-aware interception. No additional commands or waypoint
     // queue; normal movement resumes when contact ends or the attacker leaves.
     const start=this.index(u.x,u.y),queue=[{cell:start,first:null}],seen=new Set([start]);
