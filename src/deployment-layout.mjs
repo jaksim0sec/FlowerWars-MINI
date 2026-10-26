@@ -2,10 +2,14 @@ import {createFormationGroup} from './unit-groups.mjs';
 
 export function deploymentBlueprint(size,type,name){
  const blueprint=createFormationGroup(Math.max(2,size),'squad',name,type);
+ return layoutDeployment(blueprint,size,name);
+}
+export function layoutDeployment(template,size,name){
+ const blueprint=structuredClone(template);blueprint.name=name;
  blueprint.members=blueprint.members.slice(0,size);
- const priority=m=>({'shield-guard':0,scout:1,archer:2,'clover-mage':3,scholar:3,'banner-bearer':4}[m.characterId]??1);
+ const priority=m=>({guard:0,scout:1,archer:2,healer:3,support:3,banner:4}[m.role]??1);
  blueprint.members.sort((a,b)=>priority(a)-priority(b));
- const troops=blueprint.members.filter(m=>m.characterId!=='banner-bearer'),flags=blueprint.members.filter(m=>m.characterId==='banner-bearer');
+ const troops=blueprint.members.filter(m=>m.role!=='banner'),flags=blueprint.members.filter(m=>m.role==='banner');
  let rank=0;
  for(const band of [0,1,2,3]){
   const members=troops.filter(m=>priority(m)===band);

@@ -92,6 +92,7 @@ export function planFormation(board,squad,center,units,lead,otherGoals){
   for(let radius=0;radius<=12&&!best;radius++)for(let dx=-radius;dx<=radius&&!best;dx++)for(let dy=-radius;dy<=radius;dy++){
    if(Math.max(Math.abs(dx),Math.abs(dy))!==radius)continue;
    const x=wanted.x+dx,y=wanted.y+dy,key=y*board.width+x,occupant=board.at(x,y),reserved=board.reservations.get(key);
+   if(squad.botOperation?.role==='guard'&&board.match){const flag=board.match.flags.B;if(Math.max(Math.abs(x-flag.x),Math.abs(y-flag.y))>16)continue;}
    if(!board.inside(x,y)||board.navigation.blocked(key)||claimed.has(key)||occupant&&!own.has(occupant.id)||reserved&&!own.has(reserved))continue;
    // A fallback must stay behind the front for the commander.
    if(formation!=='square'&&rows[i].unit.id===lead?.id&&positions.some(p=>p&&(x-p.x)*f.x+(y-p.y)*f.y>=0))continue;

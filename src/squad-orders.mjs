@@ -158,7 +158,10 @@ function runOrder(board,s,replace=false){
    o.waypoints.shift();o.previous=null;o.phase=o.waypoints.length?'flanking':'moving';center=centerFor(board,s,o);replace=true;
  }
  const own=new Set(s.memberIds);
- if([...o.goals.values()].some(p=>{const u=board.at(p.x,p.y);return u&&!own.has(u.id)&&!u.command&&!u.step;}))o.dirty=true;
+ if(board.time>=(o.nextOccupancyCheck||0)){
+  if([...o.goals.values()].some(p=>{const u=board.at(p.x,p.y);return u&&!own.has(u.id)&&!u.command&&!u.step;}))o.dirty=true;
+  o.nextOccupancyCheck=board.time+.75;
+ }
  const anchor=center.x+','+center.y+','+s.formation;
  if(anchor!==o.previous||units.length!==o.lastMembers||o.dirty){
    replace=true;

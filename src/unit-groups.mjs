@@ -15,6 +15,7 @@ const types={
  mixed:['banner-bearer',...Array(4).fill('scout'),...Array(3).fill('shield-guard'),...Array(3).fill('archer'),'clover-mage']
 };
 const roles={'banner-bearer':'banner','scout':'scout','shield-guard':'guard','archer':'archer','clover-mage':'healer','scholar':'support'};
+export function availableSquadBlueprints(){return Object.keys(types).map(type=>createFormationGroup(12,'squad','',type));}
 export function createFormationGroup(count=8,kind='squad',name='',type='mixed'){
  count=Math.max(2,Math.min(128,Math.floor(Number(count)||8)));kind=kind==='platoon'?'platoon':'squad';
  const formation=armyFormation(count),center=Math.floor(formation.rows/2);

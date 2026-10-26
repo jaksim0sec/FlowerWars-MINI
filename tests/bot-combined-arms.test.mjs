@@ -80,18 +80,19 @@ test('home defense intercepts intruders without recalling a distant attack opera
  relocate(b,attack.memberIds.map(id=>b.unit(id)),{x:84,y:2});
  const enemy=b.units.find(u=>u.team==='A'),breach=[{x:95,y:50},{x:95,y:51},{x:96,y:50}].find(p=>!b.occupied(p.x,p.y));relocate(b,[enemy],breach);m.strategy=survey(b,m.flags.B);
  m.think(guard.id);m.think(attack.id);
- assert.equal(guard.order?.type,'focus');assert.equal(guard.order.target.squadId,enemy.squadId);
+ assert.equal(guard.order?.type,'focus');assert.equal(guard.order.target.unitId,enemy.id);
  assert.notEqual(attack.order?.type,'focus','distant attack force must keep its mission');
 });
 test('an isolated surviving banner does not become the frontline for its partners',()=>{
- const {board:b,match:m,squads}=army('mixed',48),screen=squads[0],support=squads[3],strike=squads[2];
+ const {board:b,match:m,squads}=army('mixed',144),team=squads.filter(s=>s.botOperation.role==='front'),screen=team[0],support=team[3],strike=team[2];
  for(const id of screen.memberIds)if(id!==screen.leaderId)b.damage(id,10000);
  relocate(b,[b.unit(screen.leaderId)],{x:94,y:2});
  m.think(support.id);const front=center(b,strike);
- assert.ok(Math.abs(support.order.target.x-front.x)<=6&&Math.abs(support.order.target.y-front.y)<=6);
+ const possible=squads.filter(s=>s.botOperation===support.botOperation&&s!==support&&s!==screen).map(s=>center(b,s));
+ assert.ok(possible.some(front=>Math.abs(support.order.target.x-front.x)<=6&&Math.abs(support.order.target.y-front.y)<=6));
 });
 test('a force without surviving healers eventually rejoins combat after a bounded retreat',()=>{
- const {board:b,match:m,squads}=army('mixed',48),screen=squads[0];
+ const {board:b,match:m,squads}=army('mixed',144),screen=squads.find(s=>s.botOperation.role==='front'&&s.botSlot===0);
  for(const s of squads)for(const id of s.memberIds){const u=b.unit(id);if(s.type==='support'||u.healing)b.damage(id,10000);}
  for(const id of screen.memberIds){const u=b.unit(id);if(u.health.current>0)b.damage(id,u.health.max*.8);}
  m.think(screen.id);assert.equal(screen.order?.type,'retreat');
@@ -99,7 +100,7 @@ test('a force without surviving healers eventually rejoins combat after a bounde
  b.time+=2;m.think(screen.id);assert.notEqual(screen.order?.type,'retreat','do not repeat the same futile recovery');
 });
 test('orphaned support joins a surviving fighting force instead of drifting alone',()=>{
- const {board:b,match:m,squads}=army('mixed',144),support=squads.find(s=>s.type==='support');
+ const {board:b,match:m,squads}=army('mixed',240),support=squads.find(s=>s.type==='support'&&s.botOperation.role==='front');
  for(const s of squads)if(s.botOperation===support.botOperation&&s!==support)for(const id of s.memberIds)b.damage(id,10000);
  const origin=center(b,support),hosts=squads.filter(s=>s.type!=='support'&&s.botOperation!==support.botOperation);
  hosts.sort((a,c)=>Math.max(Math.abs(center(b,a).x-origin.x),Math.abs(center(b,a).y-origin.y))-Math.max(Math.abs(center(b,c).x-origin.x),Math.abs(center(b,c).y-origin.y)));

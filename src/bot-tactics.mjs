@@ -1,6 +1,5 @@
 import {squadsFor} from './unit-groups.mjs';
 import {orderSquad} from './squad-orders.mjs';
-import {attackLane} from './bot-strategy.mjs';
 
 const distance=(a,b)=>Math.max(Math.abs(a.x-b.x),Math.abs(a.y-b.y));
 function state(board,squad){
@@ -23,6 +22,7 @@ function move(board,squad,action,point){
  // Avoid restarting physical steps/strikes for small movement of a partner.
  if(squad.order?.type===action&&(distance(squad.order.target,aim)<3||board.time<(squad.botMoveAt||0)))return true;
  if(!orderSquad(board,squad.id,action,aim))return false;
+ if(action==='fortify'){squad.order.forward={x:-1,y:0};squad.order.dirty=true;}
  squad.botMoveAt=board.time+1.2;return true;
 }
 function nearbyEnemy(board,center,flanking){
@@ -40,12 +40,27 @@ function nearbyEnemy(board,center,flanking){
  * Uses the exact player order API; no teleportation or custom movement rules. */
 export function commandBotSquad(match,squad){
  const board=match.board,operation=squad.botOperation,self=state(board,squad);if(!operation||!self)return;
- const registry=squadsFor(board),partners=match.squadIds.B.slice(operation.index*4,operation.index*4+4)
+ const features=s=>match.recruitment.get(s.type)?.features||{};
+ const tactical=match.command.planFor(operation);
+ if(operation.role==='guard'){
+  const flag=match.flags.B,slot=squad.botSlot;
+  const home=tactical.guardGoals?.get(squad.id)||tactical.goal;
+  // Only the forward screen intercepts. Firepower, inner reserve and medics
+  // continue to occupy the flag approaches instead of following the bait.
+  const intruder=board.unit(match.strategy?.intruderId);
+  if(slot===0&&intruder?.health.current>0&&distance(intruder,flag)<=10&&distance(self.center,intruder)<=16){
+   orderSquad(board,squad.id,'focus',{unitId:intruder.id});return;
+  }
+  move(board,squad,'fortify',home);
+  if(squad.formation!==home.formation){squad.formation=home.formation||'column';if(squad.order)squad.order.dirty=true;}
+  return;
+ }
+ const registry=squadsFor(board),partners=operation.squadIds
   .map(id=>registry.get(id)).filter(Boolean).map(s=>state(board,s)).filter(Boolean);
  let frontline=partners.find(p=>p.fighters&&p.squad.botSlot===0&&!p.squad.botRecovering&&p.health>=.35)||
-  partners.find(p=>p.fighters&&['defense','assault','mobile','mixed'].includes(p.squad.type)&&!p.squad.botRecovering&&p.health>=.35)||
-  partners.find(p=>p.fighters&&p.squad.type!=='support'&&!p.squad.botRecovering)||self;
- const support=partners.find(p=>p.squad.type==='support'),isSupport=squad.type==='support';
+  partners.find(p=>p.fighters&&(features(p.squad).tank+features(p.squad).melee)>.45&&!p.squad.botRecovering&&p.health>=.35)||
+  partners.find(p=>p.fighters&&p.squad.botRole!=='support'&&!p.squad.botRecovering)||self;
+ const support=partners.find(p=>p.squad.botRole==='support'),isSupport=squad.botRole==='support';
 
  const canHeal=partners.some(p=>p.units.some(u=>u.healing));
  if(self.health<.35&&!squad.botRecovering&&(canHeal||!squad.botRetreatSpent)){
@@ -62,11 +77,16 @@ export function commandBotSquad(match,squad){
   }
   return;
  }
+ const movingThrough=operation.role==='mobile'&&['penetrate','rear-attack','capture'].includes(tactical.stage);
+ if(movingThrough&&operation.needs[squad.botSlot]!=='mobile'){
+  const rear=Math.max(...partners.filter(p=>operation.needs[p.squad.botSlot]==='mobile').map(p=>p.center.x));
+  move(board,squad,'fortify',{x:Math.max(tactical.entry.x,rear+7)+(isSupport?5:0),y:tactical.entry.y});return;
+ }
 
  if(isSupport){
-  if(!partners.some(p=>p.squad.type!=='support'&&p.fighters)){
+  if(!partners.some(p=>p.squad.botRole!=='support'&&p.fighters)){
    // A rare operation-level fallback, never a global scan per soldier.
-   const hosts=match.squadIds.B.map(id=>registry.get(id)).filter(s=>s&&s.type!=='support'&&s.botOperation!==operation)
+   const hosts=match.squadIds.B.map(id=>registry.get(id)).filter(s=>s&&s.botRole!=='support'&&s.botOperation!==operation)
     .map(s=>state(board,s)).filter(p=>p?.fighters&&!p.squad.botRecovering);
    hosts.sort((a,b)=>distance(a.center,self.center)-distance(b.center,self.center));
    if(!hosts.length){move(board,squad,'retreat',{x:90,y:50});return;}
@@ -79,24 +99,17 @@ export function commandBotSquad(match,squad){
   return;
  }
 
- const intruder=board.unit(match.strategy?.intruderId);
- const enemy=operation.mission==='guard'&&intruder?.health.current>0&&distance(intruder,match.flags.B)<=14?
-  intruder:nearbyEnemy(board,frontline.center,operation.mission==='flank');
- if(enemy&&distance(self.center,enemy)<=16){
+ const enemy=nearbyEnemy(board,frontline.center,operation.role==='mobile');
+ if(enemy&&distance(self.center,enemy)<=16&&(!movingThrough||distance(self.center,enemy)<=3)){
   orderSquad(board,squad.id,'focus',enemy.squadId?{squadId:enemy.squadId}:{unitId:enemy.id});return;
- }
- if(operation.mission==='guard'){
-  move(board,squad,'fortify',{x:operation.anchor.x+(squad.botSlot%2)*5,y:operation.anchor.y+(squad.botSlot<2?-4:4)});return;
  }
  if(squad.id!==frontline.squad.id){
   // Firepower stays just behind the screen; the second strike squad guards
   // its side. Position is based on living troops, not a distant goal/commander.
-  move(board,squad,'advance',{x:frontline.center.x+(squad.type==='ranged'?3:0),y:frontline.center.y+5});return;
+  const frontX=movingThrough?(match.command.states?.get(frontline.squad.id)?.forwardX??frontline.center.x):frontline.center.x;
+  move(board,squad,'advance',{x:frontX+(movingThrough?4:features(squad).fire>.4?4:8),y:frontline.center.y});return;
  }
- const lagging=partners.some(p=>p.squad.id!==squad.id&&!p.squad.botRecovering&&distance(p.center,self.center)>13);
+ const lagging=!movingThrough&&partners.some(p=>p.squad.id!==squad.id&&!p.squad.botRecovering&&distance(p.center,self.center)>13);
  if(lagging){orderSquad(board,squad.id,'hold');return;}
- if(operation.mission==='flank'&&squad.order?.type==='flank'&&['flanking','moving'].includes(squad.order.phase))return;
- const lane=attackLane(squad,match.strategy),goal=self.center.x>53?{x:51,y:lane}:
-  self.center.x>20?{x:16,y:lane}:match.flags.A;
- move(board,squad,operation.mission==='flank'&&self.center.x>25?'flank':'advance',goal);
+ move(board,squad,tactical.action,tactical.goal);
 }
