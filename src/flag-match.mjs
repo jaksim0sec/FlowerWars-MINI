@@ -8,7 +8,7 @@ import {createRecruitmentCatalog} from './bot-doctrines.mjs';
 import {BotCommand} from './bot-command.mjs';
 
 export const PREPARATION_SECONDS=300;
-export const ARMY_LIMIT=200;
+export const ARMY_LIMIT=350;
 export const FLAG_HEALTH=1200;
 
 /** Simulation-only match controller. Decisions are staggered across squads;
