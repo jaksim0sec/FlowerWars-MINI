@@ -150,7 +150,7 @@ function paint(ctx,art,board,camera,width,height,dpr){
 export function drawTerrain(ctx,art,board,camera,width,height,dpr,interactive=false){
  let cache=caches.get(ctx);
  if(!cache){cache={canvas:document.createElement('canvas'),builds:0,tiles:0};caches.set(ctx,cache);}
- const pad=128,key=[board.width,board.height,board.terrainRevision,board.terrain,board.obstacleRevision,art.tiles,width,height,dpr];
+ const pad=128,key=[board.width,board.height,board.terrainRevision,board.terrain,board.obstacleRevision,art.tiles,width,height,dpr,camera.scale<.14?'far':'detailed'];
  const base=cache.camera;
  const covered=base&&-camera.x/camera.scale>=(-base.x-pad)/base.scale&&
   (width-camera.x)/camera.scale<=(width-base.x+pad)/base.scale&&
