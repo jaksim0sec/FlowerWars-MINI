@@ -83,3 +83,19 @@ test('normal movement exits an allied gate and breaches an opposing gate with re
  assert.equal(match.gateAt(x,50).health.current,0,'repeated strikes destroy the obstacle');
  assert.equal(invader.x,x+2,'the marching unit must pass through the breached section');
 });
+
+test('central field never inherits the decorative rear roads',()=>{
+ const board=new Board(),match=new FlagMatch(board,{count:24});
+ let road=0,open=0;
+ for(let y=20;y<80;y++)for(let x=32;x<68;x++){
+   if(board.terrain[y][x]==='road')road++;
+   if(!board.navigation.blocked(y*100+x))open++;
+ }
+ assert.equal(road,0,'roads should stay inside kingdoms, not cross the battlefield');
+ assert.ok(open>2100,'the open arena must stay traversable');
+ for(const team of ['A','B']){
+   const x=KINGDOM_WALLS[team];
+   for(let y of [2,12,21,39,60,78,88,97])
+    assert.equal(board.navigation.blocked(y*100+x),true,'side boundary stays enclosed');
+ }
+});
