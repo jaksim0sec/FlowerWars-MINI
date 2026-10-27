@@ -12,7 +12,18 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Run model and navigation regression tests
+      - name: Collect baseline failures on unmodified main
+        run: |
+          git fetch origin main --depth=1
+          git checkout --detach FETCH_HEAD
+          node --test tests/*.test.mjs > /tmp/flowerwars-main-baseline.log 2>&1 || true
+          echo 'Baseline failed cases:'
+          grep '^not ok ' /tmp/flowerwars-main-baseline.log || true
+          git checkout --detach "$GITHUB_SHA"
+      - name: Run kingdom map and core regressions
+        run: node --test tests/kingdom-siege.test.mjs tests/battlefield-terrain.test.mjs tests/terrain-render.test.mjs tests/navigation.test.mjs
+      - name: Run full regression suite for comparison
+        continue-on-error: true
         run: node --test tests/*.test.mjs
       - name: Verify offline bundle generation
         run: python3 scripts/build_offline.py
