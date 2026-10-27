@@ -130,6 +130,18 @@ export class FlagMatch{
     seen.add(key);return true;
    })){operation.anchor=anchor;return true;}
   }
+  // Dense 350-unit armies may exhaust the coarse 4-cell grid search.
+  // Scan remaining kingdom seats at tile resolution, only when needed.
+  const xs=Array.from({length:27},(_,i)=>73+i).sort((a,b)=>Math.abs(a-wanted.x)-Math.abs(b-wanted.x));
+  const ys=Array.from({length:96},(_,i)=>2+i).sort((a,b)=>Math.abs(a-wanted.y)-Math.abs(b-wanted.y));
+  for(const y of ys)for(const x of xs){
+   const anchor={x,y},seen=new Set();
+   if(footprints.every(p=>{
+    const px=x+p.x,py=y+p.y,key=py*this.board.width+px;
+    if(!this.board.inside(px,py)||!this.inTerritory('B',{x:px,y:py})||seen.has(key)||this.board.occupied(px,py)||this.board.navigation.blocked(key))return false;
+    seen.add(key);return true;
+   })){operation.anchor=anchor;return true;}
+  }
   return false;
  }
  inTerritory(team,p){return team==='A'?p.x<KINGDOM_WALLS.A:p.x>KINGDOM_WALLS.B;}
