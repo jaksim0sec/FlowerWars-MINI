@@ -12,6 +12,7 @@ import {createCharacter,equip,unequip} from './characters/engine.mjs';
 import {visibleCharacters} from './characters/catalog.mjs';
 import { Board, BOARD_COLUMNS, BOARD_ROWS, project, tileAt, zoomCamera as modelZoomCamera, fitBoardCamera } from './model.mjs';
 import { loadArtwork, render } from './render.mjs';
+import { objectiveFlagScale } from './match-overlay.mjs';
 
 const $ = id => document.getElementById(id);
 const canvas = $('board'), ctx = canvas.getContext('2d');
@@ -416,7 +417,8 @@ function pickFlag(p,tile){
   if(flag.health.current<=0)continue;
   if(tile?.x===flag.x&&tile?.y===flag.y)return flag;
   if(p){const v=project(flag.x,flag.y),x=v.x*camera.scale+camera.x,y=v.y*camera.scale+camera.y;
-   if(Math.abs(p.x-x)<=24&&p.y>=y-42&&p.y<=y+12)return flag;
+   const size=objectiveFlagScale(camera.scale);
+   if(p.x>=x-size*6&&p.x<=x+size*18&&p.y>=y-size*25&&p.y<=y+size*5+36)return flag;
   }
  }
  return null;

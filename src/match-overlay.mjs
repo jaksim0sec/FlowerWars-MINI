@@ -4,15 +4,17 @@ import {project} from './model.mjs';
 export const TEAM_COLORS={A:'#287de0',B:'#e3464d'};
 export const TEAM_MARKER_SCALE=.22;
 
-function drawFlagGlyph(ctx,team,{number=null,selected=false,large=false}={}){
- ctx.save();ctx.scale(large?1.9:1,large?1.9:1);
+export function objectiveFlagScale(scale){return Math.min(5,Math.max(1.15,1.9*Math.sqrt(scale/.12)));}
+
+function drawFlagGlyph(ctx,team,{number=null,selected=false}={}){
+ ctx.save();
  const color=TEAM_COLORS[team]||'#777';
  ctx.lineJoin='round';ctx.lineCap='round';
- ctx.fillStyle=large?'#fff9eddb':'#fff9edba';ctx.strokeStyle=color;ctx.lineWidth=large?1.35:1.1;
- ctx.beginPath();ctx.ellipse(0,1,large?10:5,large?4.5:2.5,0,0,Math.PI*2);ctx.fill();ctx.stroke();
- ctx.strokeStyle=large?'#594d42':color;ctx.lineWidth=1.8;
+ ctx.save();ctx.fillStyle=color;ctx.globalAlpha*=.45;
+ ctx.beginPath();ctx.ellipse(0,1,5,2,0,0,Math.PI*2);ctx.fill();ctx.restore();
+ ctx.strokeStyle=color;ctx.lineWidth=1.8;
  ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(0,-23);ctx.stroke();
- ctx.fillStyle=color;ctx.strokeStyle=selected?'#fff0a3':'#fff9ef';ctx.lineWidth=large?1.5:1.25;
+ ctx.fillStyle=color;ctx.strokeStyle=selected?'#fff0a3':'#fff9ef';ctx.lineWidth=1.1;
  ctx.beginPath();ctx.moveTo(0,-23);ctx.quadraticCurveTo(8,-22,16,-19);ctx.quadraticCurveTo(18,-18,16,-15);
  ctx.lineTo(14,-9);ctx.quadraticCurveTo(8,-12,0,-11);ctx.closePath();ctx.fill();ctx.stroke();
  if(number!==null){
@@ -41,10 +43,12 @@ export function drawMatchOverlay(ctx,match,scale){
  ctx.restore();ctx.restore();ctx.save();
  for(const [team,flag]of Object.entries(match.flags)){
   const p=project(flag.x,flag.y);ctx.save();ctx.translate(p.x,p.y);ctx.scale(1/scale,1/scale);
-  drawFlagGlyph(ctx,team,{large:true});
-  ctx.fillStyle=TEAM_COLORS[team];ctx.font='700 11px system-ui';ctx.textAlign='center';ctx.fillText(team==='A'?'내 깃발':'적 깃발',0,22);
+  const size=objectiveFlagScale(scale);
+  ctx.save();ctx.scale(size,size);drawFlagGlyph(ctx,team);ctx.restore();
+  const labelY=size*4+12;
+  ctx.fillStyle=TEAM_COLORS[team];ctx.font='700 11px system-ui';ctx.textAlign='center';ctx.fillText(team==='A'?'내 깃발':'적 깃발',0,labelY);
   const health=flag.health;
-  if(health){ctx.fillStyle='#4a352a66';ctx.fillRect(-23,28,46,5);ctx.fillStyle=team==='A'?'#327ca8':'#d74750';ctx.fillRect(-23,28,46*Math.max(0,health.current/health.max),5);ctx.font='600 9px system-ui';ctx.fillText(Math.ceil(health.current)+' / '+health.max,0,44);}
+  if(health){ctx.fillStyle='#4a352a66';ctx.fillRect(-23,labelY+6,46,4);ctx.fillStyle=TEAM_COLORS[team];ctx.fillRect(-23,labelY+6,46*Math.max(0,health.current/health.max),4);ctx.font='600 9px system-ui';ctx.fillText(Math.ceil(health.current)+' / '+health.max,0,labelY+24);}
   ctx.restore();
  }
  ctx.restore();
@@ -52,7 +56,6 @@ export function drawMatchOverlay(ctx,match,scale){
 
 const squadCenters=new WeakMap();
 export function drawSquadTeamFlags(ctx,board,scale,camera,width,height,selectedIds=[]){
- if(scale>=TEAM_MARKER_SCALE)return;
  let cache=squadCenters.get(board);
  if(!cache||cache.epoch!==board.byId||cache.liveCount!==board.cells.size||board.time>=cache.next){
   const points=[],previous=new Map(cache?.points.map(point=>[point.id,point]));
@@ -70,8 +73,9 @@ export function drawSquadTeamFlags(ctx,board,scale,camera,width,height,selectedI
  const selected=new Set(selectedIds);
  for(const center of cache.points){
   const p=project(center.x,center.y),sx=p.x*scale+camera.x,sy=p.y*scale+camera.y;
-  if(sx<-24||sx>width+24||sy<-24||sy>height+24)continue;
-  ctx.save();ctx.translate(p.x,p.y);ctx.scale(.75/scale,.75/scale);
+  const size=.75*Math.min(3,Math.max(1,Math.sqrt(scale/.1)));
+  if(sx<-size*24||sx>width+size*24||sy<-size*24||sy>height+size*24)continue;
+  ctx.save();ctx.translate(p.x,p.y);ctx.scale(size/scale,size/scale);
   const fall=center.deadAt===undefined?0:Math.min(1,(board.time-center.deadAt)/1.1);
   ctx.globalAlpha*=.65*(1-fall);
   if(fall)ctx.rotate((center.team==='A'?1:-1)*Math.PI/2*(1-(1-fall)**2));
