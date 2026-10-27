@@ -1,7 +1,7 @@
 import {squadsFor} from './unit-groups.mjs';
 import {planFormation,settleFormation,repairOccupiedSeats} from './formation-planner.mjs';
 import {coverPlan,moveUnderCover} from './commander-cover.mjs';
-import {reformFormation} from './formation-reform.mjs';
+import {reformFormation,pathTo as formationPath} from './formation-reform.mjs';
 import {unequip} from './characters/engine.mjs';
 
 export const SQUAD_ACTIONS={
@@ -201,7 +201,12 @@ function runOrder(board,s,replace=false){
  const occupiedGoals=new Set([...o.goals.values()].map(p=>p.x+','+p.y));
  for(const u of units){
   const goal=o.goals.get(u.id);
-  if(!goal||u.waitReason!=='traffic'||board.time-(u.waitSince??board.time)<.6||board.time<(o.nextPassingAt||0))continue;
+  if(o.passing.has(u.id)||!goal||u.waitReason!=='traffic'||board.time-(u.waitSince??board.time)<.6||board.time<(o.nextPassingAt||0))continue;
+  const route=formationPath(board,u,goal);
+  if(route===undefined)continue;
+  if(route?.length&&board.move(u.id,goal.x,goal.y,{replace:true,direct:true,plannedPath:route})){
+   o.nextPassingAt=board.time+.4;continue;
+  }
   const directions=[[1,0],[-1,0],[0,1],[0,-1]];
   let opened=false;
   for(const [dx,dy]of [[0,0],...directions]){
@@ -210,9 +215,9 @@ function runOrder(board,s,replace=false){
    if(blocker.command&&(blocker.command.type!=='move'||blocker.waitReason!=='traffic'))continue;
    for(const [bx,by]of directions){
     const x=blocker.x+bx,y=blocker.y+by;
-    if(!board.inside(x,y)||board.occupied(x,y)||board.navigation.blocked(y*board.width+x)||occupiedGoals.has(x+','+y))continue;
+    if(!board.inside(x,y)||board.occupied(x,y)||board.navigation.blocked(y*board.width+x)||occupiedGoals.has(x+','+y)||Math.abs(x-goal.x)+Math.abs(y-goal.y)<=1)continue;
     if(board.move(blocker.id,x,y,{replace:true,direct:true})){
-     o.passing.set(blocker.id,{for:u.id,until:board.time+1.5});opened=true;break;
+     o.passing.set(blocker.id,{for:u.id});opened=true;break;
     }
    }
    if(opened)break;
@@ -223,7 +228,7 @@ function runOrder(board,s,replace=false){
  board.batchCommands(()=>{for(const u of units){
    const passing=o.passing.get(u.id);
    if(passing){const waiting=board.unit(passing.for),goal=o.goals.get(passing.for);
-    if(board.time<passing.until&&waiting&&goal&&(waiting.x!==goal.x||waiting.y!==goal.y))continue;
+    if(waiting?.health.current>0&&goal&&(waiting.step||waiting.x!==goal.x||waiting.y!==goal.y))continue;
     o.passing.delete(u.id);
    }
    const p=o.goals.get(u.id),at=p&&u.x===p.x&&u.y===p.y&&!u.step;

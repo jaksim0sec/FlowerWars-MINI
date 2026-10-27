@@ -1,7 +1,7 @@
 const distance=(a,b)=>Math.abs(a.x-b.x)+Math.abs(a.y-b.y);
 // Only one reforming soldier searches/moves at a time. Search uses the existing
 // shared navigation budget and treats stationary teammates as real obstacles.
-function pathTo(board,unit,goal){
+export function pathTo(board,unit,goal){
  const nav=board.navigation,start=unit.y*board.width+unit.x,end=goal.y*board.width+goal.x;
  if(board.occupied(goal.x,goal.y,unit.id)||nav.blocked(end))return null;
  if(start!==end&&!nav.neighbors(end).some(n=>n>=0&&!nav.blocked(n)&&!board.occupied(n%board.width,Math.floor(n/board.width),unit.id)))return null;

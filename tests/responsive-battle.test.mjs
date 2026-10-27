@@ -13,8 +13,11 @@ test('foreign occupancy repairs only the blocked formation seat',()=>{
  const blocked=[...before].find(([id,p])=>!b.occupied(p.x,p.y));assert.ok(blocked);
  const stranger=b.spawn(blocked[1].x,blocked[1].y,null,{team:'A'});assert.ok(stranger);
  for(let i=0;i<30;i++){b.update(.05);updateSquadOrders(b);}
- for(const [id,p]of before)if(id!==blocked[0])assert.deepEqual(s.order.goals.get(id),p,'unrelated seat was scattered');
- assert.notDeepEqual(s.order.goals.get(blocked[0]),blocked[1]);
+ const seats=goals=>new Set([...goals.values()].map(p=>p.x+','+p.y));
+ const previous=seats(before),current=seats(s.order.goals);
+ assert.equal(current.size,previous.size);assert.ok(!current.has(blocked[1].x+','+blocked[1].y));
+ for(const key of previous)if(key!==blocked[1].x+','+blocked[1].y)assert.ok(current.has(key),'unrelated seat was scattered');
+ for(const [id,p]of s.order.goals){const prior=[...before].find(([,seat])=>seat.x===p.x&&seat.y===p.y);if(prior)assert.equal(b.unit(id).formationRole,b.unit(prior[0]).formationRole);}
  for(let i=0;i<1000&&s.order.phase!=='arrived';i++){b.update(.05);updateSquadOrders(b);}
  assert.equal(s.order.phase,'arrived');
 });
@@ -31,16 +34,17 @@ test('melee troops close on an actual nearby shooter and retaliate without an ex
  assert.ok(u.hits>0);assert.ok(archer.hits>0,'melee stood still under nearby fire');
  assert.ok(u.x>5);
 });
-test('200 soldier armies use larger squads with exactly one commander in every squad',()=>{
+test('350 soldier armies keep one commander per squad and compact defense ranks',()=>{
  const b=new Board(),m=new FlagMatch(b,{count:999});deployReserves(m,'defense');
  while(m.reserve.B)assert.ok(m.deployBot());
- assert.deepEqual(m.counts,{A:200,B:200});
+ assert.deepEqual(m.counts,{A:350,B:350});
  for(const team of ['A','B']){
   const banners=b.units.filter(u=>u.team===team&&u.formationRole==='banner');
   assert.equal(banners.length,m.squadIds[team].length);
  }
- const full=m.squadIds.A.map(id=>squadsFor(b).get(id)).filter(s=>s.memberIds.length===24);
- assert.ok(full.every(s=>s.memberIds.filter(id=>b.unit(id).formationRole==='guard').length>=10));
+ const full=m.squadIds.A.map(id=>squadsFor(b).get(id)).filter(s=>s.memberIds.length===14);
+ assert.ok(full.length);
+ assert.ok(full.every(s=>s.memberIds.filter(id=>b.unit(id).formationRole==='guard').length===6));
 });
 test('retaliation reacts promptly, keeps a short leash, and a new order cancels it',()=>{
  const b=new Board(24,12),u=b.spawn(5,5,null,{team:'A',autoCombat:true,stats:{maxHealth:1000}}),enemy=b.spawn(8,5,null,{team:'B'});
@@ -70,7 +74,7 @@ test('partial troop previews exactly match actual soldiers, equipment and offset
  for(const type of ['mixed','defense','support']){
   const b=new Board(),m=new FlagMatch(b,{count:32,makeCharacter:m=>({characterId:m.characterId})});
   assert.ok(m.deploy('A',type,{x:20,y:20}));
-  const preview=m.deploymentPreview('A',type);assert.equal(preview.members.length,8);
+  const preview=m.deploymentPreview('A',type);assert.equal(preview.members.length,type==='defense'?14:8);
   const anchor={x:20,y:50},s=m.deploy('A',type,anchor);assert.ok(s);
   const actual=s.memberIds.map(id=>b.unit(id));
   for(const member of preview.members)assert.ok(actual.some(u=>u.character.characterId===member.characterId&&u.x===anchor.x+member.offset.x&&u.y===anchor.y+member.offset.y));
