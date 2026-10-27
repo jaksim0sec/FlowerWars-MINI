@@ -85,9 +85,6 @@ export function render(ctx, art, board, view, camera, width, height, dpr, option
       const pose=cachedPose(art.catalog,unit.character,board.time,camera.scale);if(pose.computed)posedUnits++;
       drawCharacter(ctx,art.catalog,unit.character,board.time,{layout:pose.layout});
     } else drawWarrior(ctx, art, unit, board.time);
-    if(unit.team&&unit.state!=='death'&&camera.scale>=TEAM_MARKER_SCALE){
-      const r=Math.min(8,Math.max(4,2.5/camera.scale));ctx.beginPath();ctx.arc(0,-136,r,0,Math.PI*2);ctx.fillStyle=TEAM_COLORS[unit.team];ctx.fill();ctx.strokeStyle='#fff9ef';ctx.lineWidth=1.5;ctx.stroke();
-    }
     if (unit.id === view.selected && unit.state!=='death') {
       const y = -123 + Math.sin(board.time * 3) * 2;
       ctx.fillStyle = '#fff1a3'; ctx.beginPath(); ctx.moveTo(-4, y); ctx.lineTo(4, y); ctx.lineTo(0, y + 5); ctx.fill();

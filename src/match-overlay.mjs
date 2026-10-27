@@ -41,8 +41,8 @@ export function drawSquadTeamFlags(ctx,board,scale,camera,width,height,selectedI
  for(const center of cache.points){
   const p=project(center.x,center.y),sx=p.x*scale+camera.x,sy=p.y*scale+camera.y;
   if(sx<-24||sx>width+24||sy<-24||sy>height+24)continue;
-  ctx.save();ctx.translate(p.x,p.y);ctx.scale(1/scale,1/scale);
-  ctx.strokeStyle=selected.has(center.id)?'#fff0a3':'#fff9ef';ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.fillStyle=TEAM_COLORS[center.team]||'#777';
+  ctx.save();ctx.translate(p.x,p.y);ctx.scale(.75/scale,.75/scale);ctx.globalAlpha*=.65;
+  ctx.strokeStyle=selected.has(center.id)?'#fff0a3':'#fff9ef';ctx.lineWidth=1.5;ctx.lineJoin='round';ctx.fillStyle=TEAM_COLORS[center.team]||'#777';
   ctx.beginPath();ctx.moveTo(-6,4);ctx.lineTo(-6,-18);ctx.lineTo(10,-15);ctx.lineTo(10,-5);ctx.lineTo(-6,-7);ctx.closePath();ctx.fill();ctx.stroke();
   ctx.restore();
  }
