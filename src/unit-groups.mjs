@@ -15,18 +15,18 @@ const types={
  mixed:['banner-bearer',...Array(6).fill('scout'),'shield-guard',...Array(3).fill('archer'),'clover-mage']
 };
 const fullSquads={
- defense:['banner-bearer',...Array(17).fill('shield-guard'),...Array(4).fill('scout'),...Array(2).fill('clover-mage')],
+ defense:['banner-bearer',...Array(6).fill('shield-guard'),...Array(6).fill('scout'),'clover-mage'],
  ranged:['banner-bearer',...Array(14).fill('archer'),...Array(7).fill('shield-guard'),...Array(2).fill('clover-mage')],
  support:['banner-bearer',...Array(5).fill('clover-mage'),...Array(6).fill('scholar'),...Array(8).fill('shield-guard'),...Array(4).fill('scout')]
 };
 export const SPEAR_BATTLE={damageMultiplier:2,visionRange:4,speedMultiplier:1.5,attackPeriod:2.4,impactTime:.07,activeDuration:.32,movingPoise:true,charge:true,chargeDistance:4,chargeDamageMultiplier:3};
 const roles={'banner-bearer':'banner','scout':'scout','shield-guard':'guard','archer':'archer','clover-mage':'healer','scholar':'support'};
-export function availableSquadBlueprints(){return Object.keys(types).map(type=>createFormationGroup(type==='assault'?6:24,'squad','',type));}
+export function availableSquadBlueprints(){return Object.keys(types).map(type=>createFormationGroup(type==='assault'?6:type==='defense'?14:24,'squad','',type));}
 export function createFormationGroup(count=8,kind='squad',name='',type='mixed'){
  count=Math.max(2,Math.min(128,Math.floor(Number(count)||8)));kind=kind==='platoon'?'platoon':'squad';
- const formation=armyFormation(count),center=Math.floor(formation.rows/2),squadSize=kind==='squad'&&count===24?24:12;
+ const formation=armyFormation(count),center=Math.floor(formation.rows/2),squadSize=kind==='squad'&&(count===24||count===fullSquads[type]?.length)?count:12;
  if((type!=='mixed'||squadSize===24)&&types[type])for(let i=0;i<formation.slots.length;i++){
-   const id=squadSize===24?(fullSquads[type]?.[i]??(i===0?'banner-bearer':types[type][1+(i-1)%11])):types[type][i%12];formation.slots[i]={...formation.slots[i],characterId:id,role:roles[id],weapon:undefined,stats:undefined};
+   const id=(squadSize===24||count===fullSquads[type]?.length)?(fullSquads[type]?.[i]??(i===0?'banner-bearer':types[type][1+(i-1)%11])):types[type][i%12];formation.slots[i]={...formation.slots[i],characterId:id,role:roles[id],weapon:undefined,stats:undefined};
  }
  if(type!=='defense'&&!(squadSize===24&&fullSquads[type])){
   let shields=0;

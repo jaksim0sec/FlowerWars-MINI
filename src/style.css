@@ -325,9 +325,7 @@ body{display:block;}
 .squad-portrait{position:relative;display:flex;align-items:center;justify-content:center;width:46px;height:43px;flex:0 0 auto;}
 .squad-avatar{display:block;width:40px;height:40px;object-fit:contain;background:transparent;border:0;border-radius:0;box-shadow:none;}
 .squad-card.is-leader-down .squad-avatar{filter:grayscale(1);opacity:.56;}
-.squad-card.is-selected .squad-portrait::after{
- content:"";position:absolute;inset:-2px 1px;border:2px solid #b28330;border-radius:50%;pointer-events:none;
-}
+.squad-card.is-selected .squad-portrait::after{content:none;}
 .squad-card-team,.squad-card-team.team-a,.squad-card-team.team-b{
  position:absolute;right:-11px;bottom:-1px;z-index:1;border-radius:5px;
  font-size:8px;font-weight:800;padding:2px 4px;line-height:1.1;
@@ -579,7 +577,7 @@ body{display:block;}
 .quick-orders button>.icon-label{font-size:10px;line-height:1.2;}
 .selection-actions button{border-radius:16px;}
 .platoon-fold{border-radius:50%;}
-.squad-card.is-selected .squad-portrait{border-radius:50%;background:#f2d38c66;}
+.squad-card.is-selected .squad-portrait{border-radius:0;background:none;}
 @media(max-width:700px){.quick-orders button{min-height:65px;}.squad-tools{bottom:calc(274px + env(safe-area-inset-bottom));}}
 
 #match-hud[hidden],#match-result[hidden]{display:none!important;}
