@@ -9,6 +9,9 @@ export function healingOptions(options,character){
 export function tryHeal(board,actor){
  const h=actor.healing;
  if(!h||!actor.team||actor.step||!['idle','walk'].includes(actor.state)||board.time<h.nextAt)return false;
+ // Finish the assigned march before stopping to cast; repeated healing must
+ // not strand medics behind their squad. Healing resumes at the destination.
+ if(actor.command?.type==='move'&&(actor.x!==actor.command.x||actor.y!==actor.command.y))return false;
  let best=null;
  for(const id of board.spatial.candidates(actor.x,actor.y,h.range)){
   const u=board.unit(id);
