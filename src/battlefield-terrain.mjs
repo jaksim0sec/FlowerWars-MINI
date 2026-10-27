@@ -47,7 +47,7 @@ export function createBattlefield(board){
   let type='grass',atWall=x===KINGDOM_WALLS.A||x===KINGDOM_WALLS.B;
   if(atWall)type=y<GATE_FROM||y>=GATE_TO?(y<13||y>=87?'pond':'wall'):'gate';
   else if(pond(x,y))type='pond';
-  else if(kingdomRoad(x,y)||x>27&&x<72&&Math.abs(y-50-Math.sin(x/9)*2)<1.8)type='road';
+  else if(kingdomRoad(x,y)||x>27&&x<72&&Math.abs(y-50-Math.sin(Math.min(x,99-x)/9)*2)<1.8)type='road';
   else if(grove(x,y))type='grove';
   board.terrain[y][x]=type;
   if(type==='pond'||type==='wall')board.obstacles.set(y*board.width+x,{kind:type,blocked:true});
