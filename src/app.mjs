@@ -282,7 +282,7 @@ function updateMatchHud(){
  for(const id of ['group-place','summon','board-resize','combat-enable','combat-disable','group-team','terrain'])$(id).disabled=!!m;
  if(!m||m.phase!=='finished')delete $('match-result').dataset.outcome;
  if(!m)return;
- text('match-phase',m.phase==='preparation'?'준비':m.phase==='battle'?'깃발 공성전':'전투 종료');
+ text('match-phase',m.phase==='preparation'?'준비':m.phase==='battle'?'왕국 공성전':'전투 종료');
  const seconds=Math.ceil(m.remaining);text('match-timer',m.phase==='preparation'?Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0'):'');
  text('match-armies',m.phase==='preparation'?`나 ${m.counts.A}/${m.limit} · 적 ${m.counts.B}/${m.limit}`:`나 ${m.counts.A} · 적 ${m.counts.B}`);
  text('deployment-reserve',`예비 ${m.reserve.A}명 · ${Math.min(m.squadSize,m.reserve.A)}명씩 배치`);
