@@ -52,3 +52,20 @@ test('cooperative movement is deterministic for identical seeds and commands',()
  const execute=()=>{const {b,root}=lane();b.move(root.id,7,1,{direct:true});const frames=[];for(let i=0;i<200;i++){b.update(.05);frames.push(b.units.map(u=>[u.x,u.y,u.step?.x??null,u.step?.y??null]));}return frames;};
  assert.deepEqual(execute(),execute());
 });
+test('a completed formation opening can extend to a new blocker along the approach',()=>{
+ const b=new Board(12,6),root=b.spawn(1,2,null,{team:'A'}),near=b.spawn(2,2,null,{team:'A'}),far=b.spawn(8,2,null,{team:'A'});
+ for(let x=0;x<5;x++){b.setObstacle(x,1,{blocked:true});b.setObstacle(x,3,{blocked:true});}b.setObstacle(0,2,{blocked:true});
+ b.move(root.id,10,2,{direct:true});const command=root.command,goal={x:10,y:2},order={goals:new Map([[root.id,goal]])},squad={order};
+ assert.ok(b.navigation.requestCooperation(root,far,{squad,order,goal}));
+ b.navigation.serviceCooperation(far);b.update(.5);b.navigation.serviceCooperation(far);
+ assert.ok(root.remoteCourtesy);root.coopRetryAt=0;
+ assert.ok(b.navigation.requestCooperation(root,near));
+ assert.ok(root.remoteCourtesy.records.some(r=>r.id===near.id),'new approach blocker must be included, not silently ignored');
+ assert.equal(root.command,command);assert.equal(b.navigation.cooperations.size,1);
+});
+test('an actor awaiting its own formation opening cannot become another chain helper',()=>{
+ const b=new Board(12,6),a=b.spawn(1,2,null,{team:'A'}),helper=b.spawn(2,2,null,{team:'A'}),other=b.spawn(4,2,null,{team:'A'});
+ const goal={x:9,y:2},order={goals:new Map([[a.id,goal]])},squad={order};
+ assert.ok(b.navigation.requestCooperation(a,helper,{squad,order,goal}));
+ assert.equal(b.navigation.canYield(a,other,true),false,'do not create dependencies between two cooperative roots');
+});

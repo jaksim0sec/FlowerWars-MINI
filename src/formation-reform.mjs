@@ -25,7 +25,7 @@ export function reformFormation(board,squad,units,lead){
  if(o.goals.size<units.length){o.phase='blocked';o.dirty=true;o.reformRetryAt=board.time+1;return;}
  if(o.formed===o.total){o.phase='arrived';o.activeReformId=null;return;}
  o.phase='forming';
- relayFormationVacancies(board,units,o.goals);
+ relayFormationVacancies(board,units,o.goals,lead?.id);
  const occupancy=units.map(u=>u.id+':'+u.x+','+u.y).join(';');
  if(o.reformOccupancy!==occupancy)for(const u of units)u.reformSearch=null;
  if(o.reformOccupancy!==occupancy||board.time>=(o.reformRetryAt||0)){

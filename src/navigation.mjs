@@ -1,3 +1,4 @@
+import {SearchQueue} from './search-queue.mjs';
 import {squadsFor} from './unit-groups.mjs';
 import {mix} from './decision.mjs';
 import {tryHeal} from './healing.mjs';
@@ -10,23 +11,35 @@ const LOCAL_LIMIT = 96, CACHE_LIMIT = 64, FIELD_BYTES = 4*1024*1024;
 
 export class Navigation {
   constructor(board) {
-    this.board=board; this.fields=new Map(); this.pending=null; this.cursor=0;
+    this.board=board; this.fields=new Map();this.routeCache=new Map();this.routeCells=0; this.pending=null; this.cursor=0;
+    this.staticEdges=new Int32Array(board.width*board.height*4);this.staticEdgeVersions=new Uint32Array(board.width*board.height);
     this.remaining=SEARCH_BUDGET;this.cooperations=new Set();this.occupancyVersions=new Uint32Array(board.width*board.height);this.congestion=new Map();
-    this.stats={fieldBuilds:0,cacheHits:0,detours:0,expansions:0,lastExpansions:0,cooperativeSteps:0,cooperativeRequests:0,cooperativeFailures:0,sharedBuilds:0,sharedHits:0,staticBuilds:0};
+    this.stats={fieldBuilds:0,cacheHits:0,detours:0,expansions:0,lastExpansions:0,cooperativeSteps:0,cooperativeRequests:0,cooperativeFailures:0,sharedBuilds:0,sharedHits:0,staticBuilds:0,quietHits:0,staticCacheHits:0};
   }
-  invalidate(){this.fields.clear();this.pending=null;}
+  invalidate(){this.fields.clear();this.routeCache.clear();this.routeCells=0;this.pending=null;}
   index(x,y){return y*this.board.width+x;}
   coords(index){return {x:index%this.board.width,y:Math.floor(index/this.board.width)};}
   neighbors(index,unit=null) {
     const w=this.board.width,h=this.board.height,x=index%w,y=Math.floor(index/w);
-    // Actor searches break equal paths relative to their destination. A fixed
-    // east-first order gives opposing armies different detours and search-budget
-    // success rates, even when their start positions and goals are symmetric.
+    const orientation=this.orientation(unit);
+    const east=x+1<w?index+1:-1,west=x>0?index-1:-1;return orientation===-1?[west,y+1<h?index+w:-1,east,y>0?index-w:-1]:[east,y+1<h?index+w:-1,west,y>0?index-w:-1];
+  }
+  orientation(unit){
     const target=unit?.command?.type==='attack'?this.board.unit(unit.command.target):unit?.command;
     const direction=target?Math.sign(target.x-unit.x):0;
     const approach=unit?.command?.flow==='east'?1:unit?.command?.flow==='west'?-1:0;
-    const orientation=direction||approach||this.board.navigationOrientation;
-    const east=x+1<w?index+1:-1,west=x>0?index-1:-1;return orientation===-1?[west,y+1<h?index+w:-1,east,y>0?index-w:-1]:[east,y+1<h?index+w:-1,west,y>0?index-w:-1];
+    return direction||approach||this.board.navigationOrientation;
+  }
+  staticAdjacency(cell){
+    const base=cell*4,version=this.board.obstacleRevision+1;
+    if(this.staticEdgeVersions[cell]!==version){
+      const neighbors=this.neighbors(cell);
+      // Cache canonical east/south/west/north order independently of actors.
+      if(this.board.navigationOrientation===-1)[neighbors[0],neighbors[2]]=[neighbors[2],neighbors[0]];
+      for(let i=0;i<4;i++){const n=neighbors[i];this.staticEdges[base+i]=n>=0&&!this.blocked(n)?n:-1;}
+      this.staticEdgeVersions[cell]=version;
+    }
+    return base;
   }
   blocked(index){return this.board.obstacles.get(index)?.blocked!==false&&this.board.obstacles.has(index);}
   touch(x,y){
@@ -120,6 +133,13 @@ export class Navigation {
     } else {horizontal(x);vertical(y);}
     return guide;
   }
+  guideProgress(u){
+    let cache=u.detourPotential;
+    if(!cache||cache.guide!==u.guide||cache.length!==u.guide.length){
+      cache=u.detourPotential={guide:u.guide,length:u.guide.length,map:new Map(u.guide.map((cell,i)=>[cell,u.guide.length-i]))};
+    }
+    return cache.map;
+  }
   detour(u,field,start) {
     const queue=[start],previous=new Map([[start,-1]]),distance=field.at(start);
     for(let head=0;head<queue.length&&head<LOCAL_LIMIT&&this.remaining>0;head++) {
@@ -139,7 +159,7 @@ export class Navigation {
     // Local rejoining cannot see around a long stationary rank. Continue a
     // wider occupancy-aware search across ticks, charging the shared budget.
     const key=`${start}:${u.guideKey}`;
-    if(u.recovery?.key!==key)u.recovery={key,queue:[start],head:0,previous:new Map([[start,-1]]),goals:new Set(u.guide)};
+    if(u.recovery?.key!==key)u.recovery={key,queue:[start],head:0,previous:new Map([[start,-1]]),goals:new Set(u.guide),blockers:new Map(),overflow:false};
     const search=u.recovery;let work=0;
     while(search.head<search.queue.length&&this.remaining>0&&work++<256){
       const cell=search.queue[search.head++];this.consume();
@@ -148,10 +168,35 @@ export class Navigation {
         while(n!==start){path.push(this.coords(n));n=search.previous.get(n);}
         u.recovery=null;this.stats.detours++;return path.reverse();
       }
-      for(const n of this.neighbors(cell,u))if(this.free(n,u)&&!search.previous.has(n)&&search.previous.size<8192){search.previous.set(n,cell);search.queue.push(n);}
+      for(const n of this.neighbors(cell,u)){
+        if(this.free(n,u)){
+          if(!search.previous.has(n)&&search.previous.size<8192){search.previous.set(n,cell);search.queue.push(n);}
+        }else if(n>=0&&!this.blocked(n)){
+          const id=this.board.cells.get(n)??this.board.reservations.get(n),actor=this.board.unit(id);
+          if(actor&&!search.blockers.has(id)){
+            if(search.blockers.size<32)search.blockers.set(id,{id,x:actor.x,y:actor.y,step:actor.step});else search.overflow=true;
+          }
+        }
+      }
     }
-    if(search.head>=search.queue.length){u.recovery=null;u.recoveryRetryAt=this.board.time+1;}
+    if(search.head>=search.queue.length){
+      const formation=squadsFor(this.board).get(u.squadId)?.order;
+      const fixed=!formation||[...search.blockers.values()].every(record=>{const actor=this.board.unit(record.id);return actor&&(actor.team!==u.team||actor.combat.holdPosition);});
+      if(fixed&&search.blockers.size&&search.previous.size<8192)u.recoveryFailure={key,guide:u.guide,guideLength:u.guide.length,blockers:[...search.blockers.values()],until:search.overflow?this.board.time+1:Infinity};
+      u.recovery=null;u.recoveryRetryAt=this.board.time+1;
+    }
     return null;
+  }
+  quietBlockage(u,start){
+    const failed=u.recoveryFailure;
+    if(!failed)return false;
+    // Formation members may be reassigned or cooperatively moved without a
+    // cell change. Such blockers are actionable, not a quiet blockade.
+    if(squadsFor(this.board).get(u.squadId)?.order&&failed.blockers.some(record=>this.canYield(this.board.unit(record.id),u,true)))return false;
+    if(failed.guide!==u.guide||failed.guideLength!==u.guide.length||failed.key!==`${start}:${u.guideKey}`||this.board.time>=failed.until||failed.blockers.some(record=>{
+      const actor=this.board.unit(record.id);return !actor||actor.health.current<=0||actor.x!==record.x||actor.y!==record.y||actor.step!==record.step;
+    })){u.recoveryFailure=null;u.recoveryRetryAt=0;return false;}
+    this.stats.quietHits++;return true;
   }
   wait(u,reason,delay=.24) {
     u.state='idle';u.path=[];u.waitReason=reason;u.waitSince??=this.board.time;
@@ -159,31 +204,43 @@ export class Navigation {
   }
   staticRoute(u,x,y,key){
     const start=this.index(u.x,u.y),goal=this.index(x,y);
+    const cacheKey=`${start}:${goal}:${this.neighbors(start,u).join(',')}:${this.board.obstacleRevision}`;
+    if(!u.congestionReplan){
+      const cached=this.routeCache.get(cacheKey);
+      if(cached){this.routeCache.delete(cacheKey);this.routeCache.set(cacheKey,cached);u.staticSearch=null;this.stats.staticCacheHits++;return cached.slice();}
+    }
     const heuristic=cell=>Math.abs(cell%this.board.width-x)+Math.abs(Math.floor(cell/this.board.width)-y);
-    if(u.staticSearch?.key!==key||u.staticSearch.start!==start){this.stats.staticBuilds++;u.staticSearch={key,start,congested:!!u.congestionReplan,open:[{cell:start,g:0,f:heuristic(start)}],cost:new Map([[start,0]]),previous:new Map()};}
+    if(u.staticSearch?.key!==key||u.staticSearch.start!==start){this.stats.staticBuilds++;u.staticSearch={key,start,congested:!!u.congestionReplan,orientation:this.orientation(u),open:new SearchQueue([{cell:start,g:0,f:heuristic(start)}]),cost:new Map([[start,0]]),previous:new Map()};}
     const search=u.staticSearch;let count=0;
     while(search.open.length&&this.remaining>0&&count++<128){
-      const current=search.open.shift();if(current.g!==search.cost.get(current.cell))continue;
+      const current=search.open.pop();if(current.g!==search.cost.get(current.cell))continue;
       this.consume();
       if(current.cell===goal){
         const path=[];let cell=goal;while(cell!==start){path.push(cell);cell=search.previous.get(cell);}
-        u.staticSearch=null;return path.reverse();
+        u.staticSearch=null;path.reverse();
+        if(!search.congested&&path.length<=65536){
+          while(this.routeCache.size&&(this.routeCache.size>=128||this.routeCells+path.length>65536)){
+            const oldest=this.routeCache.keys().next().value;this.routeCells-=this.routeCache.get(oldest).length;this.routeCache.delete(oldest);
+          }
+          this.routeCache.set(cacheKey,path.slice());this.routeCells+=path.length;
+        }
+        return path;
       }
-      for(const n of this.neighbors(current.cell,u)){
-        if(n<0||this.blocked(n))continue;
+      const adjacent=this.staticAdjacency(current.cell);
+      for(let k=0;k<4;k++){
+        const slot=search.orientation<0&&(k===0||k===2)?2-k:k,n=this.staticEdges[adjacent+slot];
+        if(n<0)continue;
         const g=current.g+1+(search.congested?this.congestionAt(n,u)*.2:0);if(g>=(search.cost.get(n)??Infinity))continue;
         search.cost.set(n,g);search.previous.set(n,current.cell);
         const node={cell:n,g,f:g+heuristic(n)};
-        // Stable A* priority, preferring progress when estimates tie.
-        let low=0,high=search.open.length;while(low<high){const mid=(low+high)>>1,v=search.open[mid];if(v.f<node.f||v.f===node.f&&v.g>=node.g)low=mid+1;else high=mid;}
-        search.open.splice(low,0,node);
+        search.open.push(node);
       }
     }
     if(!search.open.length){u.staticSearch=null;return false;}
     return null;
   }
-  sharedSquadGuide(u,x,y,key){
-    const shared=u.squadRoute,b=this.board;
+  sharedSquadGuide(u,x,y,key,shared=u.squadRoute){
+    const b=this.board;
     if(!shared||u.congestionReplan)return undefined;
     if(shared.revision!==b.obstacleRevision){shared.path=null;shared.planner=null;shared.lanes=null;shared.revision=b.obstacleRevision;}
     if(!shared.planner){shared.planner={...shared.origin,command:{type:'move',...shared.target}};this.stats.sharedBuilds++;}
@@ -254,7 +311,7 @@ export class Navigation {
         if(route===undefined)route=this.staticRoute(u,x,y,routeKey);
         if(route===false){b.cancelCommand(u);u.waitReason='unreachable';return;}
         if(!route){this.wait(u,'planning',NAV_INTERVAL);return;}
-        u.guide=route;u.guideKey=routeKey;u.route=[];u.congestionReplan=false;
+        u.guide=route;u.guideKey=routeKey;u.route=[];u.recovery=null;u.recoveryFailure=null;u.congestionReplan=false;
       }else{
       const field=this.field(x,y,command.type==='attack'?{shape:u.combat.shape,range:u.combat.range,lineOfSight:u.combat.lineOfSight}:false);
       if(!field||field.at(start)<0) {
@@ -271,7 +328,7 @@ export class Navigation {
         if(next==null)break;
         u.guide.push(next);cell=next;
       }
-      u.guideKey=routeKey;u.route=[];
+      u.guideKey=routeKey;u.route=[];u.recovery=null;u.recoveryFailure=null;
       }
     }
     const reached=u.guide.indexOf(start);
@@ -300,11 +357,15 @@ export class Navigation {
     if(!next) {
       const waited=b.time-(u.waitSince??b.time);
       const marching=!!u.marchStepTime&&blocker?.team===u.team;
+      if(this.quietBlockage(u,start)){
+        if(this.requestCooperation(u,blocker))return;
+        this.wait(u,'traffic',.24);return;
+      }
       // Let a moving neighbor finish before spending any local search budget.
       if(!blocker?.command||waited>=(marching?Math.max(1.5,u.movement.waitBeforeDetour):u.movement.waitBeforeDetour)) {
         // A detour must rejoin a future route cell, never its origin. This
         // prevents sideways oscillation and preserves static obstacle guidance.
-        const potential=new Map(u.guide.map((cell,i)=>[cell,u.guide.length-i]));
+        const potential=this.guideProgress(u);
         const route=u.recovery?null:this.detour(u,{at:cell=>cell===start?u.guide.length+1:(potential.get(cell)??-1)},start);
         if(route?.length){next=route.shift();u.route=route;}
       }
@@ -371,6 +432,7 @@ export class Navigation {
     return true;
   }
   canYield(u,root,formation=false){
+    if(u?.remoteCourtesy)return false;
     // A completed destination is an anchor, not an unowned vacancy. Ordinary
     // traffic must go around it; only the owning formation may temporarily
     // open that seat and then restore its role assignment.
@@ -393,7 +455,11 @@ export class Navigation {
   requestCooperation(root,blocker,remote=null){
     const b=this.board;
     if(root.step||root.strike||!['idle','walk'].includes(root.state))return false;
-    if(root.courtesy||root.remoteCourtesy&&(!remote||root.remoteCourtesy.cursor>=0))return true;
+    if(root.courtesy)return true;
+    if(root.remoteCourtesy){
+      if(root.remoteCourtesy.cursor>=0)return true;
+      remote??=root.remoteCourtesy.remote;
+    }
     if(this.remaining<32||!this.canYield(blocker,root,!!remote)||this.cooperations.size>=16||b.time<(root.coopRetryAt||0))return false;
     if(!remote&&root.command?.x===blocker.x&&root.command?.y===blocker.y&&blocker.lastMoveGoal?.x===blocker.x&&blocker.lastMoveGoal?.y===blocker.y)return false;
     root.coopRetryAt=b.time+.6;this.stats.cooperativeRequests++;

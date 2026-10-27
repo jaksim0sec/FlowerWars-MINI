@@ -90,7 +90,7 @@ export class Board {
     this.width=width;this.height=height;this.terrain=Array.from({length:height},(_,y)=>Array.from({length:width},(_,x)=>terrain[y]?.[x]||'grass'));
     this.obstacles=new Map();for(const[n,info]of obstacles){const p={x:n%oldWidth,y:Math.floor(n/oldWidth)};if(inside(p))this.obstacles.set(p.y*width+p.x,info);}
     this.cells=new Map();this.reservations=new Map();this.spatial=new SpatialIndex(width,height);this.navigation=new Navigation(this);this.navClock=0;
-    for(const u of this.units){u.guide=[];u.guideKey=null;u.route=[];if(u.health.current<=0)continue;this.cells.set(u.y*width+u.x,u.id);if(u.step)this.reservations.set(u.step.y*width+u.step.x,u.id);this.spatial.add(u);this.navigation.touch(u.x,u.y);}
+    for(const u of this.units){u.guide=[];u.detourPotential=null;u.guideKey=null;u.route=[];if(u.health.current<=0)continue;this.cells.set(u.y*width+u.x,u.id);if(u.step)this.reservations.set(u.step.y*width+u.step.x,u.id);this.spatial.add(u);this.navigation.touch(u.x,u.y);}
     this.terrainRevision++;this.obstacleRevision++;return true;
   }
   setAutoCombat(enabled=true){
@@ -122,7 +122,7 @@ export class Board {
     if(info)this.obstacles.set(index,{...info});else this.obstacles.delete(index);
     this.obstacleRevision++;this.navigation.invalidate();return true;
   }
-  cancelCommand(u) { if(u.courtesy)this.navigation.cancelCooperation(u);if(u.command?.flow)this.flows[u.command.flow]--;if(u.state==='walk'&&!u.step)u.state='idle';u.command=null;u.courtesyReturn=null;u.target=null;u.squadRoute=null;u.sharedLocal=null;u.guide=[];u.guideKey=null;u.staticSearch=null;u.recovery=null;u.yieldUntil=0;u.route=[];u.path=[];u.waitReason=null;u.retryAt=0;u.waitSince=null; }
+  cancelCommand(u) { if(u.courtesy)this.navigation.cancelCooperation(u);if(u.command?.flow)this.flows[u.command.flow]--;if(u.state==='walk'&&!u.step)u.state='idle';u.command=null;u.courtesyReturn=null;u.target=null;u.squadRoute=null;u.sharedLocal=null;u.guide=[];u.guideKey=null;u.staticSearch=null;u.recovery=null;u.recoveryFailure=null;u.yieldUntil=0;u.route=[];u.path=[];u.waitReason=null;u.retryAt=0;u.waitSince=null; }
   interrupt(u){
     this.cancelCommand(u);
     u.combat.retaliation=null;u.combat.formationLocked=false;

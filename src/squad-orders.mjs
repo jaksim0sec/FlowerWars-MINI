@@ -1,5 +1,5 @@
 import {squadsFor} from './unit-groups.mjs';
-import {planFormation,settleFormation,repairOccupiedSeats} from './formation-planner.mjs';
+import {planFormation,settleFormation,repairOccupiedSeats,relayFormationVacancies} from './formation-planner.mjs';
 import {coverPlan,moveUnderCover} from './commander-cover.mjs';
 import {reformFormation,pathTo as formationPath} from './formation-reform.mjs';
 import {unequip} from './characters/engine.mjs';
@@ -97,7 +97,7 @@ export function orderSquad(board,id,action,target=null){
  }
  if(['move','advance','flank','retreat'].includes(type)){
   const units=alive(board,s),previous=s.order;
-  const stable=previous?.goals?.size&&['arrived','holding'].includes(previous.phase);
+  const stable=previous?.goals?.size===units.length&&previous.goals.has(lead.id)&&(previous.type==='rally'||['arrived','holding'].includes(previous.phase));
   const anchor=stable?previous.goals.get(lead.id):lead;
   order.travelOffsets=!stable&&previous?.travelOffsets?new Map(previous.travelOffsets):new Map(units.map(u=>{const p=stable?previous.goals.get(u.id)||u:u;return [u.id,{x:p.x-anchor.x,y:p.y-anchor.y}];}));
  }
@@ -172,9 +172,11 @@ function runOrder(board,s,replace=false){
    o.waypoints.shift();o.previous=null;o.phase=o.waypoints.length?'flanking':'moving';center=centerFor(board,s,o);replace=true;
  }
  if(board.time>=(o.nextOccupancyCheck||0)){
-  const claimed=[];
-  for(const other of squadsFor(board).values())if(other.id!==s.id&&other.team===s.team)claimed.push(...(other.order?.goals?.values()||[]));
-  repairOccupiedSeats(board,s,units,claimed);
+  repairOccupiedSeats(board,s,units,()=>{
+   const claimed=[];
+   for(const other of squadsFor(board).values())if(other.id!==s.id&&other.team===s.team)claimed.push(...(other.order?.goals?.values()||[]));
+   return claimed;
+  });
   o.nextOccupancyCheck=board.time+.25;
  }
  const anchor=center.x+','+center.y+','+s.formation;
@@ -197,6 +199,10 @@ function runOrder(board,s,replace=false){
    o.previous=anchor;o.lastMembers=units.length;o.dirty=false;
  }
  settleFormation(units,o.goals);
+ if(o.type!=='rally'&&board.time>=(o.nextRelayAt||0)){
+  o.nextRelayAt=board.time+.2;
+  if(units.some(u=>{const p=o.goals.get(u.id);return p&&!u.step&&u.x===p.x&&u.y===p.y;}))relayFormationVacancies(board,units,o.goals,commander(board,s)?.id);
+ }
  // Assigned seats remain authoritative after arrival as well as while moving.
  // Otherwise idle archers sidestep automatically and get sent back every tick.
  if(o.type==='rally'){
@@ -220,10 +226,18 @@ function runOrder(board,s,replace=false){
  if(o.travelOffsets){const pace=Math.max(...units.map(u=>u.movement.stepTime));for(const u of units)u.marchStepTime=pace;}
  board.batchCommands(()=>{for(const u of units){
    if(u.courtesy)continue;
+   const handoff=o.goals.handoffs?.get(u.id);
+   if(handoff!=null){
+    const relay=board.unit(handoff),destination=o.goals.get(handoff);
+    if(relay?.health.current>0&&destination&&!relay.combat.holdPosition&&(relay.step||relay.x!==destination.x||relay.y!==destination.y))continue;
+    o.goals.handoffs.delete(u.id);
+   }
    const p=o.goals.get(u.id),at=p&&u.x===p.x&&u.y===p.y&&!u.step;
    const defensive=['fortify','firing-line'].includes(o.type);
 
-   u.combat.holdPosition=defensive&&at;
+   // Fortification becomes a held position only after its formation is complete.
+   // Explicit hold/wait orders are handled above and stay protected throughout.
+   u.combat.holdPosition=defensive&&at&&o.phase==='holding';
    if(at){arrived++;if(u.command)board.cancelCommand(u);continue;}
    if(!p||u.command?.type==='move'&&u.command.x===p.x&&u.command.y===p.y)continue;
    if(u.state==='attack'&&u.strike)continue;
@@ -232,6 +246,7 @@ function runOrder(board,s,replace=false){
  }});
  for(const u of units)u.combat.formationLocked=true;
  if(!o.waypoints.length)o.phase=arrived===units.length?(['fortify','firing-line'].includes(o.type)?'holding':'arrived'):'moving';
+ if(o.phase==='holding')for(const u of units)u.combat.holdPosition=true;
  if(o.phase==='arrived'&&o.after){const next=o.after;s.order=null;orderSquad(board,s.id,next.type,next.target);}
 }
 export function updateSquadOrders(board){for(const s of squadsFor(board).values())if(s.order&&!['wait','hold'].includes(s.order.type))runOrder(board,s);}

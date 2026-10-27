@@ -60,3 +60,12 @@ test('all four formations physically reach their assigned seats after an idle cl
   assert.equal(squadSummary(b,s.id).formationProgress,100);
  }
 });
+test('an incomplete blocked reform can be superseded by a move without losing its commander anchor',()=>{
+ const b=new Board(20,4),lead=b.spawn(4,2,{characterId:'banner-bearer'},{team:'A'}),ids=[lead.id];
+ for(let x=5;x<=15;x++)ids.push(b.spawn(x,2,{characterId:'scout'},{team:'A'}).id);
+ const g=registerPlacedGroup(b,ids,{team:'A'}),s=squadsFor(b).get(g.squads[0]);
+ for(let y=0;y<4;y++)for(let x=0;x<20;x++)if(!b.at(x,y))b.spawn(x,y,null,{team:'B'});
+ configureSquad(b,s.id,{formation:'line'});
+ assert.doesNotThrow(()=>orderSquad(b,s.id,'move',{x:18,y:2}));
+ assert.ok(s.order);assert.ok(Number.isFinite(squadSummary(b,s.id).formationProgress));
+});

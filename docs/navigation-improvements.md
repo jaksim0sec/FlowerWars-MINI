@@ -1,5 +1,7 @@
 # Team identification and navigation changes
 
+Historical results for `72a033e`. See [the follow-up report](navigation-followup.md) for subsequent fixes and measurements.
+
 ## Scope and safeguards
 
 Close views use blue allied / red hostile filled feet markers and small head dots. Below scale 0.22 these individual team markers disappear; each living squad gets one solid team-color flag. The old translucent army-center flags are removed. Flag centers are cached for 0.2 simulated seconds and culled by the viewport. Selected squads retain a gold flag outline.

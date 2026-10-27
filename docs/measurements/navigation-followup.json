@@ -1,0 +1,503 @@
+{
+  "baselineCommit": "72a033e",
+  "seed": 73,
+  "simulatedSeconds": 120,
+  "trials": 3,
+  "modelBefore": [
+    {
+      "commands": 11,
+      "returning": 0,
+      "activeChains": 0,
+      "scenario": "individual",
+      "count": 64,
+      "seconds": 120,
+      "arrived": 53,
+      "at90": {
+        "arrived": 45,
+        "waitSeconds": 1145.35,
+        "maxStationaryWait": 22.45
+      },
+      "throughput": 0.44166666666666665,
+      "waitSeconds": 1438.5,
+      "maxWait": 52.45,
+      "updateP95ms": 0.5155,
+      "cpuMs": 292.96,
+      "expansions": 655500,
+      "maxTickExpansions": 2048,
+      "staticBuilds": 304,
+      "sharedBuilds": 0,
+      "cooperativeSteps": 44,
+      "collisions": 0,
+      "cpuTrialsMs": [
+        284.18,
+        292.96,
+        302.73
+      ],
+      "p95TrialsMs": [
+        0.5155,
+        0.5044,
+        0.5397
+      ]
+    },
+    {
+      "commands": 115,
+      "returning": 0,
+      "activeChains": 7,
+      "scenario": "individual",
+      "count": 256,
+      "seconds": 120,
+      "arrived": 141,
+      "at90": {
+        "arrived": 129,
+        "waitSeconds": 9329.25,
+        "maxStationaryWait": 48
+      },
+      "throughput": 1.175,
+      "waitSeconds": 12151.45,
+      "maxWait": 78,
+      "updateP95ms": 1.1882,
+      "cpuMs": 858,
+      "expansions": 1517086,
+      "maxTickExpansions": 2048,
+      "staticBuilds": 2961,
+      "sharedBuilds": 0,
+      "cooperativeSteps": 1053,
+      "collisions": 0,
+      "cpuTrialsMs": [
+        823.67,
+        858,
+        880.12
+      ],
+      "p95TrialsMs": [
+        1.1149,
+        1.1882,
+        1.2207
+      ]
+    },
+    {
+      "commands": 532,
+      "returning": 0,
+      "activeChains": 12,
+      "scenario": "individual",
+      "count": 700,
+      "seconds": 120,
+      "arrived": 168,
+      "at90": {
+        "arrived": 117,
+        "waitSeconds": 43367.65,
+        "maxStationaryWait": 52.1
+      },
+      "throughput": 1.4,
+      "waitSeconds": 57440.1,
+      "maxWait": 55.3,
+      "updateP95ms": 1.7081,
+      "cpuMs": 1536.02,
+      "expansions": 1963275,
+      "maxTickExpansions": 2048,
+      "staticBuilds": 7335,
+      "sharedBuilds": 0,
+      "cooperativeSteps": 3241,
+      "collisions": 0,
+      "cpuTrialsMs": [
+        1534.95,
+        1536.02,
+        1568.47
+      ],
+      "p95TrialsMs": [
+        1.7081,
+        1.7063,
+        1.7307
+      ]
+    },
+    {
+      "commands": 1,
+      "returning": 0,
+      "activeChains": 1,
+      "scenario": "squads",
+      "count": 64,
+      "seconds": 120,
+      "arrived": 62,
+      "at90": {
+        "arrived": 62,
+        "waitSeconds": 1053.7,
+        "maxStationaryWait": 25.9
+      },
+      "throughput": 0.5166666666666667,
+      "waitSeconds": 1111.45,
+      "maxWait": 29.5,
+      "updateP95ms": 0.3175,
+      "cpuMs": 313.54,
+      "expansions": 205192,
+      "maxTickExpansions": 2048,
+      "staticBuilds": 276,
+      "sharedBuilds": 3,
+      "cooperativeSteps": 46,
+      "collisions": 0,
+      "cpuTrialsMs": [
+        320.58,
+        313.54,
+        279.47
+      ],
+      "p95TrialsMs": [
+        0.3193,
+        0.3175,
+        0.3035
+      ]
+    },
+    {
+      "commands": 44,
+      "returning": 0,
+      "activeChains": 16,
+      "scenario": "squads",
+      "count": 256,
+      "seconds": 120,
+      "arrived": 194,
+      "at90": {
+        "arrived": 163,
+        "waitSeconds": 6466.3,
+        "maxStationaryWait": 31.3
+      },
+      "throughput": 1.6166666666666667,
+      "waitSeconds": 7884.45,
+      "maxWait": 40.15,
+      "updateP95ms": 1.496,
+      "cpuMs": 1355.03,
+      "expansions": 1328463,
+      "maxTickExpansions": 2048,
+      "staticBuilds": 2632,
+      "sharedBuilds": 11,
+      "cooperativeSteps": 173,
+      "collisions": 0,
+      "cpuTrialsMs": [
+        1320.27,
+        1355.03,
+        1398.21
+      ],
+      "p95TrialsMs": [
+        1.451,
+        1.496,
+        1.5334
+      ]
+    },
+    {
+      "commands": 205,
+      "returning": 0,
+      "activeChains": 16,
+      "scenario": "squads",
+      "count": 700,
+      "seconds": 120,
+      "arrived": 475,
+      "at90": {
+        "arrived": 406,
+        "waitSeconds": 22811.95,
+        "maxStationaryWait": 30.45
+      },
+      "throughput": 3.9583333333333335,
+      "waitSeconds": 28424.75,
+      "maxWait": 52.1,
+      "updateP95ms": 3.7729,
+      "cpuMs": 3672.71,
+      "expansions": 1894774,
+      "maxTickExpansions": 2048,
+      "staticBuilds": 11528,
+      "sharedBuilds": 30,
+      "cooperativeSteps": 542,
+      "collisions": 0,
+      "cpuTrialsMs": [
+        3672.71,
+        3647.64,
+        3947.97
+      ],
+      "p95TrialsMs": [
+        3.7729,
+        3.7329,
+        4.2668
+      ]
+    }
+  ],
+  "modelAfter": [
+    {
+      "commands": 8,
+      "returning": 0,
+      "activeChains": 0,
+      "scenario": "individual",
+      "count": 64,
+      "seconds": 120,
+      "arrived": 56,
+      "at90": {
+        "arrived": 49,
+        "waitSeconds": 1092.8,
+        "maxStationaryWait": 36.5
+      },
+      "throughput": 0.4666666666666667,
+      "waitSeconds": 1326.25,
+      "maxWait": 66.5,
+      "updateP95ms": 0.4843,
+      "cpuMs": 279.49,
+      "expansions": 614020,
+      "maxTickExpansions": 2048,
+      "staticBuilds": 253,
+      "sharedBuilds": 0,
+      "cooperativeSteps": 41,
+      "collisions": 0,
+      "cpuTrialsMs": [
+        279.01,
+        318.2,
+        279.49
+      ],
+      "p95TrialsMs": [
+        0.5013,
+        0.4762,
+        0.4843
+      ]
+    },
+    {
+      "commands": 110,
+      "returning": 0,
+      "activeChains": 5,
+      "scenario": "individual",
+      "count": 256,
+      "seconds": 120,
+      "arrived": 146,
+      "at90": {
+        "arrived": 128,
+        "waitSeconds": 9273.35,
+        "maxStationaryWait": 45.75
+      },
+      "throughput": 1.2166666666666666,
+      "waitSeconds": 11995.45,
+      "maxWait": 75.75,
+      "updateP95ms": 1.0694,
+      "cpuMs": 824.63,
+      "expansions": 1574617,
+      "maxTickExpansions": 2048,
+      "staticBuilds": 2668,
+      "sharedBuilds": 0,
+      "cooperativeSteps": 1075,
+      "collisions": 0,
+      "cpuTrialsMs": [
+        810.11,
+        839.1,
+        824.63
+      ],
+      "p95TrialsMs": [
+        1.0691,
+        1.0877,
+        1.0694
+      ]
+    },
+    {
+      "commands": 525,
+      "returning": 0,
+      "activeChains": 14,
+      "scenario": "individual",
+      "count": 700,
+      "seconds": 120,
+      "arrived": 175,
+      "at90": {
+        "arrived": 123,
+        "waitSeconds": 42879.75,
+        "maxStationaryWait": 51.3
+      },
+      "throughput": 1.4583333333333333,
+      "waitSeconds": 56617.45,
+      "maxWait": 66.15,
+      "updateP95ms": 1.5542,
+      "cpuMs": 1437.1,
+      "expansions": 1970370,
+      "maxTickExpansions": 2048,
+      "staticBuilds": 6800,
+      "sharedBuilds": 0,
+      "cooperativeSteps": 3178,
+      "collisions": 0,
+      "cpuTrialsMs": [
+        1385.38,
+        1437.1,
+        1443.59
+      ],
+      "p95TrialsMs": [
+        1.4832,
+        1.5542,
+        1.5729
+      ]
+    },
+    {
+      "commands": 0,
+      "returning": 0,
+      "activeChains": 0,
+      "scenario": "squads",
+      "count": 64,
+      "seconds": 120,
+      "arrived": 64,
+      "at90": {
+        "arrived": 58,
+        "waitSeconds": 1147.1,
+        "maxStationaryWait": 29.5
+      },
+      "throughput": 0.5333333333333333,
+      "waitSeconds": 1152.45,
+      "maxWait": 29.5,
+      "updateP95ms": 0.3077,
+      "cpuMs": 271.02,
+      "expansions": 116548,
+      "maxTickExpansions": 2048,
+      "staticBuilds": 254,
+      "sharedBuilds": 3,
+      "cooperativeSteps": 61,
+      "collisions": 0,
+      "cpuTrialsMs": [
+        305.61,
+        271.02,
+        268.42
+      ],
+      "p95TrialsMs": [
+        0.3207,
+        0.3077,
+        0.3
+      ]
+    },
+    {
+      "commands": 30,
+      "returning": 0,
+      "activeChains": 10,
+      "scenario": "squads",
+      "count": 256,
+      "seconds": 120,
+      "arrived": 211,
+      "at90": {
+        "arrived": 183,
+        "waitSeconds": 6320.4,
+        "maxStationaryWait": 29.9
+      },
+      "throughput": 1.7583333333333333,
+      "waitSeconds": 7374.6,
+      "maxWait": 30.25,
+      "updateP95ms": 1.2748,
+      "cpuMs": 1089.56,
+      "expansions": 804818,
+      "maxTickExpansions": 2048,
+      "staticBuilds": 2793,
+      "sharedBuilds": 11,
+      "cooperativeSteps": 228,
+      "collisions": 0,
+      "cpuTrialsMs": [
+        1150.59,
+        1086.62,
+        1089.56
+      ],
+      "p95TrialsMs": [
+        1.3356,
+        1.2748,
+        1.2674
+      ]
+    },
+    {
+      "commands": 147,
+      "returning": 0,
+      "activeChains": 16,
+      "scenario": "squads",
+      "count": 700,
+      "seconds": 120,
+      "arrived": 524,
+      "at90": {
+        "arrived": 423,
+        "waitSeconds": 21526.2,
+        "maxStationaryWait": 32.85
+      },
+      "throughput": 4.366666666666666,
+      "waitSeconds": 25239.7,
+      "maxWait": 32.95,
+      "updateP95ms": 3.2242,
+      "cpuMs": 3374.48,
+      "expansions": 1829019,
+      "maxTickExpansions": 2048,
+      "staticBuilds": 30688,
+      "sharedBuilds": 30,
+      "cooperativeSteps": 348,
+      "collisions": 0,
+      "cpuTrialsMs": [
+        3374.49,
+        3374.48,
+        3353.36
+      ],
+      "p95TrialsMs": [
+        3.2696,
+        3.2242,
+        3.183
+      ]
+    }
+  ],
+  "browserBefore": [
+    {
+      "count": 64,
+      "fps": 60.00240009600385,
+      "frameCpuP95ms": 1,
+      "frameIntervalP95ms": 16.799999999999727
+    },
+    {
+      "count": 256,
+      "fps": 60.002400096003825,
+      "frameCpuP95ms": 2.1000000089406967,
+      "frameIntervalP95ms": 16.800000000000182
+    },
+    {
+      "count": 700,
+      "fps": 60.0048003840307,
+      "frameCpuP95ms": 4.200000002980232,
+      "frameIntervalP95ms": 16.700000000000728
+    }
+  ],
+  "browserAfter": [
+    {
+      "count": 64,
+      "fps": 60.00000000000002,
+      "frameCpuP95ms": 0.9000000059604645,
+      "frameIntervalP95ms": 16.700000000000273
+    },
+    {
+      "count": 256,
+      "fps": 60.00480038403072,
+      "frameCpuP95ms": 2,
+      "frameIntervalP95ms": 16.799999999999272
+    },
+    {
+      "count": 700,
+      "fps": 60.00240009600385,
+      "frameCpuP95ms": 4,
+      "frameIntervalP95ms": 16.799999999999272
+    }
+  ],
+  "suite": {
+    "before": {
+      "tests": 258,
+      "pass": 242,
+      "fail": 16
+    },
+    "after": {
+      "tests": 268,
+      "pass": 256,
+      "fail": 12
+    },
+    "fixedExistingFailures": [
+      "edge destinations leave access around the formation until every member arrives",
+      "shared destination has one occupant; other commands wait without overlap",
+      "square formation surrounds its commander and assigns distinct valid seats to every role",
+      "the commander receives a safer rear target even when the formation is dense"
+    ],
+    "remainingExistingFailures": [
+      "a real ranged actor acquires an interpolating target across a bucket boundary",
+      "a vertical advance places the commander behind the front instead of beside it",
+      "an isolated long move follows a shortest route without a traffic lane detour",
+      "automatic armies obey the 200 cap and deploy on their own half",
+      "full bot operations pair frontline, firepower and healing in one lane",
+      "healers restore injured allies, respect cooldown and never damage enemies",
+      "home defense intercepts intruders without recalling a distant attack operation",
+      "injury changes neither movement duration nor attack damage",
+      "manual placement spends reserves atomically and rejects overlaps and enemy territory",
+      "squad destinations on a large map start without serial full-map distance fields",
+      "step timing remains exact and simulation does not depend on a renderer",
+      "visible test classes have independent configured health, damage and attack speed"
+    ],
+    "newFailures": []
+  }
+}

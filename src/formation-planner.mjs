@@ -2,14 +2,39 @@ const distance=(a,b)=>Math.abs(a.x-b.x)+Math.abs(a.y-b.y);
 export const kindOf=u=>`${u.unitType||u.character?.characterId||u.formationRole||'soldier'}:${u.combat.range}:${!!u.healing}`;
 export function forwardFor(s){return s.order?.forward||{x:s.order?.facing||(s.team==='B'?-1:1),y:0};}
 
+const settlementCaches=new WeakMap();
+function settlementIndex(units,goals){
+ let cache=settlementCaches.get(goals),valid=cache&&cache.seats.size===goals.size&&cache.byId.size===units.length;
+ if(valid)for(const u of units)if(cache.byId.get(u.id)!==u){valid=false;break;}
+ if(valid)for(const [id,p]of goals){const old=cache.seats.get(id);if(!old||old.point!==p||old.x!==p.x||old.y!==p.y){valid=false;break;}}
+ if(!valid){
+  cache={owners:new Map(),seats:new Map(),byId:new Map(units.map(u=>[u.id,u]))};
+  for(const [id,p]of goals){cache.owners.set(p.x+','+p.y,id);cache.seats.set(id,{point:p,x:p.x,y:p.y});}
+  settlementCaches.set(goals,cache);
+ }
+ return cache;
+}
+function assignSeat(goals,id,point){
+ const cache=settlementCaches.get(goals),old=cache?.seats.get(id);
+ goals.set(id,point);
+ if(cache){
+  if(old&&cache.owners.get(old.x+','+old.y)===id)cache.owners.delete(old.x+','+old.y);
+  cache.owners.set(point.x+','+point.y,id);cache.seats.set(id,{point,x:point.x,y:point.y});
+ }
+}
+
 // A temporary intruder must never relocate every seat of an existing formation.
 export function repairOccupiedSeats(board,squad,units,otherGoals=[]){
- const goals=squad.order.goals,own=new Set(units.map(u=>u.id));
+ const goals=squad.order.goals,foreign=[];let own=null;
+ for(const entry of goals){
+  const occupant=board.at(entry[1].x,entry[1].y);
+  if(!occupant||occupant.squadId===squad.id||occupant.command||occupant.step)continue;
+  own??=new Set(units.map(u=>u.id));if(!own.has(occupant.id))foreign.push(entry);
+ }
+ if(!foreign.length)return;
  const claimed=new Set([...goals.values()].map(p=>p.y*board.width+p.x));
- for(const p of otherGoals)claimed.add(p.y*board.width+p.x);
- for(const [id,seat]of goals){
-  const occupant=board.at(seat.x,seat.y);
-  if(!occupant||own.has(occupant.id)||occupant.command||occupant.step)continue;
+ for(const p of typeof otherGoals==='function'?otherGoals():otherGoals)claimed.add(p.y*board.width+p.x);
+ for(const [id,seat]of foreign){
   let replacement=null;
   for(let r=1;r<=3&&!replacement;r++)for(let dx=-r;dx<=r&&!replacement;dx++)for(let dy=-r;dy<=r;dy++){
    if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;
@@ -19,7 +44,7 @@ export function repairOccupiedSeats(board,squad,units,otherGoals=[]){
    replacement={x,y};claimed.add(key);break;
   }
   if(!replacement)continue;
-  goals.set(id,replacement);
+  assignSeat(goals,id,replacement);
   const unit=board.unit(id);if(unit){board.interrupt(unit);unit.reformSearch=null;}
  }
 }
@@ -27,28 +52,26 @@ export function repairOccupiedSeats(board,squad,units,otherGoals=[]){
 // Same-role positions have no personal owner: a soldier already on a matching
 // slot keeps it, including soldiers arriving through a different passing lane.
 export function settleFormation(units,goals){
- const owners=new Map([...goals].map(([id,p])=>[p.x+','+p.y,id]));
- const byId=new Map(units.map(u=>[u.id,u]));
+ const {owners,byId}=settlementIndex(units,goals);
  for(const u of units){
   if(u.step||u.courtesy)continue;
   const owner=owners.get(u.x+','+u.y),other=byId.get(owner),previous=goals.get(u.id);
   if(!other||other.courtesy||owner===u.id||!previous||kindOf(other)!==kindOf(u))continue;
-  const here=goals.get(owner);goals.set(u.id,here);goals.set(owner,previous);
-  owners.set(here.x+','+here.y,u.id);owners.set(previous.x+','+previous.y,owner);
+  const here=goals.get(owner);assignSeat(goals,u.id,here);assignSeat(goals,owner,previous);
  }
 }
 
 // Pass a vacant seat through settled soldiers of the same kind. Each relay
 // moves one tile; the distant soldier's destination gets one tile closer.
-export function relayFormationVacancies(board,units,goals){
+export function relayFormationVacancies(board,units,goals,commanderId=null){
  const byCell=new Map(units.filter(u=>!u.step).map(u=>[u.x+','+u.y,u]));
  for(const owner of units){
   const hole=goals.get(owner.id);
-  if(!hole||owner.step||owner.strike||owner.courtesy||owner.remoteCourtesy||distance(owner,hole)<=1||board.occupied(hole.x,hole.y))continue;
+  if(owner.id===commanderId||owner.combat.holdPosition||!hole||owner.step||owner.strike||owner.courtesy||owner.remoteCourtesy||distance(owner,hole)<=1||board.occupied(hole.x,hole.y))continue;
   for(const [dx,dy]of [[1,0],[-1,0],[0,1],[0,-1]]){
    const relay=byCell.get((hole.x+dx)+','+(hole.y+dy)),seat=relay&&goals.get(relay.id);
-   if(!relay||relay.courtesy||relay.command||relay.strike||!seat||distance(relay,seat)!==0||kindOf(relay)!==kindOf(owner)||1+distance(owner,relay)>distance(owner,hole))continue;
-   goals.set(relay.id,hole);goals.set(owner.id,seat);board.cancelCommand(owner);owner.reformSearch=null;
+   if(!relay||relay.id===commanderId||relay.combat.holdPosition||relay.courtesy||relay.command||relay.strike||!seat||distance(relay,seat)!==0||kindOf(relay)!==kindOf(owner)||1+distance(owner,relay)>distance(owner,hole))continue;
+   assignSeat(goals,relay.id,hole);assignSeat(goals,owner.id,seat);if(distance(owner,seat)<=2)(goals.handoffs??=new Map()).set(owner.id,relay.id);else goals.handoffs?.delete(owner.id);board.cancelCommand(owner);owner.reformSearch=null;
    break;
   }
  }
