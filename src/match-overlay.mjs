@@ -1,6 +1,32 @@
 import {squadsFor} from './unit-groups.mjs';
 import {project} from './model.mjs';
 
+export const TEAM_COLORS={A:'#287de0',B:'#e3464d'};
+export const TEAM_MARKER_SCALE=.22;
+
+function drawFlagGlyph(ctx,team,{number=null,selected=false,large=false}={}){
+ ctx.save();ctx.scale(large?1.9:1,large?1.9:1);
+ const color=TEAM_COLORS[team]||'#777';
+ ctx.lineJoin='round';ctx.lineCap='round';
+ ctx.fillStyle=large?'#fff9eddb':'#fff9edba';ctx.strokeStyle=color;ctx.lineWidth=large?1.35:1.1;
+ ctx.beginPath();ctx.ellipse(0,1,large?10:5,large?4.5:2.5,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+ ctx.strokeStyle=large?'#594d42':color;ctx.lineWidth=1.8;
+ ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(0,-23);ctx.stroke();
+ ctx.fillStyle=color;ctx.strokeStyle=selected?'#fff0a3':'#fff9ef';ctx.lineWidth=large?1.5:1.25;
+ ctx.beginPath();ctx.moveTo(0,-23);ctx.quadraticCurveTo(8,-22,16,-19);ctx.quadraticCurveTo(18,-18,16,-15);
+ ctx.lineTo(14,-9);ctx.quadraticCurveTo(8,-12,0,-11);ctx.closePath();ctx.fill();ctx.stroke();
+ if(number!==null){
+  ctx.fillStyle='#fff';ctx.font=`800 ${number.length>2?6.5:8}px system-ui`;
+  ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(number,8,-16,14);
+ }
+ ctx.restore();
+}
+
+function squadNumber(squad){
+ if(Number.isInteger(squad.matchIndex))return String(squad.matchIndex+1);
+ return String(squad.name?.match(/(\d+)분대/)?.[1]??squad.id.match(/:(\d+)$/)?.[1]??'');
+}
+
 export function drawMatchOverlay(ctx,match,scale){
  if(!match)return;
  ctx.save();
@@ -15,10 +41,8 @@ export function drawMatchOverlay(ctx,match,scale){
  ctx.restore();ctx.restore();ctx.save();
  for(const [team,flag]of Object.entries(match.flags)){
   const p=project(flag.x,flag.y);ctx.save();ctx.translate(p.x,p.y);ctx.scale(1/scale,1/scale);
-  ctx.fillStyle=team==='A'?'#dceefaec':'#f9dfddec';ctx.strokeStyle=team==='A'?'#3378a5':'#cd3944';ctx.lineWidth=2;
-  ctx.beginPath();ctx.ellipse(0,0,18,10,0,0,Math.PI*2);ctx.fill();ctx.stroke();
-  ctx.beginPath();ctx.moveTo(0,-3);ctx.lineTo(0,-39);ctx.lineTo(22,-34);ctx.lineTo(0,-25);ctx.stroke();
-  ctx.fillStyle=ctx.strokeStyle;ctx.font='600 11px system-ui';ctx.textAlign='center';ctx.fillText(team==='A'?'내 깃발':'적 깃발',0,22);
+  drawFlagGlyph(ctx,team,{large:true});
+  ctx.fillStyle=TEAM_COLORS[team];ctx.font='700 11px system-ui';ctx.textAlign='center';ctx.fillText(team==='A'?'내 깃발':'적 깃발',0,22);
   const health=flag.health;
   if(health){ctx.fillStyle='#4a352a66';ctx.fillRect(-23,28,46,5);ctx.fillStyle=team==='A'?'#327ca8':'#d74750';ctx.fillRect(-23,28,46*Math.max(0,health.current/health.max),5);ctx.font='600 9px system-ui';ctx.fillText(Math.ceil(health.current)+' / '+health.max,0,44);}
   ctx.restore();
@@ -26,28 +50,32 @@ export function drawMatchOverlay(ctx,match,scale){
  ctx.restore();
 }
 
-export const TEAM_COLORS={A:'#287de0',B:'#e3464d'};
-export const TEAM_MARKER_SCALE=.22;
 const squadCenters=new WeakMap();
 export function drawSquadTeamFlags(ctx,board,scale,camera,width,height,selectedIds=[]){
  if(scale>=TEAM_MARKER_SCALE)return;
  let cache=squadCenters.get(board);
- if(!cache||cache.epoch!==board.byId||board.time>=cache.next){
-  const points=[];
+ if(!cache||cache.epoch!==board.byId||cache.liveCount!==board.cells.size||board.time>=cache.next){
+  const points=[],previous=new Map(cache?.points.map(point=>[point.id,point]));
   for(const squad of squadsFor(board).values()){
    let x=0,y=0,n=0;
    for(const id of squad.memberIds){const u=board.unit(id);if(u?.health.current>0){x+=u.visualX;y+=u.visualY;n++;}}
-   if(n)points.push({id:squad.id,team:squad.team,x:x/n,y:y/n});
+   if(n)points.push({id:squad.id,team:squad.team,number:squadNumber(squad),x:x/n,y:y/n});
+   else if(previous.has(squad.id)){
+    const old=previous.get(squad.id),deadAt=old.deadAt??board.time;
+    if(board.time-deadAt<1.1)points.push({...old,deadAt});
+   }
   }
-  cache={epoch:board.byId,next:board.time+.2,points};squadCenters.set(board,cache);
+  cache={epoch:board.byId,liveCount:board.cells.size,next:board.time+.2,points};squadCenters.set(board,cache);
  }
  const selected=new Set(selectedIds);
  for(const center of cache.points){
   const p=project(center.x,center.y),sx=p.x*scale+camera.x,sy=p.y*scale+camera.y;
   if(sx<-24||sx>width+24||sy<-24||sy>height+24)continue;
-  ctx.save();ctx.translate(p.x,p.y);ctx.scale(.75/scale,.75/scale);ctx.globalAlpha*=.65;
-  ctx.strokeStyle=selected.has(center.id)?'#fff0a3':'#fff9ef';ctx.lineWidth=1.5;ctx.lineJoin='round';ctx.fillStyle=TEAM_COLORS[center.team]||'#777';
-  ctx.beginPath();ctx.moveTo(-6,4);ctx.lineTo(-6,-18);ctx.lineTo(10,-15);ctx.lineTo(10,-5);ctx.lineTo(-6,-7);ctx.closePath();ctx.fill();ctx.stroke();
+  ctx.save();ctx.translate(p.x,p.y);ctx.scale(.75/scale,.75/scale);
+  const fall=center.deadAt===undefined?0:Math.min(1,(board.time-center.deadAt)/1.1);
+  ctx.globalAlpha*=.65*(1-fall);
+  if(fall)ctx.rotate((center.team==='A'?1:-1)*Math.PI/2*(1-(1-fall)**2));
+  drawFlagGlyph(ctx,center.team,{number:center.deadAt===undefined?center.number:null,selected:selected.has(center.id)});
   ctx.restore();
  }
 }
