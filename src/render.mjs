@@ -7,50 +7,11 @@ import { project, HALF_W, HALF_H } from './model.mjs';
 import {drawCommandOverlay} from './command-overlay.mjs';
 import {drawMatchOverlay,drawDistantSoldier} from './match-overlay.mjs';
 
-const TILE_BASE = new URL('../assets/world/tiles/', import.meta.url);
+const TERRAIN_ATLAS=new URL('../assets/world/terrain/atlas.webp',import.meta.url);
 export async function loadArtwork() {
-  const catalog=await loadCatalog();
-  const tiles=Object.fromEntries(await Promise.all(['grass','soil','pond'].map(async name=>[name,normalizeTile(await loadImage(new URL(`${name}.webp`,TILE_BASE)),name)])));
+  const [catalog,atlas]=await Promise.all([loadCatalog(),loadImage(TERRAIN_ATLAS)]);
   const warrior=catalog.characters['gynari-warrior'];
-  return {catalog, rig:warrior.rig, parts:warrior.images, tiles};
-}
-
-/** Affine texture triangle; uses original image pixels, not substitute artwork. */
-function triangle(ctx, image, source, dest) {
-  const [a, b, c] = source, [p, q, r] = dest;
-  const det = (b[0] - a[0]) * (c[1] - a[1]) - (c[0] - a[0]) * (b[1] - a[1]);
-  const ax = ((q[0] - p[0]) * (c[1] - a[1]) - (r[0] - p[0]) * (b[1] - a[1])) / det;
-  const bx = ((r[0] - p[0]) * (b[0] - a[0]) - (q[0] - p[0]) * (c[0] - a[0])) / det;
-  const ay = ((q[1] - p[1]) * (c[1] - a[1]) - (r[1] - p[1]) * (b[1] - a[1])) / det;
-  const by = ((r[1] - p[1]) * (b[0] - a[0]) - (q[1] - p[1]) * (c[0] - a[0])) / det;
-  ctx.save();
-  ctx.beginPath();
-  const center = [(p[0] + q[0] + r[0]) / 3, (p[1] + q[1] + r[1]) / 3];
-  dest.forEach(([x, y], i) => {
-    const dx = x - center[0], dy = y - center[1], d = Math.hypot(dx, dy);
-    const v = [x + dx / d * 0.5, y + dy / d * 0.5];
-    if (i) ctx.lineTo(...v); else ctx.moveTo(...v);
-  });
-  ctx.closePath(); ctx.clip();
-  ctx.transform(ax, ay, bx, by, p[0] - ax * a[0] - bx * a[1], p[1] - ay * a[0] - by * a[1]);
-  ctx.drawImage(image, 0, 0);
-  ctx.restore();
-}
-
-function normalizeTile(image, type) {
-  // Source silhouettes differ despite sharing 512x384 dimensions. Register the
-  // actual seven corners, preserving both original top and stone wall textures.
-  const source = type !== 'soil'
-    ? [[256, 29], [486, 169], [256, 310], [26, 169], [486, 215], [256, 356], [26, 215]]
-    : [[256, 51], [478, 185], [256, 318], [33, 185], [478, 226], [256, 359], [33, 226]];
-  const dest = [[144, 0], [288, 84], [144, 168], [0, 84], [288, 128], [144, 212], [0, 128]];
-  const canvas = document.createElement('canvas');
-  canvas.width = 288; canvas.height = 214;
-  const ctx = canvas.getContext('2d');
-  for (const ids of [[0, 1, 2], [0, 2, 3], [1, 4, 5], [1, 5, 2], [3, 2, 5], [3, 5, 6]]) {
-    triangle(ctx, image, ids.map(i => source[i]), ids.map(i => dest[i]));
-  }
-  return canvas;
+  return {catalog,rig:warrior.rig,parts:warrior.images,tiles:{atlas}};
 }
 
 function diamond(ctx, x, y, fill, stroke = null, inset = 3) {

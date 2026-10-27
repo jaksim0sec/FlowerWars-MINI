@@ -5,6 +5,9 @@ ROOT=Path(__file__).resolve().parent.parent
 paths=[ROOT/name for name in ['index.html','characters.html','rig-editor.html','manifest.json']]
 for folder in ['src','assets']:
  paths.extend(p for p in (ROOT/folder).rglob('*') if p.is_file() and p.suffix in {'.mjs','.css','.json','.png','.webp','.svg','.jpg','.jpeg'})
+# Original terrain layers and optional decorations live in GitHub; gameplay
+# only needs the packed atlas, so do not prefetch the same artwork twice.
+paths=[p for p in paths if not (p.is_relative_to(ROOT/'assets/world/terrain') and p.parent.name in {'surface','wall_x','wall_y','decorations'})]
 paths=sorted(paths);template=(ROOT/'scripts/service-worker.template.js').read_text();digest=hashlib.sha256(template.encode())
 for p in paths:digest.update(p.relative_to(ROOT).as_posix().encode()+b'\0'+p.read_bytes())
 urls=['./']+['./'+p.relative_to(ROOT).as_posix() for p in paths]

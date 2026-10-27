@@ -15,6 +15,19 @@ export function visibleTiles(board,camera,width,height){
  }
  return tiles.sort((a,b)=>(a.x+a.y)-(b.x+b.y)||a.y-b.y);
 }
+// All materials share the same global 5x2 phase; never shuffle variants.
+export const terrainVariant=(x,y)=>1+((x%5+5)%5)+5*((y%2+2)%2);
+export function terrainMaterial(board,x,y){
+ const type=board.terrain[y][x],obstacle=board.obstacles?.get(y*board.width+x);
+ return type==='forest'||obstacle&&obstacle.blocked!==false?'pond':type==='road'?'soil':type;
+}
+export function terrainEdges(board,x,y){
+ const material=terrainMaterial(board,x,y);
+ return {wallX:x===board.width-1,wallY:y===board.height-1,
+  boundaryX:x<board.width-1&&terrainMaterial(board,x+1,y)!==material,
+  boundaryY:y<board.height-1&&terrainMaterial(board,x,y+1)!==material};
+}
+const materialRow={grass:0,soil:1,pond:2};
 function paint(ctx,art,board,camera,width,height,dpr){
  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,width,height);
  ctx.translate(camera.x,camera.y);ctx.scale(camera.scale,camera.scale);
@@ -23,14 +36,39 @@ function paint(ctx,art,board,camera,width,height,dpr){
  ctx.lineTo((board.width-board.height)*HALF_W,(board.width+board.height-1)*HALF_H);
  ctx.lineTo(-board.height*HALF_W,(board.height-1)*HALF_H);ctx.closePath();
  ctx.translate(0,23);ctx.shadowColor='#68502455';ctx.shadowBlur=38;ctx.shadowOffsetY=23;ctx.fillStyle='#97794140';ctx.fill();ctx.restore();
+ // A continuous base prevents transparent hairlines during fractional zoom.
+ ctx.fillStyle='#8eaa54';ctx.fill();
  const tiles=visibleTiles(board,camera,width,height);
+ let walls=0,boundaries=0;
  for(const{x,y}of tiles){
-  const type=board.terrain[y][x],px=(x-y)*HALF_W,py=(x+y)*HALF_H;
-  const obstacle=board.obstacles?.get(y*board.width+x);
-  const tile=(type==='forest'||(obstacle&&obstacle.blocked!==false))?'pond':type==='road'?'soil':type;
-  ctx.drawImage(art.tiles[tile],px-72,py-42,144,107);
+  const material=terrainMaterial(board,x,y),row=materialRow[material]??0;
+  const sx=(terrainVariant(x,y)-1)*144,left=(x-y)*HALF_W-72,top=(x+y)*HALF_H-42;
+  ctx.drawImage(art.tiles.atlas,sx,row*107,144,107,left,top,144,107);
+  // A neighbor of another material is still solid ground, never an exposed wall.
+  if(x===board.width-1){ctx.drawImage(art.tiles.atlas,sx,(3+row)*107,144,107,left,top,144,107);walls++;}
+  if(y===board.height-1){ctx.drawImage(art.tiles.atlas,sx,(6+row)*107,144,107,left,top,144,107);walls++;}
  }
- return tiles.length;
+ // Material seams are an independent, static overlay. Each shared edge is
+ // visited once and batched into just two paths (shoreline / land).
+ for(const water of [false,true]){
+  ctx.beginPath();let count=0;
+  for(const{x,y}of tiles){
+   const material=terrainMaterial(board,x,y),px=(x-y)*HALF_W,py=(x+y)*HALF_H;
+   for(const [dx,dy,side]of [[1,0,1],[0,1,-1]]){
+    if(!board.inside(x+dx,y+dy))continue;
+    const neighbor=terrainMaterial(board,x+dx,y+dy);
+    if(neighbor===material||(material==='pond'||neighbor==='pond')!==water)continue;
+    ctx.moveTo(px+side*HALF_W,py);ctx.lineTo(px,py+HALF_H);count++;
+   }
+  }
+  if(count){
+   ctx.lineJoin='round';ctx.lineCap='round';ctx.strokeStyle=water?'#4e796ab0':'#9b83466e';ctx.lineWidth=water?4:2;ctx.stroke();
+   ctx.strokeStyle=water?'#e4dba5b0':'#ded29980';ctx.lineWidth=1;ctx.stroke();
+  }
+  boundaries+=count;
+ }
+
+ return {tiles:tiles.length,walls,boundaries};
 }
 /** One viewport-sized backing canvas per renderer, never a map-sized allocation. */
 export function drawTerrain(ctx,art,board,camera,width,height,dpr,interactive=false){
@@ -45,11 +83,12 @@ export function drawTerrain(ctx,art,board,camera,width,height,dpr,interactive=fa
  if(!cache.key||key.some((v,i)=>v!==cache.key[i])||!covered||(!interactive&&(base.scale!==camera.scale||base.x!==camera.x||base.y!==camera.y))){
   const pw=Math.round((width+pad*2)*dpr),ph=Math.round((height+pad*2)*dpr);
   if(cache.canvas.width!==pw||cache.canvas.height!==ph){cache.canvas.width=pw;cache.canvas.height=ph;}
-  cache.tiles=paint(cache.canvas.getContext('2d'),art,board,{...camera,x:camera.x+pad,y:camera.y+pad},width+pad*2,height+pad*2,dpr);
+  const painted=paint(cache.canvas.getContext('2d'),art,board,{...camera,x:camera.x+pad,y:camera.y+pad},width+pad*2,height+pad*2,dpr);
+  Object.assign(cache,painted);
   cache.camera={...camera};cache.key=key;cache.builds++;
  }
  const ratio=camera.scale/cache.camera.scale;
  ctx.setTransform(1,0,0,1,0,0);
  ctx.drawImage(cache.canvas,(camera.x-(cache.camera.x+pad)*ratio)*dpr,(camera.y-(cache.camera.y+pad)*ratio)*dpr,cache.canvas.width*ratio,cache.canvas.height*ratio);
 }
-export function terrainRenderStats(ctx){const c=caches.get(ctx);return c?{builds:c.builds,tiles:c.tiles,bytes:c.canvas.width*c.canvas.height*4}:null;}
+export function terrainRenderStats(ctx){const c=caches.get(ctx);return c?{builds:c.builds,tiles:c.tiles,walls:c.walls,boundaries:c.boundaries,bytes:c.canvas.width*c.canvas.height*4}:null;}

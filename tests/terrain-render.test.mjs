@@ -14,3 +14,18 @@ test('visible tile enumeration matches exhaustive overlap and painter order on a
 test('terrain edits and reset invalidate cached terrain without changing combat',()=>{
  const b=new Board(),before=b.terrainRevision;b.setTerrain(0,0,'soil');assert.equal(b.terrain[0][0],'soil');assert.ok(b.terrainRevision>before);const v=b.terrainRevision;b.setTerrain(0,0,'soil');assert.equal(b.terrainRevision,v);b.reset();assert.ok(b.terrainRevision>v);
 });
+test('connected terrain variants repeat globally every five columns and two rows',()=>{
+ for(let y=0;y<8;y++)for(let x=0;x<20;x++){
+  assert.equal(terrain.terrainVariant(x,y),1+x%5+5*(y%2));
+  assert.equal(terrain.terrainVariant(x+5,y+2),terrain.terrainVariant(x,y));
+ }
+ assert.equal(terrain.terrainVariant(-1,-1),10);
+});
+test('material boundaries never create internal walls and use the same pond mapping as obstacles',()=>{
+ const b=new Board(6,6);b.terrain=Array.from({length:6},()=>Array(6).fill('grass'));
+ b.setTerrain(3,2,'soil');b.setObstacle(2,3,{blocked:true});
+ assert.deepEqual(terrain.terrainEdges(b,2,2),{wallX:false,wallY:false,boundaryX:true,boundaryY:true});
+ assert.equal(terrain.terrainMaterial(b,2,3),'pond');
+ assert.deepEqual(terrain.terrainEdges(b,5,5),{wallX:true,wallY:true,boundaryX:false,boundaryY:false});
+ assert.deepEqual(terrain.terrainEdges(b,0,0),{wallX:false,wallY:false,boundaryX:false,boundaryY:false});
+});

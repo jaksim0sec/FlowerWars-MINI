@@ -1,0 +1,23 @@
+{
+  "atlas": "atlas.webp",
+  "tileWidth": 144,
+  "tileHeight": 107,
+  "surfaceHeight": 84,
+  "layers": [
+    "surface",
+    "wall_x",
+    "wall_y"
+  ],
+  "materials": [
+    "grass",
+    "soil",
+    "pond"
+  ],
+  "variants": 10,
+  "variantRule": "1 + (x % 5) + 5 * (y % 2)",
+  "anchor": [
+    72,
+    42
+  ],
+  "notes": "Interior surfaces only; walls only at exposed world +X/+Y edges. Material boundaries use a separate cached overlay. Decorations are stored but not spawned automatically."
+}
