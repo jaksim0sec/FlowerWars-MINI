@@ -31,6 +31,24 @@ test('seeded enlarged battlefield keeps bases, central approaches and side entri
    if(t==='forest')water++;
   }
   assert.ok(water>1800&&water<6000);
+  // Verify tactical topology, not just connectivity: one medium sortie mouth
+  // and two small flank apertures, with no unrestricted edge bypass.
+  for(const gate of field.gates){
+   const openings=[];let start=null;
+   for(let y=0;y<=b.height;y++){
+    const free=y<b.height&&!b.navigation.blocked(y*b.width+gate.x);
+    if(free&&start===null)start=y;
+    if(!free&&start!==null){openings.push({start,end:y-1,width:y-start});start=null;}
+   }
+   assert.equal(openings.length,3);
+   const middle=openings.find(p=>p.start<=gate.y&&p.end>=gate.y);
+   assert.ok(middle&&middle.width>=14&&middle.width<=20);
+   assert.ok(openings.filter(p=>p!==middle).every(p=>p.width>=4&&p.width<=7));
+  }
+  let basin=0;
+  for(let y=34;y<=77;y++)for(let x=45;x<=98;x++)if(b.terrain[y][x]==='grass')basin++;
+  assert.ok(basin>2100,'central battle space stays broad and continuous grass');
+
   assert.equal(field.paths.length,7);assert.ok(field.paths[0].radius>field.paths[1].radius);
   assert.ok(field.paths.slice(3).every(p=>p.radius<field.paths[1].radius));
   shapes.add(b.terrain.map(row=>row.join(',')).join(';'));
