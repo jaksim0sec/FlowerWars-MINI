@@ -428,7 +428,8 @@ function activate(p, keyboardTile = null, additive=false) {
   if(view.mode==='deploy'&&board.match?.phase==='preparation'){
     if(!tile)return;
     const squad=board.match.deploy('A',view.deployType||'defense',tile);
-    if(!squad){notify('내 진영의 빈 공간에 배치하세요. 겹침·장애물·예비 병력을 확인하세요.');return;}
+    if(!squad){notify('편성의 절반 이상이 내 진영의 빈 칸에 들어가야 배치할 수 있습니다.');return;}
+    notify(`${squad.memberIds.length}명 배치`);
     view.deployment=board.match.reserve.A?board.match.deploymentPreview('A',view.deployType):null;
     if(!board.match.reserve.A)view.mode='move';
     syncSquadRoster();updateMatchHud();refresh();return;

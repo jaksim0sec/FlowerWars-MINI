@@ -44,17 +44,30 @@ export class FlagMatch{
   }};
   this.refreshStatus();
  }
- deploymentPreview(team,type){
+ deploymentPreview(team,type,anchor=null){
   const template=this.recruitment.get(type)?.blueprint;
   if(!template||!this.reserve[team])return null;
   const index=this.squadIds[team].length,size=Math.min(this.squadSize,this.reserve[team],template.members.length);
-  return layoutDeployment(template,size,`${index+1}분대`);
+  const blueprint=layoutDeployment(template,size,`${index+1}분대`);
+  if(!anchor)return blueprint;
+  const sign=team==='B'?-1:1,board=this.board,banner=blueprint.members.find(m=>m.role==='banner');
+  blueprint.members=blueprint.members.filter(m=>{
+   const x=anchor.x+m.offset.x*sign,y=anchor.y+m.offset.y;
+   return board.inside(x,y)&&this.inTerritory(team,{x,y})&&!board.navigation.blocked(y*board.width+x)&&!board.occupied(x,y);
+  });
+  if(blueprint.members.length<Math.ceil(size*.5))return null;
+  // Keep a commander even when the rear flag seat was clipped.
+  if(banner&&!blueprint.members.some(m=>m.role==='banner')){
+   const last=blueprint.members.length-1;
+   blueprint.members[last]={...banner,offset:{...blueprint.members[last].offset}};
+  }
+  return blueprint;
  }
  deploy(team,type,anchor){
   if(this.phase!=='preparation'||!(team in this.reserve)||!this.recruitment.has(type)||this.reserve[team]<=0)return null;
-  const index=this.squadIds[team].length,size=Math.min(this.squadSize,this.reserve[team],this.recruitment.get(type).blueprint.members.length);
-  const blueprint=this.deploymentPreview(team,type),sign=team==='B'?-1:1;
-  if(blueprint.members.some(m=>!this.inTerritory(team,{x:anchor.x+m.offset.x*sign,y:anchor.y+m.offset.y})))return null;
+  const index=this.squadIds[team].length,blueprint=this.deploymentPreview(team,type,anchor);
+  if(!blueprint)return null;
+  const size=blueprint.members.length;
   const group=placeGroup(this.board,blueprint,anchor,{team,autoCombat:false,makeCharacter:this.makeCharacter,optionsFor:this.optionsFor});
   if(!group)return null;
   const s=squadsFor(this.board).get(group.squads[0]);s.platoonIndex=Math.floor(index/4);s.platoonId=team+':match:p'+s.platoonIndex;s.matchIndex=index;
