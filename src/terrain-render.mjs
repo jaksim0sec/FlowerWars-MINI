@@ -44,6 +44,14 @@ function paint(ctx,art,board,camera,width,height,dpr){
   const material=terrainMaterial(board,x,y),row=materialRow[material]??0;
   const sx=(terrainVariant(x,y)-1)*144,left=(x-y)*HALF_W-72,top=(x+y)*HALF_H-42;
   ctx.drawImage(art.tiles.atlas,sx,row*107,144,107,left,top,144,107);
+  // Grove tint belongs to the terrain surface, not to large floating tree
+  // sprites. It makes the forest readable even with the entire map fitted.
+  if(board.terrain[y][x]==='grove'){
+   const px=(x-y)*HALF_W,py=(x+y)*HALF_H;
+   ctx.fillStyle='#426b4a72';
+   ctx.beginPath();ctx.moveTo(px,py-HALF_H+3);ctx.lineTo(px+HALF_W-4,py);
+   ctx.lineTo(px,py+HALF_H-3);ctx.lineTo(px-HALF_W+4,py);ctx.closePath();ctx.fill();
+  }
   // A neighbor of another material is still solid ground, never an exposed wall.
   if(x===board.width-1){ctx.drawImage(art.tiles.atlas,sx,(3+row)*107,144,107,left,top,144,107);walls++;}
   if(y===board.height-1){ctx.drawImage(art.tiles.atlas,sx,(6+row)*107,144,107,left,top,144,107);walls++;}
@@ -68,25 +76,53 @@ function paint(ctx,art,board,camera,width,height,dpr){
   boundaries+=count;
  }
 
- // Decorative low-profile groves and palisades are cached with the ground.
- // No roof/tower sprites: dense troops remain visible from the 2.5D camera.
+ // All obstacles are drawn on the ground plane, never as tall gatehouses.
+ // The wooded areas are dark patches with occasional short shrubs.
  for(const {x,y} of tiles){
   const type=board.terrain[y][x];
   if(type!=='grove'&&type!=='wall'&&type!=='gate')continue;
   const px=(x-y)*HALF_W,py=(x+y)*HALF_H;
   if(type==='grove'){
-   const hash=(Math.imul(x+11,1664525)^Math.imul(y+5,1013904223))>>>0;
-   ctx.fillStyle='#426c4d5c';ctx.beginPath();ctx.ellipse(px+hash%23-11,py-6,23,12,0,0,Math.PI*2);ctx.fill();
-   ctx.fillStyle='#77985b73';ctx.beginPath();ctx.ellipse(px-4,py-13,14,8,0,0,Math.PI*2);ctx.fill();
+   const hash=(Math.imul(x+13,374761393)^Math.imul(y+17,668265263))>>>0;
+   if(hash%5!==0)continue; // avoid a noisy leaf stamp on every tile
+   const dx=hash%31-15,dy=(hash>>>8)%15-7;
+   ctx.fillStyle='#34573a58';
+   ctx.beginPath();ctx.ellipse(px+dx+5,py+dy+3,20,7,0,0,Math.PI*2);ctx.fill();
+   ctx.fillStyle=hash%2?'#50794eb5':'#628753bd';
+   ctx.beginPath();ctx.ellipse(px+dx,py+dy-4,18,10,0,0,Math.PI*2);ctx.fill();
+   ctx.fillStyle='#86a978b0';
+   ctx.beginPath();ctx.ellipse(px+dx-5,py+dy-8,9,4,0,0,Math.PI*2);ctx.fill();
    continue;
   }
-  const opened=type==='gate'&&!board.match?.gateAt(x,y)?.health.current;
-  const fromX=px+HALF_W/2,fromY=py-HALF_H/2,toX=px-HALF_W/2,toY=py+HALF_H/2;
-  ctx.lineCap='butt';ctx.beginPath();ctx.moveTo(fromX,fromY);ctx.lineTo(toX,toY);
-  ctx.strokeStyle=opened?'#846b4455':'#614d3bc0';ctx.lineWidth=opened?4:12;ctx.stroke();
-  if(!opened){
-   ctx.strokeStyle=type==='gate'?'#bf9461':'#97876a';ctx.lineWidth=7;ctx.stroke();
-   ctx.strokeStyle='#dbbe8e';ctx.lineWidth=2;ctx.stroke();
+  const gate=type==='gate'?board.match?.gateAt(x,y):null;
+  const opened=type==='gate'&&gate?.health.current===0;
+  const fx=px+HALF_W/2,fy=py-HALF_H/2,tx=px-HALF_W/2,ty=py+HALF_H/2;
+  function stroke(color,width,down=0){
+   ctx.beginPath();ctx.moveTo(fx,fy+down);ctx.lineTo(tx,ty+down);
+   ctx.lineCap='butt';ctx.lineWidth=width;ctx.strokeStyle=color;ctx.stroke();
+  }
+  if(opened){
+   // Flattened timber debris still marks the breach without closing the path.
+   stroke('#816b5260',9,4);
+   continue;
+  }
+  stroke('#4d463958',31,8); // ground contact shadow, not a flying sprite
+  if(type==='wall'){
+   stroke('#5f5340',24,2);stroke('#8c8065',19,-2);stroke('#c0ad82',5,-7);
+  }else{
+   stroke('#67462f',29,2);stroke('#a9794c',22,-2);stroke('#d7aa70',8,-7);
+   // Five visually separate leafs match the five independently breakable
+   // four-cell gate sections without drawing tall towers.
+   if(y%4===0){
+    const r=board.match?.gateAt(x,y)?.health.current??0;
+    ctx.fillStyle=r?'#4f433b':'#8b7863';
+    ctx.fillRect(px-5,py-15,10,20);
+   }
+  }
+  if(type==='wall'&&y%5===0){
+   // Fence posts are small enough to stay below soldier heads.
+   ctx.fillStyle='#66553d';ctx.fillRect(px-4,py-16,8,17);
+   ctx.fillStyle='#c1a978';ctx.fillRect(px-3,py-16,6,4);
   }
  }
  return {tiles:tiles.length,walls,boundaries};
