@@ -30,7 +30,7 @@ function blocked(board,x,y) {
 export function hasLineOfSight(board,actor,target) {
   // Traverse the cells crossed by the visual center-to-center segment, including
   // both touching cells at corners so a diagonal cannot see through a solid wall.
-  let x=Math.floor(actor.visualX+.5),y=Math.floor(actor.visualY+.5);
+  let x=Math.floor(actor.visualX+.5),y=Math.floor(actor.visualY+.5),groveCount=0;
   const endX=Math.floor(target.visualX+.5),endY=Math.floor(target.visualY+.5);
   const dx=target.visualX-actor.visualX,dy=target.visualY-actor.visualY,sx=Math.sign(dx),sy=Math.sign(dy);
   const stepX=dx?1/Math.abs(dx):Infinity,stepY=dy?1/Math.abs(dy):Infinity;
@@ -42,7 +42,8 @@ export function hasLineOfSight(board,actor,target) {
       x+=sx;y+=sy;crossX+=stepX;crossY+=stepY;
     } else if(crossX<crossY){x+=sx;crossX+=stepX;}
     else {y+=sy;crossY+=stepY;}
-    if((x!==endX||y!==endY)&&blocked(board,x,y))return false;
+    if((x!==endX||y!==endY)&&(blocked(board,x,y)||board.match?.gateBlocksSight?.(actor.team,x,y)))return false;
+     if((x!==endX||y!==endY)&&board.terrain[y]?.[x]==='grove'&&++groveCount>=3)return false;
   }
   return true;
 }
