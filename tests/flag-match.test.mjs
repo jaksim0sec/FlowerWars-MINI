@@ -10,8 +10,8 @@ function prepared(b,options={}){
  deployReserves(m);assert.equal(m.reserve.A,0);
  while(m.reserve.B)assert.ok(m.deployBot());return m;
 }
-test('automatic armies obey the 200 cap and deploy on their own half',()=>{
- const b=new Board(),m=prepared(b,{count:900});assert.deepEqual(m.counts,{A:200,B:200});assert.equal(b.units.length,400);
+test('automatic armies obey the 350 cap and deploy inside their own kingdom',()=>{
+ const b=new Board(),m=prepared(b,{count:900});assert.deepEqual(m.counts,{A:350,B:350});assert.equal(b.units.length,700);
  assert.ok(b.units.every(u=>m.inTerritory(u.team,u)));assert.equal(new Set(b.units.map(u=>u.y*b.width+u.x)).size,400);
  assert.equal(b.spawn(0,0,null,{team:'A'}),null);
 });
@@ -48,7 +48,7 @@ test('both sides start empty and the bot places reserves without walking or rear
 test('manual placement spends reserves atomically and rejects overlaps and enemy territory',()=>{
  const b=new Board(),m=new FlagMatch(b,{count:48});assert.ok(m.deploy('A','defense',{x:20,y:20}));assert.equal(m.reserve.A,24);
  assert.equal(m.deploy('A','defense',{x:20,y:20}),null);assert.equal(m.deploy('A','mobile',{x:65,y:20}),null);assert.equal(m.reserve.A,24);
- assert.ok(m.deploy('A','ranged',{x:30,y:50}));assert.equal(m.reserve.A,0);assert.equal(b.units.length,48);assert.ok(b.units.every(u=>!u.step&&!u.command));
+ assert.ok(m.deploy('A','ranged',{x:16,y:67}));assert.equal(m.reserve.A,0);assert.equal(b.units.length,48);assert.ok(b.units.every(u=>!u.step&&!u.command));
  m.start();assert.equal(m.deploy('A','mobile',{x:15,y:70}),null);
 });
 test('strategic deployment reacts to player concentration and separates combat roles',()=>{
