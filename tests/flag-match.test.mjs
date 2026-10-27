@@ -46,7 +46,7 @@ test('both sides start empty and the bot places reserves without walking or rear
  assert.ok(b.units.every(u=>m.inTerritory(u.team,u)));assert.equal(b.combatStats.hits,0);
 });
 test('manual placement spends reserves atomically and rejects overlaps and enemy territory',()=>{
- const b=new Board(),m=new FlagMatch(b,{count:48});assert.ok(m.deploy('A','defense',{x:20,y:20}));assert.equal(m.reserve.A,24);
+ const b=new Board(),m=new FlagMatch(b,{count:48});assert.ok(m.deploy('A','defense',{x:20,y:50}));assert.equal(m.reserve.A,24);
  assert.equal(m.deploy('A','defense',{x:20,y:20}),null);assert.equal(m.deploy('A','mobile',{x:65,y:20}),null);assert.equal(m.reserve.A,24);
  assert.ok(m.deploy('A','ranged',{x:16,y:67}));assert.equal(m.reserve.A,0);assert.equal(b.units.length,48);assert.ok(b.units.every(u=>!u.step&&!u.command));
  m.start();assert.equal(m.deploy('A','mobile',{x:15,y:70}),null);
