@@ -66,3 +66,20 @@ test('woodland slows movement but remains walkable',()=>{
  assert.equal(match.inTerritory('B',{x:72,y:50}),false);
  assert.equal(match.inTerritory('B',{x:73,y:50}),true);
 });
+
+test('normal movement exits an allied gate and breaches an opposing gate with repeated attacks',()=>{
+ const friendlyBoard=new Board(),friendlyMatch=new FlagMatch(friendlyBoard,{count:24});
+ friendlyMatch.phase='battle';
+ const friendly=friendlyBoard.spawn(73,50,null,{team:'B'});
+ assert.ok(friendlyBoard.move(friendly.id,70,50,{direct:true}));
+ for(let i=0;i<400&&friendly.x>70;i++)friendlyBoard.update(.05);
+ assert.equal(friendly.x,70,'allied gate must not block outward traffic');
+
+ const board=new Board(),match=new FlagMatch(board,{count:24});
+ match.phase='battle';
+ const x=KINGDOM_WALLS.B,invader=board.spawn(x-1,50,null,{team:'A',stats:{damage:300,attackPeriod:.45}});
+ assert.ok(board.move(invader.id,x+2,50,{direct:true}));
+ for(let i=0;i<1000&&invader.x<x+2;i++)board.update(.05);
+ assert.equal(match.gateAt(x,50).health.current,0,'repeated strikes destroy the obstacle');
+ assert.equal(invader.x,x+2,'the marching unit must pass through the breached section');
+});
