@@ -74,7 +74,15 @@ function paint(ctx,art,board,camera,width,height,dpr){
   boundaries+=count;
  }
 
- return {tiles:tiles.length,walls,boundaries};
+ // Decorations are sparse, static and baked into the same viewport cache.
+ let decorations=0;
+ if(art.tiles.decorations)for(const d of board.battlefield?.decorations||[]){
+  const px=(d.x-d.y)*HALF_W,py=(d.x+d.y)*HALF_H,dh=d.width*270/340;
+  const screenX=px*camera.scale+camera.x,screenY=py*camera.scale+camera.y;
+  if(screenX+d.width*camera.scale<0||screenX-d.width*camera.scale>width||screenY<0||screenY-dh*camera.scale>height)continue;
+  ctx.drawImage(art.tiles.decorations,d.index%3*340,Math.floor(d.index/3)*270,340,270,px-d.width/2,py-dh,d.width,dh);decorations++;
+ }
+ return {tiles:tiles.length,walls,boundaries,decorations};
 }
 /** One viewport-sized backing canvas per renderer, never a map-sized allocation. */
 export function drawTerrain(ctx,art,board,camera,width,height,dpr,interactive=false){
@@ -97,4 +105,4 @@ export function drawTerrain(ctx,art,board,camera,width,height,dpr,interactive=fa
  ctx.setTransform(1,0,0,1,0,0);
  ctx.drawImage(cache.canvas,(camera.x-(cache.camera.x+pad)*ratio)*dpr,(camera.y-(cache.camera.y+pad)*ratio)*dpr,cache.canvas.width*ratio,cache.canvas.height*ratio);
 }
-export function terrainRenderStats(ctx){const c=caches.get(ctx);return c?{builds:c.builds,tiles:c.tiles,walls:c.walls,boundaries:c.boundaries,bytes:c.canvas.width*c.canvas.height*4}:null;}
+export function terrainRenderStats(ctx){const c=caches.get(ctx);return c?{builds:c.builds,tiles:c.tiles,walls:c.walls,boundaries:c.boundaries,decorations:c.decorations,bytes:c.canvas.width*c.canvas.height*4}:null;}

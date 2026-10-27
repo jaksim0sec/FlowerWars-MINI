@@ -20,7 +20,7 @@ test('small and uneven requested armies remain exact and timers transition once'
 });
 test('preparation rejects crossing, hostile orders and attacks; skip starts combat',()=>{
  const b=new Board(),m=prepared(b,{count:24}),a=b.units.find(u=>u.team==='A'),enemy=b.units.find(u=>u.team==='B');
- assert.equal(b.move(a.id,60,20),false);assert.equal(b.attack(a.id,enemy.id),false);assert.equal(m.canCommand('B','move',{x:70,y:20}),false);assert.equal(m.canCommand('A','move',{x:20,y:20}),true);
+ assert.equal(b.move(a.id,Math.ceil(b.width/2)+5,m.flags.B.y),false);assert.equal(b.attack(a.id,enemy.id),false);assert.equal(m.canCommand('B','move',{x:70,y:20}),false);assert.equal(m.canCommand('A','move',{x:20,y:20}),true);
  m.start();assert.equal(m.phase,'battle');assert.ok(b.units.every(u=>u.combat.auto));m.update(.1);assert.ok(m.decisions>0);assert.ok(m.squadIds.B.some(id=>squadsFor(b).get(id).order));
 });
 test('touching flags does not win; destroying the opposing flag wins and freezes battle',()=>{

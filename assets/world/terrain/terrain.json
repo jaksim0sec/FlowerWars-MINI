@@ -19,5 +19,22 @@
     72,
     42
   ],
-  "notes": "Interior surfaces only; walls only at exposed world +X/+Y edges. Material boundaries use a separate cached overlay. Decorations are stored but not spawned automatically."
+  "notes": "Interior surfaces only; walls only at exposed world +X/+Y edges. Material boundaries and sparse non-colliding decorations are baked into the viewport cache. Global 5x2 surface phase is preserved.",
+  "decorationsAtlas": "decorations.webp",
+  "decorationCell": [
+    340,
+    270
+  ],
+  "decorationColumns": 3,
+  "decorations": [
+    "autumn_leaves",
+    "clover",
+    "daisies",
+    "grass_tuft",
+    "lily_pads",
+    "moss_stone",
+    "pond_stones",
+    "reeds",
+    "twig"
+  ]
 }

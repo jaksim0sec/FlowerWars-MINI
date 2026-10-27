@@ -9,9 +9,9 @@ import {drawMatchOverlay,drawDistantSoldier,drawSquadTeamFlags,TEAM_COLORS,TEAM_
 
 const TERRAIN_ATLAS=new URL('../assets/world/terrain/atlas.webp',import.meta.url);
 export async function loadArtwork() {
-  const [catalog,atlas]=await Promise.all([loadCatalog(),loadImage(TERRAIN_ATLAS)]);
+  const [catalog,atlas,decorations]=await Promise.all([loadCatalog(),loadImage(TERRAIN_ATLAS),loadImage(new URL('../assets/world/terrain/decorations.webp',import.meta.url))]);
   const warrior=catalog.characters['gynari-warrior'];
-  return {catalog,rig:warrior.rig,parts:warrior.images,tiles:{atlas}};
+  return {catalog,rig:warrior.rig,parts:warrior.images,tiles:{atlas,decorations}};
 }
 
 function diamond(ctx, x, y, fill, stroke = null, inset = 3) {

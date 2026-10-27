@@ -17,3 +17,12 @@ for layer_index, layer in enumerate(LAYERS):
                     raise ValueError(f'Unexpected tile dimensions: {tile.filename}')
                 atlas.paste(tile, ((variant - 1) * 144, (layer_index * 3 + material_index) * 107))
 atlas.save(ROOT / 'atlas.webp', lossless=True, method=6)
+
+# Native decoration pixels packed once; game clients fetch a single extra file.
+names=('autumn_leaves','clover','daisies','grass_tuft','lily_pads','moss_stone','pond_stones','reeds','twig')
+decor=Image.new('RGBA',(1020,810))
+for i,name in enumerate(names):
+    with Image.open(ROOT/'decorations'/f'{name}.webp') as sprite:
+        if sprite.width>340 or sprite.height>270:raise ValueError(name)
+        decor.paste(sprite,(i%3*340+(340-sprite.width)//2,i//3*270+270-sprite.height))
+decor.save(ROOT/'decorations.webp',lossless=True,method=6)
