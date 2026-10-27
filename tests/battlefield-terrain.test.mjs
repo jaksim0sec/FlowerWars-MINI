@@ -22,15 +22,15 @@ test('seeded enlarged battlefield keeps bases, central approaches and side entri
   const connected=reachable(b,m.flags.A.y*b.width+m.flags.A.x);
   assert.ok(connected.has(m.flags.B.y*b.width+m.flags.B.x));
   assert.equal(connected.size,b.width*b.height-b.obstacles.size,'no isolated walkable islands');
-  let water=0;
+  let water=0,outside=0,asymmetric=0;
   for(let y=0;y<b.height;y++)for(let x=0;x<b.width;x++){
    const n=y*b.width+x,t=b.terrain[y][x];
-   assert.equal(t,b.terrain[b.height-1-y][b.width-1-x],'rotational balance');
-   assert.equal(b.navigation.blocked(n),t==='forest');
+   if(t!==b.terrain[b.height-1-y][b.width-1-x])asymmetric++;
+   assert.equal(b.navigation.blocked(n),t==='forest'||t==='void');
    if(field.protectedCells[n])assert.ok(connected.has(n));
-   if(t==='forest')water++;
+   if(t==='forest')water++;if(t==='void'){outside++;assert.equal(b.spawn(x,y),null);}
   }
-  assert.ok(water>1800&&water<6000);
+  assert.ok(water>800&&water<2500);assert.ok(outside>5000);assert.ok(asymmetric>500);
   // Verify tactical topology, not just connectivity: one medium sortie mouth
   // and two small flank apertures, with no unrestricted edge bypass.
   for(const gate of field.gates){
@@ -42,15 +42,14 @@ test('seeded enlarged battlefield keeps bases, central approaches and side entri
    }
    assert.equal(openings.length,3);
    const middle=openings.find(p=>p.start<=gate.y&&p.end>=gate.y);
-   assert.ok(middle&&middle.width>=14&&middle.width<=20);
-   assert.ok(openings.filter(p=>p!==middle).every(p=>p.width>=4&&p.width<=7));
+   assert.ok(middle&&middle.width>=12&&middle.width<=24);
+   assert.ok(openings.filter(p=>p!==middle).every(p=>p.width>=4&&p.width<=10));
   }
   let basin=0;
-  for(let y=34;y<=77;y++)for(let x=45;x<=98;x++)if(b.terrain[y][x]==='grass')basin++;
-  assert.ok(basin>2100,'central battle space stays broad and continuous grass');
+  for(let y=40;y<=71;y++)for(let x=53;x<=90;x++)if(b.terrain[y][x]==='grass')basin++;
+  assert.ok(basin>1150,'central battle space stays broad and continuous grass');
 
-  assert.equal(field.paths.length,7);assert.ok(field.paths[0].radius>field.paths[1].radius);
-  assert.ok(field.paths.slice(3).every(p=>p.radius<field.paths[1].radius));
+  assert.ok(field.outline.length>200);
   shapes.add(b.terrain.map(row=>row.join(',')).join(';'));
  }
  assert.equal(shapes.size,32);
@@ -58,6 +57,7 @@ test('seeded enlarged battlefield keeps bases, central approaches and side entri
 test('the same seed reproduces terrain and reset drops old strategic metadata',()=>{
  const a=new Board(),b=new Board();new FlagMatch(a,{seed:73});new FlagMatch(b,{seed:73});
  assert.deepEqual(a.terrain,b.terrain);assert.deepEqual(a.battlefield,b.battlefield);
+ assert.equal(a.setTerrain(0,0,'grass'),false);
  a.reset();assert.equal(a.battlefield,null);
 });
 test('roads speed movement while X rejects movement and placement for both factions',()=>{

@@ -29,3 +29,12 @@ test('material boundaries never create internal walls and use the same pond mapp
  assert.deepEqual(terrain.terrainEdges(b,5,5),{wallX:true,wallY:true,boundaryX:false,boundaryY:false});
  assert.deepEqual(terrain.terrainEdges(b,0,0),{wallX:false,wallY:false,boundaryX:false,boundaryY:false});
 });
+
+test('irregular land omits exterior cells and only exposes walls at the coastline',()=>{
+ const b=new Board(8,8);b.terrain[3][4]='void';b.obstacles.set(28,{kind:'void',blocked:true});
+ assert.equal(terrain.terrainMaterial(b,4,3),'void');
+ assert.deepEqual(terrain.terrainEdges(b,3,3),{wallX:true,wallY:false,boundaryX:false,boundaryY:false});
+ assert.ok(!terrain.visibleTiles(b,{x:300,y:50,scale:.5},800,600).some(p=>p.x===4&&p.y===3));
+ b.terrain[3][4]='forest';b.obstacles.set(28,{kind:'forest',blocked:true});
+ assert.deepEqual(terrain.terrainEdges(b,3,3),{wallX:false,wallY:false,boundaryX:true,boundaryY:false});
+});

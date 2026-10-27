@@ -17,70 +17,69 @@ export function battlefieldLane(board,y){
  return best;
 }
 function randomFor(seed){let n=seed>>>0;return()=>{n=(Math.imul(n,1664525)+1013904223)>>>0;return n/4294967296;};}
-function segmentDistance(x,y,a,b){
- const dx=b.x-a.x,dy=b.y-a.y,t=Math.max(0,Math.min(1,((x-a.x)*dx+(y-a.y)*dy)/(dx*dx+dy*dy||1)));
- return Math.hypot(x-a.x-t*dx,y-a.y-t*dy);
+const smooth=t=>{t=Math.max(0,Math.min(1,t));return t*t*(3-2*t);};
+function interpolate(knots,x){
+ for(let i=1;i<knots.length;i++)if(x<=knots[i][0]){const [a,u]=knots[i-1],[b,v]=knots[i];return u+(v-u)*smooth((x-a)/(b-a));}
+ return knots.at(-1)[1];
 }
-function insidePolygon(x,y,points){
- let inside=false;
- for(let i=0,j=points.length-1;i<points.length;j=i++){
-  const a=points[i],b=points[j];
-  if((a.y>y)!==(b.y>y)&&x<(b.x-a.x)*(y-a.y)/(b.y-a.y)+a.x)inside=!inside;
- }
- return inside;
-}
-/** Build the tactical spaces first: kingdom, sortie throat, battle basin and
- * outside flank. Water is thin separating terrain, never the central space. */
+/** Grow shorelines around tactical spaces. Independent, smoothly varying
+ * shores replace mirrored polygons; narrow flanks follow the actual land edge. */
 export function createBattlefield(board){
- const random=randomFor(board.seed),w=board.width,h=board.height,cx=(w-1)/2,cy=(h-1)/2;
- const sx=(w-1)/143,sy=(h-1)/111;
- const point=(x,y)=>({x:x*sx,y:y*sy}),rotate=p=>({x:w-1-p.x,y:h-1-p.y});
- const gateX=29+Math.floor(random()*4),gateHalf=7+Math.floor(random()*3);
- const flankY=12+Math.floor(random()*3),flankHalf=2;
- const bend=(random()-.5)*4,tip=64+Math.floor(random()*4);
- const polygons=[],add=points=>{const p=points.map(([x,y])=>point(x,y));polygons.push(p,p.map(rotate));};
- // The two home-side gate banks reach the map edge. Each has a separate
- // small flank aperture; the central opening has a bounded physical width.
- for(const bottom of [false,true]){
-  const flip=y=>bottom?111-y:y;
-  add([[gateX-6,flip(0)],[gateX+4,flip(0)],[gateX+5,flip(flankY-flankHalf-1)],[gateX-5,flip(flankY-flankHalf-1)]]);
-  add([[gateX-5,flip(flankY+flankHalf+1)],[gateX+4,flip(flankY+flankHalf+1)],
-   [gateX+8,flip(37+bend)],[gateX+2,flip(55.5-gateHalf)],[gateX-2,flip(40+bend)]]);
+ const random=randomFor(board.seed),w=board.width,h=board.height,sx=(w-1)/143,sy=(h-1)/111;
+ const jitter=n=>(random()-.5)*n,cy=55.5,phase=random()*6.28;
+ const center=x=>cy+Math.sin(x*.043+phase)*2.2*Math.sin(Math.PI*x/143);
+ const outlineBase=[[0,0],[5,11],[17,25],[34,30],[58,35],[78,40],[107,31],[127,27],[138,12],[143,0]];
+ const shores=[-1,1].map(sign=>({sign,knots:outlineBase.map(([x,y],i)=>[x,y+(i===0||i===outlineBase.length-1?0:jitter(4))]),phase:random()*6.28}));
+ const mainKnots=[[0,5],[17,21],[28,8+jitter(2)],[36,11+jitter(2)],[48,14+jitter(2)],[69,24],[77,24],[96,14+jitter(2)],[112,9+jitter(2)],[128,21],[143,5]];
+ const mainHalf=x=>interpolate(mainKnots,x);
+ const banks=shores.map(shore=>{
+  const width=5+random()*2,start=36+jitter(4),end=68+jitter(4),otherStart=77+jitter(4),otherEnd=108+jitter(4);
+  const segments=[[21+jitter(2),34+jitter(2)],[start,end],[otherStart,otherEnd],[110+jitter(2),123+jitter(2)]];
+  return {...shore,width,segments};
+ });
+ const upper=[],lower=[],protectedCells=new Uint8Array(w*h),gates=[];
+ board.obstacles.clear();
+ for(let x=0;x<w;x++){
+  const u=x/sx,c=center(u),edges=shores.map(s=>c+s.sign*(interpolate(s.knots,u)+Math.sin(u*.11+s.phase)*1.1*Math.sin(Math.PI*u/143)));
+  upper[x]=Math.ceil(edges[0]*sy);lower[x]=Math.floor(edges[1]*sy);
+  for(let y=0;y<h;y++){
+   const n=y*w+x,v=y/sy,outside=y<upper[x]||y>lower[x]||u<1||u>142;
+   let water=false;
+   if(!outside)for(let i=0;i<2;i++){
+    const bank=banks[i],distance=(v-c)*bank.sign,edgeDistance=(edges[i]-c)*bank.sign;
+    const outer=edgeDistance-bank.width-(.5+Math.sin(u*.19+bank.phase)*.6);
+    const gateBody=u<35||u>109;
+    const thickness=8.5+Math.sin(u*.095+bank.phase)*2;
+    const inner=Math.max(mainHalf(u)+Math.sin(u*.14+bank.phase)*1.3,gateBody?0:outer-thickness);
+    const middle=(outer+inner)/2;
+    // Each body tapers smoothly into irregular headlands. The spaces between
+    // bodies form rear interception gaps and side entry into the central basin.
+    const taper=Math.max(...bank.segments.map(([a,b])=>smooth((u-a)/3.5)*smooth((b-u)/4.5)));
+    const half=Math.max(0,(outer-inner)/2)*taper;
+    const ripple=Math.sin(u*.64+v*.48+bank.phase)*.28;
+    if(half>.25&&Math.abs(distance-middle)<half+ripple)water=true;
+   }
+   const terrain=outside?'void':water?'forest':'grass';board.terrain[y][x]=terrain;
+   if(outside||water)board.obstacles.set(n,{kind:terrain==='void'?'void':'forest',blocked:true});
+   else if(Math.abs(v-c)<=mainHalf(u)-2)protectedCells[n]=1;
+  }
  }
- // Four crescent shores separate the front from the flank. Their ends leave
- // side-entry gaps near the middle; these are openings, not bridges in lakes.
- const crescent=(offset)=>[[gateX+6,40+offset],[gateX+10,26+offset],[46,19+bend+offset],
-  [57,18+bend+offset],[tip-2,24+offset],[tip,35+offset],[tip-5,31+offset],
-  [54,28+bend+offset],[45,29+bend+offset],[gateX+10,35+offset],[gateX+7,43+offset]];
- add(crescent(0));add(crescent(0).map(([x,y])=>[x,111-y]));
- // A shallow outer shoreline keeps the outside route small enough to defend.
- add([[gateX+3,0],[143-gateX-3,0],[143-gateX-5,flankY-5],[91,flankY-5],
-  [75,flankY-6],[55,flankY-5],[gateX+6,flankY-5]]);
- const left=point(5,55.5),right=rotate(left),gate=point(gateX+2,55.5);
- const main=[left,gate,point(71.5,55.5),rotate(gate),right];
- const top=[left,point(gateX-8,flankY),point(gateX+6,flankY),point(71.5,flankY+1),point(137-gateX,flankY),point(151-gateX,flankY),right];
- const bottom=top.map(rotate).reverse();
- const entry=[point((tip+71.5)/2,flankY+1),point((tip+71.5)/2,38),point(71.5,45)];
- const entries=[entry,entry.map(rotate),entry.map(p=>({x:p.x,y:h-1-p.y})),entry.map(p=>({x:w-1-p.x,y:p.y}))];
- const paths=[{points:main,radius:gateHalf*sy},{points:top,radius:flankHalf*sy},{points:bottom,radius:flankHalf*sy},...entries.map(points=>({points,radius:1.5*Math.min(sx,sy)}))];
- const clearing={x:cx,y:cy,rx:24*sx,ry:18*sy};
- // Safety corridors are grass, not a road lattice. Only the short kingdom
- // approaches are surfaced, ending before the open battle basin.
- const segments=paths.flatMap(path=>path.points.slice(1).map((b,i)=>({a:path.points[i],b,radius:path.radius})));
- board.obstacles.clear();const protectedCells=new Uint8Array(w*h);
- for(let y=0;y<h;y++)for(let x=0;x<w;x++){
-  const n=y*w+x,mirror=w*h-1-n;if(n>mirror)continue;
-  const central=((x-cx)/clearing.rx)**2+((y-cy)/clearing.ry)**2<=1;
-  const safe=central||segments.some(s=>segmentDistance(x,y,s.a,s.b)<=s.radius);
-  const water=!safe&&polygons.some(p=>insidePolygon(x,y,p));
-  const approach=x<gate.x||x>w-1-gate.x;
-  const road=approach&&segmentDistance(x,y,left,right)<=1.2*sy;
-  const terrain=water?'forest':road?'road':'grass';
-  board.terrain[y][x]=terrain;board.terrain[h-1-y][w-1-x]=terrain;
-  if(safe){protectedCells[n]=1;protectedCells[mirror]=1;}
-  if(water){board.obstacles.set(n,{kind:'forest',blocked:true});board.obstacles.set(mirror,{kind:'forest',blocked:true});}
+ // Store only the small coastline and tactical summary; no work in the frame loop.
+ const outline=[];
+ for(let x=1;x<w-1;x++)if(upper[x]<=lower[x])outline.push({x:x-.5,y:upper[x]-.5});
+ for(let x=w-2;x>=1;x--)if(upper[x]<=lower[x])outline.push({x:x+.5,y:lower[x]+.5});
+ for(const [a,b]of [[25,53],[90,119]]){
+  let best=null;
+  for(let x=a;x<=b;x++){
+   const ix=Math.round(x*sx),y=Math.round(center(x)*sy);let lo=y,hi=y;
+   while(lo>0&&!board.obstacles.has((lo-1)*w+ix))lo--;
+   while(hi<h-1&&!board.obstacles.has((hi+1)*w+ix))hi++;
+   if(!best||hi-lo<best.width)best={x:ix,y,width:hi-lo+1};
+  }
+  gates.push(best);
  }
- board.battlefield={seed:board.seed,lanes:[Math.round(flankY*sy),Math.round(cy),Math.round(h-1-flankY*sy)],clearing,paths,protectedCells,
-  gates:[{x:Math.round(gate.x),y:Math.round(cy),halfWidth:gateHalf*sy},{x:Math.round(w-1-gate.x),y:Math.round(cy),halfWidth:gateHalf*sy}]};
+ const flankY=Math.round((upper[Math.round(w/2)]+banks[0].width*sy/2));
+ board.battlefield={seed:board.seed,lanes:[flankY,Math.round(center(71.5)*sy),Math.round(lower[Math.round(w/2)]-banks[1].width*sy/2)],
+  clearing:{x:71.5*sx,y:center(71.5)*sy,rx:19*sx,ry:21*sy},outline,upper,lower,gates,protectedCells};
  board.terrainRevision++;board.obstacleRevision++;board.navigation.invalidate();
 }

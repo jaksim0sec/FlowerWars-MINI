@@ -99,7 +99,7 @@ export class Board {
     return alive.length;
   }
   setTerrain(x,y,type) {
-    if(!this.inside(x,y)||!['grass','soil','road','forest'].includes(type))return false;
+    if(!this.inside(x,y)||this.terrain[y][x]==='void'||!['grass','soil','road','forest'].includes(type))return false;
     if(type==='forest'&&this.occupied(x,y))return false;
     const key=y*this.width+x;
     if(type==='forest')this.obstacles.set(key,{kind:'forest',blocked:true});

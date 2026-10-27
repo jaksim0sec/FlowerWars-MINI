@@ -98,7 +98,7 @@ export class FlagMatch{
     footprints.push({x:(slot%2)*7-member.offset.x,y:(slot<2?-4:4)+member.offset.y});
   }
   const wanted=operation.anchor;
-  for(let radius=0;radius<=36;radius+=4)for(let dx=-radius;dx<=radius;dx+=4)for(let dy=-radius;dy<=radius;dy+=4){
+  for(let radius=0;radius<=Math.max(this.board.width,this.board.height);radius+=4)for(let dx=-radius;dx<=radius;dx+=4)for(let dy=-radius;dy<=radius;dy+=4){
    if(Math.max(Math.abs(dx),Math.abs(dy))!==radius)continue;
    const anchor={x:wanted.x+dx,y:wanted.y+dy},seen=new Set();
    if(footprints.every(p=>{

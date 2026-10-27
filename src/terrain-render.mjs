@@ -11,7 +11,7 @@ export function visibleTiles(board,camera,width,height){
  for(let y=minY;y<=maxY;y++){
   const minX=Math.max(0,Math.ceil(Math.max(left/HALF_W+y,top/HALF_H-y)));
   const maxX=Math.min(board.width-1,Math.floor(Math.min(right/HALF_W+y,bottom/HALF_H-y)));
-  for(let x=minX;x<=maxX;x++)tiles.push({x,y});
+  for(let x=minX;x<=maxX;x++)if(board.terrain[y][x]!=='void')tiles.push({x,y});
  }
  return tiles.sort((a,b)=>(a.x+a.y)-(b.x+b.y)||a.y-b.y);
 }
@@ -19,22 +19,27 @@ export function visibleTiles(board,camera,width,height){
 export const terrainVariant=(x,y)=>1+((x%5+5)%5)+5*((y%2+2)%2);
 export function terrainMaterial(board,x,y){
  const type=board.terrain[y][x],obstacle=board.obstacles?.get(y*board.width+x);
+ if(type==='void')return 'void';
  return type==='forest'||obstacle&&obstacle.blocked!==false?'pond':type==='road'?'soil':type;
 }
 export function terrainEdges(board,x,y){
  const material=terrainMaterial(board,x,y);
- return {wallX:x===board.width-1,wallY:y===board.height-1,
-  boundaryX:x<board.width-1&&terrainMaterial(board,x+1,y)!==material,
-  boundaryY:y<board.height-1&&terrainMaterial(board,x,y+1)!==material};
+ const east=x<board.width-1?terrainMaterial(board,x+1,y):'void',south=y<board.height-1?terrainMaterial(board,x,y+1):'void';
+ return {wallX:material!=='void'&&east==='void',wallY:material!=='void'&&south==='void',
+  boundaryX:east!=='void'&&east!==material,boundaryY:south!=='void'&&south!==material};
 }
 const materialRow={grass:0,soil:1,pond:2};
 function paint(ctx,art,board,camera,width,height,dpr){
  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,width,height);
  ctx.translate(camera.x,camera.y);ctx.scale(camera.scale,camera.scale);
- ctx.save();ctx.beginPath();ctx.moveTo(0,-HALF_H);
- ctx.lineTo(board.width*HALF_W,(board.width-1)*HALF_H);
- ctx.lineTo((board.width-board.height)*HALF_W,(board.width+board.height-1)*HALF_H);
- ctx.lineTo(-board.height*HALF_W,(board.height-1)*HALF_H);ctx.closePath();
+ ctx.save();ctx.beginPath();
+ if(board.battlefield?.outline){
+  board.battlefield.outline.forEach((p,i)=>{const x=(p.x-p.y)*HALF_W,y=(p.x+p.y)*HALF_H;if(i)ctx.lineTo(x,y);else ctx.moveTo(x,y);});ctx.closePath();
+ }else{
+  ctx.moveTo(0,-HALF_H);ctx.lineTo(board.width*HALF_W,(board.width-1)*HALF_H);
+  ctx.lineTo((board.width-board.height)*HALF_W,(board.width+board.height-1)*HALF_H);
+  ctx.lineTo(-board.height*HALF_W,(board.height-1)*HALF_H);ctx.closePath();
+ }
  ctx.translate(0,23);ctx.shadowColor='#68502455';ctx.shadowBlur=38;ctx.shadowOffsetY=23;ctx.fillStyle='#97794140';ctx.fill();ctx.restore();
  // A continuous base prevents transparent hairlines during fractional zoom.
  ctx.fillStyle='#8eaa54';ctx.fill();
@@ -45,8 +50,9 @@ function paint(ctx,art,board,camera,width,height,dpr){
   const sx=(terrainVariant(x,y)-1)*144,left=(x-y)*HALF_W-72,top=(x+y)*HALF_H-42;
   ctx.drawImage(art.tiles.atlas,sx,row*107,144,107,left,top,144,107);
   // A neighbor of another material is still solid ground, never an exposed wall.
-  if(x===board.width-1){ctx.drawImage(art.tiles.atlas,sx,(3+row)*107,144,107,left,top,144,107);walls++;}
-  if(y===board.height-1){ctx.drawImage(art.tiles.atlas,sx,(6+row)*107,144,107,left,top,144,107);walls++;}
+  const edges=terrainEdges(board,x,y);
+  if(edges.wallX){ctx.drawImage(art.tiles.atlas,sx,(3+row)*107,144,107,left,top,144,107);walls++;}
+  if(edges.wallY){ctx.drawImage(art.tiles.atlas,sx,(6+row)*107,144,107,left,top,144,107);walls++;}
  }
  // Material seams are an independent, static overlay. Each shared edge is
  // visited once and batched into just two paths (shoreline / land).
@@ -57,7 +63,7 @@ function paint(ctx,art,board,camera,width,height,dpr){
    for(const [dx,dy,side]of [[1,0,1],[0,1,-1]]){
     if(!board.inside(x+dx,y+dy))continue;
     const neighbor=terrainMaterial(board,x+dx,y+dy);
-    if(neighbor===material||(material==='pond'||neighbor==='pond')!==water)continue;
+    if(neighbor==='void'||neighbor===material||(material==='pond'||neighbor==='pond')!==water)continue;
     ctx.moveTo(px+side*HALF_W,py);ctx.lineTo(px,py+HALF_H);count++;
    }
   }
