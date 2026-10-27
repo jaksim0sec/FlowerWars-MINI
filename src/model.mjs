@@ -70,7 +70,7 @@ export class Board {
 
   reset() {
     if(this.movementPolicy?.matchOwner)this.movementPolicy=this.movementPolicy.previousPolicy;
-    this.match=null;
+    this.match=null;this.battlefield=null;
     this.terrainRevision=(this.terrainRevision||0)+1;
     this.decisionEpoch=0;
     this.units = []; this.byId=new Map(); this.cells=new Map(); this.reservations=new Map();

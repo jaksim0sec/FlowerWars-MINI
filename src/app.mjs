@@ -69,7 +69,7 @@ function notify(message) { text('notice', message);$('notice').classList.add('vi
 
 function fit() {
   camera = fitBoardCamera(width, height, board.width, board.height);
-  if(board.match){const center=project(49.5,49.5);camera.scale=Math.max(.02,Math.min((width-32)/(width<=700?10000:14400),(height-220)/8400,.5));camera.x=width/2-center.x*camera.scale;camera.y=(height-20)/2-center.y*camera.scale;}
+  if(board.match){const center=project((board.width-1)/2,(board.height-1)/2);camera.scale=Math.max(.02,Math.min((width-32)/((width<=700?100:144)*(board.width+board.height)/2),(height-220)/(42*(board.width+board.height)),.5));camera.x=width/2-center.x*camera.scale;camera.y=(height-20)/2-center.y*camera.scale;}
   fitted = true;
   refresh();
 }

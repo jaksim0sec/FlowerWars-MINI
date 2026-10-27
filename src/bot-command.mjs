@@ -1,15 +1,15 @@
+import {fieldX,fieldY,battlefieldLanes,battlefieldLane} from './battlefield-terrain.mjs';
 import {squadsFor} from './unit-groups.mjs';
-import {survey,LANES} from './bot-strategy.mjs';
+import {survey} from './bot-strategy.mjs';
 import {DOCTRINES} from './bot-doctrines.mjs';
 
 const roles=['guard','front','breach','mobile','support'];
-const laneFor=y=>Math.min(2,Math.max(0,Math.floor(y/34)));
 const distance=(a,b)=>Math.max(Math.abs(a.x-b.x),Math.abs(a.y-b.y));
 export class BotCommand{
  constructor(match,scenario){
   this.match=match;this.requested=scenario;this.scenario=DOCTRINES.find(s=>s.id===scenario)||DOCTRINES[0];
   this.operations=match.botOperations;this.registry=new Map(roles.map(role=>[role,new Set()]));
-  this.plans=new Map();this.events=[];this.mode='deploy';this.frontX=[60,64,60];this.gapSince=[null,null,null];this.nextFront=0;
+  this.plans=new Map();this.events=[];this.mode='deploy';this.frontX=[60,64,60].map(x=>fieldX(match.board,x));this.gapSince=[null,null,null];this.nextFront=0;
   this.nextRefresh=0;this.lastScenario=-Infinity;this.contractedUntil=0;this.priorityCursor=0;
  }
  event(type,detail){this.events.push({type,time:this.match.elapsed,...detail});if(this.events.length>32)this.events.shift();}
@@ -48,8 +48,8 @@ export class BotCommand{
   const entries=live.filter(o=>o.role==='guard').flatMap(o=>o.liveIds),key=this.mode+':'+this.topologyRevision+':'+entries.map(id=>id+'/'+states.get(id).count).join(',');
   if(key===this.guardSeatKey)return;this.guardSeatKey=key;this.guardGoals=new Map();
   const b=this.match.board,flag=this.match.flags.B,claimed=new Set(),candidates=[];
-  for(let x=flag.x-16;x<=Math.min(97,flag.x+16);x++)for(let y=flag.y-16;y<=flag.y+16;y++)if(b.inside(x,y))candidates.push({x,y});
-  const preferred={x:this.mode==='contract'?91:86,y:flag.y};
+  for(let x=flag.x-16;x<=Math.min(b.width-3,flag.x+16);x++)for(let y=flag.y-16;y<=flag.y+16;y++)if(b.inside(x,y))candidates.push({x,y});
+  const preferred={x:flag.x-(this.mode==='contract'?4:9),y:flag.y};
   candidates.sort((a,c)=>(Math.abs(a.x-preferred.x)+Math.abs(a.y-preferred.y))-(Math.abs(c.x-preferred.x)+Math.abs(c.y-preferred.y)));
   for(const id of entries){
    const count=states.get(id).count,offsets=[];
@@ -64,28 +64,29 @@ export class BotCommand{
  }
  refresh(){
   const m=this.match,b=m.board,registry=squadsFor(b);this.topology();
+  const X=x=>fieldX(b,x),Y=y=>fieldY(b,y),lanes=battlefieldLanes(b),laneAt=y=>battlefieldLane(b,y);
   const observation=survey(b,m.flags.B);m.strategy=observation;this.chooseScenario(observation);
-  const states=new Map(),enemyCounts=[0,0,0],enemyFront=[10,10,10],friendly=[0,0,0],contact=[0,0,0],gateSupport=[0,0,0],enemies=[];let rearEnemy=0,flagEnemy=0,forwardDefenders=0;
+  const states=new Map(),enemyCounts=[0,0,0],enemyFront=[X(10),X(10),X(10)],friendly=[0,0,0],contact=[0,0,0],gateSupport=[0,0,0],enemies=[];let rearEnemy=0,flagEnemy=0,forwardDefenders=0;
   for(const u of b.units){
    if(u.health.current<=0)continue;
-   const lane=laneFor(u.y);
+   const lane=laneAt(u.y);
    if(u.team==='A'){
     enemies.push(u);
     enemyCounts[lane]++;enemyFront[lane]=Math.max(enemyFront[lane],u.x);
-    if(u.x>=78)rearEnemy++;
+    if(u.x>=X(78))rearEnemy++;
     if(distance(u,m.flags.B)<=10)flagEnemy++;
    }else if(u.team==='B'){
     let state=states.get(u.squadId);if(!state){state={count:0,x:0,y:0,health:0,maxHealth:0,positions:[]};states.set(u.squadId,state);}
     state.count++;state.x+=u.x;state.y+=u.y;state.health+=u.health.current;state.maxHealth+=u.health.max;
     if(u.formationRole!=='banner'&&!u.healing)state.positions.push(u.x);
     const role=registry.get(u.squadId)?.botOperation?.role;
-    if(role==='front'||role==='breach'){friendly[lane]++;if(u.x<=74&&u.x>=40)gateSupport[lane]++;}
-    if(u.x<78)forwardDefenders++;
+    if(role==='front'||role==='breach'){friendly[lane]++;if(u.x<=X(74)&&u.x>=X(40))gateSupport[lane]++;}
+    if(u.x<X(78))forwardDefenders++;
    }
   }
   for(const state of states.values()){state.x/=state.count;state.y/=state.count;state.ratio=state.health/state.maxHealth;state.positions.sort((a,b)=>a-b);state.forwardX=state.positions[Math.floor(state.positions.length*.6)]??state.x;}
   this.states=states;this.enemyCounts=enemyCounts;this.enemyFront=enemyFront;
-  for(const u of enemies)if(Math.abs(u.x-this.frontX[laneFor(u.y)])<10)contact[laneFor(u.y)]++;
+  for(const u of enemies)if(Math.abs(u.x-this.frontX[laneAt(u.y)])<10)contact[laneAt(u.y)]++;
   for(const set of this.registry.values())set.clear();
   const live=[];
   for(const operation of this.operations.values()){
@@ -118,43 +119,43 @@ export class BotCommand{
   this.guardSeats(live,states);
   const totalEnemy=Math.max(1,observation.enemy.total);
   for(let lane=0;lane<3;lane++){
-   const gate=this.free({x:51,y:LANES[lane]});
+   const gate=this.free({x:X(51),y:lanes[lane]});
    const open=enemyCounts[lane]<=Math.max(3,totalEnemy*.12)&&gateSupport[lane]>=Math.min(6,Math.max(1,total*.02))&&this.connected[gate.y*b.width+gate.x];
    if(open&&this.gapSince[lane]===null)this.gapSince[lane]=m.elapsed;
    if(!open)this.gapSince[lane]=null;
   }
-  const openingReady=m.elapsed>=this.scenario.openingHold&&(this.scenario.id!=='counterstroke'||Math.max(...enemyFront)>50||m.elapsed>=20);
+  const openingReady=m.elapsed>=this.scenario.openingHold&&(this.scenario.id!=='counterstroke'||Math.max(...enemyFront)>X(50)||m.elapsed>=20);
   if(m.elapsed>=this.nextFront&&mode!=='contract'&&openingReady){
    this.nextFront=m.elapsed+this.scenario.frontCadence;
    for(let lane=0;lane<3;lane++){
     const wings=live.filter(op=>op.role==='front'&&op.lane!==1).map(op=>op.lane);
-    if(this.scenario.id==='envelopment'&&lane===1&&wings.some(wing=>this.frontX[wing]>44))continue;
+    if(this.scenario.id==='envelopment'&&lane===1&&wings.some(wing=>this.frontX[wing]>X(44)))continue;
     const nearby=[...states].filter(([id])=>{const s=registry.get(id);return s?.botOperation?.role==='front'&&s.botOperation.lane===lane;});
-    if(nearby.some(([,s])=>s.x<=this.frontX[lane]+7)&&contact[lane]<=Math.max(6,friendly[lane]*1.15))this.frontX[lane]=Math.max(12,this.frontX[lane]-2);
+    if(nearby.some(([,s])=>s.x<=this.frontX[lane]+7)&&contact[lane]<=Math.max(6,friendly[lane]*1.15))this.frontX[lane]=Math.max(X(12),this.frontX[lane]-2);
    }
   }
   for(const op of live){
    const center=this.center(op),peers=live.filter(other=>other.role===op.role&&(op.role==='guard'||other.lane===op.lane)),rank=peers.indexOf(op);let goal,stage=op.stage||'advance',action='advance';
    if(op.role==='guard'){
-    goal={x:mode==='contract'?91:86,y:50};stage='defend';action='fortify';
-   }else if(mode==='contract'&&(op.role==='mobile'&&center.x>55||op.role==='front')){
-    goal={x:84,y:42+op.lane*8};stage='reinforce';action='fortify';
+    goal={x:X(mode==='contract'?91:86),y:Y(50)};stage='defend';action='fortify';
+   }else if(mode==='contract'&&(op.role==='mobile'&&center.x>X(55)||op.role==='front')){
+    goal={x:X(84),y:Y(42+op.lane*8)};stage='reinforce';action='fortify';
    }else if(op.role==='mobile'){
     const gaps=openingReady?[0,1,2].filter(lane=>this.gapSince[lane]!==null&&m.elapsed-this.gapSince[lane]>=this.scenario.gapHold).sort((a,c)=>enemyCounts[a]-enemyCounts[c]):[];
     if(!op.stage)op.stage='reserve';
     if(op.stage==='reserve'&&gaps.length){op.lane=gaps[0];op.stage='penetrate';op.entryFront=enemyFront[op.lane];this.event('gap-opened',{operation:op.index,lane:op.lane});}
     if(op.stage==='penetrate'&&center.x<=Math.max(8,op.entryFront-10)+rank*3+5){op.stage='rear-attack';op.rearLane=observation.strongest;this.event('rear-attack',{operation:op.index});}
-    if(op.stage==='rear-attack'&&distance(center,{x:Math.max(6,enemyFront[op.rearLane]-10),y:LANES[op.rearLane]})<7)op.stage='capture';
+    if(op.stage==='rear-attack'&&distance(center,{x:Math.max(6,enemyFront[op.rearLane]-10),y:lanes[op.rearLane]})<7)op.stage='capture';
     stage=op.stage;
-    goal=stage==='reserve'?{x:76+rank*7,y:LANES[op.lane]}:stage==='penetrate'?{x:Math.max(8,op.entryFront-10,Math.round(center.x)-10)+rank*3,y:LANES[op.lane]}:
-     stage==='rear-attack'?{x:Math.max(6,enemyFront[op.rearLane]-10),y:LANES[op.rearLane]}:m.flags.A;
+    goal=stage==='reserve'?{x:X(76)+rank*7,y:lanes[op.lane]}:stage==='penetrate'?{x:Math.max(8,op.entryFront-10,Math.round(center.x)-10)+rank*3,y:lanes[op.lane]}:
+     stage==='rear-attack'?{x:Math.max(6,enemyFront[op.rearLane]-10),y:lanes[op.rearLane]}:m.flags.A;
     if(stage==='reserve')action='fortify';
    }else{
     const lane=op.role==='breach'?observation.strongest:op.lane;
-    goal={x:op.role==='breach'?Math.max(6,this.frontX[lane]-this.scenario.breachAhead)+rank*8:this.frontX[lane]+rank*8,y:LANES[lane]};
-    if(center.x<20)goal=m.flags.A;
+    goal={x:op.role==='breach'?Math.max(6,this.frontX[lane]-this.scenario.breachAhead)+rank*8:this.frontX[lane]+rank*8,y:lanes[lane]};
+    if(center.x<X(20))goal=m.flags.A;
    }
-   this.plans.set(op.index,{goal:this.free(goal),guardGoals:this.guardGoals,entry:this.free({x:Math.min(76,Math.max(40,(op.entryFront||45)+8)),y:LANES[op.lane]}),stage,action,mode});
+   this.plans.set(op.index,{goal:this.free(goal),guardGoals:this.guardGoals,entry:this.free({x:Math.min(X(76),Math.max(X(40),(op.entryFront||X(45))+8)),y:lanes[op.lane]}),stage,action,mode});
   }
   this.nextRefresh=m.elapsed+.5;
  }

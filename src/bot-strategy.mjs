@@ -1,14 +1,14 @@
 import {availableSquadBlueprints} from './unit-groups.mjs';
 import {createRecruitmentCatalog,recruit,DOCTRINES} from './bot-doctrines.mjs';
+import {fieldX,battlefieldLanes,battlefieldLane} from './battlefield-terrain.mjs';
 export const LANES=[20,50,80];
-const laneFor=y=>Math.min(2,Math.floor(y/34));
 
 // Both armies are visible to the player; the bot reads the same board state.
 // Cache one small strategic summary, not a full enemy scan per squad.
 export function survey(board,flag){
  const pressure=[0,0,0],enemy={total:0,shields:0,mobile:0,ranged:0,healers:0};
  for(const u of board.units)if(u.health.current>0&&u.team==='A'){
-  pressure[laneFor(u.y)]+=u.x>32?2:1;enemy.total++;
+  pressure[battlefieldLane(board,u.y)]+=u.x>fieldX(board,32)?2:1;enemy.total++;
   const role=u.formationRole;
   if(u.healing||role==='healer')enemy.healers++;
   else if(role==='guard'||u.health.max>=150)enemy.shields++;
@@ -21,7 +21,7 @@ export function survey(board,flag){
   const u=board.unit(id);if(!u||u.team!=='A'||u.health.current<=0)continue;
   const d=Math.abs(u.x-flag.x)+Math.abs(u.y-flag.y);if(d<closest&&d<=14){closest=d;intruder=u;}
  }
- return {pressure,weakest,strongest,enemy,intruderId:intruder?.id??null};
+ return {width:board.width,height:board.height,lanes:battlefieldLanes(board),pressure,weakest,strongest,enemy,intruderId:intruder?.id??null};
 }
 
 /** Commit a complementary four-squad force, rather than choosing each type alone. */
@@ -36,13 +36,13 @@ export function planOperation(plan,index,totalSquads,catalog=createRecruitmentCa
  let needs=[role==='mobile'?'mobile':'screen','fire',role==='mobile'?'mobile':doctrine==='anti-shield'?'fire':doctrine==='anti-ranged'?'mobile':doctrine==='anti-mobile'?'screen':'strike','support'];
  if(squadsPerOperation===2)needs=role==='guard'?['screen','fire']:role==='mobile'?['mobile','support']:role==='breach'?['strike',doctrine==='anti-shield'?'fire':'support']:['screen',doctrine==='anti-shield'?'fire':'support'];
  const types=needs.map(need=>recruit(catalog,need));
- return {index,role,mission,lane,doctrine,types,needs,squadIds:[],anchor:{x:role==='guard'?81:role==='mobile'?75:56+(index%3)*10,y:LANES[lane]}};
+ return {index,role,mission,lane,doctrine,types,needs,squadIds:[],anchor:{x:fieldX({width:plan.width||100},role==='guard'?81:role==='mobile'?75:56+(index%3)*10),y:(plan.lanes||LANES)[lane]}};
 }
 export function deployment(s,plan){
  if(s.botOperation){const slot=s.botSlot;return {x:s.botOperation.anchor.x+(slot%2)*7,y:s.botOperation.anchor.y+(slot<2?-4:4)};}
  const index=s.matchIndex,platoon=Math.floor(index/4),band=s.type==='mobile'?plan.weakest:s.type==='defense'?plan.strongest:platoon%3;
  const depth=Math.floor(platoon/3)*5;
  const roleDepth={defense:0,assault:3,mobile:4,mixed:5,ranged:9,support:14}[s.type]??5;
- return {x:Math.min(86,58+roleDepth+depth),y:LANES[band]+(index%4-1.5)*6};
+ return {x:fieldX({width:plan.width||100},Math.min(86,58+roleDepth+depth)),y:(plan.lanes||LANES)[band]+(index%4-1.5)*6};
 }
-export function attackLane(s,plan){return s.botOperation?LANES[s.botOperation.lane]:Math.round(LANES[s.type==='mobile'?plan.weakest:Math.floor(s.matchIndex/4)%3]+(s.matchIndex%4-1.5)*5);}
+export function attackLane(s,plan){return s.botOperation?(plan.lanes||LANES)[s.botOperation.lane]:Math.round((plan.lanes||LANES)[s.type==='mobile'?plan.weakest:Math.floor(s.matchIndex/4)%3]+(s.matchIndex%4-1.5)*5);}

@@ -3,11 +3,12 @@ import {project} from './model.mjs';
 
 export function drawMatchOverlay(ctx,match,scale){
  if(!match)return;
+ const mid=match.board.width/2-.5,right=match.board.width-.5,bottom=match.board.height-.5;
  const polygon=(x1,x2,fill)=>{
-  ctx.beginPath();[[x1,-.5],[x2,-.5],[x2,99.5],[x1,99.5]].forEach(([x,y],i)=>{const p=project(x,y);if(i)ctx.lineTo(p.x,p.y);else ctx.moveTo(p.x,p.y);});ctx.closePath();ctx.fillStyle=fill;ctx.fill();
+  ctx.beginPath();[[x1,-.5],[x2,-.5],[x2,bottom],[x1,bottom]].forEach(([x,y],i)=>{const p=project(x,y);if(i)ctx.lineTo(p.x,p.y);else ctx.moveTo(p.x,p.y);});ctx.closePath();ctx.fillStyle=fill;ctx.fill();
  };
- polygon(-.5,49.5,'#397bb011');polygon(49.5,99.5,'#e3464d11');
- const a=project(49.5,-.5),b=project(49.5,99.5);
+ polygon(-.5,mid,'#397bb011');polygon(mid,right,'#e3464d11');
+ const a=project(mid,-.5),b=project(mid,bottom);
  ctx.save();ctx.strokeStyle=match.phase==='preparation'?'#fff4d9':'#fff4d966';ctx.lineWidth=1.5/scale;ctx.setLineDash([6/scale,6/scale]);ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();ctx.setLineDash([]);
  for(const [team,flag]of Object.entries(match.flags)){
   const p=project(flag.x,flag.y);ctx.save();ctx.translate(p.x,p.y);ctx.scale(1/scale,1/scale);

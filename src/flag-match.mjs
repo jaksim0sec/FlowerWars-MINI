@@ -2,7 +2,7 @@ import {placeGroup,squadsFor,availableSquadBlueprints} from './unit-groups.mjs';
 import {orderSquads} from './squad-orders.mjs';
 import {survey,deployment,planOperation} from './bot-strategy.mjs';
 import {commandBotSquad} from './bot-tactics.mjs';
-import {createBattlefield} from './battlefield-terrain.mjs';
+import {createBattlefield,BATTLEFIELD_WIDTH,BATTLEFIELD_HEIGHT} from './battlefield-terrain.mjs';
 import {layoutDeployment} from './deployment-layout.mjs';
 import {createRecruitmentCatalog} from './bot-doctrines.mjs';
 import {BotCommand} from './bot-command.mjs';
@@ -15,9 +15,9 @@ export const FLAG_HEALTH=1200;
  * spatial buckets supply local enemies; capture and counters tick at 4 Hz. */
 export class FlagMatch{
  constructor(board,{count=ARMY_LIMIT,makeCharacter,optionsFor,seed=1,blueprints=availableSquadBlueprints(),unitProfiles={},scenario}={}){
-  this.board=board;board.width=100;board.height=100;board.seed=seed;board.reset();
+  this.board=board;board.width=BATTLEFIELD_WIDTH;board.height=BATTLEFIELD_HEIGHT;board.seed=seed;board.reset();
   this.epoch=board.byId;this.phase='preparation';this.remaining=PREPARATION_SECONDS;this.winner=null;
-  this.flags={A:{x:4,y:50},B:{x:95,y:50}};this.counts={A:0,B:0};this.squadIds={A:[],B:[]};
+  this.flags={A:{x:5,y:Math.floor(board.height/2)},B:{x:board.width-6,y:board.height-1-Math.floor(board.height/2)}};this.counts={A:0,B:0};this.squadIds={A:[],B:[]};
   for(const [team,flag]of Object.entries(this.flags)){
    Object.assign(flag,{team,id:team==='A'?-1:-2,visualX:flag.x,visualY:flag.y,structure:'flag',health:{current:FLAG_HEALTH,max:FLAG_HEALTH}});
    board.byId.set(flag.id,flag);
@@ -109,7 +109,7 @@ export class FlagMatch{
   }
   return false;
  }
- inTerritory(team,p){return team==='A'?p.x<50:p.x>=50;}
+ inTerritory(team,p){return team==='A'?p.x<this.board.width/2:p.x>=this.board.width/2;}
  canCommand(team,action,target){
   if(this.phase==='finished'||team!=='A')return false;
   if(this.phase==='preparation'&&(['focus','follow'].includes(action)||target?.x!=null&&!this.inTerritory('A',target)))return false;

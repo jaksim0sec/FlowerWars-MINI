@@ -10,7 +10,7 @@ function state(board,squad){
   health:units.reduce((n,u)=>n+u.health.current,0)/units.reduce((n,u)=>n+u.health.max,0)};
 }
 function move(board,squad,action,point){
- const aim={x:Math.max(3,Math.min(94,Math.round(point.x))),y:Math.max(4,Math.min(95,Math.round(point.y)))};
+ const aim={x:Math.max(3,Math.min(board.width-6,Math.round(point.x))),y:Math.max(4,Math.min(board.height-5,Math.round(point.y)))};
  if(board.navigation.blocked(aim.y*board.width+aim.x)){
   let free=null;
   for(let r=1;r<=4&&!free;r++)for(const dx of [-r,0,r])for(const dy of [-r,0,r]){
@@ -89,7 +89,7 @@ export function commandBotSquad(match,squad){
    const hosts=match.squadIds.B.map(id=>registry.get(id)).filter(s=>s&&s.botRole!=='support'&&s.botOperation!==operation)
     .map(s=>state(board,s)).filter(p=>p?.fighters&&!p.squad.botRecovering);
    hosts.sort((a,b)=>distance(a.center,self.center)-distance(b.center,self.center));
-   if(!hosts.length){move(board,squad,'retreat',{x:90,y:50});return;}
+   if(!hosts.length){move(board,squad,'retreat',{x:match.flags.B.x-5,y:match.flags.B.y});return;}
    frontline=hosts[0];
   }
   const patients=[...partners,frontline];
