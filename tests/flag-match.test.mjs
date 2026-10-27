@@ -12,7 +12,7 @@ function prepared(b,options={}){
 }
 test('automatic armies obey the 350 cap and deploy inside their own kingdom',()=>{
  const b=new Board(),m=prepared(b,{count:900});assert.deepEqual(m.counts,{A:350,B:350});assert.equal(b.units.length,700);
- assert.ok(b.units.every(u=>m.inTerritory(u.team,u)));assert.equal(new Set(b.units.map(u=>u.y*b.width+u.x)).size,400);
+ assert.ok(b.units.every(u=>m.inTerritory(u.team,u)));assert.equal(new Set(b.units.map(u=>u.y*b.width+u.x)).size,700);
  assert.equal(b.spawn(0,0,null,{team:'A'}),null);
 });
 test('small and uneven requested armies remain exact and timers transition once',()=>{
