@@ -19,7 +19,7 @@ export function visibleTiles(board,camera,width,height){
 export const terrainVariant=(x,y)=>1+((x%5+5)%5)+5*((y%2+2)%2);
 export function terrainMaterial(board,x,y){
  const type=board.terrain[y][x],obstacle=board.obstacles?.get(y*board.width+x);
- return type==='forest'||obstacle&&obstacle.blocked!==false?'pond':type==='road'?'soil':type;
+ return type==='forest'||type==='pond'?'pond':type==='road'||type==='wall'||type==='gate'?'soil':type==='grove'?'grass':obstacle&&obstacle.blocked!==false?'pond':type;
 }
 export function terrainEdges(board,x,y){
  const material=terrainMaterial(board,x,y);
@@ -39,14 +39,41 @@ function paint(ctx,art,board,camera,width,height,dpr){
  // A continuous base prevents transparent hairlines during fractional zoom.
  ctx.fillStyle='#8eaa54';ctx.fill();
  const tiles=visibleTiles(board,camera,width,height);
+ const distant=camera.scale<.14;
+ const farColors={
+  grass:['#b9ca8f','#b9cb90','#bacd91'],
+  soil:['#d8c69f','#d6c39c','#d9c7a1'],
+  pond:['#84b8c5','#85b9c5','#82b6c3'],
+  grove:['#85a979','#83a775','#87aa7a'],
+  road:['#d9c8a2','#d8c69f','#dbc9a4'],
+  gate:['#b7a784','#b9a98a','#b9a786'],
+  wall:['#abb08b','#acb28b','#aeb18e']
+ };
  let walls=0,boundaries=0;
  for(const{x,y}of tiles){
-  const material=terrainMaterial(board,x,y),row=materialRow[material]??0;
-  const sx=(terrainVariant(x,y)-1)*144,left=(x-y)*HALF_W-72,top=(x+y)*HALF_H-42;
-  ctx.drawImage(art.tiles.atlas,sx,row*107,144,107,left,top,144,107);
-  // A neighbor of another material is still solid ground, never an exposed wall.
-  if(x===board.width-1){ctx.drawImage(art.tiles.atlas,sx,(3+row)*107,144,107,left,top,144,107);walls++;}
-  if(y===board.height-1){ctx.drawImage(art.tiles.atlas,sx,(6+row)*107,144,107,left,top,144,107);walls++;}
+  const kind=board.terrain[y][x],material=terrainMaterial(board,x,y),row=materialRow[material]??0;
+  const px=(x-y)*HALF_W,py=(x+y)*HALF_H;
+  if(distant){
+   // At fit-to-screen a 144px tile occupies only a handful of pixels.
+   // Scaling the noisy atlas produces aliasing and hides the terrain shapes.
+   const palette=farColors[kind]||farColors[material]||farColors.grass;
+   const seed=(Math.imul(x+13,1103515245)^Math.imul(y+19,12345))>>>0;
+   ctx.fillStyle=palette[seed%palette.length];ctx.beginPath();
+   ctx.moveTo(px,py-HALF_H);ctx.lineTo(px+HALF_W,py);
+   ctx.lineTo(px,py+HALF_H);ctx.lineTo(px-HALF_W,py);ctx.closePath();ctx.fill();
+  }else{
+   const sx=(terrainVariant(x,y)-1)*144,left=px-HALF_W,top=py-HALF_H;
+   ctx.drawImage(art.tiles.atlas,sx,row*107,144,107,left,top,144,107);
+   if(kind==='grove'){
+    ctx.fillStyle='#426b4a72';
+    ctx.beginPath();ctx.moveTo(px,py-HALF_H+3);ctx.lineTo(px+HALF_W-4,py);
+    ctx.lineTo(px,py+HALF_H-3);ctx.lineTo(px-HALF_W+4,py);ctx.closePath();ctx.fill();
+   }
+   if(x===board.width-1)ctx.drawImage(art.tiles.atlas,sx,(3+row)*107,144,107,left,top,144,107);
+   if(y===board.height-1)ctx.drawImage(art.tiles.atlas,sx,(6+row)*107,144,107,left,top,144,107);
+  }
+  if(x===board.width-1)walls++;
+  if(y===board.height-1)walls++;
  }
  // Material seams are an independent, static overlay. Each shared edge is
  // visited once and batched into just two paths (shoreline / land).
@@ -68,13 +95,62 @@ function paint(ctx,art,board,camera,width,height,dpr){
   boundaries+=count;
  }
 
+ // All obstacles are drawn on the ground plane, never as tall gatehouses.
+ // The wooded areas are dark patches with occasional short shrubs.
+ for(const {x,y} of tiles){
+  const type=board.terrain[y][x];
+  if(type!=='grove'&&type!=='wall'&&type!=='gate')continue;
+  const px=(x-y)*HALF_W,py=(x+y)*HALF_H;
+  if(type==='grove'){
+   const hash=(Math.imul(x+13,374761393)^Math.imul(y+17,668265263))>>>0;
+   if(distant||hash%5!==0)continue; // far camera uses clean grove silhouette
+   const dx=hash%31-15,dy=(hash>>>8)%15-7;
+   ctx.fillStyle='#34573a58';
+   ctx.beginPath();ctx.ellipse(px+dx+5,py+dy+3,20,7,0,0,Math.PI*2);ctx.fill();
+   ctx.fillStyle=hash%2?'#50794eb5':'#628753bd';
+   ctx.beginPath();ctx.ellipse(px+dx,py+dy-4,18,10,0,0,Math.PI*2);ctx.fill();
+   ctx.fillStyle='#86a978b0';
+   ctx.beginPath();ctx.ellipse(px+dx-5,py+dy-8,9,4,0,0,Math.PI*2);ctx.fill();
+   continue;
+  }
+  const gate=type==='gate'?board.match?.gateAt(x,y):null;
+  const opened=type==='gate'&&gate?.health.current===0;
+  const fx=px+HALF_W/2,fy=py-HALF_H/2,tx=px-HALF_W/2,ty=py+HALF_H/2;
+  function stroke(color,width,down=0){
+   ctx.beginPath();ctx.moveTo(fx,fy+down);ctx.lineTo(tx,ty+down);
+   ctx.lineCap='butt';ctx.lineWidth=width;ctx.strokeStyle=color;ctx.stroke();
+  }
+  if(opened){
+   // Flattened timber debris still marks the breach without closing the path.
+   stroke('#816b5260',9,4);
+   continue;
+  }
+  stroke('#4d463958',31,8); // ground contact shadow, not a flying sprite
+  if(type==='wall'){
+   stroke('#5f5340',24,2);stroke('#8c8065',19,-2);stroke('#c0ad82',5,-7);
+  }else{
+   stroke('#67462f',29,2);stroke('#a9794c',22,-2);stroke('#d7aa70',8,-7);
+   // Five visually separate leafs match the five independently breakable
+   // four-cell gate sections without drawing tall towers.
+   if(y%4===0){
+    const r=board.match?.gateAt(x,y)?.health.current??0;
+    ctx.fillStyle=r?'#4f433b':'#8b7863';
+    ctx.fillRect(px-5,py-15,10,20);
+   }
+  }
+  if(type==='wall'&&y%5===0){
+   // Fence posts are small enough to stay below soldier heads.
+   ctx.fillStyle='#66553d';ctx.fillRect(px-4,py-16,8,17);
+   ctx.fillStyle='#c1a978';ctx.fillRect(px-3,py-16,6,4);
+  }
+ }
  return {tiles:tiles.length,walls,boundaries};
 }
 /** One viewport-sized backing canvas per renderer, never a map-sized allocation. */
 export function drawTerrain(ctx,art,board,camera,width,height,dpr,interactive=false){
  let cache=caches.get(ctx);
  if(!cache){cache={canvas:document.createElement('canvas'),builds:0,tiles:0};caches.set(ctx,cache);}
- const pad=128,key=[board.width,board.height,board.terrainRevision,board.terrain,board.obstacleRevision,art.tiles,width,height,dpr];
+ const pad=128,key=[board.width,board.height,board.terrainRevision,board.terrain,board.obstacleRevision,art.tiles,width,height,dpr,camera.scale<.14?'far':'detailed'];
  const base=cache.camera;
  const covered=base&&-camera.x/camera.scale>=(-base.x-pad)/base.scale&&
   (width-camera.x)/camera.scale<=(width-base.x+pad)/base.scale&&

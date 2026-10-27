@@ -99,12 +99,12 @@ export class Board {
     return alive.length;
   }
   setTerrain(x,y,type) {
-    if(!this.inside(x,y)||!['grass','soil','road','forest'].includes(type))return false;
-    if(type==='forest'&&this.occupied(x,y))return false;
+    if(!this.inside(x,y)||!['grass','soil','road','forest','pond','grove'].includes(type))return false;
+    if(['forest','pond'].includes(type)&&this.occupied(x,y))return false;
     const key=y*this.width+x;
-    if(type==='forest')this.obstacles.set(key,{kind:'forest',blocked:true});
-    else if(this.obstacles.get(key)?.kind==='forest')this.obstacles.delete(key);
-    if(this.terrain[y][x]!==type&&(type==='forest'||this.terrain[y][x]==='forest')){this.obstacleRevision++;this.navigation.invalidate();}
+    if(['forest','pond'].includes(type))this.obstacles.set(key,{kind:type,blocked:true});
+    else if(['forest','pond'].includes(this.obstacles.get(key)?.kind))this.obstacles.delete(key);
+    if(this.terrain[y][x]!==type&&(['forest','pond'].includes(type)||['forest','pond'].includes(this.terrain[y][x]))){this.obstacleRevision++;this.navigation.invalidate();}
     if(this.terrain[y][x]!==type){this.terrain[y][x]=type;this.terrainRevision++;}
     return true;
   }
@@ -204,6 +204,7 @@ export class Board {
   damage(id,amount,direction=1,attackerId=null) {
     const u=this.unit(id);if(!u||u.health.current<=0||!Number.isFinite(amount)||amount<=0)return false;
     if(u.structure==='flag')return this.match?.damageFlag(u.team,amount)||false;
+    if(u.structure==='gate')return this.match?.damageGate(u,amount)||false;
     u.health.current=Math.max(0,u.health.current-amount);u.hits++;
     // Poise protects locomotion, never health or a lethal hit.
     if(u.health.current>0&&u.combat.movingPoise&&u.step)return true;
