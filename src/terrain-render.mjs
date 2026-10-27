@@ -19,7 +19,7 @@ export function visibleTiles(board,camera,width,height){
 export const terrainVariant=(x,y)=>1+((x%5+5)%5)+5*((y%2+2)%2);
 export function terrainMaterial(board,x,y){
  const type=board.terrain[y][x],obstacle=board.obstacles?.get(y*board.width+x);
- return type==='forest'||obstacle&&obstacle.blocked!==false?'pond':type==='road'?'soil':type;
+ return type==='forest'||type==='pond'?'pond':type==='road'||type==='wall'||type==='gate'?'soil':type==='grove'?'grass':obstacle&&obstacle.blocked!==false?'pond':type;
 }
 export function terrainEdges(board,x,y){
  const material=terrainMaterial(board,x,y);
@@ -68,6 +68,27 @@ function paint(ctx,art,board,camera,width,height,dpr){
   boundaries+=count;
  }
 
+ // Decorative low-profile groves and palisades are cached with the ground.
+ // No roof/tower sprites: dense troops remain visible from the 2.5D camera.
+ for(const {x,y} of tiles){
+  const type=board.terrain[y][x];
+  if(type!=='grove'&&type!=='wall'&&type!=='gate')continue;
+  const px=(x-y)*HALF_W,py=(x+y)*HALF_H;
+  if(type==='grove'){
+   const hash=(Math.imul(x+11,1664525)^Math.imul(y+5,1013904223))>>>0;
+   ctx.fillStyle='#426c4d5c';ctx.beginPath();ctx.ellipse(px+hash%23-11,py-6,23,12,0,0,Math.PI*2);ctx.fill();
+   ctx.fillStyle='#77985b73';ctx.beginPath();ctx.ellipse(px-4,py-13,14,8,0,0,Math.PI*2);ctx.fill();
+   continue;
+  }
+  const opened=type==='gate'&&!board.match?.gateAt(x,y)?.health.current;
+  const fromX=px+HALF_W/2,fromY=py-HALF_H/2,toX=px-HALF_W/2,toY=py+HALF_H/2;
+  ctx.lineCap='butt';ctx.beginPath();ctx.moveTo(fromX,fromY);ctx.lineTo(toX,toY);
+  ctx.strokeStyle=opened?'#846b4455':'#614d3bc0';ctx.lineWidth=opened?4:12;ctx.stroke();
+  if(!opened){
+   ctx.strokeStyle=type==='gate'?'#bf9461':'#97876a';ctx.lineWidth=7;ctx.stroke();
+   ctx.strokeStyle='#dbbe8e';ctx.lineWidth=2;ctx.stroke();
+  }
+ }
  return {tiles:tiles.length,walls,boundaries};
 }
 /** One viewport-sized backing canvas per renderer, never a map-sized allocation. */
