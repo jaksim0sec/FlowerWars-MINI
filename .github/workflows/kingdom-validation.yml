@@ -13,6 +13,6 @@ jobs:
         with:
           node-version: '22'
       - name: Run model and navigation regression tests
-        run: node --test --test-isolation=none tests/*.test.mjs
+        run: node --test tests/*.test.mjs
       - name: Verify offline bundle generation
         run: python3 scripts/build_offline.py
