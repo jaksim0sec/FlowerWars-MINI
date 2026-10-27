@@ -39,22 +39,41 @@ function paint(ctx,art,board,camera,width,height,dpr){
  // A continuous base prevents transparent hairlines during fractional zoom.
  ctx.fillStyle='#8eaa54';ctx.fill();
  const tiles=visibleTiles(board,camera,width,height);
+ const distant=camera.scale<.14;
+ const farColors={
+  grass:['#b9ca8f','#b9cb90','#bacd91'],
+  soil:['#d8c69f','#d6c39c','#d9c7a1'],
+  pond:['#84b8c5','#85b9c5','#82b6c3'],
+  grove:['#85a979','#83a775','#87aa7a'],
+  road:['#d9c8a2','#d8c69f','#dbc9a4'],
+  gate:['#b7a784','#b9a98a','#b9a786'],
+  wall:['#abb08b','#acb28b','#aeb18e']
+ };
  let walls=0,boundaries=0;
  for(const{x,y}of tiles){
-  const material=terrainMaterial(board,x,y),row=materialRow[material]??0;
-  const sx=(terrainVariant(x,y)-1)*144,left=(x-y)*HALF_W-72,top=(x+y)*HALF_H-42;
-  ctx.drawImage(art.tiles.atlas,sx,row*107,144,107,left,top,144,107);
-  // Grove tint belongs to the terrain surface, not to large floating tree
-  // sprites. It makes the forest readable even with the entire map fitted.
-  if(board.terrain[y][x]==='grove'){
-   const px=(x-y)*HALF_W,py=(x+y)*HALF_H;
-   ctx.fillStyle='#426b4a72';
-   ctx.beginPath();ctx.moveTo(px,py-HALF_H+3);ctx.lineTo(px+HALF_W-4,py);
-   ctx.lineTo(px,py+HALF_H-3);ctx.lineTo(px-HALF_W+4,py);ctx.closePath();ctx.fill();
+  const kind=board.terrain[y][x],material=terrainMaterial(board,x,y),row=materialRow[material]??0;
+  const px=(x-y)*HALF_W,py=(x+y)*HALF_H;
+  if(distant){
+   // At fit-to-screen a 144px tile occupies only a handful of pixels.
+   // Scaling the noisy atlas produces aliasing and hides the terrain shapes.
+   const palette=farColors[kind]||farColors[material]||farColors.grass;
+   const seed=(Math.imul(x+13,1103515245)^Math.imul(y+19,12345))>>>0;
+   ctx.fillStyle=palette[seed%palette.length];ctx.beginPath();
+   ctx.moveTo(px,py-HALF_H);ctx.lineTo(px+HALF_W,py);
+   ctx.lineTo(px,py+HALF_H);ctx.lineTo(px-HALF_W,py);ctx.closePath();ctx.fill();
+  }else{
+   const sx=(terrainVariant(x,y)-1)*144,left=px-HALF_W,top=py-HALF_H;
+   ctx.drawImage(art.tiles.atlas,sx,row*107,144,107,left,top,144,107);
+   if(kind==='grove'){
+    ctx.fillStyle='#426b4a72';
+    ctx.beginPath();ctx.moveTo(px,py-HALF_H+3);ctx.lineTo(px+HALF_W-4,py);
+    ctx.lineTo(px,py+HALF_H-3);ctx.lineTo(px-HALF_W+4,py);ctx.closePath();ctx.fill();
+   }
+   if(x===board.width-1)ctx.drawImage(art.tiles.atlas,sx,(3+row)*107,144,107,left,top,144,107);
+   if(y===board.height-1)ctx.drawImage(art.tiles.atlas,sx,(6+row)*107,144,107,left,top,144,107);
   }
-  // A neighbor of another material is still solid ground, never an exposed wall.
-  if(x===board.width-1){ctx.drawImage(art.tiles.atlas,sx,(3+row)*107,144,107,left,top,144,107);walls++;}
-  if(y===board.height-1){ctx.drawImage(art.tiles.atlas,sx,(6+row)*107,144,107,left,top,144,107);walls++;}
+  if(x===board.width-1)walls++;
+  if(y===board.height-1)walls++;
  }
  // Material seams are an independent, static overlay. Each shared edge is
  // visited once and batched into just two paths (shoreline / land).
@@ -84,7 +103,7 @@ function paint(ctx,art,board,camera,width,height,dpr){
   const px=(x-y)*HALF_W,py=(x+y)*HALF_H;
   if(type==='grove'){
    const hash=(Math.imul(x+13,374761393)^Math.imul(y+17,668265263))>>>0;
-   if(hash%5!==0)continue; // avoid a noisy leaf stamp on every tile
+   if(distant||hash%5!==0)continue; // far camera uses clean grove silhouette
    const dx=hash%31-15,dy=(hash>>>8)%15-7;
    ctx.fillStyle='#34573a58';
    ctx.beginPath();ctx.ellipse(px+dx+5,py+dy+3,20,7,0,0,Math.PI*2);ctx.fill();
