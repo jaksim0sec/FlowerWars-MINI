@@ -229,15 +229,16 @@ export class Navigation {
     const candidates=this.neighbors(start,u);
     if(!next) {
       const waited=b.time-(u.waitSince??b.time);
+      const marching=!!u.marchStepTime&&blocker?.team===u.team;
       // Let a moving neighbor finish before spending any local search budget.
-      if(!blocker?.command||waited>=u.movement.waitBeforeDetour) {
+      if(!blocker?.command||waited>=(marching?Math.max(1.5,u.movement.waitBeforeDetour):u.movement.waitBeforeDetour)) {
         // A detour must rejoin a future route cell, never its origin. This
         // prevents sideways oscillation and preserves static obstacle guidance.
         const potential=new Map(u.guide.map((cell,i)=>[cell,u.guide.length-i]));
         const route=u.recovery?null:this.detour(u,{at:cell=>cell===start?u.guide.length+1:(potential.get(cell)??-1)},start);
         if(route?.length){next=route.shift();u.route=route;}
       }
-      if(!next&&waited>=.24&&(!blocker?.command||waited>=1)&&b.time>=(u.recoveryRetryAt||0)){
+      if(!next&&waited>=.24&&(!blocker?.command||waited>=(marching?1.5:1))&&b.time>=(u.recoveryRetryAt||0)){
         const route=this.recover(u,start);
         if(route?.length){next=route.shift();u.route=route;}
       }

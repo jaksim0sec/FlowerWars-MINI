@@ -46,7 +46,7 @@ function slots(board,squad,center,formation=squad.formation){
  const claimed=new Set();
  for(const other of squadsFor(board).values())if(other.id!==squad.id&&other.team===squad.team)
    for(const p of other.order?.goals?.values()||[])claimed.add(p.y*board.width+p.x);
- return planFormation(board,{...squad,formation,reforming:squad.order?.type==='rally'},center,alive(board,squad),commander(board,squad),claimed);
+ return planFormation(board,{...squad,travelOffsets:squad.order?.travelOffsets,formation,reforming:squad.order?.type==='rally'},center,alive(board,squad),commander(board,squad),claimed);
 }
 export function configureSquad(board,id,{stance,formation}={}){
  const s=squadsFor(board).get(id);if(!s)return false;
@@ -95,13 +95,18 @@ export function orderSquad(board,id,action,target=null){
    candidates.sort((a,b)=>threat(a)-threat(b)||Math.abs(b-y)-Math.abs(a-y));
    const side=candidates[0];order.waypoints=[{x,y:side},{x:target.x,y:side}];order.phase='flanking';
  }
+ if(['move','advance','flank','retreat'].includes(type)){
+  const units=alive(board,s),previous=s.order;
+  const stable=previous?.goals?.size&&['arrived','holding'].includes(previous.phase);
+  const anchor=stable?previous.goals.get(lead.id):lead;
+  order.travelOffsets=!stable&&previous?.travelOffsets?new Map(previous.travelOffsets):new Map(units.map(u=>{const p=stable?previous.goals.get(u.id)||u:u;return [u.id,{x:p.x-anchor.x,y:p.y-anchor.y}];}));
+ }
  s.order=order;
- if(type==='flank')s.formation='column';
  if(type==='fortify')s.formation='line';
  if(type==='firing-line')s.formation='spread';
  if(action==='reform')s.formation='line';
  // Stop obsolete intentions now, retaining only physically committed steps.
- for(const u of alive(board,s)){board.interrupt(u);u.combat.targetId=null;u.combat.nextSearchAt=0;u.combat.holdPosition=false;}
+ for(const u of alive(board,s)){board.interrupt(u);u.marchStepTime=null;u.combat.targetId=null;u.combat.nextSearchAt=0;u.combat.holdPosition=false;}
  runOrder(board,s,true);return true;
 }
 export function orderSquads(board,ids,action,target=null){
@@ -225,6 +230,7 @@ function runOrder(board,s,replace=false){
   if(opened)o.nextPassingAt=board.time+.4;
  }
  let arrived=0;
+ if(o.travelOffsets){const pace=Math.max(...units.map(u=>u.movement.stepTime));for(const u of units)u.marchStepTime=pace;}
  board.batchCommands(()=>{for(const u of units){
    const passing=o.passing.get(u.id);
    if(passing){const waiting=board.unit(passing.for),goal=o.goals.get(passing.for);

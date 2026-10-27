@@ -106,6 +106,10 @@ export function planFormation(board,squad,center,units,lead,otherGoals){
   rows.splice(0,rows.length,...outer,...inner,...(lead?[{unit:lead}]:[]));
   offsets=rows.map(r=>r.unit===lead?{x:0,y:0}:band(r.unit)===0?perimeter.shift():core.shift()||perimeter.shift());
  }
+ if(squad.travelOffsets){
+  rows.splice(0,rows.length,...units.map(unit=>({unit})));
+  offsets=units.map(u=>squad.travelOffsets.get(u.id)||{x:0,y:0});
+ }
  const clamp=(value,low,high)=>Math.max(low,Math.min(high,value));
  const bounds=axis=>[Math.min(...offsets.map(p=>p[axis])),Math.max(...offsets.map(p=>p[axis]))];
  const [minX,maxX]=bounds('x'),[minY,maxY]=bounds('y');
@@ -133,7 +137,7 @@ export function planFormation(board,squad,center,units,lead,otherGoals){
    if(squad.botOperation?.role==='guard'&&board.match){const flag=board.match.flags.B;if(Math.max(Math.abs(x-flag.x),Math.abs(y-flag.y))>16)continue;}
    if(!board.inside(x,y)||board.navigation.blocked(key)||claimed.has(key)||occupant&&!own.has(occupant.id)||reserved&&!own.has(reserved))continue;
    // A fallback must stay behind the front for the commander.
-   if(formation!=='square'&&rows[i].unit.id===lead?.id&&positions.some(p=>p&&(x-p.x)*f.x+(y-p.y)*f.y>=0))continue;
+   if(!squad.travelOffsets&&formation!=='square'&&rows[i].unit.id===lead?.id&&positions.some(p=>p&&(x-p.x)*f.x+(y-p.y)*f.y>=0))continue;
    best={x,y};claimed.add(key);break;
   }
   positions.push(best||null);

@@ -753,3 +753,15 @@ button:not(:disabled):active{scale:.96;}
 .squad-card.is-selected{background:linear-gradient(135deg,#fff3d5ed,#ffe4b9df);border-color:#e4b45b;box-shadow:inset 0 0 0 1px #f3ca8266;}
 .squad-card.is-selected{border-color:#fffcf2b0;box-shadow:0 2px 12px #352b1612;}
 .squad-card.is-selected:focus-visible{outline:2px solid #76a9c5;outline-offset:2px;}
+/* Result reveal uses a few compositor animations, without per-frame particles. */
+#match-result{--result-accent:#eabf5b;top:46%;padding:30px 24px 24px;border:1px solid #ffffff8c;background:linear-gradient(155deg,#fffdf2ed,#fff0cddd);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 16px 60px #15232650,0 0 0 100vmax #19252366;animation:result-reveal .55s cubic-bezier(.2,.8,.2,1) both;}
+#match-result[data-outcome=defeat]{--result-accent:#9caaba;background:linear-gradient(155deg,#f2f4f8ed,#dbe0e8e8);}
+#match-result[data-outcome=draw]{--result-accent:#a9bca2;}
+#match-result-emblem{display:grid;place-items:center;margin:0 auto 14px;width:76px;height:76px;border-radius:50%;color:var(--result-accent);background:#ffffff75;box-shadow:0 0 35px color-mix(in srgb,var(--result-accent) 40%,transparent);animation:result-emblem .8s ease-out both;}
+#match-result-emblem .ui-icon{width:44px;height:44px;}
+.result-caption{display:block;font-size:10px;letter-spacing:.25em;color:#66716c;}
+#match-result-title{display:block;margin-top:5px;font-size:38px;letter-spacing:.16em;}
+#match-restart{width:100%;margin-top:12px;border:0;border-radius:14px;background:var(--result-accent);color:#26322d;font-weight:750;}
+@keyframes result-reveal{from{opacity:0;translate:0 16px;scale:.92}to{opacity:1;translate:0;scale:1}}
+@keyframes result-emblem{from{opacity:0;rotate:-14deg;scale:.6}to{opacity:1;rotate:0deg;scale:1}}
+@media(prefers-reduced-motion:reduce){#match-result,#match-result-emblem{animation:none;}}

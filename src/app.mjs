@@ -280,6 +280,7 @@ function updateMatchHud(){
  $('match-result').hidden=!m||m.phase!=='finished';
  document.body.classList.toggle('in-match',!!m);
  for(const id of ['group-place','summon','board-resize','combat-enable','combat-disable','group-team','terrain'])$(id).disabled=!!m;
+ if(!m||m.phase!=='finished')delete $('match-result').dataset.outcome;
  if(!m)return;
  text('match-phase',m.phase==='preparation'?'준비':m.phase==='battle'?'깃발 공성전':'전투 종료');
  const seconds=Math.ceil(m.remaining);text('match-timer',m.phase==='preparation'?Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0'):'');
@@ -290,7 +291,10 @@ function updateMatchHud(){
  for(const button of document.querySelectorAll('[data-deploy-type]')){button.disabled=m.reserve.A<=0;button.setAttribute('aria-pressed',String(button.dataset.deployType===view.deployType));}
  if(m.phase!=='preparation'&&view.mode==='deploy')view.mode='move';
  $('match-skip').hidden=m.phase!=='preparation';$('match-charge').hidden=m.phase!=='battle';
- if(m.phase==='finished'){text('match-result-title',m.winner==='draw'?'무승부':m.winner==='A'?'승리':'패배');text('match-result-detail',m.winner==='draw'?'양쪽 깃발이 동시에 파괴됐습니다.':m.winner==='A'?'상대 깃발을 파괴했습니다.':'내 깃발이 파괴됐습니다.');}
+ if(m.phase==='finished'){
+  const result=$('match-result'),outcome=m.winner==='A'?'victory':m.winner==='B'?'defeat':'draw';
+  if(result.dataset.outcome!==outcome){result.dataset.outcome=outcome;$('match-result-emblem').innerHTML=icon(outcome==='victory'?'rally':outcome==='defeat'?'hold':'platoon');}
+  text('match-result-title',m.winner==='draw'?'무승부':m.winner==='A'?'승리':'패배');text('match-result-detail',m.winner==='draw'?'양쪽 깃발이 동시에 파괴됐습니다.':m.winner==='A'?'상대 깃발을 파괴했습니다.':'내 깃발이 파괴됐습니다.');}
 }
 function locateFlag(team){const m=board.match;if(!m)return;const p=project(m.flags[team].x,m.flags[team].y);camera.scale=Math.max(camera.scale,.22);camera.x=width/2-p.x*camera.scale;camera.y=height*.43-p.y*camera.scale;fitted=false;refresh();}
 $('match-start').addEventListener('click',startMatch);$('match-restart').addEventListener('click',startMatch);
