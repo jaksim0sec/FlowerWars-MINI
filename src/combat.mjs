@@ -43,7 +43,7 @@ export function hasLineOfSight(board,actor,target) {
     } else if(crossX<crossY){x+=sx;crossX+=stepX;}
     else {y+=sy;crossY+=stepY;}
     if((x!==endX||y!==endY)&&(blocked(board,x,y)||board.match?.gateBlocksSight?.(actor.team,x,y)))return false;
-     if((x!==endX||y!==endY)&&board.terrain[y]?.[x]==='grove'&&++groveCount>=3)return false;
+     if((x!==endX||y!==endY)&&board.terrain?.[y]?.[x]==='grove'&&++groveCount>=3)return false;
   }
   return true;
 }
