@@ -18,7 +18,7 @@ export function drawCommandOverlay(ctx,board,view,scale=1){
   const pending=view.mode==='squad-target'&&view.commandSquadIds?.includes(id);
   const color=pending?'#fff2a1':o?.type==='retreat'?'#79c5cc':o?.type==='focus'?'#f2a173':'#ffe5a0';
   ctx.save();ctx.strokeStyle=color;ctx.lineWidth=(selected.has(id)?2:1)/scale;ctx.globalAlpha=selected.has(id)?1:.38;
-  for(const u of selected.has(id)?units:[]){const p=project(u.visualX,u.visualY);ctx.beginPath();ctx.ellipse(p.x,p.y-1,35,14,0,0,Math.PI*2);ctx.stroke();}
+  for(const u of selected.has(id)&&scale>=.22?units:[]){const p=project(u.visualX,u.visualY);ctx.beginPath();ctx.ellipse(p.x,p.y-1,35,14,0,0,Math.PI*2);ctx.stroke();}
   let target=pending?view.hover:o?.target;
   if(!pending&&target?.squadId){const squad=squadsFor(board).get(target.squadId);target=squad&&board.unit(squad.leaderId);}
   if(!pending&&target?.unitId)target=board.unit(target.unitId);

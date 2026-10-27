@@ -90,7 +90,7 @@ export class Board {
     this.width=width;this.height=height;this.terrain=Array.from({length:height},(_,y)=>Array.from({length:width},(_,x)=>terrain[y]?.[x]||'grass'));
     this.obstacles=new Map();for(const[n,info]of obstacles){const p={x:n%oldWidth,y:Math.floor(n/oldWidth)};if(inside(p))this.obstacles.set(p.y*width+p.x,info);}
     this.cells=new Map();this.reservations=new Map();this.spatial=new SpatialIndex(width,height);this.navigation=new Navigation(this);this.navClock=0;
-    for(const u of this.units){u.guide=[];u.guideKey=null;u.route=[];if(u.health.current<=0)continue;this.cells.set(u.y*width+u.x,u.id);if(u.step)this.reservations.set(u.step.y*width+u.step.x,u.id);this.spatial.add(u);}
+    for(const u of this.units){u.guide=[];u.guideKey=null;u.route=[];if(u.health.current<=0)continue;this.cells.set(u.y*width+u.x,u.id);if(u.step)this.reservations.set(u.step.y*width+u.step.x,u.id);this.spatial.add(u);this.navigation.touch(u.x,u.y);}
     this.terrainRevision++;this.obstacleRevision++;return true;
   }
   setAutoCombat(enabled=true){
@@ -122,7 +122,7 @@ export class Board {
     if(info)this.obstacles.set(index,{...info});else this.obstacles.delete(index);
     this.obstacleRevision++;this.navigation.invalidate();return true;
   }
-  cancelCommand(u) { if(u.command?.flow)this.flows[u.command.flow]--;if(u.state==='walk'&&!u.step)u.state='idle';u.command=null;u.target=null;u.guide=[];u.guideKey=null;u.staticSearch=null;u.recovery=null;u.yieldUntil=0;u.route=[];u.path=[];u.waitReason=null;u.retryAt=0;u.waitSince=null; }
+  cancelCommand(u) { if(u.courtesy)this.navigation.cancelCooperation(u);if(u.command?.flow)this.flows[u.command.flow]--;if(u.state==='walk'&&!u.step)u.state='idle';u.command=null;u.courtesyReturn=null;u.target=null;u.squadRoute=null;u.sharedLocal=null;u.guide=[];u.guideKey=null;u.staticSearch=null;u.recovery=null;u.yieldUntil=0;u.route=[];u.path=[];u.waitReason=null;u.retryAt=0;u.waitSince=null; }
   interrupt(u){
     this.cancelCommand(u);
     u.combat.retaliation=null;u.combat.formationLocked=false;
@@ -150,7 +150,7 @@ export class Board {
     if(!outer)nav.startCollection();
     try{return callback();}finally{if(!outer)nav.commit();}
   }
-  move(id,x,y,{replace=false,direct=false,plannedPath=null}={}) {
+  move(id,x,y,{replace=false,direct=false,plannedPath=null,squadRoute=null}={}) {
     const u=this.unit(id);
     if(this.match?.phase==='finished'||this.match?.phase==='preparation'&&u&&!this.match.inTerritory(u.team,{x,y}))return false;
     if(!u||u.structure||u.health.current<=0||!replace&&(u.state!=='idle'||u.step)||!this.inside(x,y)||this.navigation.blocked(y*this.width+x)||u.x===x&&u.y===y&&!u.step)return false;
@@ -164,7 +164,7 @@ export class Board {
     const field=direct?null:this.navigation.field(x,y);
     if(field?.complete&&field.at(u.y*this.width+u.x)<0)return false;
     if(replace)this.interrupt(u);else this.cancelCommand(u);const flow=Math.abs(x-u.x)>=Math.abs(y-u.y)?(x>u.x?'east':'west'):(y>u.y?'south':'north');
-    u.command={type:'move',x,y,flow,direct};this.flows[flow]++;
+    u.lastMoveGoal={x,y};u.command={type:'move',x,y,flow,direct};u.squadRoute=squadRoute;this.flows[flow]++;
     if(plannedPath){u.guide=[...plannedPath];u.guideKey=`${x},${y},${this.obstacleRevision}`;}
     this.navigation.plan(u);return true;
   }
@@ -176,7 +176,7 @@ export class Board {
   }
   beginStep(u,next) {
     u.state='walk';u.elapsed=0;u.step={...next,elapsed:0,duration:Math.max(u.movement.stepTime,u.marchStepTime||0)*terrainStepMultiplier(this,u,next)/(nearOwnFlag(this,u,next)?1.05:1)};u.path=[next];
-    this.reservations.set(next.y*this.width+next.x,u.id);this.spatial.move(u);
+    this.reservations.set(next.y*this.width+next.x,u.id);this.spatial.move(u);this.navigation.touch(u.x,u.y);this.navigation.touch(next.x,next.y);
     u.facing=project(next.x-u.x,next.y-u.y).x>=0?1:-1;
   }
 
@@ -216,6 +216,7 @@ export class Board {
         approach:retained?previous.approach:Math.sign(attacker.x-u.x)||Math.sign((this.width-1)/2-u.x)||this.navigationOrientation};
       u.combat.targetId=attacker.id;u.combat.nextSearchAt=0;u.retryAt=0;
     }
+    if(u.courtesy||u.remoteCourtesy)this.navigation.cancelCooperation(u);
     const committed=u.state==='attack'&&u.strike&&u.health.current>0;
     const resume=u.team&&u.command&&u.health.current>0;
     if(!committed){
@@ -223,7 +224,7 @@ export class Board {
       u.elapsed=0;u.state=u.health.current<=0?'death':'hit';u.strike=null;
     }
     u.deathDirection=direction;
-    if(u.health.current<=0){this.cells.delete(u.y*this.width+u.x);if(u.step)this.reservations.delete(u.step.y*this.width+u.step.x);u.step=null;this.spatial.remove(u);}
+    if(u.health.current<=0){this.navigation.touch(u.x,u.y);if(u.step)this.navigation.touch(u.step.x,u.step.y);this.cells.delete(u.y*this.width+u.x);if(u.step)this.reservations.delete(u.step.y*this.width+u.step.x);u.step=null;this.spatial.remove(u);}
     return true;
   }
   update(dt) {
@@ -241,6 +242,7 @@ export class Board {
     for(const u of this.units)if(u.step) {
       const p=u.step;p.elapsed+=dt;
       if(p.elapsed+1e-9>=p.duration) {
+        this.navigation.touch(u.x,u.y);this.navigation.touch(p.x,p.y);
         this.cells.delete(u.y*this.width+u.x);this.reservations.delete(p.y*this.width+p.x);
         u.x=p.x;u.y=p.y;u.visualX=u.x;u.visualY=u.y;this.cells.set(u.y*this.width+u.x,u.id);
         u.step=null;u.path=[];this.spatial.move(u);

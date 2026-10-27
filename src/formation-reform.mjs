@@ -31,9 +31,7 @@ export function reformFormation(board,squad,units,lead){
  if(o.reformOccupancy!==occupancy||board.time>=(o.reformRetryAt||0)){
   o.reformFailed=null;o.reformOccupancy=occupancy;o.reformRetryAt=board.time+.5;
  }
- if(o.reformBuffer){const waiter=board.unit(o.reformBuffer.for);if(!waiter||waiter.health.current<=0||at(waiter,o.goals.get(waiter.id)))o.reformBuffer=null;}
- const buffers=new Set(o.reformBuffer?.ids||[]);
- const pending=units.filter(u=>!buffers.has(u.id)&&!u.step&&!at(u,o.goals.get(u.id))).sort((a,b)=>(a.id===lead?.id?-1:b.id===lead?.id?1:distance(a,o.goals.get(a.id))-distance(b,o.goals.get(b.id))||a.id-b.id));
+ const pending=units.filter(u=>!u.courtesy&&!u.step&&!at(u,o.goals.get(u.id))).sort((a,b)=>(a.id===lead?.id?-1:b.id===lead?.id?1:distance(a,o.goals.get(a.id))-distance(b,o.goals.get(b.id))||a.id-b.id));
  const candidates=pending;
  const corridors=new Set();
  for(const u of units)if(u.step){
@@ -56,26 +54,16 @@ export function reformFormation(board,squad,units,lead){
    o.reformFailed.clear();
   }
  }
- // Occupied-goal cycles need one adjacent passing seat; never move the whole
- // formation out and back. The displaced soldier retains its final goal.
+ // Reuse Navigation cooperation; it preserves commands and protects held,
+ // attacking and healing troops, instead of forcibly assigning passing bays.
  if(searching||units.some(u=>u.step||u.command?.type==='move'&&!u.waitReason))return;
- const seats=new Set([...o.goals.values()].map(p=>p.x+','+p.y));
- if(board.navigation.remaining<128)return;
- const directions=[[1,0],[-1,0],[0,1],[0,-1]];
- for(const waiter of pending.filter(u=>!o.reformBuffer||u.id===o.reformBuffer.for))for(const [gx,gy]of [[0,0],...directions,...directions.map(([x,y])=>[x*2,y*2])]){
-  const seat=o.goals.get(waiter.id),u=board.at(seat.x+gx,seat.y+gy);
-  if(!u||u.squadId!==squad.id||u.id===waiter.id||buffers.has(u.id)||u.state!=='idle')continue;
-  // Keep the first passing cell free as an entrance into deep formations.
-  // Parking on it can seal the very seat the buffer was meant to open.
-  const parking=[...directions.map(([x,y])=>[x*2,y*2]),...directions.map(([x,y])=>[x*3,y*3]),...directions];
-  // Park away from the entering soldier rather than in their access corridor.
-  parking.sort((a,b)=>distance({x:u.x+b[0],y:u.y+b[1]},waiter)-distance({x:u.x+a[0],y:u.y+a[1]},waiter));
-  for(const [dx,dy]of parking){
-  const goal={x:u.x+dx,y:u.y+dy};
-  if(!board.inside(goal.x,goal.y)||seats.has(goal.x+','+goal.y))continue;
-  const route=pathTo(board,u,goal);
-  if(route?.length&&board.move(u.id,goal.x,goal.y,{replace:true,direct:true,plannedPath:route})){for(const other of units)other.reformSearch=null;o.reformBuffer={ids:[...buffers,u.id],for:waiter.id};o.reformFailed=null;o.activeReformId=u.id;return;}
+ if(board.navigation.remaining<32)return;
+ for(const waiter of pending){
+  if(waiter.remoteCourtesy?.cursor>=0)continue;
+  const goal=o.goals.get(waiter.id);if(!goal)continue;
+  for(const [dx,dy]of [[0,0],[1,0],[-1,0],[0,1],[0,-1],[2,0],[-2,0],[0,2],[0,-2]]){
+   const blocker=board.at(goal.x+dx,goal.y+dy);
+   if(board.navigation.requestCooperation(waiter,blocker,{squad,order:o,goal:{...goal}}))return;
   }
  }
- o.reformFailed=null;o.reformRetryAt=board.time+.75;
 }

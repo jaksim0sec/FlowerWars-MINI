@@ -1,0 +1,381 @@
+{
+  "baselineCommit": "d5a1e06",
+  "seed": 73,
+  "simulatedSeconds": 120,
+  "simulationStepSeconds": 0.05,
+  "modelBefore": [
+    {
+      "commands": 15,
+      "returning": 0,
+      "activeChains": 0,
+      "scenario": "individual",
+      "count": 64,
+      "seconds": 120,
+      "arrived": 49,
+      "at90": {
+        "arrived": 42,
+        "waitSeconds": 1131.95,
+        "maxStationaryWait": 28.2
+      },
+      "throughput": 0.4083333333333333,
+      "waitSeconds": 1533.25,
+      "maxWait": 37.45,
+      "updateP95ms": 0.4285,
+      "cpuMs": 228.15,
+      "expansions": 542926,
+      "maxTickExpansions": 2048,
+      "staticBuilds": null,
+      "sharedBuilds": 0,
+      "cooperativeSteps": 0,
+      "collisions": 0
+    },
+    {
+      "commands": 139,
+      "returning": 0,
+      "activeChains": 0,
+      "scenario": "individual",
+      "count": 256,
+      "seconds": 120,
+      "arrived": 117,
+      "at90": {
+        "arrived": 102,
+        "waitSeconds": 10377.15,
+        "maxStationaryWait": 54.95
+      },
+      "throughput": 0.975,
+      "waitSeconds": 13682.5,
+      "maxWait": 84.95,
+      "updateP95ms": 1.0192,
+      "cpuMs": 741.16,
+      "expansions": 1594780,
+      "maxTickExpansions": 2048,
+      "staticBuilds": null,
+      "sharedBuilds": 0,
+      "cooperativeSteps": 0,
+      "collisions": 0
+    },
+    {
+      "commands": 566,
+      "returning": 0,
+      "activeChains": 0,
+      "scenario": "individual",
+      "count": 700,
+      "seconds": 120,
+      "arrived": 134,
+      "at90": {
+        "arrived": 89,
+        "waitSeconds": 43514.35,
+        "maxStationaryWait": 52.55
+      },
+      "throughput": 1.1166666666666667,
+      "waitSeconds": 58563.95,
+      "maxWait": 63.35,
+      "updateP95ms": 1.2107,
+      "cpuMs": 982.04,
+      "expansions": 1775966,
+      "maxTickExpansions": 2048,
+      "staticBuilds": null,
+      "sharedBuilds": 0,
+      "cooperativeSteps": 0,
+      "collisions": 0
+    },
+    {
+      "commands": 4,
+      "returning": 0,
+      "activeChains": 0,
+      "scenario": "squads",
+      "count": 64,
+      "seconds": 120,
+      "arrived": 56,
+      "at90": {
+        "arrived": 56,
+        "waitSeconds": 758.35,
+        "maxStationaryWait": 45.25
+      },
+      "throughput": 0.4666666666666667,
+      "waitSeconds": 987.1,
+      "maxWait": 75.25,
+      "updateP95ms": 3.3893,
+      "cpuMs": 3284.77,
+      "expansions": 1113009,
+      "maxTickExpansions": 2048,
+      "staticBuilds": null,
+      "sharedBuilds": 0,
+      "cooperativeSteps": 0,
+      "collisions": 0
+    },
+    {
+      "commands": 28,
+      "returning": 0,
+      "activeChains": 0,
+      "scenario": "squads",
+      "count": 256,
+      "seconds": 120,
+      "arrived": 187,
+      "at90": {
+        "arrived": 173,
+        "waitSeconds": 6768.9,
+        "maxStationaryWait": 61.55
+      },
+      "throughput": 1.5583333333333333,
+      "waitSeconds": 8649.15,
+      "maxWait": 91.55,
+      "updateP95ms": 5.2518,
+      "cpuMs": 3621.5,
+      "expansions": 1826230,
+      "maxTickExpansions": 2048,
+      "staticBuilds": null,
+      "sharedBuilds": 0,
+      "cooperativeSteps": 0,
+      "collisions": 0
+    },
+    {
+      "commands": 226,
+      "returning": 0,
+      "activeChains": 0,
+      "scenario": "squads",
+      "count": 700,
+      "seconds": 120,
+      "arrived": 336,
+      "at90": {
+        "arrived": 250,
+        "waitSeconds": 33544.2,
+        "maxStationaryWait": 50.3
+      },
+      "throughput": 2.8,
+      "waitSeconds": 43324.35,
+      "maxWait": 80.05,
+      "updateP95ms": 4.1238,
+      "cpuMs": 3804.25,
+      "expansions": 2040749,
+      "maxTickExpansions": 2048,
+      "staticBuilds": null,
+      "sharedBuilds": 0,
+      "cooperativeSteps": 0,
+      "collisions": 0
+    }
+  ],
+  "modelAfter": [
+    {
+      "commands": 11,
+      "returning": 0,
+      "activeChains": 0,
+      "scenario": "individual",
+      "count": 64,
+      "seconds": 120,
+      "arrived": 53,
+      "at90": {
+        "arrived": 45,
+        "waitSeconds": 1145.35,
+        "maxStationaryWait": 22.45
+      },
+      "throughput": 0.44166666666666665,
+      "waitSeconds": 1438.5,
+      "maxWait": 52.45,
+      "updateP95ms": 0.5548,
+      "cpuMs": 305.74,
+      "expansions": 655500,
+      "maxTickExpansions": 2048,
+      "staticBuilds": 304,
+      "sharedBuilds": 0,
+      "cooperativeSteps": 44,
+      "collisions": 0
+    },
+    {
+      "commands": 115,
+      "returning": 0,
+      "activeChains": 7,
+      "scenario": "individual",
+      "count": 256,
+      "seconds": 120,
+      "arrived": 141,
+      "at90": {
+        "arrived": 129,
+        "waitSeconds": 9329.25,
+        "maxStationaryWait": 48
+      },
+      "throughput": 1.175,
+      "waitSeconds": 12151.45,
+      "maxWait": 78,
+      "updateP95ms": 1.2383,
+      "cpuMs": 866.27,
+      "expansions": 1517086,
+      "maxTickExpansions": 2048,
+      "staticBuilds": 2961,
+      "sharedBuilds": 0,
+      "cooperativeSteps": 1053,
+      "collisions": 0
+    },
+    {
+      "commands": 532,
+      "returning": 0,
+      "activeChains": 12,
+      "scenario": "individual",
+      "count": 700,
+      "seconds": 120,
+      "arrived": 168,
+      "at90": {
+        "arrived": 117,
+        "waitSeconds": 43367.65,
+        "maxStationaryWait": 52.1
+      },
+      "throughput": 1.4,
+      "waitSeconds": 57440.1,
+      "maxWait": 55.3,
+      "updateP95ms": 1.7506,
+      "cpuMs": 1557.19,
+      "expansions": 1963275,
+      "maxTickExpansions": 2048,
+      "staticBuilds": 7335,
+      "sharedBuilds": 0,
+      "cooperativeSteps": 3241,
+      "collisions": 0
+    },
+    {
+      "commands": 1,
+      "returning": 0,
+      "activeChains": 1,
+      "scenario": "squads",
+      "count": 64,
+      "seconds": 120,
+      "arrived": 62,
+      "at90": {
+        "arrived": 62,
+        "waitSeconds": 1053.7,
+        "maxStationaryWait": 25.9
+      },
+      "throughput": 0.5166666666666667,
+      "waitSeconds": 1111.45,
+      "maxWait": 29.5,
+      "updateP95ms": 0.3098,
+      "cpuMs": 278.42,
+      "expansions": 205192,
+      "maxTickExpansions": 2048,
+      "staticBuilds": 276,
+      "sharedBuilds": 3,
+      "cooperativeSteps": 46,
+      "collisions": 0
+    },
+    {
+      "commands": 44,
+      "returning": 0,
+      "activeChains": 16,
+      "scenario": "squads",
+      "count": 256,
+      "seconds": 120,
+      "arrived": 194,
+      "at90": {
+        "arrived": 163,
+        "waitSeconds": 6466.3,
+        "maxStationaryWait": 31.3
+      },
+      "throughput": 1.6166666666666667,
+      "waitSeconds": 7884.45,
+      "maxWait": 40.15,
+      "updateP95ms": 1.5953,
+      "cpuMs": 1425.7,
+      "expansions": 1328463,
+      "maxTickExpansions": 2048,
+      "staticBuilds": 2632,
+      "sharedBuilds": 11,
+      "cooperativeSteps": 173,
+      "collisions": 0
+    },
+    {
+      "commands": 205,
+      "returning": 0,
+      "activeChains": 16,
+      "scenario": "squads",
+      "count": 700,
+      "seconds": 120,
+      "arrived": 475,
+      "at90": {
+        "arrived": 406,
+        "waitSeconds": 22811.95,
+        "maxStationaryWait": 30.45
+      },
+      "throughput": 3.9583333333333335,
+      "waitSeconds": 28424.75,
+      "maxWait": 52.1,
+      "updateP95ms": 3.7705,
+      "cpuMs": 3730.37,
+      "expansions": 1894774,
+      "maxTickExpansions": 2048,
+      "staticBuilds": 11528,
+      "sharedBuilds": 30,
+      "cooperativeSteps": 542,
+      "collisions": 0
+    }
+  ],
+  "browserBefore": [
+    {
+      "count": 64,
+      "fps": 60.002400096003825,
+      "frameCpuP95ms": 0.7999999970197678,
+      "frameIntervalP95ms": 16.700000000000273
+    },
+    {
+      "count": 256,
+      "fps": 60.00240009600385,
+      "frameCpuP95ms": 1.7999999970197678,
+      "frameIntervalP95ms": 16.700000000000728
+    },
+    {
+      "count": 700,
+      "fps": 59.99999999999999,
+      "frameCpuP95ms": 3.2000000029802322,
+      "frameIntervalP95ms": 16.700000000000728
+    }
+  ],
+  "browserAfter": [
+    {
+      "count": 64,
+      "fps": 59.99999999999999,
+      "frameCpuP95ms": 1,
+      "frameIntervalP95ms": 16.799999999999727
+    },
+    {
+      "count": 256,
+      "fps": 60.00240009600385,
+      "frameCpuP95ms": 2,
+      "frameIntervalP95ms": 16.700000000000728
+    },
+    {
+      "count": 700,
+      "fps": 60.00240009600385,
+      "frameCpuP95ms": 3.8999999910593033,
+      "frameIntervalP95ms": 16.799999999999272
+    }
+  ],
+  "modelTestResults": {
+    "before": {
+      "tests": 250,
+      "pass": 234,
+      "fail": 16
+    },
+    "after": {
+      "tests": 258,
+      "pass": 242,
+      "fail": 16
+    },
+    "newFailures": [],
+    "existingFailures": [
+      "a real ranged actor acquires an interpolating target across a bucket boundary",
+      "a vertical advance places the commander behind the front instead of beside it",
+      "an isolated long move follows a shortest route without a traffic lane detour",
+      "automatic armies obey the 200 cap and deploy on their own half",
+      "edge destinations leave access around the formation until every member arrives",
+      "full bot operations pair frontline, firepower and healing in one lane",
+      "healers restore injured allies, respect cooldown and never damage enemies",
+      "home defense intercepts intruders without recalling a distant attack operation",
+      "injury changes neither movement duration nor attack damage",
+      "manual placement spends reserves atomically and rejects overlaps and enemy territory",
+      "shared destination has one occupant; other commands wait without overlap",
+      "squad destinations on a large map start without serial full-map distance fields",
+      "square formation surrounds its commander and assigns distinct valid seats to every role",
+      "step timing remains exact and simulation does not depend on a renderer",
+      "the commander receives a safer rear target even when the formation is dense",
+      "visible test classes have independent configured health, damage and attack speed"
+    ]
+  }
+}

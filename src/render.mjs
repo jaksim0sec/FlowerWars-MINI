@@ -5,7 +5,7 @@ import {loadCatalog, loadImage} from './characters/catalog.mjs';
 import {createCharacter, equip, drawCharacter} from './characters/engine.mjs';
 import { project, HALF_W, HALF_H } from './model.mjs';
 import {drawCommandOverlay} from './command-overlay.mjs';
-import {drawMatchOverlay,drawDistantSoldier} from './match-overlay.mjs';
+import {drawMatchOverlay,drawDistantSoldier,drawSquadTeamFlags,TEAM_COLORS,TEAM_MARKER_SCALE} from './match-overlay.mjs';
 
 const TERRAIN_ATLAS=new URL('../assets/world/terrain/atlas.webp',import.meta.url);
 export async function loadArtwork() {
@@ -70,8 +70,10 @@ export function render(ctx, art, board, view, camera, width, height, dpr, option
   for (const unit of units) {
     const p = project(unit.visualX, unit.visualY);
     ctx.save(); ctx.translate(p.x, p.y);
-    if(unit.team&&unit.state!=='death'){ctx.beginPath();ctx.ellipse(0,-1,29,10,0,0,Math.PI*2);ctx.strokeStyle=unit.team==='A'?'#3983b8':'#d56c3b';ctx.lineWidth=2;ctx.stroke();}
-    if (unit.state!=='death' && (unit.id === view.selected || view.mode === 'attack')) {
+    if(unit.team&&unit.state!=='death'&&camera.scale>=TEAM_MARKER_SCALE){
+      ctx.beginPath();ctx.ellipse(0,-1,30,11,0,0,Math.PI*2);ctx.fillStyle=unit.team==='A'?'#287de0b8':'#e3464db8';ctx.fill();ctx.strokeStyle=TEAM_COLORS[unit.team];ctx.lineWidth=2;ctx.stroke();
+    }
+    if (unit.state!=='death' && camera.scale>=TEAM_MARKER_SCALE && (unit.id === view.selected || view.mode === 'attack')) {
       ctx.beginPath(); ctx.ellipse(0, -1, 34, 13, 0, 0, Math.PI * 2);
       ctx.strokeStyle = unit.id === view.selected ? '#fff3ae' : '#b96335';
       ctx.lineWidth = unit.id === view.selected ? 2.5 : 1.5; ctx.stroke();
@@ -83,12 +85,16 @@ export function render(ctx, art, board, view, camera, width, height, dpr, option
       const pose=cachedPose(art.catalog,unit.character,board.time,camera.scale);if(pose.computed)posedUnits++;
       drawCharacter(ctx,art.catalog,unit.character,board.time,{layout:pose.layout});
     } else drawWarrior(ctx, art, unit, board.time);
+    if(unit.team&&unit.state!=='death'&&camera.scale>=TEAM_MARKER_SCALE){
+      const r=Math.min(8,Math.max(4,2.5/camera.scale));ctx.beginPath();ctx.arc(0,-136,r,0,Math.PI*2);ctx.fillStyle=TEAM_COLORS[unit.team];ctx.fill();ctx.strokeStyle='#fff9ef';ctx.lineWidth=1.5;ctx.stroke();
+    }
     if (unit.id === view.selected && unit.state!=='death') {
       const y = -123 + Math.sin(board.time * 3) * 2;
       ctx.fillStyle = '#fff1a3'; ctx.beginPath(); ctx.moveTo(-4, y); ctx.lineTo(4, y); ctx.lineTo(0, y + 5); ctx.fill();
     }
     ctx.restore();
   }
+  drawSquadTeamFlags(ctx,board,camera.scale,camera,width,height,view.selectedSquadIds||[]);
   for (const effect of board.effects) {
     const p = project(effect.x, effect.y), t = effect.age / .55;
     if(!onScreen(p.x,p.y-54,50,camera,width,height))continue;

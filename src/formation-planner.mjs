@@ -30,9 +30,9 @@ export function settleFormation(units,goals){
  const owners=new Map([...goals].map(([id,p])=>[p.x+','+p.y,id]));
  const byId=new Map(units.map(u=>[u.id,u]));
  for(const u of units){
-  if(u.step)continue;
+  if(u.step||u.courtesy)continue;
   const owner=owners.get(u.x+','+u.y),other=byId.get(owner),previous=goals.get(u.id);
-  if(!other||owner===u.id||!previous||kindOf(other)!==kindOf(u))continue;
+  if(!other||other.courtesy||owner===u.id||!previous||kindOf(other)!==kindOf(u))continue;
   const here=goals.get(owner);goals.set(u.id,here);goals.set(owner,previous);
   owners.set(here.x+','+here.y,u.id);owners.set(previous.x+','+previous.y,owner);
  }
@@ -44,10 +44,10 @@ export function relayFormationVacancies(board,units,goals){
  const byCell=new Map(units.filter(u=>!u.step).map(u=>[u.x+','+u.y,u]));
  for(const owner of units){
   const hole=goals.get(owner.id);
-  if(!hole||owner.step||owner.strike||distance(owner,hole)<=1||board.occupied(hole.x,hole.y))continue;
+  if(!hole||owner.step||owner.strike||owner.courtesy||owner.remoteCourtesy||distance(owner,hole)<=1||board.occupied(hole.x,hole.y))continue;
   for(const [dx,dy]of [[1,0],[-1,0],[0,1],[0,-1]]){
    const relay=byCell.get((hole.x+dx)+','+(hole.y+dy)),seat=relay&&goals.get(relay.id);
-   if(!relay||relay.command||relay.strike||!seat||distance(relay,seat)!==0||kindOf(relay)!==kindOf(owner)||1+distance(owner,relay)>distance(owner,hole))continue;
+   if(!relay||relay.courtesy||relay.command||relay.strike||!seat||distance(relay,seat)!==0||kindOf(relay)!==kindOf(owner)||1+distance(owner,relay)>distance(owner,hole))continue;
    goals.set(relay.id,hole);goals.set(owner.id,seat);board.cancelCommand(owner);owner.reformSearch=null;
    break;
   }

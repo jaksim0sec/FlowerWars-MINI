@@ -190,6 +190,10 @@ function runOrder(board,s,replace=false){
     for(const u of units){if(u.state!=='attack'||!u.strike)board.interrupt(u);u.reformSearch=null;}
     o.activeReformId=null;o.reformBuffer=null;o.reformFailed=null;
    }
+   if(o.type!=='rally'){
+    const lead=commander(board,s),origin=lead?.step||lead,target=lead&&o.goals.get(lead.id);
+    if(origin&&target)o.marchRoute={origin:{x:origin.x,y:origin.y},target:{...target},starts:new Map(units.map(u=>[u.id,{x:u.step?.x??u.x,y:u.step?.y??u.y}]))};
+   }
    o.previous=anchor;o.lastMembers=units.length;o.dirty=false;
  }
  settleFormation(units,o.goals);
@@ -200,43 +204,22 @@ function runOrder(board,s,replace=false){
   for(const u of units)u.combat.formationLocked=true;
   return;
  }
- // An arrived teammate can seal the last empty seat on all four sides.
- // Temporarily open one passing bay, rather than wait forever on that seat.
- o.passing??=new Map();
- const occupiedGoals=new Set([...o.goals.values()].map(p=>p.x+','+p.y));
- for(const u of units){
-  const goal=o.goals.get(u.id);
-  if(o.passing.has(u.id)||!goal||u.waitReason!=='traffic'||board.time-(u.waitSince??board.time)<.6||board.time<(o.nextPassingAt||0))continue;
-  const route=formationPath(board,u,goal);
-  if(route===undefined)continue;
-  if(route?.length&&board.move(u.id,goal.x,goal.y,{replace:true,direct:true,plannedPath:route})){
-   o.nextPassingAt=board.time+.4;continue;
-  }
-  const directions=[[1,0],[-1,0],[0,1],[0,-1]];
-  let opened=false;
-  for(const [dx,dy]of [[0,0],...directions]){
+ // Blocked deep seats use the same bounded, protected cooperation as normal
+ // navigation. No second system issues replacement commands to passing troops.
+ if(board.time>=(o.nextPassingAt||0))for(const u of units){
+  if(u.courtesy||u.remoteCourtesy||u.waitReason!=='traffic'||board.time-(u.waitSince??board.time)<.6)continue;
+  const goal=o.goals.get(u.id);if(!goal)continue;
+  let requested=false;
+  for(const [dx,dy]of [[0,0],[1,0],[-1,0],[0,1],[0,-1]]){
    const blocker=board.at(goal.x+dx,goal.y+dy);
-   if(!blocker||blocker.squadId!==s.id||blocker.id===u.id||blocker.state!=='idle'||blocker.step||o.passing.has(blocker.id))continue;
-   if(blocker.command&&(blocker.command.type!=='move'||blocker.waitReason!=='traffic'))continue;
-   for(const [bx,by]of directions){
-    const x=blocker.x+bx,y=blocker.y+by;
-    if(!board.inside(x,y)||board.occupied(x,y)||board.navigation.blocked(y*board.width+x)||occupiedGoals.has(x+','+y)||Math.abs(x-goal.x)+Math.abs(y-goal.y)<=1)continue;
-    if(board.move(blocker.id,x,y,{replace:true,direct:true})){
-     o.passing.set(blocker.id,{for:u.id});opened=true;break;
-    }
-   }
-   if(opened)break;
+   if(board.navigation.requestCooperation(u,blocker,{squad:s,order:o,goal:{...goal}})){requested=true;break;}
   }
-  if(opened)o.nextPassingAt=board.time+.4;
+  if(requested){o.nextPassingAt=board.time+.4;break;}
  }
  let arrived=0;
  if(o.travelOffsets){const pace=Math.max(...units.map(u=>u.movement.stepTime));for(const u of units)u.marchStepTime=pace;}
  board.batchCommands(()=>{for(const u of units){
-   const passing=o.passing.get(u.id);
-   if(passing){const waiting=board.unit(passing.for),goal=o.goals.get(passing.for);
-    if(waiting?.health.current>0&&goal&&(waiting.step||waiting.x!==goal.x||waiting.y!==goal.y))continue;
-    o.passing.delete(u.id);
-   }
+   if(u.courtesy)continue;
    const p=o.goals.get(u.id),at=p&&u.x===p.x&&u.y===p.y&&!u.step;
    const defensive=['fortify','firing-line'].includes(o.type);
 
@@ -245,7 +228,7 @@ function runOrder(board,s,replace=false){
    if(!p||u.command?.type==='move'&&u.command.x===p.x&&u.command.y===p.y)continue;
    if(u.state==='attack'&&u.strike)continue;
    if(!replace&&u.command?.type!=='move'&&(u.state!=='idle'||u.step))continue;
-   board.move(u.id,p.x,p.y,{replace:replace||u.command?.type==='move',direct:true});
+   board.move(u.id,p.x,p.y,{replace:replace||u.command?.type==='move',direct:true,squadRoute:o.marchRoute});
  }});
  for(const u of units)u.combat.formationLocked=true;
  if(!o.waypoints.length)o.phase=arrived===units.length?(['fortify','firing-line'].includes(o.type)?'holding':'arrived'):'moving';
