@@ -6,9 +6,9 @@ export function drawMatchOverlay(ctx,match,scale){
  const polygon=(x1,x2,fill)=>{
   ctx.beginPath();[[x1,-.5],[x2,-.5],[x2,99.5],[x1,99.5]].forEach(([x,y],i)=>{const p=project(x,y);if(i)ctx.lineTo(p.x,p.y);else ctx.moveTo(p.x,p.y);});ctx.closePath();ctx.fillStyle=fill;ctx.fill();
  };
- polygon(-.5,49.5,'#397bb011');polygon(49.5,99.5,'#e3464d11');
- const a=project(49.5,-.5),b=project(49.5,99.5);
- ctx.save();ctx.strokeStyle=match.phase==='preparation'?'#fff4d9':'#fff4d966';ctx.lineWidth=1.5/scale;ctx.setLineDash([6/scale,6/scale]);ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();ctx.setLineDash([]);
+ polygon(-.5,26.5,'#397bb011');polygon(72.5,99.5,'#e3464d11');
+ const boundaryLines=[26.5,72.5].map(x=>[project(x,-.5),project(x,99.5)]);
+ ctx.save();ctx.strokeStyle=match.phase==='preparation'?'#fff4d9':'#fff4d966';ctx.lineWidth=1.5/scale;ctx.setLineDash([6/scale,6/scale]);for(const [a,b] of boundaryLines){ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}ctx.setLineDash([]);
  for(const [team,flag]of Object.entries(match.flags)){
   const p=project(flag.x,flag.y);ctx.save();ctx.translate(p.x,p.y);ctx.scale(1/scale,1/scale);
   ctx.fillStyle=team==='A'?'#dceefaec':'#f9dfddec';ctx.strokeStyle=team==='A'?'#3378a5':'#cd3944';ctx.lineWidth=2;
@@ -17,6 +17,20 @@ export function drawMatchOverlay(ctx,match,scale){
   ctx.fillStyle=ctx.strokeStyle;ctx.font='600 11px system-ui';ctx.textAlign='center';ctx.fillText(team==='A'?'내 깃발':'적 깃발',0,22);
   const health=flag.health;
   if(health){ctx.fillStyle='#4a352a66';ctx.fillRect(-23,28,46,5);ctx.fillStyle=team==='A'?'#327ca8':'#d74750';ctx.fillRect(-23,28,46*Math.max(0,health.current/health.max),5);ctx.font='600 9px system-ui';ctx.fillText(Math.ceil(health.current)+' / '+health.max,0,44);}
+  ctx.restore();
+ }
+ // Small at-a-glance indicators: each bar corresponds to four actual cells.
+ for(const team of ['A','B']){
+  const gate=match.gates?.[team];if(!gate)continue;
+  const x=team==='A'?27:72,p=project(x,34);
+  ctx.save();ctx.translate(p.x,p.y);ctx.scale(1/scale,1/scale);
+  ctx.fillStyle='#fff9e9cc';ctx.fillRect(-30,-18,60,18);
+  ctx.fillStyle=team==='A'?'#357eb3':'#bf655b';
+  ctx.font='600 10px system-ui';ctx.textAlign='center';
+  ctx.fillText(team+' 관문',0,-6);
+  gate.forEach((part,i)=>{ctx.fillStyle='#64544255';ctx.fillRect(-29+i*12,2,10,5);
+   ctx.fillStyle=team==='A'?'#397fb0':'#c66d5f';
+   ctx.fillRect(-29+i*12,2,10*part.health.current/part.health.max,5);});
   ctx.restore();
  }
  ctx.restore();
