@@ -1,5 +1,5 @@
 const distance=(a,b)=>Math.abs(a.x-b.x)+Math.abs(a.y-b.y);
-export const kindOf=u=>`${u.character?.characterId||u.formationRole||'soldier'}:${u.combat.range}:${!!u.healing}`;
+export const kindOf=u=>`${u.unitType||u.character?.characterId||u.formationRole||'soldier'}:${u.combat.range}:${!!u.healing}`;
 export function forwardFor(s){return s.order?.forward||{x:s.order?.facing||(s.team==='B'?-1:1),y:0};}
 
 // A temporary intruder must never relocate every seat of an existing formation.
@@ -35,6 +35,22 @@ export function settleFormation(units,goals){
   if(!other||owner===u.id||!previous||kindOf(other)!==kindOf(u))continue;
   const here=goals.get(owner);goals.set(u.id,here);goals.set(owner,previous);
   owners.set(here.x+','+here.y,u.id);owners.set(previous.x+','+previous.y,owner);
+ }
+}
+
+// Pass a vacant seat through settled soldiers of the same kind. Each relay
+// moves one tile; the distant soldier's destination gets one tile closer.
+export function relayFormationVacancies(board,units,goals){
+ const byCell=new Map(units.filter(u=>!u.step).map(u=>[u.x+','+u.y,u]));
+ for(const owner of units){
+  const hole=goals.get(owner.id);
+  if(!hole||owner.step||owner.strike||distance(owner,hole)<=1||board.occupied(hole.x,hole.y))continue;
+  for(const [dx,dy]of [[1,0],[-1,0],[0,1],[0,-1]]){
+   const relay=byCell.get((hole.x+dx)+','+(hole.y+dy)),seat=relay&&goals.get(relay.id);
+   if(!relay||relay.command||relay.strike||!seat||distance(relay,seat)!==0||kindOf(relay)!==kindOf(owner)||1+distance(owner,relay)>distance(owner,hole))continue;
+   goals.set(relay.id,hole);goals.set(owner.id,seat);board.cancelCommand(owner);owner.reformSearch=null;
+   break;
+  }
  }
 }
 
