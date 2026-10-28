@@ -16,7 +16,7 @@ export class TacticalController{
   const existing=[...this.operations.values()].flatMap(o=>o.needs),mobileShare=total?ranged/total*.55+.15:.2;
   const mobile=existing.filter(n=>n==='mobile').length<(index+1)*mobileShare;
   const needs=slots===2?[mobile?'mobile':'screen',existing.filter(n=>n==='support').length<(existing.length+slots)*(armored>total*.35?.15:.25)?'support':'fire']:['screen','fire',ranged>total*.35?'mobile':armored>total*.35?'fire':'strike','support'].slice(0,slots);
-  const anchors=this.observer.nodes.filter(n=>['staging','merge','deployment'].includes(n.kind)&&n.x>=m.board.width*.6).sort((a,b)=>this.observer.travel(a,m.flags.A)-this.observer.travel(b,m.flags.A));
+  const anchors=this.observer.nodes.filter(n=>['staging','merge','deployment'].includes(n.kind)&&(n.x>=m.board.width*.6||n.kind==='staging'&&m.inTerritory('B',n))).sort((a,b)=>this.observer.travel(a,m.flags.A)-this.observer.travel(b,m.flags.A));
   const types=needs.map(n=>recruit(m.recruitment,n)),size=types.reduce((n,type)=>n+m.recruitment.get(type).blueprint.members.length,0);
   const placed=[...this.operations.values()];
   const cost=n=>{const nearby=placed.reduce((v,o)=>v+(o.types||[]).reduce((a,t)=>a+m.recruitment.get(t).blueprint.members.length,0)*Math.max(0,1-distance(n,o.anchor)/24),0);
