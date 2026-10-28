@@ -7,13 +7,13 @@ import {createBattleState,stepBattle} from './battle-state.mjs';
 import {applyBattleCommand} from './battle-commands.mjs';
 import {BattleFrames,applyBattleFrame} from './battle-wire.mjs';
 import {unpackMessage} from './wire-codec.mjs';
-import {packOffThread,validateOffThread} from './checkpoint-processor.mjs';
+import {packOffThread,validateOffThread,unpackOffThread} from './checkpoint-processor.mjs';
 
 let socketScript;
 export async function loadSocketClient(){if(globalThis.io)return globalThis.io;if(!socketScript)socketScript=new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='/socket.io/socket.io.js';const timer=setTimeout(()=>{script.remove();socketScript=null;reject(new Error('SERVER_UNAVAILABLE'));},60000);script.onload=()=>{clearTimeout(timer);if(typeof globalThis.io!=='function'){script.remove();socketScript=null;reject(new Error('SERVER_UNAVAILABLE'));return;}resolve(globalThis.io);};script.onerror=()=>{clearTimeout(timer);socketScript=null;reject(new Error('SERVER_UNAVAILABLE'));};document.head.append(script);});return socketScript;}
 const storage=name=>{try{return globalThis[name];}catch{return null;}};
 export class OnlineSession extends EventTarget {
- constructor({adapter='fixture-v1'}={}){super();this.adapterId=adapter;this.battleFrames=new BattleFrames();this.commandSequence=0;this.lastCommandSequence=0;this.pendingCommands=new Map();this.sessionStorage=storage('sessionStorage');this.localStorage=storage('localStorage');this.identity=loadIdentity(this.sessionStorage,this.localStorage);if(this.identity)setOnlineActive(true);this.backup=new SnapshotBackup();this.room=null;this.state=null;this.peer=null;this.status='';this.peerStatus='미연결';this.clockOffset=0;this.appliedEpoch=-1;this.sequence=-1;this.frame=0;this.lastFrame=-1;this.guestFrameAt=null;this.messages=Promise.resolve();this.busy=false;this.publishing=false;this.initializing=false;this.lastCheckpoint=0;this.lastSent=0;this.lastTick=performance.now();this.timer=setInterval(()=>this.tick(),50);}
+ constructor({adapter='fixture-v1'}={}){super();this.adapterId=adapter;this.battleFrames=new BattleFrames();this.commandSequence=0;this.lastCommandSequence=0;this.pendingCommands=new Map();this.sessionStorage=storage('sessionStorage');this.localStorage=storage('localStorage');this.identity=loadIdentity(this.sessionStorage,this.localStorage);if(this.identity)setOnlineActive(true);this.backup=new SnapshotBackup();this.room=null;this.state=null;this.peer=null;this.status='';this.peerStatus='미연결';this.clockOffset=0;this.appliedEpoch=-1;this.sequence=-1;this.frame=0;this.lastFrame=-1;this.guestFrameAt=null;this.messages=Promise.resolve();this.backgroundCheckpoints=Promise.resolve();this.busy=false;this.publishing=false;this.initializing=false;this.lastCheckpoint=0;this.lastSent=0;this.lastTick=performance.now();this.timer=setInterval(()=>this.tick(),50);}
  changed(){this.dispatchEvent(new Event('change'));}
  error(code){this.status=code;this.changed();}
  persist(){if(this.identity){const deadline=this.room?.deadline;saveIdentity({...this.identity,expiresAt:Math.min(this.identity.expiresAt,deadline??Infinity)},this.sessionStorage,this.localStorage);}}
@@ -66,8 +66,12 @@ export class OnlineSession extends EventTarget {
    await this.rpc('participant:synced',{epoch,sequence:snapshot.sequence,hash:snapshot.hash});if(current()){this.peerStatus='직접 연결됨';this.status='';}
   }finally{if(this.syncJob===job)this.syncingEpoch=null;this.changed();}
  }
- async receive(message,epoch){if(!this.room||!this.identity||this.room.epoch!==epoch)return;const identity=this.identity,code=this.room.roomCode,matchId=this.room.matchId,current=()=>this.identity===identity&&this.room?.epoch===epoch&&this.room?.roomCode===code&&this.room?.matchId===matchId;
-  if(message.kind==='compressed'){const decoded=await unpackMessage(message);if(current())await this.receive(decoded,epoch);return;}
+ async receive(message,epoch,background=false){if(!this.room||!this.identity||this.room.epoch!==epoch)return;const identity=this.identity,code=this.room.roomCode,matchId=this.room.matchId,current=()=>this.identity===identity&&this.room?.epoch===epoch&&this.room?.roomCode===code&&this.room?.matchId===matchId;
+  if(message.kind==='compressed'){const decoded=message.byteLength>65536?await unpackOffThread(message):await unpackMessage(message);if(current())await this.receive(decoded,epoch,background);return;}
+  if(!background&&message.kind==='checkpoint'&&!message.final&&this.identity.role==='guest'&&this.room.state==='PLAYING'){
+   this.backgroundCheckpoints=this.backgroundCheckpoints.then(()=>this.receive(message,epoch,true)).catch(e=>{if(current()){this.error(e.message);this.peer?.fail('RECOVERY_FAILED');}});
+   return;
+  }
   if(message.kind==='hello'){this.peerCompression=message.compression===true;await this.ensureSync();return;}
   if(message.kind==='command'){
    if(this.identity.role!=='host'||this.room.state!=='PLAYING'||!this.state)return;
