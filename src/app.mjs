@@ -787,7 +787,8 @@ function frame(now) {
       const p=project(u.visualX,u.visualY);return onScreen(p.x,p.y,u.character?characterRadius(art.catalog,u.character):250,camera,width,height);
     })||board.effects.some(e=>{const p=project(e.x,e.y);return onScreen(p.x,p.y-54,50,camera,width,height);});
     if((dirty||board.match?.phase!=='finished'&&(active||visibleCount>0))&&(now-lastDraw>=1000/(board.match?30:60)-1)){
-      const result=render(ctx,art,board,view,camera,width,height,dpr,{cameraMoving});visibleCount=result.visibleUnits;lastDraw=now;dirty=false;if(!cameraMoving)cameraSettled=true;
+      const s=onlineContext.session,guestAgeMs=s?.identity?.role==='guest'&&s.state?.board===board&&s.room?.state==='PLAYING'&&Number.isFinite(s.guestFrameAt)?now-s.guestFrameAt:null;
+      const result=render(ctx,art,board,view,camera,width,height,dpr,{cameraMoving,guestAgeMs});visibleCount=result.visibleUnits;lastDraw=now;dirty=false;if(!cameraMoving)cameraSettled=true;
     }
   }
   requestAnimationFrame(frame);

@@ -25,3 +25,11 @@ test('identity uses same-tab storage with expiring local fallback, expires witho
  const a=memory(),b=memory(),identity={roomCode:'ABCDEF',role:'host',clientId:'a'.repeat(32),reconnectToken:'x'.repeat(43),expiresAt:2000};saveIdentity(identity,a,b);assert.deepEqual(loadIdentity(a,b,1000),identity);a.removeItem('flowerwars-online');assert.deepEqual(loadIdentity(a,b,1000),identity);assert.equal(loadIdentity(a,b,2000),null);saveIdentity(identity,a,b);clearIdentity(a,b);assert.equal(loadIdentity(a,b,1000),null);const broken={getItem(){throw Error();},setItem(){throw Error();},removeItem(){throw Error();}};assert.doesNotThrow(()=>saveIdentity(identity,broken,b));assert.deepEqual(loadIdentity(broken,b,1000),identity);
 });
 test('single-player gate defaults inactive and is reversible without touching combat mechanics',()=>{assert.equal(pauseSinglePlayer(),false);setOnlineActive(true);assert.equal(pauseSinglePlayer(),true);setOnlineActive(false);assert.equal(pauseSinglePlayer(),false);});
+
+test('trusted checkpoint writes skip redundant validation but restore still checks integrity',async()=>{
+ const backup=new SnapshotBackup({indexedDB,name:'online-verified-'+Math.random()});
+ try{const snapshot=await saveMatchState(createFixture('trusted'),4);assert.equal(await validateMatchState(snapshot),true);
+  await backup.put('ABCDEF',snapshot,{verified:true});assert.equal((await backup.get('ABCDEF','trusted')).sequence,4);
+  const tampered={...snapshot,hash:'0'.repeat(64)};await assert.rejects(()=>backup.put('ABCDEF',tampered),/INVALID_SNAPSHOT/);
+ }finally{await backup.close();}
+});

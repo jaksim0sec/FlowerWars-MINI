@@ -1,4 +1,5 @@
 import {combatAnimationElapsed} from './combat.mjs';
+import {guestVisual} from './online/game-gate.mjs';
 import {characterRadius,onScreen,cachedPose,releasePose} from './character-render-cache.mjs';
 import {drawTerrain} from './terrain-render.mjs';
 import {loadCatalog, loadImage} from './characters/catalog.mjs';
@@ -66,9 +67,11 @@ export function render(ctx, art, board, view, camera, width, height, dpr, option
     ctx.setLineDash([3, 6]); ctx.strokeStyle = '#fff3b9'; ctx.lineWidth = 3; ctx.stroke(); ctx.restore();
   }
   let posedUnits=0;
-  const units = board.units.filter(u=>{const p=project(u.visualX,u.visualY);const visible=onScreen(p.x,p.y,u.character?characterRadius(art.catalog,u.character):250,camera,width,height);if(!visible&&u.character)releasePose(u.character);return visible;}).sort((a, b) => (a.visualX + a.visualY) - (b.visualX + b.visualY) || a.visualX - b.visualX);
+  const guestAgeMs=options.guestAgeMs,visualTime=board.time+(guestAgeMs==null?0:Math.min(200,Math.max(0,guestAgeMs))/1000),positions=new Map();
+  const locate=u=>{let v=positions.get(u.id);if(!v){v=guestAgeMs==null?{x:u.visualX,y:u.visualY,elapsed:u.elapsed}:guestVisual(u,guestAgeMs);positions.set(u.id,v);}return v;};
+  const units = board.units.filter(u=>{const v=locate(u),p=project(v.x,v.y);const visible=onScreen(p.x,p.y,u.character?characterRadius(art.catalog,u.character):250,camera,width,height);if(!visible&&u.character)releasePose(u.character);return visible;}).sort((a,b)=>{const x=locate(a),y=locate(b);return (x.x+x.y)-(y.x+y.y)||x.x-y.x;});
   for (const unit of units) {
-    const p = project(unit.visualX, unit.visualY);
+    const motion=locate(unit),p=project(motion.x,motion.y);
     ctx.save(); ctx.translate(p.x, p.y);
     if(unit.team&&unit.state!=='death'&&camera.scale>=TEAM_MARKER_SCALE){
       ctx.beginPath();ctx.ellipse(0,-1,30,11,0,0,Math.PI*2);ctx.fillStyle=unit.team==='A'?'#287de0b8':'#e3464db8';ctx.fill();ctx.strokeStyle=TEAM_COLORS[unit.team];ctx.lineWidth=2;ctx.stroke();
@@ -81,9 +84,9 @@ export function render(ctx, art, board, view, camera, width, height, dpr, option
     if(unit.character&&board.match&&camera.scale<.28){
       drawDistantSoldier(ctx,art,unit,drawCharacter);
     }else if(unit.character) {
-      Object.assign(unit.character.animation,{state:unit.state,elapsed:combatAnimationElapsed(unit),facing:unit.facing,phase:unit.id,attackVector:unit.attackVector,deathDirection:unit.deathDirection});
-      const pose=cachedPose(art.catalog,unit.character,board.time,camera.scale);if(pose.computed)posedUnits++;
-      drawCharacter(ctx,art.catalog,unit.character,board.time,{layout:pose.layout});
+      Object.assign(unit.character.animation,{state:unit.state,elapsed:guestAgeMs==null?combatAnimationElapsed(unit):combatAnimationElapsed({state:unit.state,strike:unit.strike,elapsed:motion.elapsed}),facing:unit.facing,phase:unit.id,attackVector:unit.attackVector,deathDirection:unit.deathDirection});
+      const pose=cachedPose(art.catalog,unit.character,visualTime,camera.scale);if(pose.computed)posedUnits++;
+      drawCharacter(ctx,art.catalog,unit.character,visualTime,{layout:pose.layout});
     } else drawWarrior(ctx, art, unit, board.time);
     if (unit.id === view.selected && unit.state!=='death') {
       const y = -123 + Math.sin(board.time * 3) * 2;

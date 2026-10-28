@@ -8,3 +8,15 @@ export const onlineContext={session:null};
 export function registerBattleView(value){view=value;resolveView(value);}
 export const battleViewReady=()=>view?Promise.resolve(view):ready;
 export function playerTeam(){return onlineContext.session?.room?.matchId?(onlineContext.session.identity?.role==='guest'?'B':'A'):'A';}
+
+// Presentation-only extrapolation. Never mutate authoritative occupancy or combat state.
+export function guestVisual(unit,ageMs=0){
+ const age=Number.isFinite(ageMs)?Math.min(.2,Math.max(0,ageMs)/1000):0;
+ let x=unit.visualX,y=unit.visualY;
+ const step=unit.step;
+ if(unit.state==='walk'&&step&&Number.isFinite(step.duration)&&step.duration>0&&Number.isFinite(step.elapsed)){
+  const t=Math.max(0,Math.min(1,(step.elapsed+age)/step.duration));
+  x=unit.x+(step.x-unit.x)*t;y=unit.y+(step.y-unit.y)*t;
+ }
+ return {x,y,elapsed:unit.elapsed+age};
+}
