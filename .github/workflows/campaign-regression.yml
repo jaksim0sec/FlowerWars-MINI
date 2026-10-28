@@ -1,0 +1,47 @@
+name: Campaign progression regression
+on:
+  push:
+    branches:
+      - feat/campaign-progression-20261029
+  workflow_dispatch:
+jobs:
+  campaign-logic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Syntax checks
+        run: |
+          node --check src/app.mjs
+          node --check src/progression/core.mjs
+          node --check src/progression/ui.mjs
+      - name: Campaign unit tests
+        run: node --test tests/campaign-progression.test.mjs
+      - name: Existing online regression tests
+        run: npm run test:online
+  campaign-mobile-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: python3 -m pip install --quiet playwright
+      - run: python3 -m playwright install --with-deps chromium
+      - name: Run mobile-size browser smoke
+        shell: bash
+        run: |
+          npm start > /tmp/flowerwars-campaign.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:10000/health >/dev/null; then break; fi
+            sleep 0.25
+          done
+          BASE_URL=http://127.0.0.1:10000 python3 tests/campaign-browser.py
