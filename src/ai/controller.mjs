@@ -1,3 +1,4 @@
+import {logDecision} from './decision-log.mjs';
 import {recruit} from '../bot-doctrines.mjs';
 import {Observer} from './observer.mjs';
 import {CommandGateway} from './commands.mjs';
@@ -53,7 +54,7 @@ export class TacticalController{
    const reserve=forces.length>2&&operation.index===forces.at(-1).operation.index;
    const planningForce=force.live.every(s=>s.squad.aiRecoverySpent)?{...force,ratio:Math.max(.5,force.ratio)}:force;
    const candidate=choose(this.observer,this.snapshot,planningForce,operation,{reserve,homeDanger:defenders.has(operation.index),claimed});
-   if(candidate){adopt(operation,candidate,this.observer,force.center,m.elapsed,this.metrics);claimed.set(candidate.node.id,(claimed.get(candidate.node.id)||0)+1);}
+   if(candidate){const previous=operation.intent+':'+operation.nodeId;adopt(operation,candidate,this.observer,force.center,m.elapsed,this.metrics);if(previous!==operation.intent+':'+operation.nodeId)logDecision(m,'plan',operation.index,operation.intent,operation.goal);claimed.set(candidate.node.id,(claimed.get(candidate.node.id)||0)+1);}
    for(const s of force.live){s.squad.botRole=s.heal>s.count*.15?'support':operation.role;this.registry.get(s.squad.botRole).add(s.id);}
   }
   m.strategy={...this.snapshot,enemy:{total:this.snapshot.totalEnemy}};this.nextRefresh=m.elapsed+.75;

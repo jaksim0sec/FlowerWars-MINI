@@ -1,3 +1,4 @@
+import {logDecision} from './decision-log.mjs';
 import {orderSquad} from '../squad-orders.mjs';
 const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 export class CommandGateway{
@@ -13,6 +14,6 @@ export class CommandGateway{
   if(same){this.metrics.deduplicated++;return true;}
   const last=this.last.get(s.id);if(!urgent&&(b.time-(last??-Infinity)<(aim?.x!==undefined?3:2)||state.engaged>0&&!state.redirect&&action!=='retreat')){this.metrics.deferred++;return false;}
   if(!orderSquad(b,s.id,action,aim))return false;
-  this.last.set(s.id,b.time);this.metrics.orders++;if(old)this.metrics.replacements++;return true;
+  this.last.set(s.id,b.time);this.metrics.orders++;logDecision(this.match,'order',(s.matchIndex??0)+1,action,aim);if(old)this.metrics.replacements++;return true;
  }
 }

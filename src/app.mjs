@@ -275,7 +275,21 @@ function startMatch(){
  syncSelectionView();syncSquadRoster();$('debug-tools').open=false;fit();updateMatchHud();refresh();
  notify('병종을 고르고 파란 진영을 터치해 배치하세요.');
 }
+function updateAiLog(){
+ const el=$('ai-decision-log'),m=board.match;
+ const entries=m?.phase==='battle'?m.aiLog?.entries.filter(e=>m.elapsed-e.at<12).slice(-4)||[]:[];
+ el.hidden=!entries.length;if(el.hidden)return;
+ const text=entries.map(e=>`${Math.floor(e.at/60)}:${String(Math.floor(e.at%60)).padStart(2,'0')}  ${e.text}`).join('\n');
+ if(el.textContent!==text)el.textContent=text;
+ const r=el.getBoundingClientRect();let top=12;
+ for(const selector of ['.masthead','.camera-tools','#match-hud','#debug-tools','#deployment-tools']){
+  const item=document.querySelector(selector);if(!item||item.hidden)continue;
+  const box=item.getBoundingClientRect();if(box.width&&box.height&&box.right>r.left&&box.left<r.right&&box.top<innerHeight*.5)top=Math.max(top,box.bottom+8);
+ }
+ el.style.top=top+'px';el.hidden=top+el.offsetHeight>innerHeight*.55;
+}
 function updateMatchHud(){
+ updateAiLog();
  const m=board.match;$('match-hud').hidden=!m;
  $('deployment-tools').hidden=!m||m.phase!=='preparation';
  $('match-result').hidden=!m||m.phase!=='finished';
