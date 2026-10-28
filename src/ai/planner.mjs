@@ -33,9 +33,20 @@ export function candidates(observer,snapshot,force,operation,{reserve=false,home
  return out.sort((a,b)=>b.score-a.score||a.node.index-b.node.index);
 }
 export function choose(observer,snapshot,force,operation,options){
+ // During commitment the existing planner would keep any still-feasible
+ // intent regardless of scores. Validate the dynamic exceptions before scoring.
+ const emergency=operation.ineffective||options.homeDanger&&operation.intent!=='DEFEND';
+ const completed=operation.arrived&&!['HOLD','DEFEND','REGROUP','CAPTURE'].includes(operation.intent);
+ if(!emergency&&!operation.stalled&&!completed&&snapshot.time-operation.changedAt<8&&operation.terrainRevision===observer.revision){
+  const node=observer.nodes.find(n=>n.id===operation.nodeId);
+  const valid=node&&Number.isFinite(observer.travel(force.center,node))&&
+   (operation.intent!=='DEFEND'||options.homeDanger)&&
+   (operation.intent!=='COUNTERATTACK'||observer.local(snapshot,node).A>1)&&
+   (operation.intent!=='FLANK'||force.live.reduce((n,s)=>n+s.count,0)<=node.width*10);
+  if(valid)return {intent:operation.intent,node};
+ }
  const choices=candidates(observer,snapshot,force,operation,options),best=choices[0];if(!best)return null;
  const current=choices.find(c=>c.intent===operation.intent&&c.node.id===operation.nodeId);
- const emergency=operation.ineffective||options.homeDanger&&operation.intent!=='DEFEND';
  if(!emergency&&!operation.stalled&&!(operation.arrived&&!['HOLD','DEFEND','REGROUP','CAPTURE'].includes(operation.intent))&&current&&operation.terrainRevision===observer.revision){
   if(snapshot.time-operation.changedAt<8||best.score<current.score+9)return current;
  }

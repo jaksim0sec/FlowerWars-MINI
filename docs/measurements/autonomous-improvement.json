@@ -1,0 +1,1542 @@
+{
+  "baselineRevision": "083d284",
+  "method": "Current utility recruitment and 176x128 terrain; 350/team; seeds17,73,191 × coordinated archers/flanking, 0/20/60/120s. Baseline and final run sequentially on same host.",
+  "summary": {
+    "before": {
+      "0": {
+        "power": 461.2088226545577,
+        "protectedRear": 17,
+        "orders": 0,
+        "movementStalls": 0,
+        "cpuP95ms": 0,
+        "aiRefreshCpuMs": 4.792097666665924,
+        "progress": 0,
+        "completed": 9,
+        "stalls": 0,
+        "aliveA": 350,
+        "aliveB": 350
+      },
+      "20": {
+        "power": 460.7330769095728,
+        "protectedRear": 16.333333333333332,
+        "orders": 74.33333333333333,
+        "movementStalls": 570,
+        "cpuP95ms": 4.633679000000048,
+        "aiRefreshCpuMs": 63.07171699999949,
+        "progress": 68.66666666666667,
+        "completed": 13.166666666666666,
+        "stalls": 1811,
+        "aliveA": 349.6666666666667,
+        "aliveB": 349.8333333333333
+      },
+      "60": {
+        "power": 449.3309404019835,
+        "protectedRear": 16.833333333333332,
+        "orders": 137.66666666666666,
+        "movementStalls": 2318,
+        "cpuP95ms": 5.653128666666589,
+        "aiRefreshCpuMs": 170.1687721666681,
+        "progress": 148.16666666666666,
+        "completed": 22,
+        "stalls": 7636.333333333333,
+        "aliveA": 346.1666666666667,
+        "aliveB": 343.1666666666667
+      },
+      "120": {
+        "power": 431.84424947784197,
+        "protectedRear": 16.166666666666668,
+        "orders": 178.66666666666666,
+        "movementStalls": 7451.666666666667,
+        "cpuP95ms": 6.655942666667063,
+        "aiRefreshCpuMs": 327.85613950000123,
+        "progress": 188.83333333333334,
+        "completed": 27.166666666666668,
+        "stalls": 20656.166666666668,
+        "aliveA": 330.8333333333333,
+        "aliveB": 330.3333333333333
+      }
+    },
+    "after": {
+      "0": {
+        "power": 461.2088226545577,
+        "protectedRear": 17,
+        "orders": 0,
+        "movementStalls": 0,
+        "cpuP95ms": 0,
+        "aiRefreshCpuMs": 4.463945500000482,
+        "progress": 0,
+        "completed": 9,
+        "stalls": 0,
+        "aliveA": 350,
+        "aliveB": 350
+      },
+      "20": {
+        "power": 460.4686849841172,
+        "protectedRear": 16.5,
+        "orders": 65.66666666666667,
+        "movementStalls": 551.5,
+        "cpuP95ms": 4.3314758333332675,
+        "aiRefreshCpuMs": 33.9577610000001,
+        "progress": 69.33333333333333,
+        "completed": 13.5,
+        "stalls": 1864.6666666666667,
+        "aliveA": 349.6666666666667,
+        "aliveB": 350
+      },
+      "60": {
+        "power": 443.70813346484925,
+        "protectedRear": 16.833333333333332,
+        "orders": 124,
+        "movementStalls": 2339,
+        "cpuP95ms": 5.23216266666689,
+        "aiRefreshCpuMs": 107.02990150000412,
+        "progress": 145.83333333333334,
+        "completed": 20.333333333333332,
+        "stalls": 7431.5,
+        "aliveA": 342.6666666666667,
+        "aliveB": 339.1666666666667
+      },
+      "120": {
+        "power": 423.20709222259677,
+        "protectedRear": 16.166666666666668,
+        "orders": 165.83333333333334,
+        "movementStalls": 7412.833333333333,
+        "cpuP95ms": 5.906422833333939,
+        "aiRefreshCpuMs": 227.72666216667295,
+        "progress": 206.5,
+        "completed": 25.5,
+        "stalls": 19809.333333333332,
+        "aliveA": 325.6666666666667,
+        "aliveB": 324.5
+      }
+    }
+  },
+  "before": [
+    {
+      "seed": 17,
+      "scenario": "archers",
+      "size": [
+        176,
+        128
+      ],
+      "snapshots": [
+        {
+          "time": 0,
+          "alive": {
+            "A": 350,
+            "B": 350
+          },
+          "power": 461.2088226545577,
+          "isolatedSquads": 0,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 33,
+          "engaged": 0,
+          "orders": 0,
+          "stalls": 0,
+          "movementStalls": 0,
+          "aiRefreshCpuMs": 9.202596999999997,
+          "spatialCacheHits": null,
+          "spatialCacheBuilds": null,
+          "progress": 0,
+          "completed": 9,
+          "replans": 9,
+          "cpuP95ms": 0
+        },
+        {
+          "time": 20,
+          "alive": {
+            "A": 349,
+            "B": 350
+          },
+          "power": 459.9343036979056,
+          "isolatedSquads": 0,
+          "protectedRear": 15,
+          "rearSquads": 17,
+          "frontage": 23.66666666666667,
+          "engaged": 5,
+          "orders": 69,
+          "stalls": 1710,
+          "movementStalls": 550,
+          "aiRefreshCpuMs": 88.85797100000025,
+          "spatialCacheHits": null,
+          "spatialCacheBuilds": null,
+          "progress": 75,
+          "completed": 13,
+          "replans": 11,
+          "cpuP95ms": 5.541859000000045
+        },
+        {
+          "time": 60,
+          "alive": {
+            "A": 344,
+            "B": 345
+          },
+          "power": 449.817380751531,
+          "isolatedSquads": 0,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 20.416666666666664,
+          "engaged": 5,
+          "orders": 122,
+          "stalls": 7719,
+          "movementStalls": 2270,
+          "aiRefreshCpuMs": 215.4634609999987,
+          "spatialCacheHits": null,
+          "spatialCacheBuilds": null,
+          "progress": 156,
+          "completed": 23,
+          "replans": 21,
+          "cpuP95ms": 6.466089000000011
+        },
+        {
+          "time": 120,
+          "alive": {
+            "A": 338,
+            "B": 327
+          },
+          "power": 424.8976114917308,
+          "isolatedSquads": 1,
+          "protectedRear": 16,
+          "rearSquads": 17,
+          "frontage": 27.666666666666664,
+          "engaged": 0,
+          "orders": 158,
+          "stalls": 20810,
+          "movementStalls": 7101,
+          "aiRefreshCpuMs": 385.22006100000385,
+          "spatialCacheHits": null,
+          "spatialCacheBuilds": null,
+          "progress": 232,
+          "completed": 31,
+          "replans": 30,
+          "cpuP95ms": 7.067235999999866
+        }
+      ],
+      "collisions": 0,
+      "invalid": 0,
+      "winner": null
+    },
+    {
+      "seed": 17,
+      "scenario": "flanking",
+      "size": [
+        176,
+        128
+      ],
+      "snapshots": [
+        {
+          "time": 0,
+          "alive": {
+            "A": 350,
+            "B": 350
+          },
+          "power": 461.2088226545577,
+          "isolatedSquads": 0,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 33,
+          "engaged": 0,
+          "orders": 0,
+          "stalls": 0,
+          "movementStalls": 0,
+          "aiRefreshCpuMs": 4.235475999999835,
+          "spatialCacheHits": null,
+          "spatialCacheBuilds": null,
+          "progress": 0,
+          "completed": 9,
+          "replans": 9,
+          "cpuP95ms": 0
+        },
+        {
+          "time": 20,
+          "alive": {
+            "A": 349,
+            "B": 349
+          },
+          "power": 460.00946391744,
+          "isolatedSquads": 0,
+          "protectedRear": 16,
+          "rearSquads": 17,
+          "frontage": 23.66666666666667,
+          "engaged": 0,
+          "orders": 74,
+          "stalls": 1581,
+          "movementStalls": 471,
+          "aiRefreshCpuMs": 57.760214000000815,
+          "spatialCacheHits": null,
+          "spatialCacheBuilds": null,
+          "progress": 69,
+          "completed": 13,
+          "replans": 11,
+          "cpuP95ms": 4.655883999999787
+        },
+        {
+          "time": 60,
+          "alive": {
+            "A": 343,
+            "B": 336
+          },
+          "power": 438.66188673616887,
+          "isolatedSquads": 0,
+          "protectedRear": 16,
+          "rearSquads": 17,
+          "frontage": 31.5,
+          "engaged": 0,
+          "orders": 137,
+          "stalls": 6954,
+          "movementStalls": 2019,
+          "aiRefreshCpuMs": 162.03845100000035,
+          "spatialCacheHits": null,
+          "spatialCacheBuilds": null,
+          "progress": 143,
+          "completed": 32,
+          "replans": 34,
+          "cpuP95ms": 5.577852000000348
+        },
+        {
+          "time": 120,
+          "alive": {
+            "A": 315,
+            "B": 319
+          },
+          "power": 416.9994893762557,
+          "isolatedSquads": 1,
+          "protectedRear": 14,
+          "rearSquads": 17,
+          "frontage": 9.166666666666664,
+          "engaged": 7,
+          "orders": 176,
+          "stalls": 19718,
+          "movementStalls": 7280,
+          "aiRefreshCpuMs": 334.5039609999985,
+          "spatialCacheHits": null,
+          "spatialCacheBuilds": null,
+          "progress": 187,
+          "completed": 39,
+          "replans": 37,
+          "cpuP95ms": 6.585645999999542
+        }
+      ],
+      "collisions": 0,
+      "invalid": 0,
+      "winner": null
+    },
+    {
+      "seed": 73,
+      "scenario": "archers",
+      "size": [
+        176,
+        128
+      ],
+      "snapshots": [
+        {
+          "time": 0,
+          "alive": {
+            "A": 350,
+            "B": 350
+          },
+          "power": 461.2088226545577,
+          "isolatedSquads": 0,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 33,
+          "engaged": 0,
+          "orders": 0,
+          "stalls": 0,
+          "movementStalls": 0,
+          "aiRefreshCpuMs": 3.344344999999521,
+          "spatialCacheHits": null,
+          "spatialCacheBuilds": null,
+          "progress": 0,
+          "completed": 9,
+          "replans": 9,
+          "cpuP95ms": 0
+        },
+        {
+          "time": 20,
+          "alive": {
+            "A": 350,
+            "B": 350
+          },
+          "power": 461.0185242664878,
+          "isolatedSquads": 0,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 23.83333333333333,
+          "engaged": 0,
+          "orders": 57,
+          "stalls": 2068,
+          "movementStalls": 880,
+          "aiRefreshCpuMs": 51.08326399999896,
+          "spatialCacheHits": null,
+          "spatialCacheBuilds": null,
+          "progress": 73,
+          "completed": 13,
+          "replans": 11,
+          "cpuP95ms": 4.377898000000641
+        },
+        {
+          "time": 60,
+          "alive": {
+            "A": 348,
+            "B": 341
+          },
+          "power": 446.75327244529797,
+          "isolatedSquads": 0,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 17.166666666666664,
+          "engaged": 0,
+          "orders": 109,
+          "stalls": 8382,
+          "movementStalls": 3245,
+          "aiRefreshCpuMs": 151.6511519999949,
+          "spatialCacheHits": null,
+          "spatialCacheBuilds": null,
+          "progress": 141,
+          "completed": 22,
+          "replans": 19,
+          "cpuP95ms": 5.577119999999923
+        },
+        {
+          "time": 120,
+          "alive": {
+            "A": 348,
+            "B": 340
+          },
+          "power": 444.79751718550744,
+          "isolatedSquads": 0,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 20.333333333333336,
+          "engaged": 0,
+          "orders": 135,
+          "stalls": 22150,
+          "movementStalls": 8492,
+          "aiRefreshCpuMs": 300.3053499999969,
+          "spatialCacheHits": null,
+          "spatialCacheBuilds": null,
+          "progress": 180,
+          "completed": 26,
+          "replans": 22,
+          "cpuP95ms": 6.501450000003388
+        }
+      ],
+      "collisions": 0,
+      "invalid": 0,
+      "winner": null
+    },
+    {
+      "seed": 73,
+      "scenario": "flanking",
+      "size": [
+        176,
+        128
+      ],
+      "snapshots": [
+        {
+          "time": 0,
+          "alive": {
+            "A": 350,
+            "B": 350
+          },
+          "power": 461.2088226545577,
+          "isolatedSquads": 0,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 33,
+          "engaged": 0,
+          "orders": 0,
+          "stalls": 0,
+          "movementStalls": 0,
+          "aiRefreshCpuMs": 4.6124089999975695,
+          "spatialCacheHits": null,
+          "spatialCacheBuilds": null,
+          "progress": 0,
+          "completed": 9,
+          "replans": 9,
+          "cpuP95ms": 0
+        },
+        {
+          "time": 20,
+          "alive": {
+            "A": 350,
+            "B": 350
+          },
+          "power": 461.0185242664878,
+          "isolatedSquads": 0,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 21.83333333333333,
+          "engaged": 0,
+          "orders": 71,
+          "stalls": 1670,
+          "movementStalls": 522,
+          "aiRefreshCpuMs": 57.792336999995314,
+          "spatialCacheHits": null,
+          "spatialCacheBuilds": null,
+          "progress": 69,
+          "completed": 12,
+          "replans": 12,
+          "cpuP95ms": 3.9084169999987353
+        },
+        {
+          "time": 60,
+          "alive": {
+            "A": 345,
+            "B": 339
+          },
+          "power": 442.44841610857355,
+          "isolatedSquads": 0,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 19.333333333333336,
+          "engaged": 0,
+          "orders": 132,
+          "stalls": 7477,
+          "movementStalls": 2389,
+          "aiRefreshCpuMs": 161.75478600000497,
+          "spatialCacheHits": null,
+          "spatialCacheBuilds": null,
+          "progress": 154,
+          "completed": 20,
+          "replans": 20,
+          "cpuP95ms": 5.404421999999613
+        },
+        {
+          "time": 120,
+          "alive": {
+            "A": 316,
+            "B": 325
+          },
+          "power": 424.6291992267421,
+          "isolatedSquads": 0,
+          "protectedRear": 16,
+          "rearSquads": 17,
+          "frontage": 20,
+          "engaged": 14,
+          "orders": 184,
+          "stalls": 20235,
+          "movementStalls": 7106,
+          "aiRefreshCpuMs": 314.88712300002226,
+          "spatialCacheHits": null,
+          "spatialCacheBuilds": null,
+          "progress": 173,
+          "completed": 26,
+          "replans": 28,
+          "cpuP95ms": 6.5315950000003795
+        }
+      ],
+      "collisions": 0,
+      "invalid": 0,
+      "winner": null
+    },
+    {
+      "seed": 191,
+      "scenario": "archers",
+      "size": [
+        176,
+        128
+      ],
+      "snapshots": [
+        {
+          "time": 0,
+          "alive": {
+            "A": 350,
+            "B": 350
+          },
+          "power": 461.2088226545577,
+          "isolatedSquads": 0,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 33,
+          "engaged": 0,
+          "orders": 0,
+          "stalls": 0,
+          "movementStalls": 0,
+          "aiRefreshCpuMs": 2.864698999997927,
+          "spatialCacheHits": null,
+          "spatialCacheBuilds": null,
+          "progress": 0,
+          "completed": 9,
+          "replans": 9,
+          "cpuP95ms": 0
+        },
+        {
+          "time": 20,
+          "alive": {
+            "A": 350,
+            "B": 350
+          },
+          "power": 461.2088226545577,
+          "isolatedSquads": 1,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 21.499999999999993,
+          "engaged": 0,
+          "orders": 88,
+          "stalls": 1932,
+          "movementStalls": 515,
+          "aiRefreshCpuMs": 60.92474500000753,
+          "spatialCacheHits": null,
+          "spatialCacheBuilds": null,
+          "progress": 67,
+          "completed": 14,
+          "replans": 12,
+          "cpuP95ms": 4.799267999998847
+        },
+        {
+          "time": 60,
+          "alive": {
+            "A": 347,
+            "B": 348
+          },
+          "power": 457.09586371577205,
+          "isolatedSquads": 0,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 19.333333333333336,
+          "engaged": 0,
+          "orders": 174,
+          "stalls": 8088,
+          "movementStalls": 2405,
+          "aiRefreshCpuMs": 165.84142900001098,
+          "spatialCacheHits": null,
+          "spatialCacheBuilds": null,
+          "progress": 145,
+          "completed": 18,
+          "replans": 16,
+          "cpuP95ms": 5.8526810000003024
+        },
+        {
+          "time": 120,
+          "alive": {
+            "A": 338,
+            "B": 330
+          },
+          "power": 432.178995203066,
+          "isolatedSquads": 0,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 19.833333333333336,
+          "engaged": 0,
+          "orders": 203,
+          "stalls": 21947,
+          "movementStalls": 8463,
+          "aiRefreshCpuMs": 310.0101790000008,
+          "spatialCacheHits": null,
+          "spatialCacheBuilds": null,
+          "progress": 175,
+          "completed": 22,
+          "replans": 29,
+          "cpuP95ms": 6.652827000001707
+        }
+      ],
+      "collisions": 0,
+      "invalid": 0,
+      "winner": null
+    },
+    {
+      "seed": 191,
+      "scenario": "flanking",
+      "size": [
+        176,
+        128
+      ],
+      "snapshots": [
+        {
+          "time": 0,
+          "alive": {
+            "A": 350,
+            "B": 350
+          },
+          "power": 461.2088226545577,
+          "isolatedSquads": 0,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 33,
+          "engaged": 0,
+          "orders": 0,
+          "stalls": 0,
+          "movementStalls": 0,
+          "aiRefreshCpuMs": 4.493060000000696,
+          "spatialCacheHits": null,
+          "spatialCacheBuilds": null,
+          "progress": 0,
+          "completed": 9,
+          "replans": 9,
+          "cpuP95ms": 0
+        },
+        {
+          "time": 20,
+          "alive": {
+            "A": 350,
+            "B": 350
+          },
+          "power": 461.2088226545577,
+          "isolatedSquads": 1,
+          "protectedRear": 16,
+          "rearSquads": 17,
+          "frontage": 23.833333333333336,
+          "engaged": 0,
+          "orders": 87,
+          "stalls": 1905,
+          "movementStalls": 482,
+          "aiRefreshCpuMs": 62.01177099999404,
+          "spatialCacheHits": null,
+          "spatialCacheBuilds": null,
+          "progress": 59,
+          "completed": 14,
+          "replans": 14,
+          "cpuP95ms": 4.518748000002233
+        },
+        {
+          "time": 60,
+          "alive": {
+            "A": 350,
+            "B": 350
+          },
+          "power": 461.2088226545577,
+          "isolatedSquads": 0,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 8.5,
+          "engaged": 0,
+          "orders": 152,
+          "stalls": 7198,
+          "movementStalls": 1580,
+          "aiRefreshCpuMs": 164.2633539999988,
+          "spatialCacheHits": null,
+          "spatialCacheBuilds": null,
+          "progress": 150,
+          "completed": 17,
+          "replans": 20,
+          "cpuP95ms": 5.040607999999338
+        },
+        {
+          "time": 120,
+          "alive": {
+            "A": 330,
+            "B": 341
+          },
+          "power": 447.56268438374985,
+          "isolatedSquads": 0,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 6.833333333333329,
+          "engaged": 1,
+          "orders": 216,
+          "stalls": 19077,
+          "movementStalls": 6268,
+          "aiRefreshCpuMs": 322.2101629999852,
+          "spatialCacheHits": null,
+          "spatialCacheBuilds": null,
+          "progress": 186,
+          "completed": 19,
+          "replans": 27,
+          "cpuP95ms": 6.596901999997499
+        }
+      ],
+      "collisions": 0,
+      "invalid": 0,
+      "winner": null
+    }
+  ],
+  "after": [
+    {
+      "seed": 17,
+      "scenario": "archers",
+      "size": [
+        176,
+        128
+      ],
+      "snapshots": [
+        {
+          "time": 0,
+          "alive": {
+            "A": 350,
+            "B": 350
+          },
+          "power": 461.2088226545577,
+          "isolatedSquads": 0,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 33,
+          "engaged": 0,
+          "orders": 0,
+          "stalls": 0,
+          "movementStalls": 0,
+          "aiRefreshCpuMs": 9.130957999999993,
+          "spatialCacheHits": 207,
+          "spatialCacheBuilds": 37,
+          "progress": 0,
+          "completed": 9,
+          "replans": 9,
+          "cpuP95ms": 0
+        },
+        {
+          "time": 20,
+          "alive": {
+            "A": 349,
+            "B": 350
+          },
+          "power": 459.25946478538174,
+          "isolatedSquads": 0,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 22.833333333333336,
+          "engaged": 1,
+          "orders": 67,
+          "stalls": 1762,
+          "movementStalls": 550,
+          "aiRefreshCpuMs": 47.294738000000365,
+          "spatialCacheHits": 19409,
+          "spatialCacheBuilds": 6620,
+          "progress": 72,
+          "completed": 14,
+          "replans": 13,
+          "cpuP95ms": 5.545571999999993
+        },
+        {
+          "time": 60,
+          "alive": {
+            "A": 341,
+            "B": 332
+          },
+          "power": 431.50725136954077,
+          "isolatedSquads": 0,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 18.416666666666664,
+          "engaged": 1,
+          "orders": 121,
+          "stalls": 7527,
+          "movementStalls": 2196,
+          "aiRefreshCpuMs": 140.1580020000009,
+          "spatialCacheHits": 68860,
+          "spatialCacheBuilds": 16892,
+          "progress": 143,
+          "completed": 26,
+          "replans": 23,
+          "cpuP95ms": 5.940062000000012
+        },
+        {
+          "time": 120,
+          "alive": {
+            "A": 339,
+            "B": 320
+          },
+          "power": 417.29738553837865,
+          "isolatedSquads": 0,
+          "protectedRear": 16,
+          "rearSquads": 17,
+          "frontage": 4,
+          "engaged": 0,
+          "orders": 143,
+          "stalls": 21048,
+          "movementStalls": 6459,
+          "aiRefreshCpuMs": 266.1553799999991,
+          "spatialCacheHits": 161239,
+          "spatialCacheBuilds": 26763,
+          "progress": 185,
+          "completed": 28,
+          "replans": 26,
+          "cpuP95ms": 6.06652000000031
+        }
+      ],
+      "collisions": 0,
+      "invalid": 0,
+      "winner": null
+    },
+    {
+      "seed": 17,
+      "scenario": "flanking",
+      "size": [
+        176,
+        128
+      ],
+      "snapshots": [
+        {
+          "time": 0,
+          "alive": {
+            "A": 350,
+            "B": 350
+          },
+          "power": 461.2088226545577,
+          "isolatedSquads": 0,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 33,
+          "engaged": 0,
+          "orders": 0,
+          "stalls": 0,
+          "movementStalls": 0,
+          "aiRefreshCpuMs": 4.2750349999996615,
+          "spatialCacheHits": 190,
+          "spatialCacheBuilds": 38,
+          "progress": 0,
+          "completed": 9,
+          "replans": 9,
+          "cpuP95ms": 0
+        },
+        {
+          "time": 20,
+          "alive": {
+            "A": 349,
+            "B": 350
+          },
+          "power": 459.0979512772305,
+          "isolatedSquads": 0,
+          "protectedRear": 16,
+          "rearSquads": 17,
+          "frontage": 24.833333333333336,
+          "engaged": 0,
+          "orders": 67,
+          "stalls": 1723,
+          "movementStalls": 528,
+          "aiRefreshCpuMs": 31.55856699999913,
+          "spatialCacheHits": 17868,
+          "spatialCacheBuilds": 6431,
+          "progress": 75,
+          "completed": 13,
+          "replans": 12,
+          "cpuP95ms": 3.9553079999996044
+        },
+        {
+          "time": 60,
+          "alive": {
+            "A": 345,
+            "B": 337
+          },
+          "power": 440.9148359349317,
+          "isolatedSquads": 0,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 13.833333333333336,
+          "engaged": 4,
+          "orders": 121,
+          "stalls": 7449,
+          "movementStalls": 2407,
+          "aiRefreshCpuMs": 98.3526649999967,
+          "spatialCacheHits": 62238,
+          "spatialCacheBuilds": 17169,
+          "progress": 148,
+          "completed": 21,
+          "replans": 19,
+          "cpuP95ms": 4.979957999999897
+        },
+        {
+          "time": 120,
+          "alive": {
+            "A": 310,
+            "B": 304
+          },
+          "power": 396.91006344446816,
+          "isolatedSquads": 1,
+          "protectedRear": 16,
+          "rearSquads": 17,
+          "frontage": 8.999999999999993,
+          "engaged": 2,
+          "orders": 172,
+          "stalls": 19279,
+          "movementStalls": 8095,
+          "aiRefreshCpuMs": 221.75958499998887,
+          "spatialCacheHits": 139343,
+          "spatialCacheBuilds": 28232,
+          "progress": 205,
+          "completed": 26,
+          "replans": 29,
+          "cpuP95ms": 5.967864000000191
+        }
+      ],
+      "collisions": 0,
+      "invalid": 0,
+      "winner": null
+    },
+    {
+      "seed": 73,
+      "scenario": "archers",
+      "size": [
+        176,
+        128
+      ],
+      "snapshots": [
+        {
+          "time": 0,
+          "alive": {
+            "A": 350,
+            "B": 350
+          },
+          "power": 461.2088226545577,
+          "isolatedSquads": 0,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 33,
+          "engaged": 0,
+          "orders": 0,
+          "stalls": 0,
+          "movementStalls": 0,
+          "aiRefreshCpuMs": 2.413865000000442,
+          "spatialCacheHits": 210,
+          "spatialCacheBuilds": 36,
+          "progress": 0,
+          "completed": 9,
+          "replans": 9,
+          "cpuP95ms": 0
+        },
+        {
+          "time": 20,
+          "alive": {
+            "A": 350,
+            "B": 350
+          },
+          "power": 460.82822587841787,
+          "isolatedSquads": 0,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 24.166666666666664,
+          "engaged": 1,
+          "orders": 61,
+          "stalls": 1815,
+          "movementStalls": 597,
+          "aiRefreshCpuMs": 30.120005000000674,
+          "spatialCacheHits": 20188,
+          "spatialCacheBuilds": 6604,
+          "progress": 73,
+          "completed": 13,
+          "replans": 12,
+          "cpuP95ms": 4.242024999999558
+        },
+        {
+          "time": 60,
+          "alive": {
+            "A": 341,
+            "B": 343
+          },
+          "power": 446.25438116769385,
+          "isolatedSquads": 0,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 19.500000000000007,
+          "engaged": 0,
+          "orders": 116,
+          "stalls": 7537,
+          "movementStalls": 2499,
+          "aiRefreshCpuMs": 100.39500100000805,
+          "spatialCacheHits": 68259,
+          "spatialCacheBuilds": 17313,
+          "progress": 136,
+          "completed": 21,
+          "replans": 20,
+          "cpuP95ms": 5.361276999999973
+        },
+        {
+          "time": 120,
+          "alive": {
+            "A": 337,
+            "B": 321
+          },
+          "power": 416.76872233201533,
+          "isolatedSquads": 0,
+          "protectedRear": 15,
+          "rearSquads": 17,
+          "frontage": 27.333333333333336,
+          "engaged": 0,
+          "orders": 144,
+          "stalls": 19998,
+          "movementStalls": 6935,
+          "aiRefreshCpuMs": 220.5698870000124,
+          "spatialCacheHits": 155756,
+          "spatialCacheBuilds": 28873,
+          "progress": 217,
+          "completed": 31,
+          "replans": 29,
+          "cpuP95ms": 5.936696000000666
+        }
+      ],
+      "collisions": 0,
+      "invalid": 0,
+      "winner": null
+    },
+    {
+      "seed": 73,
+      "scenario": "flanking",
+      "size": [
+        176,
+        128
+      ],
+      "snapshots": [
+        {
+          "time": 0,
+          "alive": {
+            "A": 350,
+            "B": 350
+          },
+          "power": 461.2088226545577,
+          "isolatedSquads": 0,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 33,
+          "engaged": 0,
+          "orders": 0,
+          "stalls": 0,
+          "movementStalls": 0,
+          "aiRefreshCpuMs": 3.1481320000020787,
+          "spatialCacheHits": 194,
+          "spatialCacheBuilds": 37,
+          "progress": 0,
+          "completed": 9,
+          "replans": 9,
+          "cpuP95ms": 0
+        },
+        {
+          "time": 20,
+          "alive": {
+            "A": 350,
+            "B": 350
+          },
+          "power": 461.2088226545577,
+          "isolatedSquads": 0,
+          "protectedRear": 16,
+          "rearSquads": 17,
+          "frontage": 24.666666666666664,
+          "engaged": 0,
+          "orders": 59,
+          "stalls": 1790,
+          "movementStalls": 611,
+          "aiRefreshCpuMs": 33.887339999997494,
+          "spatialCacheHits": 18844,
+          "spatialCacheBuilds": 6480,
+          "progress": 75,
+          "completed": 13,
+          "replans": 12,
+          "cpuP95ms": 4.392230000001291
+        },
+        {
+          "time": 60,
+          "alive": {
+            "A": 344,
+            "B": 339
+          },
+          "power": 442.9063412244187,
+          "isolatedSquads": 0,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 19.499999999999993,
+          "engaged": 0,
+          "orders": 121,
+          "stalls": 7716,
+          "movementStalls": 2774,
+          "aiRefreshCpuMs": 108.30830300001617,
+          "spatialCacheHits": 61808,
+          "spatialCacheBuilds": 17911,
+          "progress": 152,
+          "completed": 22,
+          "replans": 19,
+          "cpuP95ms": 5.087929000001168
+        },
+        {
+          "time": 120,
+          "alive": {
+            "A": 312,
+            "B": 324
+          },
+          "power": 419.2689123906009,
+          "isolatedSquads": 0,
+          "protectedRear": 16,
+          "rearSquads": 17,
+          "frontage": 19.000000000000007,
+          "engaged": 8,
+          "orders": 171,
+          "stalls": 19884,
+          "movementStalls": 7474,
+          "aiRefreshCpuMs": 244.97843700003432,
+          "spatialCacheHits": 136790,
+          "spatialCacheBuilds": 29520,
+          "progress": 194,
+          "completed": 28,
+          "replans": 25,
+          "cpuP95ms": 5.846341000000393
+        }
+      ],
+      "collisions": 0,
+      "invalid": 0,
+      "winner": null
+    },
+    {
+      "seed": 191,
+      "scenario": "archers",
+      "size": [
+        176,
+        128
+      ],
+      "snapshots": [
+        {
+          "time": 0,
+          "alive": {
+            "A": 350,
+            "B": 350
+          },
+          "power": 461.2088226545577,
+          "isolatedSquads": 0,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 33,
+          "engaged": 0,
+          "orders": 0,
+          "stalls": 0,
+          "movementStalls": 0,
+          "aiRefreshCpuMs": 5.52361000000019,
+          "spatialCacheHits": 208,
+          "spatialCacheBuilds": 37,
+          "progress": 0,
+          "completed": 9,
+          "replans": 9,
+          "cpuP95ms": 0
+        },
+        {
+          "time": 20,
+          "alive": {
+            "A": 350,
+            "B": 350
+          },
+          "power": 461.2088226545577,
+          "isolatedSquads": 1,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 22.33333333333333,
+          "engaged": 0,
+          "orders": 74,
+          "stalls": 2013,
+          "movementStalls": 506,
+          "aiRefreshCpuMs": 33.38073400000576,
+          "spatialCacheHits": 19773,
+          "spatialCacheBuilds": 6402,
+          "progress": 60,
+          "completed": 14,
+          "replans": 12,
+          "cpuP95ms": 3.8751980000015465
+        },
+        {
+          "time": 60,
+          "alive": {
+            "A": 343,
+            "B": 341
+          },
+          "power": 448.20449149399866,
+          "isolatedSquads": 0,
+          "protectedRear": 16,
+          "rearSquads": 17,
+          "frontage": 18.166666666666664,
+          "engaged": 0,
+          "orders": 124,
+          "stalls": 7148,
+          "movementStalls": 2061,
+          "aiRefreshCpuMs": 104.55304400000387,
+          "spatialCacheHits": 65351,
+          "spatialCacheBuilds": 18058,
+          "progress": 153,
+          "completed": 16,
+          "replans": 21,
+          "cpuP95ms": 5.119135000000824
+        },
+        {
+          "time": 120,
+          "alive": {
+            "A": 343,
+            "B": 341
+          },
+          "power": 448.20449149399866,
+          "isolatedSquads": 0,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 17.16666666666667,
+          "engaged": 0,
+          "orders": 153,
+          "stalls": 19771,
+          "movementStalls": 7148,
+          "aiRefreshCpuMs": 214.06834600000002,
+          "spatialCacheHits": 156884,
+          "spatialCacheBuilds": 30266,
+          "progress": 211,
+          "completed": 20,
+          "replans": 28,
+          "cpuP95ms": 5.875425999998697
+        }
+      ],
+      "collisions": 0,
+      "invalid": 0,
+      "winner": null
+    },
+    {
+      "seed": 191,
+      "scenario": "flanking",
+      "size": [
+        176,
+        128
+      ],
+      "snapshots": [
+        {
+          "time": 0,
+          "alive": {
+            "A": 350,
+            "B": 350
+          },
+          "power": 461.2088226545577,
+          "isolatedSquads": 0,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 33,
+          "engaged": 0,
+          "orders": 0,
+          "stalls": 0,
+          "movementStalls": 0,
+          "aiRefreshCpuMs": 2.292073000000528,
+          "spatialCacheHits": 193,
+          "spatialCacheBuilds": 38,
+          "progress": 0,
+          "completed": 9,
+          "replans": 9,
+          "cpuP95ms": 0
+        },
+        {
+          "time": 20,
+          "alive": {
+            "A": 350,
+            "B": 350
+          },
+          "power": 461.2088226545577,
+          "isolatedSquads": 1,
+          "protectedRear": 16,
+          "rearSquads": 17,
+          "frontage": 19.333333333333336,
+          "engaged": 0,
+          "orders": 66,
+          "stalls": 2085,
+          "movementStalls": 517,
+          "aiRefreshCpuMs": 27.50518199999715,
+          "spatialCacheHits": 18812,
+          "spatialCacheBuilds": 6349,
+          "progress": 61,
+          "completed": 14,
+          "replans": 12,
+          "cpuP95ms": 3.9785219999976107
+        },
+        {
+          "time": 60,
+          "alive": {
+            "A": 342,
+            "B": 343
+          },
+          "power": 452.4614995985119,
+          "isolatedSquads": 0,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 14.499999999999993,
+          "engaged": 0,
+          "orders": 141,
+          "stalls": 7212,
+          "movementStalls": 2097,
+          "aiRefreshCpuMs": 90.41239399999904,
+          "spatialCacheHits": 59357,
+          "spatialCacheBuilds": 17679,
+          "progress": 143,
+          "completed": 16,
+          "replans": 21,
+          "cpuP95ms": 4.904614999999467
+        },
+        {
+          "time": 120,
+          "alive": {
+            "A": 313,
+            "B": 337
+          },
+          "power": 440.7929781361191,
+          "isolatedSquads": 0,
+          "protectedRear": 17,
+          "rearSquads": 17,
+          "frontage": 13.166666666666671,
+          "engaged": 5,
+          "orders": 212,
+          "stalls": 18876,
+          "movementStalls": 8366,
+          "aiRefreshCpuMs": 198.828338000003,
+          "spatialCacheHits": 137899,
+          "spatialCacheBuilds": 30024,
+          "progress": 227,
+          "completed": 20,
+          "replans": 29,
+          "cpuP95ms": 5.745690000003378
+        }
+      ],
+      "collisions": 0,
+      "invalid": 0,
+      "winner": null
+    }
+  ],
+  "tests": {
+    "baseline": {
+      "tests": 294,
+      "pass": 257,
+      "fail": 37
+    },
+    "after": {
+      "tests": 299,
+      "pass": 269,
+      "fail": 30
+    },
+    "newFocusedPassed": 5,
+    "fixedFailureNames": [
+      "a protected commander can finish a local defensive strike during focus orders",
+      "a stranded focus commander regroups with the actual troops and a nearby escort",
+      "all four formations physically reach their assigned seats after an idle click",
+      "edge destinations leave access around the formation until every member arrives",
+      "manual group becomes flag-led squads with unchanged parent group",
+      "square formation surrounds its commander and assigns distinct valid seats to every role",
+      "utility recruitment responds to enemy capabilities without fixed squad type identifiers"
+    ],
+    "remainingFailures": [
+      "350 soldier armies keep one commander per squad and compact defense ranks",
+      "a middle front advances when there is no wing army to wait for",
+      "a real ranged actor acquires an interpolating target across a bucket boundary",
+      "a vertical advance places the commander behind the front instead of beside it",
+      "an isolated long move follows a shortest route without a traffic lane detour",
+      "assault template replaces shields and sword scouts with spear scouts",
+      "automatic armies obey the 200 cap and deploy on their own half",
+      "automatic attacks acquire enemy flags without counting flags as soldiers",
+      "clipped deployment A accepts half, retains a commander and charges only actual troops",
+      "clipped deployment B accepts half, retains a commander and charges only actual troops",
+      "distant soldiers resume budgeted reform searches across ticks",
+      "emergency guard destinations stay inside the flag leash",
+      "full bot operations pair frontline, firepower and healing in one lane",
+      "group template edits never mutate another group or future defaults",
+      "healers restore injured allies, respect cooldown and never damage enemies",
+      "home defense intercepts intruders without recalling a distant attack operation",
+      "injury changes neither movement duration nor attack damage",
+      "lost emergency guards are replaced with existing living squads",
+      "manual placement spends reserves atomically and rejects overlaps and enemy territory",
+      "mobile reserves exploit a gap, then react only to a serious home breach",
+      "partial troop previews exactly match actual soldiers, equipment and offsets",
+      "rear breach promotes existing squads to guard within the flag leash",
+      "reform finds a clear footprint beside X rather than circling across blocked seats",
+      "retreat interrupts an unlanded strike without releasing an ongoing step reservation",
+      "seeded enlarged battlefield keeps bases, central approaches and side entries connected",
+      "simultaneous killing impacts draw in the same combat batch, without waiting for the status poll",
+      "squad destinations on a large map start without serial full-map distance fields",
+      "step timing remains exact and simulation does not depend on a renderer",
+      "touching a flag does not win; soldiers must land real attacks and destroy its health",
+      "visible test classes have independent configured health, damage and attack speed"
+    ],
+    "newFailures": []
+  },
+  "cacheOnlyOutcomesIdenticalAcrossSixScenarios": true,
+  "diagnosticProfileBeforeSpatialCache": [
+    {
+      "function": "plan",
+      "file": "navigation.mjs",
+      "sampledSelfMs": 1950.949
+    },
+    {
+      "function": "findLocalEnemy",
+      "file": "combat.mjs",
+      "sampledSelfMs": 934.53
+    },
+    {
+      "function": "(garbage collector)",
+      "file": "",
+      "sampledSelfMs": 715.032
+    },
+    {
+      "function": "targets",
+      "file": "combat.mjs",
+      "sampledSelfMs": 665.038
+    },
+    {
+      "function": "recover",
+      "file": "navigation.mjs",
+      "sampledSelfMs": 639.54
+    },
+    {
+      "function": "candidates",
+      "file": "spatial-index.mjs",
+      "sampledSelfMs": 575.655
+    },
+    {
+      "function": "tryAutoAttack",
+      "file": "combat.mjs",
+      "sampledSelfMs": 541.179
+    },
+    {
+      "function": "runOrder",
+      "file": "squad-orders.mjs",
+      "sampledSelfMs": 489.124
+    },
+    {
+      "function": "advance",
+      "file": "model.mjs",
+      "sampledSelfMs": 440.549
+    },
+    {
+      "function": "staticRoute",
+      "file": "navigation.mjs",
+      "sampledSelfMs": 306.981
+    },
+    {
+      "function": "schedule",
+      "file": "navigation.mjs",
+      "sampledSelfMs": 277.573
+    },
+    {
+      "function": "candidates",
+      "file": "spatial-index.mjs",
+      "sampledSelfMs": 224.623
+    },
+    {
+      "function": "settleFormation",
+      "file": "formation-planner.mjs",
+      "sampledSelfMs": 221.643
+    },
+    {
+      "function": "updateSquadOrders",
+      "file": "squad-orders.mjs",
+      "sampledSelfMs": 212.06
+    },
+    {
+      "function": "counterStep",
+      "file": "navigation.mjs",
+      "sampledSelfMs": 166.547
+    },
+    {
+      "function": "congestionAt",
+      "file": "navigation.mjs",
+      "sampledSelfMs": 147.13
+    },
+    {
+      "function": "staticRoute",
+      "file": "navigation.mjs",
+      "sampledSelfMs": 145.815
+    },
+    {
+      "function": "waitingAge",
+      "file": "navigation.mjs",
+      "sampledSelfMs": 133.832
+    },
+    {
+      "function": "update",
+      "file": "model.mjs",
+      "sampledSelfMs": 132.484
+    },
+    {
+      "function": "tryHeal",
+      "file": "healing.mjs",
+      "sampledSelfMs": 122.326
+    }
+  ],
+  "limits": [
+    "Single-host timings and six scenarios, not a universal performance guarantee.",
+    "Move-stall samples barely improve; no claim of resolved physical congestion.",
+    "More enemy casualties accompany more friendly casualties. No improved win-rate claim.",
+    "Remaining legacy fixture/stat/geometry failures have not been hidden by changing assertions."
+  ]
+}

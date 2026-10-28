@@ -24,7 +24,8 @@ export function createFormationGroup(count=8,kind='squad',name='',type='mixed'){
   const spear=id==='scout'&&(type==='assault'||type==='mobile'&&local<=5);
   const columns=type==='defense'||type==='ranged'||type==='mobile'?5:6;
   let depth=local===0?Math.ceil((Math.min(count,squadSize)-1)/columns):Math.floor((local-1)/columns),row=local===0?0:(local-1)%columns-Math.floor(Math.min(columns,count-1)/2);
-  if(type==='mobile'&&local===0){depth=1;row=2;}
+  if(type==='mobile'&&squadSize===10&&local===0){depth=1;row=2;}
+  if(kind==='platoon'){const band=Math.floor(i/squadSize),cols=Math.min(2,Math.ceil(count/squadSize));depth+=band%cols*(Math.ceil(squadSize/columns)+3);row+=Math.floor(band/cols)*(columns+2);}
   return {characterId:id,role:roles[id],offset:{x:-depth,y:row},...(spear?{weapon:'ribbon_spear',battle:{...SPEAR_BATTLE}}:{})};
  });
  return {format:'doragami-unit-group',version:1,kind,squadSize,name:name.trim()||(kind==='platoon'?'혼성 소대':'분대'),squadType:type,members};

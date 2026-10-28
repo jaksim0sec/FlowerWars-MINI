@@ -15,7 +15,7 @@ export class TacticalController{
   for(const u of m.board.units)if(u.team==='A'&&u.health.current>0){total++;if(u.combat.range>1)ranged++;if(u.formationRole==='guard')armored++;}
   const existing=[...this.operations.values()].flatMap(o=>o.needs),mobileShare=total?ranged/total*.55+.15:.2;
   const mobile=existing.filter(n=>n==='mobile').length<(index+1)*mobileShare;
-  const needs=slots===2?[mobile?'mobile':'screen',existing.filter(n=>n==='support').length<(existing.length+slots)*(armored>total*.35?.15:.25)?'support':'fire']:['screen','fire',ranged>total*.35?'mobile':'strike','support'].slice(0,slots);
+  const needs=slots===2?[mobile?'mobile':'screen',existing.filter(n=>n==='support').length<(existing.length+slots)*(armored>total*.35?.15:.25)?'support':'fire']:['screen','fire',ranged>total*.35?'mobile':armored>total*.35?'fire':'strike','support'].slice(0,slots);
   const anchors=this.observer.nodes.filter(n=>['staging','merge','deployment'].includes(n.kind)&&n.x>=m.board.width*.6).sort((a,b)=>this.observer.travel(a,m.flags.A)-this.observer.travel(b,m.flags.A));
   const types=needs.map(n=>recruit(m.recruitment,n)),size=types.reduce((n,type)=>n+m.recruitment.get(type).blueprint.members.length,0);
   const placed=[...this.operations.values()];
@@ -66,11 +66,14 @@ export class TacticalController{
   // Health/death is validated again at dispatch; shared estimates remain bounded.
   const live=state.units.filter(u=>u.health.current>0);if(!live.length)return;
   state.engaged=live.filter(u=>u.state==='attack').length;
-  const operation=squad.botOperation;state.redirect=!!operation.ineffective||operation.intent==='DEFEND'||((state.fire>state.melee||state.heal>state.count*.3)&&state.engaged>0);
+  const operation=squad.botOperation;state.redirect=!!operation.ineffective||operation.intent==='DEFEND';
   const peers=operation.squadIds.map(id=>this.states.get(id)).filter(s=>s&&s.units.some(u=>u.health.current>0));
   const front=selectFront(peers,operation.intent);
   const screens=[...this.states.values()].filter(s=>(s.shield||0)>0&&s.ratio>.3&&this.observer.travel(state,s)<24);
-  const screen=screens.sort((a,b)=>this.observer.travel(state,a)-this.observer.travel(state,b))[0]||front;
+  let screen=screens.sort((a,b)=>this.observer.travel(state,a)-this.observer.travel(state,b))[0]||front;
+  const previous=screens.find(s=>s.id===squad.aiScreenId);
+  if(previous&&screen&&this.observer.travel(state,previous)<=this.observer.travel(state,screen)+6)screen=previous;
+  squad.aiScreenId=screen?.id;
   const now=this.match.elapsed,ratio=live.reduce((n,u)=>n+u.health.current,0)/live.reduce((n,u)=>n+u.health.max,0);
   if(ratio<.35&&!squad.aiRecovery&&!squad.aiRecoverySpent){squad.aiRecovery={until:now+8};}
   if(squad.aiRecovery){
@@ -82,6 +85,9 @@ export class TacticalController{
    const back=Math.max(2,Math.min(8,state.heal?Math.max(...live.map(u=>u.healing?.range||1))-1:(state.range||4)-1)),lateral=((squad.matchIndex??squad.botSlot)%3-1)*4;
    let threat=null,closest=Infinity;
    for(const id of this.match.board.spatial.candidates(screen.x,screen.y,12)){const u=this.match.board.unit(id);if(u?.team==='A'&&u.health.current>0&&distance(screen,u)<closest){threat=u;closest=distance(screen,u);}}
+   const exposed=threat&&distance(state,threat)<=Math.max(2,state.heal?2:(state.range||3)*.5);
+   state.redirect ||= !!exposed;
+   if(state.engaged&&!exposed&&distance(state,screen)<=Math.max(8,(state.range||3)+4))return;
    const dx=threat?screen.x-threat.x:1,dy=threat?screen.y-threat.y:0,length=Math.hypot(dx,dy)||1;
    const target=this.safe({x:screen.x+dx/length*back-dy/length*lateral,y:screen.y+dy/length*back+dx/length*lateral});
    if(target&&Number.isFinite(this.observer.travel(state,target)))this.gateway.issue(state,'advance',target);return;

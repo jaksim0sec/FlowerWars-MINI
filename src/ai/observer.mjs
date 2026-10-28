@@ -4,7 +4,7 @@ export class Observer{
  constructor(match){this.match=match;this.revision=-1;this.builds=0;}
  topology(){
   const b=this.match.board;if(this.revision===b.obstacleRevision)return;
-  this.revision=b.obstacleRevision;this.builds++;this.nodes=[];this.distances=new Map();
+  this.revision=b.obstacleRevision;this.builds++;this.nodes=[];this.distances=new Map();this.routeCache=new Map();this.influence=new Map();
   const nearest=p=>{for(let r=0;r<16;r++)for(let dx=-r;dx<=r;dx++)for(let dy=-r;dy<=r;dy++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;const x=Math.round(p.x)+dx,y=Math.round(p.y)+dy;if(b.inside(x,y)&&!b.navigation.blocked(y*b.width+x))return {x,y};}return null;};
   const add=(id,kind,p,width=12)=>{const point=nearest(p);if(!point)return;const node={id,kind,...point,width,index:this.nodes.length,edges:new Map()};this.nodes.push(node);return node;};
   for(const room of b.battlefield?.rooms||[])add(room.id,room.kind,room,Math.min(room.rx,room.ry)*2);
@@ -27,7 +27,7 @@ export class Observer{
   const result={costs,previous};this.distances.set(from.index,result);return result;
  }
  travel(a,b){const from=a.index!==undefined?a:this.nodeAt(a),to=b.index!==undefined?b:this.nodeAt(b);return from&&to?distance(a,from)+this.routes(from).costs[to.index]+distance(to,b):Infinity;}
- route(a,b){const from=a.index!==undefined?a:this.nodeAt(a),to=b.index!==undefined?b:this.nodeAt(b);if(!from||!to)return [];const routes=this.routes(from);if(!Number.isFinite(routes.costs[to.index]))return [];const result=[];for(let i=to.index;i!==from.index;i=routes.previous[i]){if(i<0)return [];result.push(this.nodes[i]);}return result.reverse();}
+ route(a,b){const from=a.index!==undefined?a:this.nodeAt(a),to=b.index!==undefined?b:this.nodeAt(b);if(!from||!to)return [];const routes=this.routes(from);if(!Number.isFinite(routes.costs[to.index]))return [];const key=from.index+':'+to.index;if(this.routeCache.has(key))return this.routeCache.get(key).slice();const result=[];for(let i=to.index;i!==from.index;i=routes.previous[i]){if(i<0)return [];result.push(this.nodes[i]);}result.reverse();if(this.routeCache.size>=2048)this.routeCache.delete(this.routeCache.keys().next().value);this.routeCache.set(key,result);return result.slice();}
  waypoints(start,nodes){
   const b=this.match.board;
   const clear=(a,c)=>{const steps=Math.ceil(Math.hypot(c.x-a.x,c.y-a.y)*2);for(let i=0;i<=steps;i++){const t=steps?i/steps:0,x=Math.round(a.x+(c.x-a.x)*t),y=Math.round(a.y+(c.y-a.y)*t);if(!b.inside(x,y)||b.navigation.blocked(y*b.width+x))return false;}return true;};
@@ -48,5 +48,16 @@ export class Observer{
   const home=this.match.flags.B,homeThreat=b.units.reduce((sum,u)=>sum+(u.team==='A'&&u.health.current>0&&distance(u,home)<20?(u.health.current/u.health.max)*(Math.sqrt(u.health.max/100)+u.damage/u.combat.period/35):0),0),totalEnemy=regions.reduce((n,r)=>n+r.A,0),totalFriendly=regions.reduce((n,r)=>n+r.B,0);
   return {states,regions,homeThreat,totalEnemy,totalFriendly,time:this.match.elapsed,flagHit:this.match.elapsed-(home.lastHitAt??-Infinity)<6};
  }
- local(snapshot,point,radius=24){const key=point.index!==undefined?point.index+':'+radius:null;snapshot.localCache??=new Map();if(key&&snapshot.localCache.has(key))return snapshot.localCache.get(key);const out={A:0,B:0,heal:0,congestion:0};for(const r of snapshot.regions){const d=this.travel(point,r.node);if(d>radius)continue;const weight=1-d/(radius+1);out.A+=r.A*weight;out.B+=r.B*weight;out.heal+=r.healingB*weight;out.congestion+=r.congestion*weight;}if(key)snapshot.localCache.set(key,out);return out;}
+ local(snapshot,point,radius=24){
+  const key=point.index!==undefined?point.index+':'+radius:null;snapshot.localCache??=new Map();
+  if(key&&snapshot.localCache.has(key))return snapshot.localCache.get(key);
+  const out={A:0,B:0,heal:0,congestion:0};
+  if(key){
+   let kernel=this.influence.get(key);
+   if(!kernel){kernel=[];const costs=this.routes(point).costs;for(let i=0;i<costs.length;i++)if(costs[i]<=radius)kernel.push([i,1-costs[i]/(radius+1)]);this.influence.set(key,kernel);}
+   for(const [i,weight]of kernel){const r=snapshot.regions[i];out.A+=r.A*weight;out.B+=r.B*weight;out.heal+=r.healingB*weight;out.congestion+=r.congestion*weight;}
+   snapshot.localCache.set(key,out);
+  }else for(const r of snapshot.regions){if(!r.A&&!r.B&&!r.healingB&&!r.congestion)continue;const d=this.travel(point,r.node);if(d>radius)continue;const weight=1-d/(radius+1);out.A+=r.A*weight;out.B+=r.B*weight;out.heal+=r.healingB*weight;out.congestion+=r.congestion*weight;}
+  return out;
+ }
 }
