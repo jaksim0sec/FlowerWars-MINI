@@ -48,3 +48,31 @@ jobs:
             exit 1
           fi
           echo "No new test failures compared to main"
+  browser-diagnosis:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: python3 -m pip install --quiet playwright
+      - run: python3 -m playwright install --with-deps chromium
+      - name: Run two-client 700-unit browser diagnosis
+        shell: bash
+        run: |
+          npm start > /tmp/flowerwars-server.log 2>&1 &
+          for i in $(seq 1 50); do
+            if curl -fsS http://127.0.0.1:10000/health > /dev/null; then break; fi
+            sleep 0.2
+          done
+          OUTPUT=/tmp/online-diagnosis.json python3 scripts/diagnose_online_stutter.py
+          python3 - <<'PY'
+          import json
+          with open('/tmp/online-diagnosis.json') as f: data=json.load(f)
+          for r in data:
+              duration=max([t['duration'] for t in r['longTasks']],default=0)
+              print(f"{r['role']}: soldiers={r['soldiers']} frameGapP95={r['frameGapP95']:.1f}ms RAF_p95={r['rafP95']:.1f}ms maxLongTask={duration:.1f}ms")
+          PY
