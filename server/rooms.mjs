@@ -6,7 +6,7 @@ const fail=code=>{throw new Error(code);};
 const hash=value=>createHash('sha256').update(value).digest();
 const object=value=>value&&typeof value==='object'&&!Array.isArray(value);
 const codeOK=value=>typeof value==='string'&&/^[A-Z]{6}$/.test(value);
-const metaOK=m=>object(m)&&typeof m.matchId==='string'&&m.matchId.length<=64&&m.adapter==='fixture-v1'&&m.version===1&&Number.isSafeInteger(m.sequence)&&m.sequence>=0&&typeof m.hash==='string'&&/^[a-f0-9]{64}$/.test(m.hash);
+const metaOK=m=>object(m)&&typeof m.matchId==='string'&&m.matchId.length<=64&&['fixture-v1','battle-v1'].includes(m.adapter)&&m.version===1&&Number.isSafeInteger(m.sequence)&&m.sequence>=0&&typeof m.hash==='string'&&/^[a-f0-9]{64}$/.test(m.hash);
 const sameMeta=(a,b)=>a&&b&&a.matchId===b.matchId&&a.sequence===b.sequence&&a.hash===b.hash&&a.adapter===b.adapter&&a.version===b.version;
 
 export class RoomStore {
@@ -24,7 +24,7 @@ export class RoomStore {
   maybeResume(room){if(room.players.length!==2||!room.players.every(p=>p.online&&p.syncedEpoch===room.epoch))return;
     if(room.matchId&&!room.checkpoint)return;
     for(const p of room.players)p.deadline=null;room.linkDeadline=null;
-    if(!room.manualPause){room.state=room.matchId?'PLAYING':room.players.every(p=>p.ready)?'READY':'WAITING';this.send(room,'match:resumed',{epoch:room.epoch});}
+    if(!room.manualPause){room.state=room.finished?'FINISHED':room.matchId?'PLAYING':room.players.every(p=>p.ready)?'READY':'WAITING';this.send(room,'match:resumed',{epoch:room.epoch});}
   }
   close(room,state){room.state=state;this.send(room,state==='EXPIRED'?'room:expired':'room:finished',{state,roomCode:room.code});for(const p of room.players){if(p.socketId)this.bindings.delete(p.socketId);p.tokenHash.fill(0);}room.chat.length=0;room.players.length=0;room.pending=null;room.checkpoint=null;this.rooms.delete(room.code);this.send(room,'room:closed',{state});}
   sweep(){for(const room of this.rooms.values())if(this.now()>=room.expiresAt||(this.deadline(room)!==null&&this.now()>=this.deadline(room)))this.close(room,'EXPIRED');}
@@ -55,13 +55,13 @@ export class RoomStore {
     }
     const {room,p}=this.current(socketId);
     if(event==='room:leave'){this.close(room,'FINISHED');return {};}
-    if(event==='match:finish'){if(p.role!=='host')fail('HOST_ONLY');if(!room.matchId||room.state!=='PLAYING')fail('NOT_PLAYING');this.close(room,'FINISHED');return {};}
+    if(event==='match:finish'){if(p.role!=='host')fail('HOST_ONLY');if(!room.matchId||room.state!=='PLAYING')fail('NOT_PLAYING');if(room.adapter==='battle-v1'){room.finished=true;room.state='FINISHED';this.send(room);return {room:this.view(room)};}this.close(room,'FINISHED');return {};}
     if(event==='participant:ready'){
       if(typeof data.ready!=='boolean'||room.matchId)fail('INVALID_READY');p.ready=data.ready;
       if(room.state!=='PAUSED')room.state=room.players.length===2&&room.players.every(p=>p.ready)?'READY':'WAITING';
     }else if(event==='match:start'){
       if(p.role!=='host')fail('HOST_ONLY');if(room.state!=='READY'||!room.players.every(p=>p.online&&p.syncedEpoch===room.epoch))fail('NOT_READY');
-      room.matchId=randomBytes(16).toString('hex');room.adapter='fixture-v1';room.linkDeadline=this.now()+GRACE_MS;this.pause(room,'INITIAL_SYNC');
+      if(data.adapter!==undefined&&!['fixture-v1','battle-v1'].includes(data.adapter))fail('INVALID_ADAPTER');room.matchId=randomBytes(16).toString('hex');room.adapter=data.adapter||'fixture-v1';room.linkDeadline=this.now()+GRACE_MS;this.pause(room,'INITIAL_SYNC');
     }else if(event==='participant:synced'){
       if(data.epoch!==room.epoch)fail('STALE_EPOCH');if(room.matchId){if(!room.checkpoint||data.sequence!==room.checkpoint.sequence||data.hash!==room.checkpoint.hash)fail('SNAPSHOT_MISMATCH');}else if(data.sequence!==null||data.hash!==null)fail('SNAPSHOT_MISMATCH');
       p.syncedEpoch=room.epoch;this.maybeResume(room);
@@ -71,7 +71,7 @@ export class RoomStore {
     }else if(event==='match:resume'){
       if(p.role!=='host')fail('HOST_ONLY');if(!room.players.every(p=>p.online&&p.syncedEpoch===room.epoch)||room.matchId&&!room.checkpoint)fail('NOT_SYNCHRONIZED');room.manualPause=false;this.maybeResume(room);
     }else if(event==='snapshot:publish'){
-      if(p.role!=='host')fail('HOST_ONLY');if(!metaOK(data)||data.matchId!==room.matchId)fail('INVALID_SNAPSHOT');if(room.pending||room.checkpoint&&data.sequence<=room.checkpoint.sequence)fail('STALE_SNAPSHOT');
+      if(p.role!=='host')fail('HOST_ONLY');if(!metaOK(data)||data.matchId!==room.matchId||data.adapter!==room.adapter)fail('INVALID_SNAPSHOT');if(room.pending||room.checkpoint&&data.sequence<=room.checkpoint.sequence)fail('STALE_SNAPSHOT');
       room.pending={matchId:data.matchId,adapter:data.adapter,version:data.version,sequence:data.sequence,hash:data.hash};this.send(room,'snapshot:available',room.pending);
     }else if(event==='snapshot:stored'){
       if(p.role!=='guest')fail('GUEST_ONLY');if(!sameMeta(room.pending,data))fail('SNAPSHOT_MISMATCH');room.checkpoint=room.pending;room.pending=null;this.send(room,'snapshot:committed',room.checkpoint);

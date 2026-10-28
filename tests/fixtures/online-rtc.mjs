@@ -2,7 +2,7 @@
 window.__fixturePeers=new Map();let nextPeer=0;
 class Channel {
  constructor(pc){this.pc=pc;this.readyState='connecting';this.bufferedAmount=0;}
- send(data){if(this.readyState!=='open')throw Error('closed');window.fixtureWire({target:this.pc.remoteId,kind:'data',data}).catch(()=>{});}
+ send(data){if(this.readyState!=='open')throw Error('closed');const size=new TextEncoder().encode(data).length;this.bufferedAmount+=size;this.queue=(this.queue||Promise.resolve()).then(()=>window.fixtureWire({target:this.pc.remoteId,kind:'data',data})).catch(()=>{}).finally(()=>{this.bufferedAmount-=size;});}
  close(){if(this.readyState==='closed')return;this.readyState='closed';this.onclose?.();if(this.pc.remoteId)window.fixtureWire({target:this.pc.remoteId,kind:'close'}).catch(()=>{});}
 }
 window.RTCPeerConnection=class {

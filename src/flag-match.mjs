@@ -15,7 +15,7 @@ export const FLAG_HEALTH=1200;
 /** Simulation-only match controller. Decisions are staggered across squads;
  * spatial buckets supply local enemies; capture and counters tick at 4 Hz. */
 export class FlagMatch{
- constructor(board,{count=ARMY_LIMIT,makeCharacter,optionsFor,seed=1,blueprints=availableSquadBlueprints(),unitProfiles={},scenario,aiImplementation='legacy'}={}){
+ constructor(board,{count=ARMY_LIMIT,makeCharacter,optionsFor,seed=1,blueprints=availableSquadBlueprints(),unitProfiles={},scenario,aiImplementation='legacy',multiplayer=false}={}){
   this.board=board;board.width=BATTLEFIELD_WIDTH;board.height=BATTLEFIELD_HEIGHT;board.seed=seed;board.reset();
   this.epoch=board.byId;this.phase='preparation';this.remaining=PREPARATION_SECONDS;this.winner=null;
   this.flags={A:{x:5,y:Math.floor(board.height/2)},B:{x:board.width-6,y:board.height-1-Math.floor(board.height/2)}};this.counts={A:0,B:0};this.squadIds={A:[],B:[]};
@@ -30,7 +30,7 @@ export class FlagMatch{
   this.squadSize=Math.max(...blueprints.map(bp=>bp.members.length));
   this.operationSize=Math.max(2,Math.min(4,Math.floor(48/this.squadSize)));
   if(!['legacy','utility'].includes(aiImplementation))throw new Error('Unknown AI implementation');
-  this.aiImplementation=aiImplementation;
+  this.multiplayer=!!multiplayer;this.aiImplementation=aiImplementation;
   this.command=aiImplementation==='legacy'?new BotCommand(this,scenario):new TacticalController(this);
   this.limit=Math.max(1,Math.min(ARMY_LIMIT,Math.floor(Number(count)||ARMY_LIMIT)));
   this.reserve={A:this.limit,B:this.limit};this.makeCharacter=makeCharacter;this.optionsFor=optionsFor;
@@ -77,6 +77,7 @@ export class FlagMatch{
   this.squadIds[team].push(s.id);this.reserve[team]-=size;this.refreshStatus();return s;
  }
  deployBot(){
+  if(this.multiplayer)return false;
   if(!this.reserve.B)return false;
   const index=this.squadIds.B.length,groupIndex=Math.floor(index/this.operationSize),slot=index%this.operationSize;
   let operation=this.botOperations.get(groupIndex);
@@ -114,18 +115,18 @@ export class FlagMatch{
  }
  inTerritory(team,p){return team==='A'?p.x<this.board.width/2:p.x>=this.board.width/2;}
  canCommand(team,action,target){
-  if(this.phase==='finished'||team!=='A')return false;
-  if(this.phase==='preparation'&&(['focus','follow'].includes(action)||target?.x!=null&&!this.inTerritory('A',target)))return false;
+  if(this.phase==='finished'||!['A','B'].includes(team)||!this.multiplayer&&team!=='A')return false;
+  if(this.phase==='preparation'&&(['focus','follow'].includes(action)||target?.x!=null&&!this.inTerritory(team,target)))return false;
   return true;
  }
  start(){
   if(this.phase!=='preparation')return false;
   if(this.aiImplementation==='legacy'){this.command.lastScenario=-Infinity;this.command.chooseScenario(survey(this.board,this.flags.B));}
   // Finish the bot's direct placement before skipping the preparation clock.
-  while(this.reserve.B>0)if(!this.deployBot())break;
+  while(!this.multiplayer&&this.reserve.B>0)if(!this.deployBot())break;
   this.strategy=this.aiImplementation==='legacy'?survey(this.board,this.flags.B):this.command.observer.observe();
   this.phase='battle';this.remaining=0;this.statusRevision++;
-  this.command.refresh();
+  if(!this.multiplayer)this.command.refresh();
   for(const u of this.board.units)if(u.health.current>0){u.combat.auto=true;u.retryAt=0;u.waitReason=null;}
   this.nextDecision=this.elapsed;return true;
  }
@@ -134,6 +135,7 @@ export class FlagMatch{
   this.elapsed+=dt;
   if(this.phase==='preparation'){this.remaining=Math.max(0,this.remaining-dt);if(this.remaining<=1e-8)this.start();}
   if(this.elapsed>=this.nextStatus){this.nextStatus=this.elapsed+.25;this.refreshStatus();}
+  if(this.multiplayer)return;
   if(this.phase==='battle'&&(this.elapsed>=this.command.nextRefresh||this.aiImplementation==='utility'&&this.command.observer.revision!==this.board.obstacleRevision))this.command.refresh();
   else if(this.phase==='preparation'&&this.elapsed>=this.nextSurvey){this.strategy=this.aiImplementation==='legacy'?survey(this.board,this.flags.B):this.command.observer.observe();this.nextSurvey=this.elapsed+3;}
   if(this.phase!=='finished'&&this.elapsed>=this.nextDecision){
@@ -169,7 +171,7 @@ export class FlagMatch{
   this.statusRevision++;return true;
  }
  think(id){
-  if(this.phase!=='battle')return;
+  if(this.multiplayer||this.phase!=='battle')return;
   const s=squadsFor(this.board).get(id);if(!s)return;
   this.decisions++;
   if(this.aiImplementation==='utility')this.command.think(s);else commandBotSquad(this,s);

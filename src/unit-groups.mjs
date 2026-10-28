@@ -106,3 +106,10 @@ function attachSquads(board,group){
   group.platoons=[...platoons.values()];
  }
 }
+
+/** Durable registry data; callers encode the Maps with their shared state graph. */
+export function exportGroupRegistry(board){const {groups,squads,next}=registry(board);return {groups,squads,next};}
+export function importGroupRegistry(board,{groups,squads,next}){
+ if(!(groups instanceof Map)||!(squads instanceof Map)||!Number.isSafeInteger(next)||next<1)throw new Error('INVALID_GROUP_REGISTRY');
+ registries.set(board,{epoch:board.byId,groups,squads,next});
+}

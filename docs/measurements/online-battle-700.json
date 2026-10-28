@@ -1,0 +1,45 @@
+{
+  "node": "v22.23.4",
+  "seed": 73,
+  "seconds": 20,
+  "soldiers": 700,
+  "size": [
+    176,
+    128
+  ],
+  "initialSnapshotBytes": 2537258,
+  "initialSaveMs": 97.709566,
+  "initialRestoreMs": 85.072968,
+  "stepP95Ms": 5.661180999999942,
+  "frameBuildAndApplyP95Ms": 14.068181999999979,
+  "maxFrameBytes": 84322,
+  "averageRawFrameBytesPerSecond": 633914.45,
+  "averageEncodedBytesPerSecond": 90334.95,
+  "collisions": 0,
+  "checkpoints": [
+    {
+      "time": 5,
+      "bytes": 3495668,
+      "packedBytes": 369654,
+      "saveMs": 115.96231799999998
+    },
+    {
+      "time": 10,
+      "bytes": 3497604,
+      "packedBytes": 370682,
+      "saveMs": 85.2898459999999
+    },
+    {
+      "time": 15,
+      "bytes": 3512061,
+      "packedBytes": 376486,
+      "saveMs": 107.34070599999995
+    },
+    {
+      "time": 20,
+      "bytes": 3491434,
+      "packedBytes": 374874,
+      "saveMs": 79.40613900000017
+    }
+  ]
+}

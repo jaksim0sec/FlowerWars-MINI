@@ -46,7 +46,7 @@ export function drawMatchOverlay(ctx,match,scale){
   const size=objectiveFlagScale(scale);
   ctx.save();ctx.scale(size,size);drawFlagGlyph(ctx,team);ctx.restore();
   const labelY=size*4+12;
-  ctx.fillStyle=TEAM_COLORS[team];ctx.font='700 11px system-ui';ctx.textAlign='center';ctx.fillText(team==='A'?'내 깃발':'적 깃발',0,labelY);
+  ctx.fillStyle=TEAM_COLORS[team];ctx.font='700 11px system-ui';ctx.textAlign='center';ctx.fillText(team===(match.viewTeam||'A')?'내 깃발':'적 깃발',0,labelY);
   const health=flag.health;
   if(health){ctx.fillStyle='#4a352a66';ctx.fillRect(-23,labelY+6,46,4);ctx.fillStyle=TEAM_COLORS[team];ctx.fillRect(-23,labelY+6,46*Math.max(0,health.current/health.max),4);ctx.font='600 9px system-ui';ctx.fillText(Math.ceil(health.current)+' / '+health.max,0,labelY+24);}
   ctx.restore();

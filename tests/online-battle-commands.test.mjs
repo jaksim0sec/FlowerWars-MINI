@@ -1,0 +1,8 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {Board} from '../src/model.mjs';import {FlagMatch} from '../src/flag-match.mjs';
+import {applyBattleCommand} from '../src/online/battle-commands.mjs';
+import {squadsFor} from '../src/unit-groups.mjs';
+function match(){return new FlagMatch(new Board(),{seed:73,multiplayer:true});}
+function deploy(m,team,type='mixed'){for(let x=team==='A'?8:110;x<(team==='A'?80:170);x++)for(let y=10;y<117;y++){const s=m.deploy(team,type,{x,y});if(s)return s;}throw Error('no footprint');}
+test('human-vs-human preparation never recruits bots and accepts either team own-side commands',()=>{const m=match();m.update(10);assert.equal(m.counts.B,0);assert.equal(m.reserve.B,350);assert.equal(m.canCommand('B','advance',{x:120,y:60}),true);assert.equal(m.canCommand('B','advance',{x:30,y:60}),false);m.start();assert.equal(m.counts.B,0);assert.equal(m.phase,'battle');});
+test('guest deployment and orders are owned by B; forged A selection and start are rejected atomically',()=>{const m=match();const a=deploy(m,'A');const b=deploy(m,'B');assert.equal(applyBattleCommand({board:m.board},'guest',{kind:'orders',ids:[a.id,b.id],action:'hold'}).ok,false);assert.equal(a.order,null);assert.equal(b.order,null);assert.equal(applyBattleCommand({board:m.board},'guest',{kind:'begin-battle'}).ok,false);assert.equal(applyBattleCommand({board:m.board},'host',{kind:'begin-battle'}).ok,true);assert.equal(applyBattleCommand({board:m.board},'guest',{kind:'orders',ids:[b.id],action:'hold'}).ok,true);assert.equal(b.order.type,'hold');assert.equal(applyBattleCommand({board:m.board},'guest',{kind:'configure',ids:[b.id],formation:'column'}).ok,true);assert.equal(squadsFor(m.board).get(b.id).formation,'column');});

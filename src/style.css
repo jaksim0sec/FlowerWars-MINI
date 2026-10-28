@@ -790,3 +790,5 @@ button:not(:disabled):active{scale:.96;}
 @keyframes online-open{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){#online-panel{animation:none;}#online-panel button{transition:none;}}
 @media(max-height:600px){#online-chat-log{max-height:80px;}#online-panel{padding:10px;}.online-scope{margin-bottom:6px;}}
+.online-room-active.online-battle-live #command-dock,.online-room-active.online-battle-live #squad-tools,.online-room-active.online-battle-live #deployment-tools,.online-room-active.online-battle-live #squad-roster,.online-room-active.online-battle-live #match-hud{pointer-events:auto;}
+#online-fixture-wrap:has(#online-fixture[hidden]) small{display:none;}
