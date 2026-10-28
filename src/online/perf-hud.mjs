@@ -22,9 +22,9 @@ export function createOnlinePerfHud({getSession,getUnits,enabled=false}){
    const mean=raf.length?raf.reduce((a,b)=>a+b,0)/raf.length:0;
    const age=s?.identity?.role==='guest'&&Number.isFinite(s?.guestFrameAt)?Math.max(0,now-s.guestFrameAt):null;
    hud.textContent='RAF '+(mean?(1000/mean).toFixed(0):'?')+'fps  p95 '+percentile(raf).toFixed(0)+'ms'+
-    '\\nCanvas p95 '+percentile(draw).toFixed(1)+'ms  max '+(draw.length?Math.max(...draw):0).toFixed(1)+'ms'+
-    '\\nNet p95 '+(packetGaps.length?percentile(packetGaps).toFixed(0):'?')+'ms  age '+(age==null?'?':age.toFixed(0))+'ms'+
-    '\\nUnits '+(getUnits?.()??'?')+'  '+(s?.identity?.role||'offline');
+    '\nCanvas p95 '+percentile(draw).toFixed(1)+'ms  max '+(draw.length?Math.max(...draw):0).toFixed(1)+'ms'+
+    '\nNet p95 '+(packetGaps.length?percentile(packetGaps).toFixed(0):'?')+'ms  age '+(age==null?'?':age.toFixed(0))+'ms'+
+    '\nUnits '+(getUnits?.()??'?')+'  '+(s?.identity?.role||'offline');
    raf=[];draw=[];packetGaps=[];
   },
   draw(ms){if(Number.isFinite(ms))draw.push(ms);}
