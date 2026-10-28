@@ -43,3 +43,37 @@ test('incremental movement, death and removal update only affected occupancy',as
  assert.equal(gb.byId.has(u.id),false);
  assert.equal(gb.units.length,hb.units.length);
 });
+
+test('700 unchanged actors incur zero spatial updates on small state-only deltas',async()=>{
+ const host=createBattleState('delta-700',{seed:71}),guest=await restoreBattleState(await saveBattleState(host,0)),stream=new BattleFrames();
+ for(const team of ['A','B']){let n=0;for(let y=8;y<host.board.height&&n<350;y++)for(let x=team==='A'?8:100;x<(team==='A'?76:169)&&n<350;x++){
+  if(host.board.navigation.blocked(y*host.board.width+x)||host.board.occupied(x,y))continue;
+  if(host.board.spawn(x,y,null,{team}))n++;
+ }assert.equal(n,350);}
+ assert.equal(applyBattleFrame(guest,stream.build(host)),true);
+ assert.equal(guest.board.units.length,700);
+ const b=guest.board,units=b.units,keep=b.units[699],membership=b.spatial.memberships.get(keep.id);
+ let moves=0,clears=0;const originalMove=b.spatial.move.bind(b.spatial),originalClear=b.spatial.clear.bind(b.spatial);
+ b.spatial.move=u=>{moves++;return originalMove(u);};b.spatial.clear=()=>{clears++;return originalClear();};
+ for(const u of host.board.units.slice(0,5)){u.state='hit';u.elapsed=.07;}
+ const delta=stream.build(host);assert.equal(delta.units.length,5);
+ assert.equal(applyBattleFrame(guest,delta),true);
+ assert.equal(b.units,units);
+ assert.equal(b.units[699],keep);
+ assert.equal(b.spatial.memberships.get(keep.id),membership);
+ assert.equal(moves,0);assert.equal(clears,0);
+ assert.equal(b.cells.size,700);
+});
+test('two-phase spatial updates do not delete another actor on simultaneous movements',async()=>{
+ const host=createBattleState('delta-swap',{seed:71}),guest=await restoreBattleState(await saveBattleState(host,0)),stream=new BattleFrames();
+ const b=host.board;b.obstacles.clear();for(const row of b.terrain)row.fill('grass');
+ const left=b.spawn(20,40,null,{team:'A'}),right=b.spawn(21,40,null,{team:'B'});
+ assert.ok(left&&right);assert.equal(applyBattleFrame(guest,stream.build(host)),true);
+ [left.x,right.x]=[right.x,left.x];
+ left.visualX=left.x;right.visualX=right.x;
+ assert.equal(applyBattleFrame(guest,stream.build(host)),true);
+ const g=guest.board;
+ assert.equal(g.cells.get(40*g.width+20),right.id);
+ assert.equal(g.cells.get(40*g.width+21),left.id);
+ assert.equal(g.spatial.memberships.size,2);
+});
