@@ -1,3 +1,4 @@
+import {pauseSinglePlayer} from './online/game-gate.mjs';
 import {commanderPortrait} from './commander-portrait.mjs';
 import {squadTapIntent} from './gesture-commands.mjs';
 import {terrainNames} from './battlefield-terrain.mjs';
@@ -282,7 +283,7 @@ function updateAiLog(){
  const text=entries.map(e=>`${Math.floor(e.at/60)}:${String(Math.floor(e.at%60)).padStart(2,'0')}  ${e.text}`).join('\n');
  if(el.textContent!==text)el.textContent=text;
  const r=el.getBoundingClientRect();let top=12;
- for(const selector of ['.masthead','.camera-tools','#match-hud','#debug-tools','#deployment-tools']){
+ for(const selector of ['.masthead','.camera-tools','#match-hud','#debug-tools','#deployment-tools','#online-entry','#online-recovery']){
   const item=document.querySelector(selector);if(!item||item.hidden)continue;
   const box=item.getBoundingClientRect();if(box.width&&box.height&&box.right>r.left&&box.left<r.right&&box.top<innerHeight*.5)top=Math.max(top,box.bottom+8);
  }
@@ -746,10 +747,12 @@ function frame(now) {
   const dt = lastFrame ? Math.min((now - lastFrame) / 1000, .05) : 0;
   lastFrame = now;
   if (art) {
-    board.update(dt);
-    board.match?.update(wallDt);
+    if(!pauseSinglePlayer()){
+      board.update(dt);
+      board.match?.update(wallDt);
+    }
     if(now-lastMatchHud>=250){updateMatchHud();lastMatchHud=now;}
-    if(now-lastSquadUpdate>=50&&board.match?.phase!=='finished'){updateSquadOrders(board);lastSquadUpdate=now;}
+    if(!pauseSinglePlayer()&&now-lastSquadUpdate>=50&&board.match?.phase!=='finished'){updateSquadOrders(board);lastSquadUpdate=now;}
     if(now-lastRosterUpdate>=700){syncSquadRoster();lastRosterUpdate=now;}
     const hits = board.units.reduce((n, u) => n + u.hits, 0);
     if (hits > previousHits&&!selectedSquads.size&&!board.match) notify('공격이 명중했어요! 상대 용사가 충격에 반응합니다.');

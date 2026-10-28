@@ -1,0 +1,12 @@
+import {validateMatchState} from './match-state.mjs';
+const result=request=>new Promise((resolve,reject)=>{request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});
+const done=tx=>new Promise((resolve,reject)=>{tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||new Error('BACKUP_ABORTED'));});
+export class SnapshotBackup {
+ constructor({indexedDB=globalThis.indexedDB,name='flowerwars-online-v1'}={}){this.indexedDB=indexedDB;this.name=name;}
+ async open(){if(!this.db)this.db=new Promise((resolve,reject)=>{if(!this.indexedDB){reject(new Error('BACKUP_UNAVAILABLE'));return;}const req=this.indexedDB.open(this.name,1);req.onupgradeneeded=()=>req.result.createObjectStore('snapshots',{keyPath:'key'});req.onerror=()=>reject(req.error);req.onblocked=()=>reject(new Error('BACKUP_BLOCKED'));req.onsuccess=()=>{req.result.onversionchange=()=>req.result.close();resolve(req.result);};});return this.db;}
+ async put(roomCode,snapshot){if(!await validateMatchState(snapshot))throw new Error('INVALID_SNAPSHOT');const db=await this.open(),tx=db.transaction('snapshots','readwrite'),finished=done(tx),store=tx.objectStore('snapshots');store.put({key:`${roomCode}:${snapshot.matchId}:${snapshot.sequence}`,roomCode,matchId:snapshot.matchId,sequence:snapshot.sequence,savedAt:Date.now(),snapshot});
+ const req=store.getAll();req.onsuccess=()=>{const all=req.result,matching=all.filter(r=>r.roomCode===roomCode&&r.matchId===snapshot.matchId).sort((a,b)=>b.sequence-a.sequence);for(const r of matching.slice(3))store.delete(r.key);for(const r of all.sort((a,b)=>b.savedAt-a.savedAt).slice(30))store.delete(r.key);};await finished;}
+ async get(roomCode,matchId,metadata=null){const db=await this.open(),tx=db.transaction('snapshots','readonly'),all=await result(tx.objectStore('snapshots').getAll());const records=all.filter(r=>r.roomCode===roomCode&&r.matchId===matchId&&(!metadata||r.sequence===metadata.sequence&&(!metadata.hash||r.snapshot.hash===metadata.hash))).sort((a,b)=>b.sequence-a.sequence);for(const record of records)if(await validateMatchState(record.snapshot))return record.snapshot;return null;}
+ async clearRoom(roomCode){const db=await this.open(),tx=db.transaction('snapshots','readwrite'),finished=done(tx),store=tx.objectStore('snapshots'),req=store.getAll();req.onsuccess=()=>{for(const r of req.result)if(r.roomCode===roomCode)store.delete(r.key);};await finished;}
+ async close(){if(this.db)(await this.db).close();this.db=null;}
+}
