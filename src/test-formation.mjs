@@ -33,7 +33,7 @@ const battalionSquadPatterns=[
  {type:'assault',label:'돌격대',roles:['banner','scout','scout','scout','scout','guard','guard','scout','scout','autumn','guard','healer']},
  {type:'ranged',label:'궁병대',roles:['banner','archer','archer','archer','guard','guard','guard','archer','archer','archer','archer','scout']},
  {type:'mobile',label:'기동대',roles:['banner','scout','scout','scout','scout','scout','scout','scout','scout','scout','archer','archer']},
- {type:'mixed',label:'혼성대',roles:['banner','guard','guard','guard','scout','scout','scout','scout','archer','archer','archer','healer']},
+ {type:'mixed',label:'보병대',roles:['banner','guard','guard','guard','scout','scout','scout','scout','archer','archer','archer','healer']},
  {type:'support',label:'지원대',roles:['banner','healer','healer','healer','healer','scholar','scholar','scholar','guard','guard','guard','scout']}
 ];
 const battalionExtraRoles={

@@ -12,4 +12,4 @@ export function icon(name){
  const content=grids[name]?grids[name].map(([x,y])=>`<rect x="${x-1.5}" y="${y-1.5}" width="3" height="3" rx="1.2" fill="currentColor" stroke="none"/>`).join(''):`<path d="${commands[name]||paths[name]||paths.hold}"/>`;
  return `<svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${content}</svg>`;
 }
-export const typeLabels={assault:'돌격',defense:'방어',ranged:'궁병',mobile:'기동',support:'지원',mixed:'혼성'};
+export const typeLabels={assault:'돌격',defense:'철벽',ranged:'궁병',mobile:'기동',support:'지원',mixed:'보병'};
