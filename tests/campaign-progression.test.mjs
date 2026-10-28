@@ -68,3 +68,19 @@ test('defeat ends only current expedition, retains progression',()=>{
   assert.ok(c.getProfile().wins>=3);
   assert.equal(c.battleActive(),false);
 });
+
+test('each expedition stage grants its own goal bonus once',()=>{
+  assert.equal(c.beginExpedition().ok,true);
+  assert.equal(c.beginBattle().ok,true);
+  const first=c.finishBattle({winner:'A',alive:80,flagRatio:.3,types:['defense']});
+  assert.equal(first.objective,false);
+  const before=c.getProfile().chests;
+  assert.equal(c.beginBattle().ok,true);
+  const second=c.finishBattle({winner:'A',alive:70,flagRatio:.6,types:['defense','ranged','mixed']});
+  assert.equal(second.objective,true);
+  assert.equal(c.getProfile().chests,before+2,'normal chest and goal chest');
+  assert.equal(c.beginBattle().ok,true);
+  const third=c.finishBattle({winner:'A',alive:45,flagRatio:.5,types:['defense']});
+  assert.equal(third.objective,true);
+  assert.equal(third.materials,4,'last battle gives 2 materials plus 2 from survival goal');
+});
