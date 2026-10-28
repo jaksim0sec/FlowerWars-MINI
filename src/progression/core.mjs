@@ -18,6 +18,11 @@ export const CHESTS=Object.freeze({
   equipment:{name:'장비 상자',desc:'훈련 재료와 도토리'},
   honor:{name:'전공 상자',desc:'깃발 및 도토리'}
 });
+export const STAGE_GOALS=Object.freeze({
+  1:{name:'선봉 진격',desc:'내 깃발 체력 70% 이상 유지',bonus:'도토리 +20'},
+  2:{name:'중앙 공방',desc:'서로 다른 부대 3종 이상 사용',bonus:'상자 +1'},
+  3:{name:'최후의 깃발',desc:'아군 병사 40명 이상 생존',bonus:'훈련 재료 +2'}
+});
 export const QUESTS=Object.freeze({
   first:{name:'첫 번째 승전보',desc:'원정 전투 1회 승리',reward:40},
   flag:{name:'흔들리지 않는 깃발',desc:'깃발 체력 70% 이상으로 승리',reward:45},
@@ -52,7 +57,7 @@ function readProfile(){
     if(raw.expedition&&[1,2,3].includes(raw.expedition.stage)){
       safe.expedition={stage:raw.expedition.stage,supply:Math.max(0,Math.min(500,Math.floor(Number(raw.expedition.supply)||0))),boost:['attack','health',null].includes(raw.expedition.boost)?raw.expedition.boost:null};
     }
-    if(raw.lastReport&&typeof raw.lastReport==='object')safe.lastReport={outcome:['victory','defeat','draw'].includes(raw.lastReport.outcome)?raw.lastReport.outcome:'draw',acorns:Math.max(0,Math.floor(Number(raw.lastReport.acorns)||0)),materials:Math.max(0,Math.floor(Number(raw.lastReport.materials)||0)),stage:Math.max(1,Math.min(3,Number(raw.lastReport.stage)||1)),complete:!!raw.lastReport.complete};
+    if(raw.lastReport&&typeof raw.lastReport==='object')safe.lastReport={outcome:['victory','defeat','draw'].includes(raw.lastReport.outcome)?raw.lastReport.outcome:'draw',acorns:Math.max(0,Math.floor(Number(raw.lastReport.acorns)||0)),materials:Math.max(0,Math.floor(Number(raw.lastReport.materials)||0)),stage:Math.max(1,Math.min(3,Number(raw.lastReport.stage)||1)),complete:!!raw.lastReport.complete,objective:!!raw.lastReport.objective};
     return safe;
   }catch{return defaultProfile();}
 }
@@ -198,12 +203,14 @@ export function finishBattle({winner='draw',alive=0,flagRatio=0,types=[]}={}){
   let questAcorns=0;
   const grant=(id)=>{if(!next.quests.includes(id)){next.quests.push(id);next.acorns+=QUESTS[id].reward;questAcorns+=QUESTS[id].reward;}};
   if(won){grant('first');if(flagRatio>=.7)grant('flag');if(unique.length>=3)grant('diverse');}
+  const objective=won&&(stage===1&&flagRatio>=.7||stage===2&&unique.length>=3||stage===3&&alive>=40);
+  if(objective){if(stage===1)next.acorns+=20;else if(stage===2)next.chests++;else next.materials+=2;}
   if(won&&flagRatio>0&&flagRatio<=.25&&!next.medals.includes('최후의 잎'))next.medals.push('최후의 잎');
   if(won&&alive<=12&&alive>0&&!next.medals.includes('생환 훈장'))next.medals.push('생환 훈장');
   let complete=false;
   if(won&&stage===3){complete=true;next.acorns+=90;next.chests+=2;next.expedition=null;if(!next.medals.includes('원정 완수'))next.medals.push('원정 완수');}
   else if(won){next.expedition={stage:stage+1,supply:Math.min(500,next.expedition.supply+45),boost:null};next.chests++;}
   else{next.expedition=null;}
-  next.lastReport={outcome:won?'victory':winner==='draw'?'draw':'defeat',acorns:acorns+questAcorns+(complete?90:0),materials,stage,complete};
+  next.lastReport={outcome:won?'victory':winner==='draw'?'draw':'defeat',acorns:acorns+questAcorns+(complete?90:0)+(objective&&stage===1?20:0),materials:materials+(objective&&stage===3?2:0),stage,complete,objective};
   save(next);return next.lastReport;
 }
