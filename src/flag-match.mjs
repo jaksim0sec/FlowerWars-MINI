@@ -108,7 +108,7 @@ export class FlagMatch{
     const x=anchor.x+p.x,y=anchor.y+p.y,key=y*this.board.width+x;
     if(!this.board.inside(x,y)||!this.inTerritory('B',{x,y})||seen.has(key)||this.board.occupied(x,y)||this.board.navigation.blocked(key))return false;
     seen.add(key);return true;
-   })){operation.anchor=anchor;return true;}
+   })&&(this.aiImplementation!=='utility'||this.command.placementAllowed(anchor))){operation.anchor=anchor;return true;}
   }
   return false;
  }

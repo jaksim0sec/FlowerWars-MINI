@@ -11,7 +11,7 @@ export class CommandGateway{
   if(action==='focus'){const enemy=aim?.unitId!==undefined?b.unit(aim.unitId):null;if(!enemy||enemy.team===s.team||enemy.health.current<=0)return false;}
   const old=s.order,same=old?.type===action&&(aim?.x!==undefined&&old.target?.x!==undefined?distance(old.target,aim)<5:JSON.stringify(old.target??null)===JSON.stringify(aim??null));
   if(same){this.metrics.deduplicated++;return true;}
-  const last=this.last.get(s.id);if(!urgent&&(b.time-(last??-Infinity)<(aim?.x!==undefined?3:2)||state.engaged>0&&action!=='retreat')){this.metrics.deferred++;return false;}
+  const last=this.last.get(s.id);if(!urgent&&(b.time-(last??-Infinity)<(aim?.x!==undefined?3:2)||state.engaged>0&&!state.redirect&&action!=='retreat')){this.metrics.deferred++;return false;}
   if(!orderSquad(b,s.id,action,aim))return false;
   this.last.set(s.id,b.time);this.metrics.orders++;if(old)this.metrics.replacements++;return true;
  }

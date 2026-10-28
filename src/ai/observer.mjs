@@ -41,8 +41,8 @@ export class Observer{
    const health=u.health.current/u.health.max,dps=u.healing?0:u.damage/u.combat.period,range=1+Math.min(8,u.combat.range)*.06,power=(u.formationRole==='banner'?.15:1)*health*(Math.sqrt(u.health.max/100)+dps/35*range);
    const node=this.nodeAt(u);if(node){const r=regions[node.index];r[u.team]+=power;r['count'+u.team]++;if(u.healing)r['healing'+u.team]++;if(u.waitReason)r.congestion++;}
    if(u.team!=='B')continue;
-   let s=states.get(u.squadId);if(!s){s={id:u.squadId,squad:squadsFor(b).get(u.squadId),units:[],count:0,x:0,y:0,health:0,maxHealth:0,power:0,heal:0,fire:0,melee:0,speed:0,engaged:0};states.set(u.squadId,s);}
-   s.units.push(u);s.count++;s.health+=u.health.current;s.maxHealth+=u.health.max;s.power+=power;s.speed+=1/u.movement.stepTime;if(u.healing)s.heal++;else if(u.formationRole!=='banner'){s.x+=u.x;s.y+=u.y;if(u.combat.range>1)s.fire++;else s.melee++;}if(u.state==='attack')s.engaged++;
+   let s=states.get(u.squadId);if(!s){s={id:u.squadId,squad:squadsFor(b).get(u.squadId),units:[],count:0,x:0,y:0,health:0,maxHealth:0,power:0,heal:0,fire:0,melee:0,shield:0,spear:0,range:0,speed:0,engaged:0};states.set(u.squadId,s);}
+   s.units.push(u);s.count++;if(u.formationRole==='guard')s.shield++;if(u.combat.charge)s.spear++;s.range=Math.max(s.range,u.combat.range);s.health+=u.health.current;s.maxHealth+=u.health.max;s.power+=power;s.speed+=1/u.movement.stepTime;if(u.healing)s.heal++;else if(u.formationRole!=='banner'){s.x+=u.x;s.y+=u.y;if(u.combat.range>1)s.fire++;else s.melee++;}if(u.state==='attack')s.engaged++;
   }
   for(const s of states.values()){const n=s.fire+s.melee;if(n){s.x/=n;s.y/=n;}else{s.x=s.units.reduce((a,u)=>a+u.x,0)/s.count;s.y=s.units.reduce((a,u)=>a+u.y,0)/s.count;}s.ratio=s.health/s.maxHealth;s.speed/=s.count;s.node=this.nodeAt(s);}
   const home=this.match.flags.B,homeThreat=b.units.reduce((sum,u)=>sum+(u.team==='A'&&u.health.current>0&&distance(u,home)<20?(u.health.current/u.health.max)*(Math.sqrt(u.health.max/100)+u.damage/u.combat.period/35):0),0),totalEnemy=regions.reduce((n,r)=>n+r.A,0),totalFriendly=regions.reduce((n,r)=>n+r.B,0);
