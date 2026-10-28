@@ -1,3 +1,4 @@
+import {autumnScenery,autumnGroundContours} from './autumn-scenery.mjs';
 import {HALF_W,HALF_H,unproject} from './model.mjs';
 const caches=new WeakMap();
 /** Enumerate only projected tiles touching the viewport, in original painter order. */
@@ -20,6 +21,7 @@ export const terrainVariant=(x,y)=>1+((x%5+5)%5)+5*((y%2+2)%2);
 export function terrainMaterial(board,x,y){
  const type=board.terrain[y][x],obstacle=board.obstacles?.get(y*board.width+x);
  if(type==='void')return 'void';
+ if(obstacle?.visual==='rock')return 'rock';
  return type==='forest'||obstacle&&obstacle.blocked!==false?'pond':type==='road'?'soil':type;
 }
 export function terrainEdges(board,x,y){
@@ -28,9 +30,10 @@ export function terrainEdges(board,x,y){
  return {wallX:material!=='void'&&east==='void',wallY:material!=='void'&&south==='void',
   boundaryX:east!=='void'&&east!==material,boundaryY:south!=='void'&&south!==material};
 }
-const materialRow={grass:0,soil:1,pond:2};
+const materialRow={grass:0,soil:1,pond:2,rock:1};
 function paint(ctx,art,board,camera,width,height,dpr){
  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,width,height);
+ if(art.tiles.distance&&board.battlefield?.visualVersion==='autumn-v1')ctx.drawImage(art.tiles.distance,0,0,width,height);
  ctx.translate(camera.x,camera.y);ctx.scale(camera.scale,camera.scale);
  ctx.save();ctx.beginPath();
  if(board.battlefield?.outline){
@@ -41,14 +44,23 @@ function paint(ctx,art,board,camera,width,height,dpr){
   ctx.lineTo(-board.height*HALF_W,(board.height-1)*HALF_H);ctx.closePath();
  }
  ctx.translate(0,23);ctx.shadowColor='#68502455';ctx.shadowBlur=38;ctx.shadowOffsetY=23;ctx.fillStyle='#97794140';ctx.fill();ctx.restore();
+ // Continuous exposed thickness; decorative rock sprites are accents, not a tiled wall.
+ if(board.battlefield?.visualVersion==='autumn-v1'){
+  const rim=board.battlefield.outline;
+  for(let i=0;i<rim.length;i++){
+   const a=rim[i],b=rim[(i+1)%rim.length],ax=(a.x-a.y)*72,ay=(a.x+a.y)*42,bx=(b.x-b.y)*72,by=(b.x+b.y)*42,side=new Path2D();
+   side.moveTo(ax,ay);side.lineTo(bx,by);side.lineTo(bx,by+140);side.lineTo(ax,ay+140);side.closePath();ctx.fillStyle=bx>ax?'#9b8057':'#796b50';ctx.fill(side);
+  }
+ }
  // A continuous base prevents transparent hairlines during fractional zoom.
- ctx.fillStyle='#8eaa54';ctx.fill();
+ ctx.fillStyle=board.battlefield?.visualVersion==='autumn-v1'?'#999e59':'#8eaa54';ctx.fill();
  const tiles=visibleTiles(board,camera,width,height);
  let walls=0,boundaries=0;
  for(const{x,y}of tiles){
   const material=terrainMaterial(board,x,y),row=materialRow[material]??0;
   const sx=(terrainVariant(x,y)-1)*144,left=(x-y)*HALF_W-72,top=(x+y)*HALF_H-42;
-  ctx.drawImage(art.tiles.atlas,sx,row*107,144,107,left,top,144,107);
+  ctx.globalAlpha=material==='grass'&&board.battlefield?.visualVersion==='autumn-v1'? .3:1;
+  ctx.drawImage(art.tiles.atlas,sx,row*107,144,107,left,top,144,107);ctx.globalAlpha=1;
   // A neighbor of another material is still solid ground, never an exposed wall.
   const edges=terrainEdges(board,x,y);
   if(edges.wallX){ctx.drawImage(art.tiles.atlas,sx,(3+row)*107,144,107,left,top,144,107);walls++;}
@@ -81,6 +93,18 @@ function paint(ctx,art,board,camera,width,height,dpr){
   const screenX=px*camera.scale+camera.x,screenY=py*camera.scale+camera.y;
   if(screenX+d.width*camera.scale<0||screenX-d.width*camera.scale>width||screenY<0||screenY-dh*camera.scale>height)continue;
   ctx.drawImage(art.tiles.decorations,d.index%3*340,Math.floor(d.index/3)*270,340,270,px-d.width/2,py-dh,d.width,dh);decorations++;
+ }
+ if(art.tiles.autumn)for(const ground of [true,false]){
+  ctx.save();
+  if(ground){ctx.beginPath();for(const loop of autumnGroundContours(board)){for(let i=0;i<loop.length;i++){const p=loop[i],x=(p.x-p.y)*72,y=(p.x+p.y)*42;if(i)ctx.lineTo(x,y);else ctx.moveTo(x,y);}ctx.closePath();}ctx.clip('evenodd');}
+  for(const d of autumnScenery(board)){
+   if((d.layer===0)!==ground)continue;const sprite=art.tiles.autumnCatalog.items[d.id];if(!sprite)continue;
+   const px=(d.x-d.y)*HALF_W,py=(d.x+d.y)*HALF_H,dh=ground?d.width*.6:d.width,left=px-d.width/2,top=ground?py-dh/2:d.id.startsWith('cliff_side')?py-45:py-dh;
+   const sx=left*camera.scale+camera.x,sy=top*camera.scale+camera.y;
+   if(sx+d.width*camera.scale<0||sx>width||sy+dh*camera.scale<0||sy>height)continue;
+   ctx.globalAlpha=ground?(d.id==='stone_paving'? .85:.48):1;
+   ctx.drawImage(art.tiles.autumn,sprite.x,sprite.y,sprite.w,sprite.h,left,top,d.width,dh);decorations++;
+  }ctx.restore();
  }
  return {tiles:tiles.length,walls,boundaries,decorations};
 }

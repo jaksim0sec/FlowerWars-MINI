@@ -29,25 +29,25 @@ export function planBattlefield(width,height,random){
  room('battle','battle',72,middle,25,25);
  for(const [team,gate,home,front]of [['A',gateA,20,44],['B',gateB,123,100]]){
   room('rear-'+team,'staging',home,middle,9,10);room('front-'+team,'staging',front,middle,10,10);
-  path('main-'+team,'main',[[team==='A'?15:128,team==='A'?56:55],[home,middle],[gate,middle+jitter(2)],[front,middle],[72,middle]],8,'kingdom-'+team,'battle');
+  path('main-'+team,'main',[[team==='A'?15:128,team==='A'?56:55],[home,middle],[gate,middle+jitter(2)],[front,middle],[team==='A'?68:76,middle+(team==='A'?-1:1)]],9.5,'kingdom-'+team,'battle');
  }
  for(const [side,y,sign]of [['upper',top,-1],['lower',bottom,1]]){
   // Each flank has its own smooth centerline and fixed width. A corridor does
   // not move when the outer coastline changes.
-  const bend=y+jitter(3);
-  path('flank-'+side,'flank',[[15,56],[21,middle+sign*20],[29,y+sign*2],[48,bend],[66,y],[79,y+jitter(2)],[97,bend+jitter(2)],[115,y],[122,middle+sign*20],[128,55]],3.5,'kingdom-A','kingdom-B');
+  const bend=y+jitter(3)+(side==='lower'?2:0);
+  path('flank-'+side,'flank',[[15,56],[21,middle+sign*20],[29,y+sign*2],[48,bend],[66,y],[79,y+jitter(2)],[97,bend+(side==='lower'?2:-1)+jitter(2)],[115,y],[122,middle+sign*20],[128,55]],4,'kingdom-A','kingdom-B');
   for(const [team,x,entryX]of [['A',62,68],['B',82,77]]){
    room(`flank-stage-${side}-${team}`,'staging',x,y,6);
    room(`merge-${side}-${team}`,'merge',entryX,middle+sign*16,7);
-   path(`entry-${side}-${team}`,'entry',[[x,y],[entryX,middle+sign*22],[entryX,middle+sign*16],[72,middle]],3,'flank-'+side,'battle');
+   path(`entry-${side}-${team}`,'entry',[[x,y],[entryX,middle+sign*22],[entryX,middle+sign*16],[entryX,middle+sign*10]],4,'flank-'+side,'battle');
   }
   for(const [team,x,front]of [['A',34,44],['B',109,100]]){
    room(`counter-stage-${side}-${team}`,'merge',x,middle+sign*22,5);
-   path(`counter-${side}-${team}`,'counter',[[x,y],[x,middle+sign*22],[front,middle+sign*9],[front,middle]],3,'flank-'+side,'front-'+team);
+   path(`counter-${side}-${team}`,'counter',[[x,y],[x,middle+sign*22],[front,middle+sign*9],[front,middle]],4,'flank-'+side,'front-'+team);
   }
   for(const [team,flip]of [['A',false],['B',true]]){
    const transform=([x,v])=>[flip?143-x:x,middle+sign*v];
-   const long=[[38,15],[40,24+jitter(2)],[49,28+jitter(3)],[58,25+jitter(2)],[63,18]];
+   const long=side==='upper'?[[37,15],[42,24+jitter(2)],[53,25+jitter(2)],[63,17]]:[[37,15],[39,25+jitter(2)],[48,31+jitter(2)],[58,29+jitter(2)],[65,20]];
    const short=[[23,19],[26,24+jitter(2)],[28,31]];
    for(const [kind,points,radius]of [['front',long,3.8+random()*.8],['gate',short,4.5]]){
     defenses.push({id:`defense-${side}-${team}-${kind}`,team,side,kind,points:roundedPath(points.map(transform).map(([x,y])=>p(x,y))),radius:radius*scale,phase:random()*6.28});

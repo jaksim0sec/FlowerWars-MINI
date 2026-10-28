@@ -20,7 +20,7 @@ test('seeded enlarged battlefield keeps bases, central approaches and side entri
  const shapes=new Set();
  for(let seed=0;seed<32;seed++){
   const b=new Board(),m=new FlagMatch(b,{seed}),field=b.battlefield;
-  assert.equal(b.width,144);assert.equal(b.height,112);assert.ok(m.flags.B.x-m.flags.A.x>125);
+  assert.equal(b.width,176);assert.equal(b.height,128);assert.ok(m.flags.B.x-m.flags.A.x>125);
   const connected=reachable(b,m.flags.A.y*b.width+m.flags.A.x);
   assert.ok(connected.has(m.flags.B.y*b.width+m.flags.B.x));
   assert.equal(connected.size,b.width*b.height-b.obstacles.size,'no isolated walkable islands');

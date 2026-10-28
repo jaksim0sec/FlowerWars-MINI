@@ -9,9 +9,9 @@ import {drawMatchOverlay,drawDistantSoldier,drawSquadTeamFlags,TEAM_COLORS,TEAM_
 
 const TERRAIN_ATLAS=new URL('../assets/world/terrain/atlas.webp',import.meta.url);
 export async function loadArtwork() {
-  const [catalog,atlas,decorations]=await Promise.all([loadCatalog(),loadImage(TERRAIN_ATLAS),loadImage(new URL('../assets/world/terrain/decorations.webp',import.meta.url))]);
+  const [catalog,atlas,decorations,autumn,autumnCatalog,distance]=await Promise.all([loadCatalog(),loadImage(TERRAIN_ATLAS),loadImage(new URL('../assets/world/terrain/decorations.webp',import.meta.url)),loadImage(new URL('../assets/world/autumn/atlas.webp',import.meta.url)),fetch(new URL('../assets/world/autumn/catalog.json',import.meta.url)).then(r=>{if(!r.ok)throw Error('Autumn catalog unavailable');return r.json();}),loadImage(new URL('../assets/world/autumn/distance.webp',import.meta.url))]);
   const warrior=catalog.characters['gynari-warrior'];
-  return {catalog,rig:warrior.rig,parts:warrior.images,tiles:{atlas,decorations}};
+  return {catalog,rig:warrior.rig,parts:warrior.images,tiles:{atlas,decorations,autumn,autumnCatalog,distance}};
 }
 
 function diamond(ctx, x, y, fill, stroke = null, inset = 3) {

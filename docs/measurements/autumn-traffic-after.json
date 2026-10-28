@@ -1,0 +1,614 @@
+[
+  {
+    "seed": 7,
+    "scenario": "main-350",
+    "count": 350,
+    "seconds": 180,
+    "passed": 350,
+    "arrived": 223,
+    "completeAt": null,
+    "firstPass": 15.350000000000083,
+    "lastPass": 88.6499999999971,
+    "passP95": 77.84999999999772,
+    "idleSeconds": 23613,
+    "maxWait": 81.5,
+    "cpuMs": 2911.63,
+    "updateP95ms": 1.9734,
+    "expansions": 2147722,
+    "maxTickExpansions": 2048,
+    "collisions": 0,
+    "timelines": [
+      {
+        "at": 30,
+        "passed": 128,
+        "arrived": 1
+      },
+      {
+        "at": 60,
+        "passed": 292,
+        "arrived": 51
+      },
+      {
+        "at": 90,
+        "passed": 350,
+        "arrived": 102
+      },
+      {
+        "at": 120,
+        "passed": 350,
+        "arrived": 149
+      },
+      {
+        "at": 150,
+        "passed": 350,
+        "arrived": 178
+      },
+      {
+        "at": 180,
+        "passed": 350,
+        "arrived": 223
+      }
+    ]
+  },
+  {
+    "seed": 7,
+    "scenario": "flank-24",
+    "count": 24,
+    "seconds": 180,
+    "passed": 24,
+    "arrived": 24,
+    "completeAt": 50.99999999999924,
+    "firstPass": 19.200000000000138,
+    "lastPass": 26.850000000000247,
+    "passP95": 24.700000000000216,
+    "idleSeconds": 151.1,
+    "maxWait": 8.65,
+    "cpuMs": 55.11,
+    "updateP95ms": 0.0319,
+    "expansions": 5700,
+    "maxTickExpansions": 635,
+    "collisions": 0,
+    "timelines": [
+      {
+        "at": 30,
+        "passed": 24,
+        "arrived": 1
+      },
+      {
+        "at": 60,
+        "passed": 24,
+        "arrived": 24
+      },
+      {
+        "at": 90,
+        "passed": 24,
+        "arrived": 24
+      },
+      {
+        "at": 120,
+        "passed": 24,
+        "arrived": 24
+      },
+      {
+        "at": 150,
+        "passed": 24,
+        "arrived": 24
+      },
+      {
+        "at": 180,
+        "passed": 24,
+        "arrived": 24
+      }
+    ]
+  },
+  {
+    "seed": 7,
+    "scenario": "opposing-48",
+    "count": 48,
+    "seconds": 180,
+    "passed": 48,
+    "arrived": 48,
+    "completeAt": 82.29999999999747,
+    "firstPass": 21.600000000000172,
+    "lastPass": 68.04999999999828,
+    "passP95": 61.19999999999866,
+    "idleSeconds": 882.5,
+    "maxWait": 30.3,
+    "cpuMs": 90.93,
+    "updateP95ms": 0.0607,
+    "expansions": 25256,
+    "maxTickExpansions": 1544,
+    "collisions": 0,
+    "timelines": [
+      {
+        "at": 30,
+        "passed": 20,
+        "arrived": 0
+      },
+      {
+        "at": 60,
+        "passed": 44,
+        "arrived": 32
+      },
+      {
+        "at": 90,
+        "passed": 48,
+        "arrived": 48
+      },
+      {
+        "at": 120,
+        "passed": 48,
+        "arrived": 48
+      },
+      {
+        "at": 150,
+        "passed": 48,
+        "arrived": 48
+      },
+      {
+        "at": 180,
+        "passed": 48,
+        "arrived": 48
+      }
+    ]
+  },
+  {
+    "seed": 7,
+    "scenario": "merge-96",
+    "count": 96,
+    "seconds": 180,
+    "passed": 96,
+    "arrived": 96,
+    "completeAt": 65.74999999999841,
+    "firstPass": 18.70000000000013,
+    "lastPass": 49.19999999999934,
+    "passP95": 44.14999999999963,
+    "idleSeconds": 953.45,
+    "maxWait": 22.75,
+    "cpuMs": 196.87,
+    "updateP95ms": 0.1552,
+    "expansions": 72056,
+    "maxTickExpansions": 2048,
+    "collisions": 0,
+    "timelines": [
+      {
+        "at": 30,
+        "passed": 35,
+        "arrived": 8
+      },
+      {
+        "at": 60,
+        "passed": 96,
+        "arrived": 88
+      },
+      {
+        "at": 90,
+        "passed": 96,
+        "arrived": 96
+      },
+      {
+        "at": 120,
+        "passed": 96,
+        "arrived": 96
+      },
+      {
+        "at": 150,
+        "passed": 96,
+        "arrived": 96
+      },
+      {
+        "at": 180,
+        "passed": 96,
+        "arrived": 96
+      }
+    ]
+  },
+  {
+    "seed": 29,
+    "scenario": "main-350",
+    "count": 350,
+    "seconds": 180,
+    "passed": 350,
+    "arrived": 225,
+    "completeAt": null,
+    "firstPass": 15.350000000000083,
+    "lastPass": 91.19999999999696,
+    "passP95": 79.44999999999763,
+    "idleSeconds": 22295.45,
+    "maxWait": 44.4,
+    "cpuMs": 2680.29,
+    "updateP95ms": 1.8776,
+    "expansions": 2137309,
+    "maxTickExpansions": 2048,
+    "collisions": 0,
+    "timelines": [
+      {
+        "at": 30,
+        "passed": 108,
+        "arrived": 0
+      },
+      {
+        "at": 60,
+        "passed": 278,
+        "arrived": 50
+      },
+      {
+        "at": 90,
+        "passed": 348,
+        "arrived": 132
+      },
+      {
+        "at": 120,
+        "passed": 350,
+        "arrived": 160
+      },
+      {
+        "at": 150,
+        "passed": 350,
+        "arrived": 187
+      },
+      {
+        "at": 180,
+        "passed": 350,
+        "arrived": 225
+      }
+    ]
+  },
+  {
+    "seed": 29,
+    "scenario": "flank-24",
+    "count": 24,
+    "seconds": 180,
+    "passed": 24,
+    "arrived": 24,
+    "completeAt": 49.8999999999993,
+    "firstPass": 19.200000000000138,
+    "lastPass": 26.850000000000247,
+    "passP95": 24.700000000000216,
+    "idleSeconds": 160.55,
+    "maxWait": 9,
+    "cpuMs": 43.7,
+    "updateP95ms": 0.0219,
+    "expansions": 13480,
+    "maxTickExpansions": 704,
+    "collisions": 0,
+    "timelines": [
+      {
+        "at": 30,
+        "passed": 24,
+        "arrived": 0
+      },
+      {
+        "at": 60,
+        "passed": 24,
+        "arrived": 24
+      },
+      {
+        "at": 90,
+        "passed": 24,
+        "arrived": 24
+      },
+      {
+        "at": 120,
+        "passed": 24,
+        "arrived": 24
+      },
+      {
+        "at": 150,
+        "passed": 24,
+        "arrived": 24
+      },
+      {
+        "at": 180,
+        "passed": 24,
+        "arrived": 24
+      }
+    ]
+  },
+  {
+    "seed": 29,
+    "scenario": "opposing-48",
+    "count": 48,
+    "seconds": 180,
+    "passed": 48,
+    "arrived": 48,
+    "completeAt": 104.24999999999622,
+    "firstPass": 21.35000000000017,
+    "lastPass": 93.24999999999685,
+    "passP95": 67.79999999999829,
+    "idleSeconds": 792,
+    "maxWait": 29.5,
+    "cpuMs": 89.92,
+    "updateP95ms": 0.0637,
+    "expansions": 42548,
+    "maxTickExpansions": 1554,
+    "collisions": 0,
+    "timelines": [
+      {
+        "at": 30,
+        "passed": 24,
+        "arrived": 0
+      },
+      {
+        "at": 60,
+        "passed": 45,
+        "arrived": 31
+      },
+      {
+        "at": 90,
+        "passed": 47,
+        "arrived": 47
+      },
+      {
+        "at": 120,
+        "passed": 48,
+        "arrived": 48
+      },
+      {
+        "at": 150,
+        "passed": 48,
+        "arrived": 48
+      },
+      {
+        "at": 180,
+        "passed": 48,
+        "arrived": 48
+      }
+    ]
+  },
+  {
+    "seed": 29,
+    "scenario": "merge-96",
+    "count": 96,
+    "seconds": 180,
+    "passed": 96,
+    "arrived": 96,
+    "completeAt": 64.1999999999985,
+    "firstPass": 18.70000000000013,
+    "lastPass": 45.84999999999953,
+    "passP95": 43.499999999999666,
+    "idleSeconds": 831,
+    "maxWait": 9.1,
+    "cpuMs": 177.8,
+    "updateP95ms": 0.1177,
+    "expansions": 50126,
+    "maxTickExpansions": 2048,
+    "collisions": 0,
+    "timelines": [
+      {
+        "at": 30,
+        "passed": 37,
+        "arrived": 6
+      },
+      {
+        "at": 60,
+        "passed": 96,
+        "arrived": 93
+      },
+      {
+        "at": 90,
+        "passed": 96,
+        "arrived": 96
+      },
+      {
+        "at": 120,
+        "passed": 96,
+        "arrived": 96
+      },
+      {
+        "at": 150,
+        "passed": 96,
+        "arrived": 96
+      },
+      {
+        "at": 180,
+        "passed": 96,
+        "arrived": 96
+      }
+    ]
+  },
+  {
+    "seed": 73,
+    "scenario": "main-350",
+    "count": 350,
+    "seconds": 180,
+    "passed": 350,
+    "arrived": 230,
+    "completeAt": null,
+    "firstPass": 15.350000000000083,
+    "lastPass": 95.04999999999674,
+    "passP95": 82.19999999999747,
+    "idleSeconds": 22752.3,
+    "maxWait": 77.4,
+    "cpuMs": 2623.11,
+    "updateP95ms": 1.8289,
+    "expansions": 2091840,
+    "maxTickExpansions": 2048,
+    "collisions": 0,
+    "timelines": [
+      {
+        "at": 30,
+        "passed": 112,
+        "arrived": 1
+      },
+      {
+        "at": 60,
+        "passed": 279,
+        "arrived": 51
+      },
+      {
+        "at": 90,
+        "passed": 345,
+        "arrived": 122
+      },
+      {
+        "at": 120,
+        "passed": 350,
+        "arrived": 155
+      },
+      {
+        "at": 150,
+        "passed": 350,
+        "arrived": 174
+      },
+      {
+        "at": 180,
+        "passed": 350,
+        "arrived": 230
+      }
+    ]
+  },
+  {
+    "seed": 73,
+    "scenario": "flank-24",
+    "count": 24,
+    "seconds": 180,
+    "passed": 24,
+    "arrived": 24,
+    "completeAt": 47.49999999999944,
+    "firstPass": 19.200000000000138,
+    "lastPass": 26.650000000000244,
+    "passP95": 26.650000000000244,
+    "idleSeconds": 141.35,
+    "maxWait": 7.65,
+    "cpuMs": 40.9,
+    "updateP95ms": 0.023,
+    "expansions": 10060,
+    "maxTickExpansions": 635,
+    "collisions": 0,
+    "timelines": [
+      {
+        "at": 30,
+        "passed": 24,
+        "arrived": 1
+      },
+      {
+        "at": 60,
+        "passed": 24,
+        "arrived": 24
+      },
+      {
+        "at": 90,
+        "passed": 24,
+        "arrived": 24
+      },
+      {
+        "at": 120,
+        "passed": 24,
+        "arrived": 24
+      },
+      {
+        "at": 150,
+        "passed": 24,
+        "arrived": 24
+      },
+      {
+        "at": 180,
+        "passed": 24,
+        "arrived": 24
+      }
+    ]
+  },
+  {
+    "seed": 73,
+    "scenario": "opposing-48",
+    "count": 48,
+    "seconds": 180,
+    "passed": 48,
+    "arrived": 48,
+    "completeAt": 92.3999999999969,
+    "firstPass": 21.600000000000172,
+    "lastPass": 69.94999999999817,
+    "passP95": 60.69999999999869,
+    "idleSeconds": 868.05,
+    "maxWait": 30.2,
+    "cpuMs": 106.96,
+    "updateP95ms": 0.064,
+    "expansions": 36631,
+    "maxTickExpansions": 1541,
+    "collisions": 0,
+    "timelines": [
+      {
+        "at": 30,
+        "passed": 19,
+        "arrived": 0
+      },
+      {
+        "at": 60,
+        "passed": 44,
+        "arrived": 32
+      },
+      {
+        "at": 90,
+        "passed": 48,
+        "arrived": 46
+      },
+      {
+        "at": 120,
+        "passed": 48,
+        "arrived": 48
+      },
+      {
+        "at": 150,
+        "passed": 48,
+        "arrived": 48
+      },
+      {
+        "at": 180,
+        "passed": 48,
+        "arrived": 48
+      }
+    ]
+  },
+  {
+    "seed": 73,
+    "scenario": "merge-96",
+    "count": 96,
+    "seconds": 180,
+    "passed": 96,
+    "arrived": 96,
+    "completeAt": 61.54999999999864,
+    "firstPass": 16.800000000000104,
+    "lastPass": 48.449999999999385,
+    "passP95": 43.29999999999968,
+    "idleSeconds": 835.15,
+    "maxWait": 27.2,
+    "cpuMs": 184.07,
+    "updateP95ms": 0.1275,
+    "expansions": 48120,
+    "maxTickExpansions": 2048,
+    "collisions": 0,
+    "timelines": [
+      {
+        "at": 30,
+        "passed": 42,
+        "arrived": 12
+      },
+      {
+        "at": 60,
+        "passed": 96,
+        "arrived": 92
+      },
+      {
+        "at": 90,
+        "passed": 96,
+        "arrived": 96
+      },
+      {
+        "at": 120,
+        "passed": 96,
+        "arrived": 96
+      },
+      {
+        "at": 150,
+        "passed": 96,
+        "arrived": 96
+      },
+      {
+        "at": 180,
+        "passed": 96,
+        "arrived": 96
+      }
+    ]
+  }
+]

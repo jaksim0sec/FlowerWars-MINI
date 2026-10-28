@@ -1,0 +1,975 @@
+{
+  "format_version": 1,
+  "selection_order": "image display order: 1 nature, 2 distant background (excluded), 3 structures, 4 ground overlays",
+  "assets": [
+    {
+      "id": "golden_tree_round",
+      "selection": 1,
+      "row": 1,
+      "column": 1,
+      "path": "01_nature/01_golden_tree_round.png",
+      "size": [
+        322,
+        347
+      ],
+      "source_sheet": "original_sheets/01_nature.png",
+      "source_rect_xyxy": [
+        17,
+        68,
+        323,
+        399
+      ],
+      "padding": 8,
+      "sha256": "153c0a891c99ca03b3d9af890e85a982351c39282f3475877325fdab3053968a"
+    },
+    {
+      "id": "golden_tree_tall",
+      "selection": 1,
+      "row": 1,
+      "column": 2,
+      "path": "01_nature/02_golden_tree_tall.png",
+      "size": [
+        305,
+        368
+      ],
+      "source_sheet": "original_sheets/01_nature.png",
+      "source_rect_xyxy": [
+        339,
+        39,
+        628,
+        391
+      ],
+      "padding": 8,
+      "sha256": "5322d13bcd8e2a7141605f1bc91c98e9fe67d7336e245b4f0470d4df55992f68"
+    },
+    {
+      "id": "golden_shrub",
+      "selection": 1,
+      "row": 1,
+      "column": 3,
+      "path": "01_nature/03_golden_shrub.png",
+      "size": [
+        285,
+        235
+      ],
+      "source_sheet": "original_sheets/01_nature.png",
+      "source_rect_xyxy": [
+        651,
+        175,
+        920,
+        394
+      ],
+      "padding": 8,
+      "sha256": "d7e80ad9bd66234a1693e9fa8918c25be873537afa24ed8903eaf886dcb380c8"
+    },
+    {
+      "id": "olive_shrub",
+      "selection": 1,
+      "row": 1,
+      "column": 4,
+      "path": "01_nature/04_olive_shrub.png",
+      "size": [
+        290,
+        234
+      ],
+      "source_sheet": "original_sheets/01_nature.png",
+      "source_rect_xyxy": [
+        952,
+        176,
+        1226,
+        394
+      ],
+      "padding": 8,
+      "sha256": "5a9458efe488b11084430d680e28e6aa409e7794e6514ee3176d55178e3368d9"
+    },
+    {
+      "id": "mossy_boulder",
+      "selection": 1,
+      "row": 2,
+      "column": 1,
+      "path": "01_nature/05_mossy_boulder.png",
+      "size": [
+        314,
+        237
+      ],
+      "source_sheet": "original_sheets/01_nature.png",
+      "source_rect_xyxy": [
+        21,
+        435,
+        319,
+        656
+      ],
+      "padding": 8,
+      "sha256": "2e3f3582af131e0aa3ea505e2f8a17c981c3b7cc05500cdd37c1867e8f75f954"
+    },
+    {
+      "id": "rock_pair",
+      "selection": 1,
+      "row": 2,
+      "column": 2,
+      "path": "01_nature/06_rock_pair.png",
+      "size": [
+        293,
+        263
+      ],
+      "source_sheet": "original_sheets/01_nature.png",
+      "source_rect_xyxy": [
+        341,
+        413,
+        618,
+        660
+      ],
+      "padding": 8,
+      "sha256": "d2f15c183b85d2f45f271690814848b15ed3e806b6adf8dc0ac944cd6ec5a622"
+    },
+    {
+      "id": "low_outcrop",
+      "selection": 1,
+      "row": 2,
+      "column": 3,
+      "path": "01_nature/07_low_outcrop.png",
+      "size": [
+        312,
+        188
+      ],
+      "source_sheet": "original_sheets/01_nature.png",
+      "source_rect_xyxy": [
+        637,
+        475,
+        933,
+        647
+      ],
+      "padding": 8,
+      "sha256": "60e33dc5a966020dab954023cabc88ea7474ab453ef17c201dce9c07ccee3468"
+    },
+    {
+      "id": "tree_stump",
+      "selection": 1,
+      "row": 2,
+      "column": 4,
+      "path": "01_nature/08_tree_stump.png",
+      "size": [
+        300,
+        209
+      ],
+      "source_sheet": "original_sheets/01_nature.png",
+      "source_rect_xyxy": [
+        953,
+        465,
+        1237,
+        658
+      ],
+      "padding": 8,
+      "sha256": "01ec670a34d0101ea1cc816d290e2e3e1797c26d58dd1ef1af850e546a2078cf"
+    },
+    {
+      "id": "white_flowers",
+      "selection": 1,
+      "row": 3,
+      "column": 1,
+      "path": "01_nature/09_white_flowers.png",
+      "size": [
+        253,
+        216
+      ],
+      "source_sheet": "original_sheets/01_nature.png",
+      "source_rect_xyxy": [
+        49,
+        709,
+        286,
+        909
+      ],
+      "padding": 8,
+      "sha256": "aa8d4be7e2c8ed4ea1c1162959f5165c02e43066e0efff35aed378489536c208"
+    },
+    {
+      "id": "golden_wildflowers",
+      "selection": 1,
+      "row": 3,
+      "column": 2,
+      "path": "01_nature/10_golden_wildflowers.png",
+      "size": [
+        289,
+        248
+      ],
+      "source_sheet": "original_sheets/01_nature.png",
+      "source_rect_xyxy": [
+        342,
+        682,
+        615,
+        914
+      ],
+      "padding": 8,
+      "sha256": "cf9fda13754c7e60120368b543bd43692c99789ac94fb772ed8121bdeddede1f"
+    },
+    {
+      "id": "grass_tuft",
+      "selection": 1,
+      "row": 3,
+      "column": 3,
+      "path": "01_nature/11_grass_tuft.png",
+      "size": [
+        264,
+        207
+      ],
+      "source_sheet": "original_sheets/01_nature.png",
+      "source_rect_xyxy": [
+        659,
+        724,
+        907,
+        915
+      ],
+      "padding": 8,
+      "sha256": "f0ea909d2ef494b50d3c83890a7e3c7241e72872d24553ac27349612defcd467"
+    },
+    {
+      "id": "fallen_leaves",
+      "selection": 1,
+      "row": 3,
+      "column": 4,
+      "path": "01_nature/12_fallen_leaves.png",
+      "size": [
+        284,
+        185
+      ],
+      "source_sheet": "original_sheets/01_nature.png",
+      "source_rect_xyxy": [
+        963,
+        737,
+        1231,
+        906
+      ],
+      "padding": 8,
+      "sha256": "cca205b0582c02544c2d6c9f320711bd36cd0bb8730df2d12af32b5f5a6ece31"
+    },
+    {
+      "id": "reeds",
+      "selection": 1,
+      "row": 4,
+      "column": 1,
+      "path": "01_nature/13_reeds.png",
+      "size": [
+        279,
+        313
+      ],
+      "source_sheet": "original_sheets/01_nature.png",
+      "source_rect_xyxy": [
+        35,
+        915,
+        298,
+        1212
+      ],
+      "padding": 8,
+      "sha256": "c13219620ae27ff25ab40324631df5410a3e5262b19b47588cbd6303626fda7d"
+    },
+    {
+      "id": "cattails",
+      "selection": 1,
+      "row": 4,
+      "column": 2,
+      "path": "01_nature/14_cattails.png",
+      "size": [
+        284,
+        303
+      ],
+      "source_sheet": "original_sheets/01_nature.png",
+      "source_rect_xyxy": [
+        341,
+        920,
+        609,
+        1207
+      ],
+      "padding": 8,
+      "sha256": "112861ead9be9821584c4aa9bb7c9079b6b6367f0d7192842d4f8d1d2f27bcfe"
+    },
+    {
+      "id": "lily_pads",
+      "selection": 1,
+      "row": 4,
+      "column": 3,
+      "path": "01_nature/15_lily_pads.png",
+      "size": [
+        290,
+        176
+      ],
+      "source_sheet": "original_sheets/01_nature.png",
+      "source_rect_xyxy": [
+        638,
+        1012,
+        912,
+        1172
+      ],
+      "padding": 8,
+      "sha256": "bed7970b07733bf3e391f1420c68627b058b6a0b9c322b10c553cd03eddad35b"
+    },
+    {
+      "id": "ferns",
+      "selection": 1,
+      "row": 4,
+      "column": 4,
+      "path": "01_nature/16_ferns.png",
+      "size": [
+        292,
+        252
+      ],
+      "source_sheet": "original_sheets/01_nature.png",
+      "source_rect_xyxy": [
+        952,
+        970,
+        1228,
+        1206
+      ],
+      "padding": 8,
+      "sha256": "e0ed17fbd1ea7f69d570353678102d9fcd6c760244727944844df685dc6d194f"
+    },
+    {
+      "id": "timber_fence_01",
+      "selection": 3,
+      "row": 1,
+      "column": 1,
+      "path": "03_structures/01_timber_fence_01.png",
+      "size": [
+        342,
+        258
+      ],
+      "source_sheet": "original_sheets/03_structures.png",
+      "source_rect_xyxy": [
+        14,
+        60,
+        340,
+        302
+      ],
+      "padding": 8,
+      "sha256": "bcdbfa8f0e82f64aca8d415d39ad9f1255c22f64a6b165561bd81e2fa02f1d1e"
+    },
+    {
+      "id": "timber_fence_02",
+      "selection": 3,
+      "row": 1,
+      "column": 2,
+      "path": "03_structures/02_timber_fence_02.png",
+      "size": [
+        311,
+        260
+      ],
+      "source_sheet": "original_sheets/03_structures.png",
+      "source_rect_xyxy": [
+        327,
+        58,
+        622,
+        302
+      ],
+      "padding": 8,
+      "sha256": "4b6781c7f3155c36de79abdc4c50770760ae29399bcbfdc5a323e216c98d930b"
+    },
+    {
+      "id": "timber_fence_corner",
+      "selection": 3,
+      "row": 1,
+      "column": 3,
+      "path": "03_structures/03_timber_fence_corner.png",
+      "size": [
+        335,
+        232
+      ],
+      "source_sheet": "original_sheets/03_structures.png",
+      "source_rect_xyxy": [
+        614,
+        80,
+        933,
+        296
+      ],
+      "padding": 8,
+      "sha256": "192adb3d1acd051a82b7649055b8b409fdd16306113984c21c604e41d7b5f801"
+    },
+    {
+      "id": "timber_fence_broken",
+      "selection": 3,
+      "row": 1,
+      "column": 4,
+      "path": "03_structures/04_timber_fence_broken.png",
+      "size": [
+        316,
+        225
+      ],
+      "source_sheet": "original_sheets/03_structures.png",
+      "source_rect_xyxy": [
+        944,
+        85,
+        1244,
+        294
+      ],
+      "padding": 8,
+      "sha256": "be1aa1bd51c21ccfb6114d1b490e49e9f2d6edc8feac4801a0bd22eae78243c8"
+    },
+    {
+      "id": "stone_wall_01",
+      "selection": 3,
+      "row": 2,
+      "column": 1,
+      "path": "03_structures/05_stone_wall_01.png",
+      "size": [
+        349,
+        267
+      ],
+      "source_sheet": "original_sheets/03_structures.png",
+      "source_rect_xyxy": [
+        12,
+        347,
+        345,
+        598
+      ],
+      "padding": 8,
+      "sha256": "56191ab7ed6da243c1a2e2cdda86ffaa241ee073064887814758cbce62aa1ad2"
+    },
+    {
+      "id": "stone_wall_02",
+      "selection": 3,
+      "row": 2,
+      "column": 2,
+      "path": "03_structures/06_stone_wall_02.png",
+      "size": [
+        318,
+        273
+      ],
+      "source_sheet": "original_sheets/03_structures.png",
+      "source_rect_xyxy": [
+        326,
+        333,
+        628,
+        590
+      ],
+      "padding": 8,
+      "sha256": "4edb19d868cda612e9e0c62e54fd11dee3ec175c256ee2859c7cdae5e3114c31"
+    },
+    {
+      "id": "stone_wall_corner",
+      "selection": 3,
+      "row": 2,
+      "column": 3,
+      "path": "03_structures/07_stone_wall_corner.png",
+      "size": [
+        338,
+        234
+      ],
+      "source_sheet": "original_sheets/03_structures.png",
+      "source_rect_xyxy": [
+        620,
+        362,
+        942,
+        580
+      ],
+      "padding": 8,
+      "sha256": "b513430e041b8441534e2c1f72b60bd46bb0d6bf5d5cb629dfed1ac276c2d190"
+    },
+    {
+      "id": "masonry_remnant",
+      "selection": 3,
+      "row": 2,
+      "column": 4,
+      "path": "03_structures/08_masonry_remnant.png",
+      "size": [
+        308,
+        261
+      ],
+      "source_sheet": "original_sheets/03_structures.png",
+      "source_rect_xyxy": [
+        953,
+        339,
+        1245,
+        584
+      ],
+      "padding": 8,
+      "sha256": "872e50d55dd6e38d84ffe8b1a5e2ed7a32cf277010c11930a05e5c3412942e2b"
+    },
+    {
+      "id": "cliff_side_01",
+      "selection": 3,
+      "row": 3,
+      "column": 1,
+      "path": "03_structures/09_cliff_side_01.png",
+      "size": [
+        324,
+        319
+      ],
+      "source_sheet": "original_sheets/03_structures.png",
+      "source_rect_xyxy": [
+        21,
+        602,
+        329,
+        905
+      ],
+      "padding": 8,
+      "sha256": "03f61c64fe40ffa9cabb9116b3fef972da09f16ceecc532f3198be85b346b610"
+    },
+    {
+      "id": "cliff_side_02",
+      "selection": 3,
+      "row": 3,
+      "column": 2,
+      "path": "03_structures/10_cliff_side_02.png",
+      "size": [
+        314,
+        327
+      ],
+      "source_sheet": "original_sheets/03_structures.png",
+      "source_rect_xyxy": [
+        321,
+        612,
+        619,
+        923
+      ],
+      "padding": 8,
+      "sha256": "4faf3ac74e9e6fafecc9d3c1d115b44f5a1348924de959d57c1bcf8fd60e5c51"
+    },
+    {
+      "id": "cliff_corner",
+      "selection": 3,
+      "row": 3,
+      "column": 3,
+      "path": "03_structures/11_cliff_corner.png",
+      "size": [
+        337,
+        309
+      ],
+      "source_sheet": "original_sheets/03_structures.png",
+      "source_rect_xyxy": [
+        617,
+        607,
+        938,
+        900
+      ],
+      "padding": 8,
+      "sha256": "55abfc3b91b30960c39af34595e099f26a2ed55ea7a8b8ef1d5b6ae047551057"
+    },
+    {
+      "id": "rocky_edge_cap",
+      "selection": 3,
+      "row": 3,
+      "column": 4,
+      "path": "03_structures/12_rocky_edge_cap.png",
+      "size": [
+        312,
+        287
+      ],
+      "source_sheet": "original_sheets/03_structures.png",
+      "source_rect_xyxy": [
+        949,
+        627,
+        1245,
+        898
+      ],
+      "padding": 8,
+      "sha256": "1a2b47be81d38ab5258a14955bcb84b8e969e595b1672b19bf0d326f6d13ebb7"
+    },
+    {
+      "id": "stone_gatepost",
+      "selection": 3,
+      "row": 4,
+      "column": 1,
+      "path": "03_structures/13_stone_gatepost.png",
+      "size": [
+        256,
+        303
+      ],
+      "source_sheet": "original_sheets/03_structures.png",
+      "source_rect_xyxy": [
+        27,
+        922,
+        267,
+        1209
+      ],
+      "padding": 8,
+      "sha256": "99837dbc47f7437369523637b6fada91928e59ff8a019c9720b861006e8d9cb2"
+    },
+    {
+      "id": "timber_gate_open",
+      "selection": 3,
+      "row": 4,
+      "column": 2,
+      "path": "03_structures/14_timber_gate_open.png",
+      "size": [
+        348,
+        278
+      ],
+      "source_sheet": "original_sheets/03_structures.png",
+      "source_rect_xyxy": [
+        293,
+        946,
+        625,
+        1208
+      ],
+      "padding": 8,
+      "sha256": "d16adec57aa78681cbf531d0fea0d670376f40af27683c9fb9b3e8b94aec844f"
+    },
+    {
+      "id": "stone_paving",
+      "selection": 3,
+      "row": 4,
+      "column": 3,
+      "path": "03_structures/15_stone_paving.png",
+      "size": [
+        362,
+        244
+      ],
+      "source_sheet": "original_sheets/03_structures.png",
+      "source_rect_xyxy": [
+        618,
+        965,
+        964,
+        1193
+      ],
+      "padding": 8,
+      "sha256": "1ef8c7927fac3d91c1ef3222782105087c4d9c81d76cab227aa50e9406b060b7"
+    },
+    {
+      "id": "broken_pillar",
+      "selection": 3,
+      "row": 4,
+      "column": 4,
+      "path": "03_structures/16_broken_pillar.png",
+      "size": [
+        281,
+        315
+      ],
+      "source_sheet": "original_sheets/03_structures.png",
+      "source_rect_xyxy": [
+        962,
+        919,
+        1227,
+        1218
+      ],
+      "padding": 8,
+      "sha256": "ca264703cbd31549be713fc8ae34b7362d7a02e74056418ee9802b17e178dbd2"
+    },
+    {
+      "id": "compacted_soil",
+      "selection": 4,
+      "row": 1,
+      "column": 1,
+      "path": "04_ground_overlays/01_compacted_soil.png",
+      "size": [
+        331,
+        245
+      ],
+      "source_sheet": "original_sheets/04_ground_overlays.png",
+      "source_rect_xyxy": [
+        14,
+        79,
+        329,
+        308
+      ],
+      "padding": 8,
+      "sha256": "64d01e1f2f4e74be29b31e4defac05b97387836635cb029f88f2f197fd50f5c3"
+    },
+    {
+      "id": "curved_worn_earth",
+      "selection": 4,
+      "row": 1,
+      "column": 2,
+      "path": "04_ground_overlays/02_curved_worn_earth.png",
+      "size": [
+        324,
+        251
+      ],
+      "source_sheet": "original_sheets/04_ground_overlays.png",
+      "source_rect_xyxy": [
+        321,
+        91,
+        629,
+        326
+      ],
+      "padding": 8,
+      "sha256": "42cb00377f5916db7c169a17246a9749ba8cdd3b759d7077e34cbf23498f0951"
+    },
+    {
+      "id": "dry_grass_patch",
+      "selection": 4,
+      "row": 1,
+      "column": 3,
+      "path": "04_ground_overlays/03_dry_grass_patch.png",
+      "size": [
+        329,
+        250
+      ],
+      "source_sheet": "original_sheets/04_ground_overlays.png",
+      "source_rect_xyxy": [
+        632,
+        98,
+        945,
+        332
+      ],
+      "padding": 8,
+      "sha256": "21d585f0f6ce8a13fc4cd55eef3055262b4751a9faa7776d77292efd23c10a48"
+    },
+    {
+      "id": "olive_grass_patch",
+      "selection": 4,
+      "row": 1,
+      "column": 4,
+      "path": "04_ground_overlays/04_olive_grass_patch.png",
+      "size": [
+        311,
+        248
+      ],
+      "source_sheet": "original_sheets/04_ground_overlays.png",
+      "source_rect_xyxy": [
+        945,
+        102,
+        1240,
+        334
+      ],
+      "padding": 8,
+      "sha256": "9e5c79d55f03087160cfa3f4429fdec437b386d72b4180d5536e26b43410c5dd"
+    },
+    {
+      "id": "leaf_scatter_01",
+      "selection": 4,
+      "row": 2,
+      "column": 1,
+      "path": "04_ground_overlays/05_leaf_scatter_01.png",
+      "size": [
+        295,
+        222
+      ],
+      "source_sheet": "original_sheets/04_ground_overlays.png",
+      "source_rect_xyxy": [
+        24,
+        399,
+        303,
+        605
+      ],
+      "padding": 8,
+      "sha256": "b709be665b2c196f9cece4234b5b57f4a2e39b40474976eaeec741eb816b71ef"
+    },
+    {
+      "id": "leaf_scatter_02",
+      "selection": 4,
+      "row": 2,
+      "column": 2,
+      "path": "04_ground_overlays/06_leaf_scatter_02.png",
+      "size": [
+        313,
+        261
+      ],
+      "source_sheet": "original_sheets/04_ground_overlays.png",
+      "source_rect_xyxy": [
+        325,
+        370,
+        622,
+        615
+      ],
+      "padding": 8,
+      "sha256": "2e417b2a8dbe2689323041a18d84d6cca5536e64732c07265afe4ea4f1fecb2d"
+    },
+    {
+      "id": "embedded_pebbles",
+      "selection": 4,
+      "row": 2,
+      "column": 3,
+      "path": "04_ground_overlays/07_embedded_pebbles.png",
+      "size": [
+        271,
+        208
+      ],
+      "source_sheet": "original_sheets/04_ground_overlays.png",
+      "source_rect_xyxy": [
+        665,
+        418,
+        920,
+        610
+      ],
+      "padding": 8,
+      "sha256": "3dff078d674d8d7024f2a2efaf997b742b23f8ddfece312bd59780c204694723"
+    },
+    {
+      "id": "gravel_scatter",
+      "selection": 4,
+      "row": 2,
+      "column": 4,
+      "path": "04_ground_overlays/08_gravel_scatter.png",
+      "size": [
+        282,
+        186
+      ],
+      "source_sheet": "original_sheets/04_ground_overlays.png",
+      "source_rect_xyxy": [
+        961,
+        421,
+        1227,
+        591
+      ],
+      "padding": 8,
+      "sha256": "e63f82ba5af0f5a07890e965b12c2ce2d5506fd133787fb6a6c21c4f8f6a52f7"
+    },
+    {
+      "id": "canopy_shadow",
+      "selection": 4,
+      "row": 3,
+      "column": 1,
+      "path": "04_ground_overlays/09_canopy_shadow.png",
+      "size": [
+        326,
+        267
+      ],
+      "source_sheet": "original_sheets/04_ground_overlays.png",
+      "source_rect_xyxy": [
+        11,
+        649,
+        321,
+        900
+      ],
+      "padding": 8,
+      "sha256": "3e5bc469cc388b506173f8525ea02a6d0fdb89a60f99aa32aba15069ed866955"
+    },
+    {
+      "id": "shrub_shadow",
+      "selection": 4,
+      "row": 3,
+      "column": 2,
+      "path": "04_ground_overlays/10_shrub_shadow.png",
+      "size": [
+        318,
+        262
+      ],
+      "source_sheet": "original_sheets/04_ground_overlays.png",
+      "source_rect_xyxy": [
+        323,
+        658,
+        625,
+        904
+      ],
+      "padding": 8,
+      "sha256": "fd2bcf481ff0c4f3fcad61f52f269faf5c7d14d2ef94a67d9934ea61d5882e51"
+    },
+    {
+      "id": "moss_patch",
+      "selection": 4,
+      "row": 3,
+      "column": 3,
+      "path": "04_ground_overlays/11_moss_patch.png",
+      "size": [
+        325,
+        229
+      ],
+      "source_sheet": "original_sheets/04_ground_overlays.png",
+      "source_rect_xyxy": [
+        630,
+        682,
+        939,
+        895
+      ],
+      "padding": 8,
+      "sha256": "082a929f462b55e2641ad405678ac84c6adbfeb84de7c4638c6e40153edff253"
+    },
+    {
+      "id": "dry_grass_blades",
+      "selection": 4,
+      "row": 3,
+      "column": 4,
+      "path": "04_ground_overlays/12_dry_grass_blades.png",
+      "size": [
+        309,
+        248
+      ],
+      "source_sheet": "original_sheets/04_ground_overlays.png",
+      "source_rect_xyxy": [
+        947,
+        663,
+        1240,
+        895
+      ],
+      "padding": 8,
+      "sha256": "6ba9a960525cece453046e4f0def37b74d400a811cc48762bec5d0fc9377b988"
+    },
+    {
+      "id": "shoreline_bank",
+      "selection": 4,
+      "row": 4,
+      "column": 1,
+      "path": "04_ground_overlays/13_shoreline_bank.png",
+      "size": [
+        318,
+        312
+      ],
+      "source_sheet": "original_sheets/04_ground_overlays.png",
+      "source_rect_xyxy": [
+        21,
+        896,
+        323,
+        1192
+      ],
+      "padding": 8,
+      "sha256": "650c64083684febe63d632b2d3a88a74770e4e3600b5e8250ccbeefef579643c"
+    },
+    {
+      "id": "shoreline_corner",
+      "selection": 4,
+      "row": 4,
+      "column": 2,
+      "path": "04_ground_overlays/14_shoreline_corner.png",
+      "size": [
+        237,
+        317
+      ],
+      "source_sheet": "original_sheets/04_ground_overlays.png",
+      "source_rect_xyxy": [
+        377,
+        896,
+        598,
+        1197
+      ],
+      "padding": 8,
+      "sha256": "a836bbd0dd7a9ca13655a9b2f7476c2d4be863b6cc0436126a3394b163828c58"
+    },
+    {
+      "id": "wet_earth",
+      "selection": 4,
+      "row": 4,
+      "column": 3,
+      "path": "04_ground_overlays/15_wet_earth.png",
+      "size": [
+        289,
+        210
+      ],
+      "source_sheet": "original_sheets/04_ground_overlays.png",
+      "source_rect_xyxy": [
+        642,
+        981,
+        915,
+        1175
+      ],
+      "padding": 8,
+      "sha256": "b9b036150abb8d4dc9993ac8a2945130a1ac82878dd6640e3466422957c7c9ed"
+    },
+    {
+      "id": "reed_bank",
+      "selection": 4,
+      "row": 4,
+      "column": 4,
+      "path": "04_ground_overlays/16_reed_bank.png",
+      "size": [
+        311,
+        268
+      ],
+      "source_sheet": "original_sheets/04_ground_overlays.png",
+      "source_rect_xyxy": [
+        943,
+        945,
+        1238,
+        1197
+      ],
+      "padding": 8,
+      "sha256": "cee3218450d3a746bca40883fec97d7514a0ca41dd7fcfb69b49df197c745c3b"
+    }
+  ],
+  "notes": [
+    "Original selected sheets included unchanged.",
+    "No rescaling or color changes.",
+    "Nature and structure sprites isolated using alpha components; detached nearby details retained and negligible distant alpha noise omitted.",
+    "Ground overlays cropped by manually adjusted sheet regions, retaining their original alpha values.",
+    "Eight pixels of transparent padding around each crop.",
+    "Crop rectangles refer to original sheets; masked isolation may exclude pixels belonging to neighboring sprites.",
+    "Files are cropped artwork, not validated seamless terrain modules or registered game collision geometry."
+  ]
+}

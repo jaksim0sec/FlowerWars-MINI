@@ -1,0 +1,1706 @@
+{
+  "before": [
+    {
+      "node": "v24.19.0",
+      "seed": 7,
+      "seconds": 60,
+      "soldiers": 700,
+      "size": [
+        176,
+        128
+      ],
+      "initialSnapshotBytes": 2527967,
+      "initialSaveMs": 119.94890800000002,
+      "initialRestoreMs": 79.617932,
+      "stepP95Ms": 4.318129999999655,
+      "frameBuildAndApplyP95Ms": 15.992717000000084,
+      "maxFrameBytes": 84582,
+      "averageRawFrameBytesPerSecond": 561266.7,
+      "averageEncodedBytesPerSecond": 87376.81666666667,
+      "collisions": 0,
+      "checkpoints": [
+        {
+          "time": 5,
+          "bytes": 3498251,
+          "packedBytes": 370130,
+          "saveMs": 131.0029259999999
+        },
+        {
+          "time": 10,
+          "bytes": 3482725,
+          "packedBytes": 372282,
+          "saveMs": 95.73072900000011
+        },
+        {
+          "time": 15,
+          "bytes": 3479724,
+          "packedBytes": 374678,
+          "saveMs": 116.32855600000039
+        },
+        {
+          "time": 20,
+          "bytes": 3470266,
+          "packedBytes": 376222,
+          "saveMs": 98.62857699999995
+        },
+        {
+          "time": 25,
+          "bytes": 3442375,
+          "packedBytes": 374870,
+          "saveMs": 86.11947299999974
+        },
+        {
+          "time": 30,
+          "bytes": 3420948,
+          "packedBytes": 371582,
+          "saveMs": 82.67293500000005
+        },
+        {
+          "time": 35,
+          "bytes": 3403095,
+          "packedBytes": 370194,
+          "saveMs": 143.0257019999999
+        },
+        {
+          "time": 40,
+          "bytes": 3338085,
+          "packedBytes": 366434,
+          "saveMs": 74.36059999999998
+        },
+        {
+          "time": 45,
+          "bytes": 3255592,
+          "packedBytes": 357698,
+          "saveMs": 107.57583100000011
+        },
+        {
+          "time": 50,
+          "bytes": 3168362,
+          "packedBytes": 350842,
+          "saveMs": 119.25626899999952
+        },
+        {
+          "time": 55,
+          "bytes": 3042972,
+          "packedBytes": 336286,
+          "saveMs": 83.45556399999987
+        },
+        {
+          "time": 60,
+          "bytes": 2933567,
+          "packedBytes": 324646,
+          "saveMs": 69.99988499999927
+        }
+      ]
+    },
+    {
+      "node": "v24.19.0",
+      "seed": 29,
+      "seconds": 60,
+      "soldiers": 700,
+      "size": [
+        176,
+        128
+      ],
+      "initialSnapshotBytes": 2535916,
+      "initialSaveMs": 126.82997499999999,
+      "initialRestoreMs": 92.89104700000001,
+      "stepP95Ms": 4.691777999999886,
+      "frameBuildAndApplyP95Ms": 17.656592999999702,
+      "maxFrameBytes": 84382,
+      "averageRawFrameBytesPerSecond": 556278.6,
+      "averageEncodedBytesPerSecond": 86451.53333333334,
+      "collisions": 0,
+      "checkpoints": [
+        {
+          "time": 5,
+          "bytes": 3499461,
+          "packedBytes": 369622,
+          "saveMs": 131.52668599999993
+        },
+        {
+          "time": 10,
+          "bytes": 3500462,
+          "packedBytes": 373746,
+          "saveMs": 122.17975499999989
+        },
+        {
+          "time": 15,
+          "bytes": 3485950,
+          "packedBytes": 372434,
+          "saveMs": 132.7785859999999
+        },
+        {
+          "time": 20,
+          "bytes": 3481356,
+          "packedBytes": 374746,
+          "saveMs": 80.44923400000016
+        },
+        {
+          "time": 25,
+          "bytes": 3446273,
+          "packedBytes": 372266,
+          "saveMs": 129.75197500000013
+        },
+        {
+          "time": 30,
+          "bytes": 3429801,
+          "packedBytes": 369614,
+          "saveMs": 83.44197299999996
+        },
+        {
+          "time": 35,
+          "bytes": 3410807,
+          "packedBytes": 366706,
+          "saveMs": 113.56662099999994
+        },
+        {
+          "time": 40,
+          "bytes": 3350320,
+          "packedBytes": 364094,
+          "saveMs": 80.9330259999997
+        },
+        {
+          "time": 45,
+          "bytes": 3276793,
+          "packedBytes": 360886,
+          "saveMs": 125.91938000000027
+        },
+        {
+          "time": 50,
+          "bytes": 3218260,
+          "packedBytes": 357586,
+          "saveMs": 78.38482099999965
+        },
+        {
+          "time": 55,
+          "bytes": 3089761,
+          "packedBytes": 342518,
+          "saveMs": 94.21310199999971
+        },
+        {
+          "time": 60,
+          "bytes": 2976754,
+          "packedBytes": 329390,
+          "saveMs": 144.90828899999997
+        }
+      ]
+    },
+    {
+      "node": "v24.19.0",
+      "seed": 73,
+      "seconds": 60,
+      "soldiers": 700,
+      "size": [
+        176,
+        128
+      ],
+      "initialSnapshotBytes": 2537258,
+      "initialSaveMs": 124.98148899999998,
+      "initialRestoreMs": 109.25794399999998,
+      "stepP95Ms": 4.850334999999973,
+      "frameBuildAndApplyP95Ms": 14.10030099999949,
+      "maxFrameBytes": 84322,
+      "averageRawFrameBytesPerSecond": 565926.3166666667,
+      "averageEncodedBytesPerSecond": 88173.25,
+      "collisions": 0,
+      "checkpoints": [
+        {
+          "time": 5,
+          "bytes": 3495668,
+          "packedBytes": 369654,
+          "saveMs": 121.9863949999999
+        },
+        {
+          "time": 10,
+          "bytes": 3497604,
+          "packedBytes": 370682,
+          "saveMs": 127.73018500000012
+        },
+        {
+          "time": 15,
+          "bytes": 3512061,
+          "packedBytes": 376486,
+          "saveMs": 148.44763999999986
+        },
+        {
+          "time": 20,
+          "bytes": 3491434,
+          "packedBytes": 374874,
+          "saveMs": 86.59970900000008
+        },
+        {
+          "time": 25,
+          "bytes": 3447118,
+          "packedBytes": 372670,
+          "saveMs": 94.90505600000006
+        },
+        {
+          "time": 30,
+          "bytes": 3437668,
+          "packedBytes": 371574,
+          "saveMs": 125.64610299999958
+        },
+        {
+          "time": 35,
+          "bytes": 3418066,
+          "packedBytes": 370230,
+          "saveMs": 98.15341699999954
+        },
+        {
+          "time": 40,
+          "bytes": 3362755,
+          "packedBytes": 368554,
+          "saveMs": 97.71562399999948
+        },
+        {
+          "time": 45,
+          "bytes": 3305614,
+          "packedBytes": 365266,
+          "saveMs": 123.8646920000001
+        },
+        {
+          "time": 50,
+          "bytes": 3219422,
+          "packedBytes": 357046,
+          "saveMs": 73.77390300000025
+        },
+        {
+          "time": 55,
+          "bytes": 3127864,
+          "packedBytes": 348158,
+          "saveMs": 103.29153699999915
+        },
+        {
+          "time": 60,
+          "bytes": 3018284,
+          "packedBytes": 335794,
+          "saveMs": 91.28999699999986
+        }
+      ]
+    }
+  ],
+  "after": [
+    {
+      "node": "v24.19.0",
+      "seed": 7,
+      "seconds": 60,
+      "soldiers": 700,
+      "size": [
+        176,
+        128
+      ],
+      "initialSnapshotBytes": 2504563,
+      "initialSaveMs": 139.41754699999998,
+      "initialRestoreMs": 108.684122,
+      "stepP95Ms": 4.808962999999949,
+      "frameBuildAndApplyP95Ms": 18.033596000000216,
+      "maxFrameBytes": 85214,
+      "averageRawFrameBytesPerSecond": 594880.5333333333,
+      "averageEncodedBytesPerSecond": 91981.11666666667,
+      "collisions": 0,
+      "checkpoints": [
+        {
+          "time": 5,
+          "bytes": 3505389,
+          "packedBytes": 369298,
+          "saveMs": 189.86300099999994
+        },
+        {
+          "time": 10,
+          "bytes": 3505619,
+          "packedBytes": 371542,
+          "saveMs": 127.4369569999999
+        },
+        {
+          "time": 15,
+          "bytes": 3507763,
+          "packedBytes": 374574,
+          "saveMs": 112.9632889999998
+        },
+        {
+          "time": 20,
+          "bytes": 3476448,
+          "packedBytes": 371010,
+          "saveMs": 108.94840199999999
+        },
+        {
+          "time": 25,
+          "bytes": 3442550,
+          "packedBytes": 368986,
+          "saveMs": 98.83703000000014
+        },
+        {
+          "time": 30,
+          "bytes": 3434963,
+          "packedBytes": 368174,
+          "saveMs": 121.53143600000021
+        },
+        {
+          "time": 35,
+          "bytes": 3414277,
+          "packedBytes": 365990,
+          "saveMs": 99.45160000000033
+        },
+        {
+          "time": 40,
+          "bytes": 3347252,
+          "packedBytes": 361462,
+          "saveMs": 82.70480700000007
+        },
+        {
+          "time": 45,
+          "bytes": 3273798,
+          "packedBytes": 357462,
+          "saveMs": 116.00460199999998
+        },
+        {
+          "time": 50,
+          "bytes": 3172387,
+          "packedBytes": 348170,
+          "saveMs": 93.77764500000012
+        },
+        {
+          "time": 55,
+          "bytes": 3056695,
+          "packedBytes": 337962,
+          "saveMs": 78.2258469999997
+        },
+        {
+          "time": 60,
+          "bytes": 2939562,
+          "packedBytes": 326662,
+          "saveMs": 132.29255899999953
+        }
+      ]
+    },
+    {
+      "node": "v24.19.0",
+      "seed": 29,
+      "seconds": 60,
+      "soldiers": 700,
+      "size": [
+        176,
+        128
+      ],
+      "initialSnapshotBytes": 2491795,
+      "initialSaveMs": 132.700855,
+      "initialRestoreMs": 108.81999099999996,
+      "stepP95Ms": 4.933328000000074,
+      "frameBuildAndApplyP95Ms": 14.027181999999812,
+      "maxFrameBytes": 85242,
+      "averageRawFrameBytesPerSecond": 599506.45,
+      "averageEncodedBytesPerSecond": 92219.91666666667,
+      "collisions": 0,
+      "checkpoints": [
+        {
+          "time": 5,
+          "bytes": 3495397,
+          "packedBytes": 366010,
+          "saveMs": 129.5432229999999
+        },
+        {
+          "time": 10,
+          "bytes": 3494583,
+          "packedBytes": 368746,
+          "saveMs": 136.9904059999999
+        },
+        {
+          "time": 15,
+          "bytes": 3479363,
+          "packedBytes": 367534,
+          "saveMs": 115.57878399999981
+        },
+        {
+          "time": 20,
+          "bytes": 3467304,
+          "packedBytes": 369078,
+          "saveMs": 168.19621199999983
+        },
+        {
+          "time": 25,
+          "bytes": 3421113,
+          "packedBytes": 364610,
+          "saveMs": 89.3788639999998
+        },
+        {
+          "time": 30,
+          "bytes": 3416777,
+          "packedBytes": 364430,
+          "saveMs": 101.773596
+        },
+        {
+          "time": 35,
+          "bytes": 3390292,
+          "packedBytes": 359722,
+          "saveMs": 114.07319699999971
+        },
+        {
+          "time": 40,
+          "bytes": 3333424,
+          "packedBytes": 360986,
+          "saveMs": 101.67726299999958
+        },
+        {
+          "time": 45,
+          "bytes": 3266956,
+          "packedBytes": 356546,
+          "saveMs": 83.58312800000022
+        },
+        {
+          "time": 50,
+          "bytes": 3174044,
+          "packedBytes": 350518,
+          "saveMs": 114.0346840000002
+        },
+        {
+          "time": 55,
+          "bytes": 3045765,
+          "packedBytes": 335530,
+          "saveMs": 88.76062099999945
+        },
+        {
+          "time": 60,
+          "bytes": 2937581,
+          "packedBytes": 325290,
+          "saveMs": 78.21620199999961
+        }
+      ]
+    },
+    {
+      "node": "v24.19.0",
+      "seed": 73,
+      "seconds": 60,
+      "soldiers": 700,
+      "size": [
+        176,
+        128
+      ],
+      "initialSnapshotBytes": 2500423,
+      "initialSaveMs": 135.654785,
+      "initialRestoreMs": 95.70370000000003,
+      "stepP95Ms": 4.993798999999967,
+      "frameBuildAndApplyP95Ms": 17.163763000000472,
+      "maxFrameBytes": 84750,
+      "averageRawFrameBytesPerSecond": 584152.6,
+      "averageEncodedBytesPerSecond": 90231.13333333333,
+      "collisions": 0,
+      "checkpoints": [
+        {
+          "time": 5,
+          "bytes": 3474598,
+          "packedBytes": 363998,
+          "saveMs": 118.54864100000009
+        },
+        {
+          "time": 10,
+          "bytes": 3468921,
+          "packedBytes": 366070,
+          "saveMs": 148.84551599999986
+        },
+        {
+          "time": 15,
+          "bytes": 3470610,
+          "packedBytes": 369690,
+          "saveMs": 120.99626699999999
+        },
+        {
+          "time": 20,
+          "bytes": 3452425,
+          "packedBytes": 369966,
+          "saveMs": 102.97612200000003
+        },
+        {
+          "time": 25,
+          "bytes": 3406855,
+          "packedBytes": 366662,
+          "saveMs": 108.57418800000005
+        },
+        {
+          "time": 30,
+          "bytes": 3393509,
+          "packedBytes": 364222,
+          "saveMs": 122.27683200000047
+        },
+        {
+          "time": 35,
+          "bytes": 3385006,
+          "packedBytes": 364326,
+          "saveMs": 119.49798199999987
+        },
+        {
+          "time": 40,
+          "bytes": 3319840,
+          "packedBytes": 360706,
+          "saveMs": 93.20857099999921
+        },
+        {
+          "time": 45,
+          "bytes": 3258349,
+          "packedBytes": 357318,
+          "saveMs": 107.26862900000015
+        },
+        {
+          "time": 50,
+          "bytes": 3173667,
+          "packedBytes": 349546,
+          "saveMs": 92.04672500000015
+        },
+        {
+          "time": 55,
+          "bytes": 3016101,
+          "packedBytes": 332874,
+          "saveMs": 96.76140700000087
+        },
+        {
+          "time": 60,
+          "bytes": 2893144,
+          "packedBytes": 318438,
+          "saveMs": 87.53759100000025
+        }
+      ]
+    }
+  ],
+  "repeats": [
+    {
+      "repeat": 1,
+      "label": "after",
+      "node": "v24.19.0",
+      "seed": 7,
+      "seconds": 60,
+      "soldiers": 700,
+      "size": [
+        176,
+        128
+      ],
+      "initialSnapshotBytes": 2504563,
+      "initialSaveMs": 146.276899,
+      "initialRestoreMs": 109.76290699999998,
+      "stepP95Ms": 5.386153999999806,
+      "frameBuildAndApplyP95Ms": 19.620394000000488,
+      "maxFrameBytes": 85214,
+      "averageRawFrameBytesPerSecond": 594880.5333333333,
+      "averageEncodedBytesPerSecond": 91981.11666666667,
+      "collisions": 0,
+      "checkpoints": [
+        {
+          "time": 5,
+          "bytes": 3505389,
+          "packedBytes": 369298,
+          "saveMs": 149.42297099999996
+        },
+        {
+          "time": 10,
+          "bytes": 3505619,
+          "packedBytes": 371542,
+          "saveMs": 123.83956999999987
+        },
+        {
+          "time": 15,
+          "bytes": 3507763,
+          "packedBytes": 374574,
+          "saveMs": 136.4105040000004
+        },
+        {
+          "time": 20,
+          "bytes": 3476448,
+          "packedBytes": 371010,
+          "saveMs": 94.07679599999983
+        },
+        {
+          "time": 25,
+          "bytes": 3442550,
+          "packedBytes": 368986,
+          "saveMs": 88.63700500000004
+        },
+        {
+          "time": 30,
+          "bytes": 3434963,
+          "packedBytes": 368174,
+          "saveMs": 130.27328899999975
+        },
+        {
+          "time": 35,
+          "bytes": 3414277,
+          "packedBytes": 365990,
+          "saveMs": 114.32653600000049
+        },
+        {
+          "time": 40,
+          "bytes": 3347252,
+          "packedBytes": 361462,
+          "saveMs": 116.55118399999992
+        },
+        {
+          "time": 45,
+          "bytes": 3273798,
+          "packedBytes": 357462,
+          "saveMs": 107.79032000000007
+        },
+        {
+          "time": 50,
+          "bytes": 3172387,
+          "packedBytes": 348170,
+          "saveMs": 117.39608100000078
+        },
+        {
+          "time": 55,
+          "bytes": 3056695,
+          "packedBytes": 337962,
+          "saveMs": 81.66840500000035
+        },
+        {
+          "time": 60,
+          "bytes": 2939562,
+          "packedBytes": 326662,
+          "saveMs": 107.81479600000057
+        }
+      ]
+    },
+    {
+      "repeat": 1,
+      "label": "before",
+      "node": "v24.19.0",
+      "seed": 7,
+      "seconds": 60,
+      "soldiers": 700,
+      "size": [
+        176,
+        128
+      ],
+      "initialSnapshotBytes": 2527967,
+      "initialSaveMs": 130.358827,
+      "initialRestoreMs": 109.38973800000002,
+      "stepP95Ms": 4.985797000000048,
+      "frameBuildAndApplyP95Ms": 15.759688000000097,
+      "maxFrameBytes": 84582,
+      "averageRawFrameBytesPerSecond": 561266.7,
+      "averageEncodedBytesPerSecond": 87376.81666666667,
+      "collisions": 0,
+      "checkpoints": [
+        {
+          "time": 5,
+          "bytes": 3498251,
+          "packedBytes": 370130,
+          "saveMs": 120.84504700000002
+        },
+        {
+          "time": 10,
+          "bytes": 3482725,
+          "packedBytes": 372282,
+          "saveMs": 126.51256400000011
+        },
+        {
+          "time": 15,
+          "bytes": 3479724,
+          "packedBytes": 374678,
+          "saveMs": 112.01856100000032
+        },
+        {
+          "time": 20,
+          "bytes": 3470266,
+          "packedBytes": 376222,
+          "saveMs": 148.72724400000016
+        },
+        {
+          "time": 25,
+          "bytes": 3442375,
+          "packedBytes": 374870,
+          "saveMs": 87.25140599999986
+        },
+        {
+          "time": 30,
+          "bytes": 3420948,
+          "packedBytes": 371582,
+          "saveMs": 94.84247899999991
+        },
+        {
+          "time": 35,
+          "bytes": 3403095,
+          "packedBytes": 370194,
+          "saveMs": 119.33146500000021
+        },
+        {
+          "time": 40,
+          "bytes": 3338085,
+          "packedBytes": 366434,
+          "saveMs": 92.52187099999992
+        },
+        {
+          "time": 45,
+          "bytes": 3255592,
+          "packedBytes": 357698,
+          "saveMs": 90.32327900000018
+        },
+        {
+          "time": 50,
+          "bytes": 3168362,
+          "packedBytes": 350842,
+          "saveMs": 120.21437500000047
+        },
+        {
+          "time": 55,
+          "bytes": 3042972,
+          "packedBytes": 336286,
+          "saveMs": 69.56716600000073
+        },
+        {
+          "time": 60,
+          "bytes": 2933567,
+          "packedBytes": 324646,
+          "saveMs": 80.43810399999984
+        }
+      ]
+    },
+    {
+      "repeat": 1,
+      "label": "after",
+      "node": "v24.19.0",
+      "seed": 29,
+      "seconds": 60,
+      "soldiers": 700,
+      "size": [
+        176,
+        128
+      ],
+      "initialSnapshotBytes": 2491795,
+      "initialSaveMs": 151.64257999999998,
+      "initialRestoreMs": 99.32794799999999,
+      "stepP95Ms": 5.792151999999987,
+      "frameBuildAndApplyP95Ms": 20.42990800000007,
+      "maxFrameBytes": 85242,
+      "averageRawFrameBytesPerSecond": 599506.45,
+      "averageEncodedBytesPerSecond": 92219.91666666667,
+      "collisions": 0,
+      "checkpoints": [
+        {
+          "time": 5,
+          "bytes": 3495397,
+          "packedBytes": 366010,
+          "saveMs": 198.66767400000003
+        },
+        {
+          "time": 10,
+          "bytes": 3494583,
+          "packedBytes": 368746,
+          "saveMs": 113.20674200000008
+        },
+        {
+          "time": 15,
+          "bytes": 3479363,
+          "packedBytes": 367534,
+          "saveMs": 143.30004499999995
+        },
+        {
+          "time": 20,
+          "bytes": 3467304,
+          "packedBytes": 369078,
+          "saveMs": 118.92473599999994
+        },
+        {
+          "time": 25,
+          "bytes": 3421113,
+          "packedBytes": 364610,
+          "saveMs": 171.2756629999999
+        },
+        {
+          "time": 30,
+          "bytes": 3416777,
+          "packedBytes": 364430,
+          "saveMs": 92.54966199999944
+        },
+        {
+          "time": 35,
+          "bytes": 3390292,
+          "packedBytes": 359722,
+          "saveMs": 127.29114200000004
+        },
+        {
+          "time": 40,
+          "bytes": 3333424,
+          "packedBytes": 360986,
+          "saveMs": 103.73656699999992
+        },
+        {
+          "time": 45,
+          "bytes": 3266956,
+          "packedBytes": 356546,
+          "saveMs": 126.01752000000033
+        },
+        {
+          "time": 50,
+          "bytes": 3174044,
+          "packedBytes": 350518,
+          "saveMs": 107.47089599999981
+        },
+        {
+          "time": 55,
+          "bytes": 3045765,
+          "packedBytes": 335530,
+          "saveMs": 171.46215200000006
+        },
+        {
+          "time": 60,
+          "bytes": 2937581,
+          "packedBytes": 325290,
+          "saveMs": 96.37581200000022
+        }
+      ]
+    },
+    {
+      "repeat": 1,
+      "label": "before",
+      "node": "v24.19.0",
+      "seed": 29,
+      "seconds": 60,
+      "soldiers": 700,
+      "size": [
+        176,
+        128
+      ],
+      "initialSnapshotBytes": 2535916,
+      "initialSaveMs": 153.66591499999998,
+      "initialRestoreMs": 100.878717,
+      "stepP95Ms": 5.868976999999973,
+      "frameBuildAndApplyP95Ms": 22.736030000000028,
+      "maxFrameBytes": 84382,
+      "averageRawFrameBytesPerSecond": 556278.6,
+      "averageEncodedBytesPerSecond": 86451.53333333334,
+      "collisions": 0,
+      "checkpoints": [
+        {
+          "time": 5,
+          "bytes": 3499461,
+          "packedBytes": 369622,
+          "saveMs": 180.61101000000008
+        },
+        {
+          "time": 10,
+          "bytes": 3500462,
+          "packedBytes": 373746,
+          "saveMs": 128.52186800000004
+        },
+        {
+          "time": 15,
+          "bytes": 3485950,
+          "packedBytes": 372434,
+          "saveMs": 118.98396199999979
+        },
+        {
+          "time": 20,
+          "bytes": 3481356,
+          "packedBytes": 374746,
+          "saveMs": 97.5946740000004
+        },
+        {
+          "time": 25,
+          "bytes": 3446273,
+          "packedBytes": 372266,
+          "saveMs": 119.33342300000004
+        },
+        {
+          "time": 30,
+          "bytes": 3429801,
+          "packedBytes": 369614,
+          "saveMs": 126.69071299999996
+        },
+        {
+          "time": 35,
+          "bytes": 3410807,
+          "packedBytes": 366706,
+          "saveMs": 138.20641400000022
+        },
+        {
+          "time": 40,
+          "bytes": 3350320,
+          "packedBytes": 364094,
+          "saveMs": 98.05007400000068
+        },
+        {
+          "time": 45,
+          "bytes": 3276793,
+          "packedBytes": 360886,
+          "saveMs": 121.00542099999984
+        },
+        {
+          "time": 50,
+          "bytes": 3218260,
+          "packedBytes": 357586,
+          "saveMs": 122.41561700000057
+        },
+        {
+          "time": 55,
+          "bytes": 3089761,
+          "packedBytes": 342518,
+          "saveMs": 82.33612399999947
+        },
+        {
+          "time": 60,
+          "bytes": 2976754,
+          "packedBytes": 329390,
+          "saveMs": 161.52774099999988
+        }
+      ]
+    },
+    {
+      "repeat": 1,
+      "label": "after",
+      "node": "v24.19.0",
+      "seed": 73,
+      "seconds": 60,
+      "soldiers": 700,
+      "size": [
+        176,
+        128
+      ],
+      "initialSnapshotBytes": 2500423,
+      "initialSaveMs": 132.72335900000002,
+      "initialRestoreMs": 96.440339,
+      "stepP95Ms": 4.80117000000007,
+      "frameBuildAndApplyP95Ms": 13.535957000000053,
+      "maxFrameBytes": 84750,
+      "averageRawFrameBytesPerSecond": 584152.6,
+      "averageEncodedBytesPerSecond": 90231.13333333333,
+      "collisions": 0,
+      "checkpoints": [
+        {
+          "time": 5,
+          "bytes": 3474598,
+          "packedBytes": 363998,
+          "saveMs": 116.62370299999998
+        },
+        {
+          "time": 10,
+          "bytes": 3468921,
+          "packedBytes": 366070,
+          "saveMs": 131.80617900000016
+        },
+        {
+          "time": 15,
+          "bytes": 3470610,
+          "packedBytes": 369690,
+          "saveMs": 107.46452399999998
+        },
+        {
+          "time": 20,
+          "bytes": 3452425,
+          "packedBytes": 369966,
+          "saveMs": 105.2919139999999
+        },
+        {
+          "time": 25,
+          "bytes": 3406855,
+          "packedBytes": 366662,
+          "saveMs": 92.39604800000006
+        },
+        {
+          "time": 30,
+          "bytes": 3393509,
+          "packedBytes": 364222,
+          "saveMs": 90.46188100000018
+        },
+        {
+          "time": 35,
+          "bytes": 3385006,
+          "packedBytes": 364326,
+          "saveMs": 106.52288800000042
+        },
+        {
+          "time": 40,
+          "bytes": 3319840,
+          "packedBytes": 360706,
+          "saveMs": 88.62292400000024
+        },
+        {
+          "time": 45,
+          "bytes": 3258349,
+          "packedBytes": 357318,
+          "saveMs": 119.7422919999999
+        },
+        {
+          "time": 50,
+          "bytes": 3173667,
+          "packedBytes": 349546,
+          "saveMs": 106.110232
+        },
+        {
+          "time": 55,
+          "bytes": 3016101,
+          "packedBytes": 332874,
+          "saveMs": 99.75848299999961
+        },
+        {
+          "time": 60,
+          "bytes": 2893144,
+          "packedBytes": 318438,
+          "saveMs": 97.78468900000007
+        }
+      ]
+    },
+    {
+      "repeat": 1,
+      "label": "before",
+      "node": "v24.19.0",
+      "seed": 73,
+      "seconds": 60,
+      "soldiers": 700,
+      "size": [
+        176,
+        128
+      ],
+      "initialSnapshotBytes": 2537258,
+      "initialSaveMs": 126.336364,
+      "initialRestoreMs": 97.29557799999998,
+      "stepP95Ms": 4.781450999999834,
+      "frameBuildAndApplyP95Ms": 15.281594000000041,
+      "maxFrameBytes": 84322,
+      "averageRawFrameBytesPerSecond": 565926.3166666667,
+      "averageEncodedBytesPerSecond": 88173.25,
+      "collisions": 0,
+      "checkpoints": [
+        {
+          "time": 5,
+          "bytes": 3495668,
+          "packedBytes": 369654,
+          "saveMs": 190.08208600000012
+        },
+        {
+          "time": 10,
+          "bytes": 3497604,
+          "packedBytes": 370682,
+          "saveMs": 118.16327299999989
+        },
+        {
+          "time": 15,
+          "bytes": 3512061,
+          "packedBytes": 376486,
+          "saveMs": 136.1093719999999
+        },
+        {
+          "time": 20,
+          "bytes": 3491434,
+          "packedBytes": 374874,
+          "saveMs": 100.38682699999981
+        },
+        {
+          "time": 25,
+          "bytes": 3447118,
+          "packedBytes": 372670,
+          "saveMs": 104.09376400000019
+        },
+        {
+          "time": 30,
+          "bytes": 3437668,
+          "packedBytes": 371574,
+          "saveMs": 109.3187769999995
+        },
+        {
+          "time": 35,
+          "bytes": 3418066,
+          "packedBytes": 370230,
+          "saveMs": 74.60773299999983
+        },
+        {
+          "time": 40,
+          "bytes": 3362755,
+          "packedBytes": 368554,
+          "saveMs": 87.3802999999998
+        },
+        {
+          "time": 45,
+          "bytes": 3305614,
+          "packedBytes": 365266,
+          "saveMs": 122.25962600000003
+        },
+        {
+          "time": 50,
+          "bytes": 3219422,
+          "packedBytes": 357046,
+          "saveMs": 80.99653000000035
+        },
+        {
+          "time": 55,
+          "bytes": 3127864,
+          "packedBytes": 348158,
+          "saveMs": 93.08404400000018
+        },
+        {
+          "time": 60,
+          "bytes": 3018284,
+          "packedBytes": 335794,
+          "saveMs": 96.63141199999973
+        }
+      ]
+    },
+    {
+      "repeat": 2,
+      "label": "before",
+      "node": "v24.19.0",
+      "seed": 7,
+      "seconds": 60,
+      "soldiers": 700,
+      "size": [
+        176,
+        128
+      ],
+      "initialSnapshotBytes": 2527967,
+      "initialSaveMs": 144.484773,
+      "initialRestoreMs": 113.93577200000004,
+      "stepP95Ms": 4.726200000000063,
+      "frameBuildAndApplyP95Ms": 23.741329999999834,
+      "maxFrameBytes": 84582,
+      "averageRawFrameBytesPerSecond": 561266.7,
+      "averageEncodedBytesPerSecond": 87376.81666666667,
+      "collisions": 0,
+      "checkpoints": [
+        {
+          "time": 5,
+          "bytes": 3498251,
+          "packedBytes": 370130,
+          "saveMs": 171.04132099999993
+        },
+        {
+          "time": 10,
+          "bytes": 3482725,
+          "packedBytes": 372282,
+          "saveMs": 129.63684599999988
+        },
+        {
+          "time": 15,
+          "bytes": 3479724,
+          "packedBytes": 374678,
+          "saveMs": 99.1539399999997
+        },
+        {
+          "time": 20,
+          "bytes": 3470266,
+          "packedBytes": 376222,
+          "saveMs": 112.05869299999995
+        },
+        {
+          "time": 25,
+          "bytes": 3442375,
+          "packedBytes": 374870,
+          "saveMs": 86.636665
+        },
+        {
+          "time": 30,
+          "bytes": 3420948,
+          "packedBytes": 371582,
+          "saveMs": 115.11488800000006
+        },
+        {
+          "time": 35,
+          "bytes": 3403095,
+          "packedBytes": 370194,
+          "saveMs": 98.25974399999996
+        },
+        {
+          "time": 40,
+          "bytes": 3338085,
+          "packedBytes": 366434,
+          "saveMs": 127.89371000000028
+        },
+        {
+          "time": 45,
+          "bytes": 3255592,
+          "packedBytes": 357698,
+          "saveMs": 80.23218300000008
+        },
+        {
+          "time": 50,
+          "bytes": 3168362,
+          "packedBytes": 350842,
+          "saveMs": 101.21666499999992
+        },
+        {
+          "time": 55,
+          "bytes": 3042972,
+          "packedBytes": 336286,
+          "saveMs": 81.50597999999991
+        },
+        {
+          "time": 60,
+          "bytes": 2933567,
+          "packedBytes": 324646,
+          "saveMs": 119.4573819999996
+        }
+      ]
+    },
+    {
+      "repeat": 2,
+      "label": "after",
+      "node": "v24.19.0",
+      "seed": 7,
+      "seconds": 60,
+      "soldiers": 700,
+      "size": [
+        176,
+        128
+      ],
+      "initialSnapshotBytes": 2504563,
+      "initialSaveMs": 122.37149399999998,
+      "initialRestoreMs": 91.68042700000001,
+      "stepP95Ms": 5.494306000000506,
+      "frameBuildAndApplyP95Ms": 17.718963000000258,
+      "maxFrameBytes": 85214,
+      "averageRawFrameBytesPerSecond": 594880.5333333333,
+      "averageEncodedBytesPerSecond": 91981.11666666667,
+      "collisions": 0,
+      "checkpoints": [
+        {
+          "time": 5,
+          "bytes": 3505389,
+          "packedBytes": 369298,
+          "saveMs": 162.28928100000007
+        },
+        {
+          "time": 10,
+          "bytes": 3505619,
+          "packedBytes": 371542,
+          "saveMs": 130.0222000000001
+        },
+        {
+          "time": 15,
+          "bytes": 3507763,
+          "packedBytes": 374574,
+          "saveMs": 128.29141600000003
+        },
+        {
+          "time": 20,
+          "bytes": 3476448,
+          "packedBytes": 371010,
+          "saveMs": 91.39824399999998
+        },
+        {
+          "time": 25,
+          "bytes": 3442550,
+          "packedBytes": 368986,
+          "saveMs": 128.00088200000027
+        },
+        {
+          "time": 30,
+          "bytes": 3434963,
+          "packedBytes": 368174,
+          "saveMs": 78.45987299999979
+        },
+        {
+          "time": 35,
+          "bytes": 3414277,
+          "packedBytes": 365990,
+          "saveMs": 106.72259800000029
+        },
+        {
+          "time": 40,
+          "bytes": 3347252,
+          "packedBytes": 361462,
+          "saveMs": 119.41451000000052
+        },
+        {
+          "time": 45,
+          "bytes": 3273798,
+          "packedBytes": 357462,
+          "saveMs": 90.2173159999993
+        },
+        {
+          "time": 50,
+          "bytes": 3172387,
+          "packedBytes": 348170,
+          "saveMs": 85.88446400000066
+        },
+        {
+          "time": 55,
+          "bytes": 3056695,
+          "packedBytes": 337962,
+          "saveMs": 154.3618830000005
+        },
+        {
+          "time": 60,
+          "bytes": 2939562,
+          "packedBytes": 326662,
+          "saveMs": 89.51487300000008
+        }
+      ]
+    },
+    {
+      "repeat": 2,
+      "label": "before",
+      "node": "v24.19.0",
+      "seed": 29,
+      "seconds": 60,
+      "soldiers": 700,
+      "size": [
+        176,
+        128
+      ],
+      "initialSnapshotBytes": 2535916,
+      "initialSaveMs": 137.564216,
+      "initialRestoreMs": 108.29465500000003,
+      "stepP95Ms": 5.604640000000018,
+      "frameBuildAndApplyP95Ms": 17.37678199999982,
+      "maxFrameBytes": 84382,
+      "averageRawFrameBytesPerSecond": 556278.6,
+      "averageEncodedBytesPerSecond": 86451.53333333334,
+      "collisions": 0,
+      "checkpoints": [
+        {
+          "time": 5,
+          "bytes": 3499461,
+          "packedBytes": 369622,
+          "saveMs": 175.79319199999986
+        },
+        {
+          "time": 10,
+          "bytes": 3500462,
+          "packedBytes": 373746,
+          "saveMs": 113.874102
+        },
+        {
+          "time": 15,
+          "bytes": 3485950,
+          "packedBytes": 372434,
+          "saveMs": 99.1140989999999
+        },
+        {
+          "time": 20,
+          "bytes": 3481356,
+          "packedBytes": 374746,
+          "saveMs": 88.62616500000013
+        },
+        {
+          "time": 25,
+          "bytes": 3446273,
+          "packedBytes": 372266,
+          "saveMs": 129.26372900000024
+        },
+        {
+          "time": 30,
+          "bytes": 3429801,
+          "packedBytes": 369614,
+          "saveMs": 111.9740899999997
+        },
+        {
+          "time": 35,
+          "bytes": 3410807,
+          "packedBytes": 366706,
+          "saveMs": 110.9495509999997
+        },
+        {
+          "time": 40,
+          "bytes": 3350320,
+          "packedBytes": 364094,
+          "saveMs": 149.0789789999999
+        },
+        {
+          "time": 45,
+          "bytes": 3276793,
+          "packedBytes": 360886,
+          "saveMs": 100.7719989999996
+        },
+        {
+          "time": 50,
+          "bytes": 3218260,
+          "packedBytes": 357586,
+          "saveMs": 118.01649499999985
+        },
+        {
+          "time": 55,
+          "bytes": 3089761,
+          "packedBytes": 342518,
+          "saveMs": 76.03146800000013
+        },
+        {
+          "time": 60,
+          "bytes": 2976754,
+          "packedBytes": 329390,
+          "saveMs": 69.55029800000011
+        }
+      ]
+    },
+    {
+      "repeat": 2,
+      "label": "after",
+      "node": "v24.19.0",
+      "seed": 29,
+      "seconds": 60,
+      "soldiers": 700,
+      "size": [
+        176,
+        128
+      ],
+      "initialSnapshotBytes": 2491795,
+      "initialSaveMs": 113.030813,
+      "initialRestoreMs": 91.476426,
+      "stepP95Ms": 4.746570000000247,
+      "frameBuildAndApplyP95Ms": 18.539308999999776,
+      "maxFrameBytes": 85242,
+      "averageRawFrameBytesPerSecond": 599506.45,
+      "averageEncodedBytesPerSecond": 92219.91666666667,
+      "collisions": 0,
+      "checkpoints": [
+        {
+          "time": 5,
+          "bytes": 3495397,
+          "packedBytes": 366010,
+          "saveMs": 171.87296300000003
+        },
+        {
+          "time": 10,
+          "bytes": 3494583,
+          "packedBytes": 368746,
+          "saveMs": 125.86385499999983
+        },
+        {
+          "time": 15,
+          "bytes": 3479363,
+          "packedBytes": 367534,
+          "saveMs": 89.75363199999993
+        },
+        {
+          "time": 20,
+          "bytes": 3467304,
+          "packedBytes": 369078,
+          "saveMs": 109.4644830000002
+        },
+        {
+          "time": 25,
+          "bytes": 3421113,
+          "packedBytes": 364610,
+          "saveMs": 127.38439599999992
+        },
+        {
+          "time": 30,
+          "bytes": 3416777,
+          "packedBytes": 364430,
+          "saveMs": 86.30938900000001
+        },
+        {
+          "time": 35,
+          "bytes": 3390292,
+          "packedBytes": 359722,
+          "saveMs": 127.2389549999998
+        },
+        {
+          "time": 40,
+          "bytes": 3333424,
+          "packedBytes": 360986,
+          "saveMs": 100.17124299999978
+        },
+        {
+          "time": 45,
+          "bytes": 3266956,
+          "packedBytes": 356546,
+          "saveMs": 89.889005
+        },
+        {
+          "time": 50,
+          "bytes": 3174044,
+          "packedBytes": 350518,
+          "saveMs": 145.14388899999994
+        },
+        {
+          "time": 55,
+          "bytes": 3045765,
+          "packedBytes": 335530,
+          "saveMs": 78.32909800000016
+        },
+        {
+          "time": 60,
+          "bytes": 2937581,
+          "packedBytes": 325290,
+          "saveMs": 109.08842800000002
+        }
+      ]
+    },
+    {
+      "repeat": 2,
+      "label": "before",
+      "node": "v24.19.0",
+      "seed": 73,
+      "seconds": 60,
+      "soldiers": 700,
+      "size": [
+        176,
+        128
+      ],
+      "initialSnapshotBytes": 2537258,
+      "initialSaveMs": 147.32397500000002,
+      "initialRestoreMs": 105.67437899999999,
+      "stepP95Ms": 4.944004999999947,
+      "frameBuildAndApplyP95Ms": 13.697427000000062,
+      "maxFrameBytes": 84322,
+      "averageRawFrameBytesPerSecond": 565926.3166666667,
+      "averageEncodedBytesPerSecond": 88173.25,
+      "collisions": 0,
+      "checkpoints": [
+        {
+          "time": 5,
+          "bytes": 3495668,
+          "packedBytes": 369654,
+          "saveMs": 164.56287099999986
+        },
+        {
+          "time": 10,
+          "bytes": 3497604,
+          "packedBytes": 370682,
+          "saveMs": 135.56080700000007
+        },
+        {
+          "time": 15,
+          "bytes": 3512061,
+          "packedBytes": 376486,
+          "saveMs": 123.64991800000007
+        },
+        {
+          "time": 20,
+          "bytes": 3491434,
+          "packedBytes": 374874,
+          "saveMs": 119.67664800000011
+        },
+        {
+          "time": 25,
+          "bytes": 3447118,
+          "packedBytes": 372670,
+          "saveMs": 107.79330600000003
+        },
+        {
+          "time": 30,
+          "bytes": 3437668,
+          "packedBytes": 371574,
+          "saveMs": 108.96738899999946
+        },
+        {
+          "time": 35,
+          "bytes": 3418066,
+          "packedBytes": 370230,
+          "saveMs": 78.57475599999998
+        },
+        {
+          "time": 40,
+          "bytes": 3362755,
+          "packedBytes": 368554,
+          "saveMs": 102.78425499999958
+        },
+        {
+          "time": 45,
+          "bytes": 3305614,
+          "packedBytes": 365266,
+          "saveMs": 113.04742299999998
+        },
+        {
+          "time": 50,
+          "bytes": 3219422,
+          "packedBytes": 357046,
+          "saveMs": 86.90316600000006
+        },
+        {
+          "time": 55,
+          "bytes": 3127864,
+          "packedBytes": 348158,
+          "saveMs": 91.12840499999947
+        },
+        {
+          "time": 60,
+          "bytes": 3018284,
+          "packedBytes": 335794,
+          "saveMs": 142.90474600000016
+        }
+      ]
+    },
+    {
+      "repeat": 2,
+      "label": "after",
+      "node": "v24.19.0",
+      "seed": 73,
+      "seconds": 60,
+      "soldiers": 700,
+      "size": [
+        176,
+        128
+      ],
+      "initialSnapshotBytes": 2500423,
+      "initialSaveMs": 154.244102,
+      "initialRestoreMs": 97.31363299999998,
+      "stepP95Ms": 4.995871000000079,
+      "frameBuildAndApplyP95Ms": 20.656380999999783,
+      "maxFrameBytes": 84750,
+      "averageRawFrameBytesPerSecond": 584152.6,
+      "averageEncodedBytesPerSecond": 90231.13333333333,
+      "collisions": 0,
+      "checkpoints": [
+        {
+          "time": 5,
+          "bytes": 3474598,
+          "packedBytes": 363998,
+          "saveMs": 160.36088899999982
+        },
+        {
+          "time": 10,
+          "bytes": 3468921,
+          "packedBytes": 366070,
+          "saveMs": 144.55482100000017
+        },
+        {
+          "time": 15,
+          "bytes": 3470610,
+          "packedBytes": 369690,
+          "saveMs": 121.89197299999978
+        },
+        {
+          "time": 20,
+          "bytes": 3452425,
+          "packedBytes": 369966,
+          "saveMs": 138.9954819999998
+        },
+        {
+          "time": 25,
+          "bytes": 3406855,
+          "packedBytes": 366662,
+          "saveMs": 95.58179300000029
+        },
+        {
+          "time": 30,
+          "bytes": 3393509,
+          "packedBytes": 364222,
+          "saveMs": 145.58853499999987
+        },
+        {
+          "time": 35,
+          "bytes": 3385006,
+          "packedBytes": 364326,
+          "saveMs": 88.07987200000025
+        },
+        {
+          "time": 40,
+          "bytes": 3319840,
+          "packedBytes": 360706,
+          "saveMs": 109.51904300000024
+        },
+        {
+          "time": 45,
+          "bytes": 3258349,
+          "packedBytes": 357318,
+          "saveMs": 102.7866469999999
+        },
+        {
+          "time": 50,
+          "bytes": 3173667,
+          "packedBytes": 349546,
+          "saveMs": 135.78741499999978
+        },
+        {
+          "time": 55,
+          "bytes": 3016101,
+          "packedBytes": 332874,
+          "saveMs": 77.72246200000063
+        },
+        {
+          "time": 60,
+          "bytes": 2893144,
+          "packedBytes": 318438,
+          "saveMs": 68.37980900000002
+        }
+      ]
+    }
+  ]
+}

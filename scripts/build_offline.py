@@ -8,6 +8,7 @@ for folder in ['src','assets']:
 # Original terrain layers and optional decorations live in GitHub; gameplay
 # only needs the packed atlas, so do not prefetch the same artwork twice.
 paths=[p for p in paths if not (p.is_relative_to(ROOT/'assets/world/terrain') and p.parent.name in {'surface','wall_x','wall_y','decorations'})]
+paths=[p for p in paths if not p.is_relative_to(ROOT/'assets/world/autumn/source') and p.name!='source-manifest.json']
 paths=sorted(paths);template=(ROOT/'scripts/service-worker.template.js').read_text();digest=hashlib.sha256(template.encode())
 for p in paths:digest.update(p.relative_to(ROOT).as_posix().encode()+b'\0'+p.read_bytes())
 urls=['./']+['./'+p.relative_to(ROOT).as_posix() for p in paths]

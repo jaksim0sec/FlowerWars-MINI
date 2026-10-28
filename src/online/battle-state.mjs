@@ -41,6 +41,9 @@ function durable(state){
  for(const u of b.units){projections.set(u,select(u,UNIT_FIELDS));if(u.character)projections.set(u.character,select(u.character,CHARACTER_FIELDS));}
  for(const g of registry.groups.values())projections.set(g,select(g,GROUP_FIELDS));
  for(const s of registry.squads.values()){projections.set(s,select(s,SQUAD_FIELDS));if(s.order)projections.set(s.order,select(s.order,ORDER_FIELDS));}
+ // Shared route planners contain runtime A* heaps. Rebuild only that transient
+ // search after recovery, retaining route/command/formation aliases and paths.
+ for(const route of [...b.units.map(u=>u.squadRoute),...[...registry.squads.values()].map(s=>s.order?.marchRoute)])if(route&&!projections.has(route))projections.set(route,{...route,planner:null});
  const root={board:select(b,BOARD_FIELDS),match:select(m,MATCH_FIELDS),units:b.units,registry,cooperations:b.navigation.cooperations,navigation:{cursor:b.navigation.cursor,remaining:b.navigation.remaining}};
  for(const chain of b.navigation.cooperations)if(chain.remote?.order&&!projections.has(chain.remote.order))projections.set(chain.remote.order,select(chain.remote.order,ORDER_FIELDS));
  const graph=encodeStateGraph(root,projections);assertDurable(decodeStateGraph(graph));return {graph};
