@@ -33,3 +33,17 @@ test('trusted checkpoint writes skip redundant validation but restore still chec
   const tampered={...snapshot,hash:'0'.repeat(64)};await assert.rejects(()=>backup.put('ABCDEF',tampered),/INVALID_SNAPSHOT/);
  }finally{await backup.close();}
 });
+
+test('IndexedDB stores a compact payload rather than a copied snapshot graph, while retaining recovery integrity',async()=>{
+ const backup=new SnapshotBackup({indexedDB,name:'online-compact-'+Math.random()}),snapshot=await saveMatchState(createFixture('stored'),3);
+ try{
+  await backup.put('ABCDEF',snapshot);
+  const db=await backup.open();
+  const raw=await new Promise((resolve,reject)=>{const req=db.transaction('snapshots').objectStore('snapshots').get('ABCDEF:stored:3');req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);});
+  assert.ok(raw.payload);
+  assert.equal(Object.hasOwn(raw,'snapshot'),false,'no live state graph may be cloned into IndexedDB');
+  const restored=await backup.get('ABCDEF','stored',{sequence:3,hash:snapshot.hash});
+  assert.equal(restored.hash,snapshot.hash);
+  assert.equal(restored.sequence,3);
+ }finally{await backup.close();}
+});
