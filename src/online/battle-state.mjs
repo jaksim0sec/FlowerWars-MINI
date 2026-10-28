@@ -35,6 +35,25 @@ export function stepBattle(state,dt){
  if(!state?.board||!Number.isFinite(dt)||dt<=0)return;
  while(dt>1e-9){const slice=Math.min(dt,.05);state.board.update(slice);state.board.match.update(slice);updateSquadOrders(state.board);dt-=slice;}
 }
+// Produce a self-contained data-only graph while the host is at one tick.
+// The Worker can then encode, validate, hash and size-check without live state.
+function cloneProjected(value,projections,seen=new Map()){
+ if(value===null||typeof value!=='object')return value;
+ if(seen.has(value))return seen.get(value);
+ const projected=projections.get(value)||value;let copy;
+ if(Array.isArray(projected))copy=[];
+ else if(projected instanceof Map)copy=new Map();
+ else if(projected instanceof Set)copy=new Set();
+ else if(ArrayBuffer.isView(projected))copy=new projected.constructor(projected);
+ else if(Object.getPrototypeOf(projected)===Object.prototype||Object.getPrototypeOf(projected)===null)copy={};
+ else fail();
+ seen.set(value,copy);
+ if(Array.isArray(projected)){for(const item of projected)copy.push(cloneProjected(item,projections,seen));}
+ else if(projected instanceof Map){for(const[k,v]of projected)copy.set(cloneProjected(k,projections,seen),cloneProjected(v,projections,seen));for(const[k,v]of Object.entries(projected))copy[k]=cloneProjected(v,projections,seen);}
+ else if(projected instanceof Set){for(const item of projected)copy.add(cloneProjected(item,projections,seen));}
+ else if(!ArrayBuffer.isView(projected)){for(const[k,v]of Object.entries(projected))copy[k]=cloneProjected(v,projections,seen);}
+ return copy;
+}
 function durable(state){
  const b=state.board,m=b?.match;if(!(b instanceof Board)||!(m instanceof FlagMatch)||!m.multiplayer||b.navigation.collecting)fail();
  const registry=exportGroupRegistry(b),projections=new Map();
@@ -43,7 +62,7 @@ function durable(state){
  for(const s of registry.squads.values()){projections.set(s,select(s,SQUAD_FIELDS));if(s.order)projections.set(s.order,select(s.order,ORDER_FIELDS));}
  const root={board:select(b,BOARD_FIELDS),match:select(m,MATCH_FIELDS),units:b.units,registry,cooperations:b.navigation.cooperations,navigation:{cursor:b.navigation.cursor,remaining:b.navigation.remaining}};
  for(const chain of b.navigation.cooperations)if(chain.remote?.order&&!projections.has(chain.remote.order))projections.set(chain.remote.order,select(chain.remote.order,ORDER_FIELDS));
- const graph=encodeStateGraph(root,projections);return {graph};
+ return {source:cloneProjected(root,projections)};
 }
 function assertDurable(root){
  if(!exact(root,['board','match','units','registry','cooperations','navigation']))fail();
@@ -83,9 +102,10 @@ export function captureBattleState(state,sequence){
  return {version:VERSION,adapter:ADAPTER,matchId:state.matchId,sequence,state:data};
 }
 export async function sealBattleState(draft){
- if(!exact(draft,['version','adapter','matchId','sequence','state'])||draft.version!==VERSION||draft.adapter!==ADAPTER||!identifier(draft.matchId)||!integer(draft.sequence)||!exact(draft.state,['graph']))fail();
- try{assertDurable(decodeStateGraph(draft.state.graph));}catch(cause){throw new Error('INVALID_STATE',{cause});}
- const snapshot={...draft};snapshot.hash=await digest(snapshot);
+ if(!exact(draft,['version','adapter','matchId','sequence','state'])||draft.version!==VERSION||draft.adapter!==ADAPTER||!identifier(draft.matchId)||!integer(draft.sequence)||!exact(draft.state,['source']))fail();
+ let graph;try{graph=encodeStateGraph(draft.state.source);assertDurable(decodeStateGraph(graph));}catch(cause){throw new Error('INVALID_STATE',{cause});}
+ const snapshot={version:VERSION,adapter:ADAPTER,matchId:draft.matchId,sequence:draft.sequence,state:{graph}};
+ snapshot.hash=await digest(snapshot);
  if(new TextEncoder().encode(JSON.stringify(snapshot)).length>MAX_BATTLE_SNAPSHOT_BYTES)fail();
  return snapshot;
 }
