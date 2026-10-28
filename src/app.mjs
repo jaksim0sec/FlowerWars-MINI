@@ -1,4 +1,5 @@
 import {pauseSinglePlayer,onlineContext,registerBattleView,playerTeam} from './online/game-gate.mjs';
+import {createOnlinePerfHud} from './online/perf-hud.mjs';
 import {commanderPortrait} from './commander-portrait.mjs';
 import {squadTapIntent} from './gesture-commands.mjs';
 import {terrainNames} from './battlefield-terrain.mjs';
@@ -758,7 +759,9 @@ loadArtwork().then(loaded => {
   text('loading', error.message); notify('에셋을 확인해주세요. 원본 이미지가 필요합니다.');
 });
 
+const onlinePerfHud=createOnlinePerfHud({getSession:()=>onlineContext.session,getUnits:()=>board.units.length,enabled:new URLSearchParams(location.search).get('perf')==='1'});
 function frame(now) {
+  onlinePerfHud.frame(now);
   const wallDt=lastFrame?Math.max(0,(now-lastFrame)/1000):0;
   const dt = lastFrame ? Math.min((now - lastFrame) / 1000, .05) : 0;
   lastFrame = now;
@@ -788,7 +791,7 @@ function frame(now) {
     })||board.effects.some(e=>{const p=project(e.x,e.y);return onScreen(p.x,p.y-54,50,camera,width,height);});
     if((dirty||board.match?.phase!=='finished'&&(active||visibleCount>0))&&(now-lastDraw>=1000/(board.match?30:60)-1)){
       const s=onlineContext.session,guestAgeMs=s?.identity?.role==='guest'&&s.state?.board===board&&s.room?.state==='PLAYING'&&Number.isFinite(s.guestFrameAt)?now-s.guestFrameAt:null;
-      const result=render(ctx,art,board,view,camera,width,height,dpr,{cameraMoving,guestAgeMs});visibleCount=result.visibleUnits;lastDraw=now;dirty=false;if(!cameraMoving)cameraSettled=true;
+      const drawStarted=performance.now(),result=render(ctx,art,board,view,camera,width,height,dpr,{cameraMoving,guestAgeMs});onlinePerfHud.draw(performance.now()-drawStarted);visibleCount=result.visibleUnits;lastDraw=now;dirty=false;if(!cameraMoving)cameraSettled=true;
     }
   }
   requestAnimationFrame(frame);
