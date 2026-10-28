@@ -5,7 +5,7 @@ on:
       - fix/online-stutter-presentation-20261028
   workflow_dispatch:
 jobs:
-  node-tests:
+  online-tests:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -15,4 +15,36 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
-      - run: npm test
+      - run: npm run test:online
+  baseline-parity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Compare complete test failures with main
+        shell: bash
+        run: |
+          set +e
+          npm test > /tmp/candidate.log 2>&1
+          candidate_code=$?
+          git fetch --no-tags --depth=1 origin main
+          git checkout --detach FETCH_HEAD
+          npm test > /tmp/baseline.log 2>&1
+          baseline_code=$?
+          set -e
+          grep '^not ok [0-9]' /tmp/candidate.log | sed -E 's/^not ok [0-9]+ - //' | sort > /tmp/candidate-fails || true
+          grep '^not ok [0-9]' /tmp/baseline.log | sed -E 's/^not ok [0-9]+ - //' | sort > /tmp/baseline-fails || true
+          echo "Candidate exit=$candidate_code failures=$(wc -l < /tmp/candidate-fails)"
+          echo "Baseline exit=$baseline_code failures=$(wc -l < /tmp/baseline-fails)"
+          echo "New regressions compared to main:"
+          comm -23 /tmp/candidate-fails /tmp/baseline-fails | tee /tmp/new-fails
+          if test -s /tmp/new-fails; then
+            tail -n 20 /tmp/candidate.log
+            exit 1
+          fi
+          echo "No new test failures compared to main"
