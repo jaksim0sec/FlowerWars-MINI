@@ -1,5 +1,6 @@
+import {inviteCode} from './invite.mjs';
 // Shared small bridge; network code never reaches into the app's DOM or camera.
-let onlineActive=false,view;
+let onlineActive=Boolean(inviteCode(globalThis.location?.href)),view;
 let resolveView;const ready=new Promise(resolve=>{resolveView=resolve;});
 export const setOnlineActive=value=>{onlineActive=Boolean(value);};
 export const pauseSinglePlayer=()=>onlineActive;

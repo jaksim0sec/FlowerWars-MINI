@@ -24,11 +24,11 @@
   <button id="online-entry" type="button" aria-controls="online-panel" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="7" r="3"/><circle cx="18" cy="17" r="3"/><path d="M6 10v5a2 2 0 0 0 2 2h7M9 7h7a2 2 0 0 1 2 2v5"/></svg><span>온라인</span></button>
   <section id="online-panel" role="dialog" aria-labelledby="online-title" hidden>
     <header><div class="online-heading"><span class="online-eyebrow">FLOWERWARS</span><strong id="online-title">함께하는 전장</strong></div><button id="online-close" type="button" aria-label="온라인 창 접기">×</button></header>
-    <p class="online-scope">친구를 초대하고, 나만의 군대를 지휘하세요.</p>
+    <p id="online-scope" class="online-scope">친구를 초대하고, 나만의 군대를 지휘하세요.</p>
     <p id="online-error" role="status" hidden></p>
     <div id="online-connect">
       <button id="online-create" type="button" class="online-primary"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>새 전장 만들기</span><small>1 대 1 · 친구 초대</small></button>
-      <button id="online-cancel-recovery" type="button" hidden>복구 취소 · 싱글 플레이</button>
+      <button id="online-cancel-recovery" type="button" hidden>온라인 취소 · 싱글 플레이</button>
       <form id="online-join"><label for="online-code-input">초대받으셨나요?</label><div><input id="online-code-input" name="code" placeholder="6자리 코드" maxlength="6" pattern="[A-Za-z]{6}" autocomplete="off" autocapitalize="characters" spellcheck="false" required><button type="submit">참가</button></div></form>
     </div>
     <div id="online-room" hidden>

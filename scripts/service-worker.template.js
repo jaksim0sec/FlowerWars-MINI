@@ -4,7 +4,9 @@ const ASSETS=__ASSETS__;
 const PATHS=new Set(ASSETS.map(path=>new URL(path,self.registration.scope).pathname));
 self.addEventListener('install',event=>{
   // All required files must succeed before this version becomes available.
-  event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)));
+  // Keep open tabs from indefinitely pinning obsolete invite/bootstrap code.
+  // Existing simulations keep their loaded modules; navigation gets the complete new bundle.
+  event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting()));
 });
 self.addEventListener('activate',event=>{
   event.waitUntil((async()=>{

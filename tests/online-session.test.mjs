@@ -18,3 +18,12 @@ test('ending a room during asynchronous snapshot digest cannot revive state or s
  try{s.identity={role:'host',clientId:'a',roomCode:'ABCDEF'};s.room={epoch:1,roomCode:'ABCDEF',matchId:'old',checkpoint:{sequence:1,hash:snapshot.hash}};s.peer={channel:{readyState:'open'},close(){}};s.backup.get=async()=>snapshot;s.backup.clearRoom=async()=>{};s.rpc=async()=>{rpcCount++;};crypto.subtle.digest=async(...args)=>{entered();await gate;return original.apply(crypto.subtle,args);};const restoring=s.ensureSync();await waiting;s.ended('ROOM_FINISHED');release();await restoring;assert.equal(s.state,null);assert.equal(s.appliedEpoch,-1);assert.equal(rpcCount,0);}finally{crypto.subtle.digest=original;s.dispose();}
 });
 test('a late match-start acknowledgement cannot recreate fixture state after leaving',async()=>{const s=new OnlineSession();let release;try{s.identity={clientId:'host',roomCode:'ABCDEF',role:'host'};s.room={roomCode:'ABCDEF'};s.peer={close(){}};s.backup.clearRoom=async()=>{};s.rpc=()=>new Promise(r=>release=r);const starting=s.start();s.ended('ROOM_FINISHED');release({room:{matchId:'orphan'}});await starting;assert.equal(s.state,null);}finally{s.dispose();}});
+
+test('joining or creating suspends the single-player bot before network connection, including failure',async()=>{
+ const {pauseSinglePlayer}=await import('../src/online/game-gate.mjs');
+ for(const method of ['create','join']){const s=new OnlineSession();try{s.connect=async()=>{assert.equal(pauseSinglePlayer(),true,'bot must stop before awaiting network');throw new Error('SERVER_UNAVAILABLE');};await assert.rejects(s[method]('ABCDEF'),/SERVER_UNAVAILABLE/);assert.equal(pauseSinglePlayer(),true,'failed invite must not silently start a bot match');s.cancelRecovery();assert.equal(pauseSinglePlayer(),false);}finally{s.dispose();}}
+});
+
+test('cancelling while connecting cannot join a room after the connection finally succeeds',async()=>{
+ const s=new OnlineSession();let release;try{s.connect=()=>new Promise(r=>release=r);s.authenticate=()=>assert.fail('cancelled invite must not authenticate');const joining=s.join('ABCDEF');s.cancelRecovery();release();await joining;assert.equal(s.room,null);}finally{s.dispose();}
+});
