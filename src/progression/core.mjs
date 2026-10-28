@@ -67,6 +67,7 @@ function save(next){
   if(typeof window!=='undefined')window.dispatchEvent(new Event('flowerwars:campaign-changed'));
 }
 function action(fn){
+  if(activeBattle)return {ok:false,reason:'전투 중에는 야영지 설정을 변경할 수 없어.'};
   const next=structuredClone(profile),result=fn(next);
   if(!result?.ok)return result||{ok:false,reason:'요청을 처리할 수 없어요.'};
   save(next);return result;
@@ -194,7 +195,8 @@ export function finishBattle({winner='draw',alive=0,flagRatio=0,types=[]}={}){
   next.acorns+=acorns;next.materials+=materials;next.battles++;
   if(won)next.wins++;
   for(const type of unique){next.squads[type].battles++;if(won)next.squads[type].wins++;}
-  const grant=(id)=>{if(!next.quests.includes(id)){next.quests.push(id);next.acorns+=QUESTS[id].reward;}};
+  let questAcorns=0;
+  const grant=(id)=>{if(!next.quests.includes(id)){next.quests.push(id);next.acorns+=QUESTS[id].reward;questAcorns+=QUESTS[id].reward;}};
   if(won){grant('first');if(flagRatio>=.7)grant('flag');if(unique.length>=3)grant('diverse');}
   if(won&&flagRatio>0&&flagRatio<=.25&&!next.medals.includes('최후의 잎'))next.medals.push('최후의 잎');
   if(won&&alive<=12&&alive>0&&!next.medals.includes('생환 훈장'))next.medals.push('생환 훈장');
@@ -202,6 +204,6 @@ export function finishBattle({winner='draw',alive=0,flagRatio=0,types=[]}={}){
   if(won&&stage===3){complete=true;next.acorns+=90;next.chests+=2;next.expedition=null;if(!next.medals.includes('원정 완수'))next.medals.push('원정 완수');}
   else if(won){next.expedition={stage:stage+1,supply:Math.min(500,next.expedition.supply+45),boost:null};next.chests++;}
   else{next.expedition=null;}
-  next.lastReport={outcome:won?'victory':winner==='draw'?'draw':'defeat',acorns:acorns+(complete?90:0),materials,stage,complete};
+  next.lastReport={outcome:won?'victory':winner==='draw'?'draw':'defeat',acorns:acorns+questAcorns+(complete?90:0),materials,stage,complete};
   save(next);return next.lastReport;
 }
