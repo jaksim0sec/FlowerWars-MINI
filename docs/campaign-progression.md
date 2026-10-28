@@ -27,6 +27,7 @@ A normal practice/debug match is unchanged (350 units per side). Online battle n
 - Each winning stage before the final grants 45 expedition supplies and 1 chest. Clearing stage 3 grants an additional 90 acorns, 2 chests and a medal.
 - Expedition-only supplies can be spent once per upcoming battle: attack +7%, or health +8%, at a cost of 35 supplies.
 - Quest rewards: first victory (+40 acorns), high flag health (+45), or deploy 3 distinct squad types (+40).
+- Stage-specific repeatable bonus goal: stage 1 keep flag at 70%+ (+20 acorns); stage 2 deploy 3 different unit types (+1 chest); stage 3 finish with 40+ survivors (+2 materials). These do not change the main flag-siege win condition.
 
 ## Code ownership
 
