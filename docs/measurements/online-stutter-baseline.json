@@ -1,0 +1,66 @@
+[
+  {
+    "role": "host",
+    "soldiers": 700,
+    "elapsed": 26.324499999195528,
+    "rafSamples": 1148,
+    "rafP95": 16.799999999999272,
+    "rafMax": 250,
+    "paintP95": 3.2999999821186066,
+    "paintMax": 10.599999994039536,
+    "stepP95": 6.0999999940395355,
+    "positionSamples": 1148,
+    "positionChanges": 384,
+    "frameCount": 0,
+    "frameGapP50": 0,
+    "frameGapP95": 0,
+    "frameGapMax": 0,
+    "receiveP95": 0,
+    "longTasks": [
+      {
+        "at": 13176.299999982119,
+        "duration": 256
+      },
+      {
+        "at": 19232.90000000596,
+        "duration": 239
+      },
+      {
+        "at": 25076.29999998212,
+        "duration": 232
+      }
+    ]
+  },
+  {
+    "role": "guest",
+    "soldiers": 700,
+    "elapsed": 26.282899999201486,
+    "rafSamples": 1168,
+    "rafP95": 16.700000000000728,
+    "rafMax": 249.90000000000146,
+    "paintP95": 3.5,
+    "paintMax": 13.699999988079071,
+    "stepP95": 0,
+    "positionSamples": 1162,
+    "positionChanges": 102,
+    "frameCount": 104,
+    "frameGapP50": 197.5,
+    "frameGapP95": 327.59999999403954,
+    "frameGapMax": 410.40000000596046,
+    "receiveP95": 7.9000000059604645,
+    "longTasks": [
+      {
+        "at": 13184.09999999404,
+        "duration": 258
+      },
+      {
+        "at": 19066.79999998212,
+        "duration": 218
+      },
+      {
+        "at": 24967.399999976158,
+        "duration": 206
+      }
+    ]
+  }
+]

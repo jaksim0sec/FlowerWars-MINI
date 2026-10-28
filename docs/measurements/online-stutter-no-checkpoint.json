@@ -1,0 +1,60 @@
+[
+  {
+    "role": "host",
+    "soldiers": 700,
+    "elapsed": 27.679300000816767,
+    "rafSamples": 1201,
+    "rafP95": 16.799999999999272,
+    "rafMax": 16.80000000000291,
+    "paintP95": 3.300000011920929,
+    "paintMax": 10.400000005960464,
+    "stepP95": 6.5,
+    "positionSamples": 1201,
+    "positionChanges": 401,
+    "frameCount": 0,
+    "frameGapP50": 0,
+    "frameGapP95": 0,
+    "frameGapMax": 0,
+    "receiveP95": 0,
+    "checkpoints": [
+      {
+        "at": 17264.69999998808,
+        "sync": 0.09999999403953552,
+        "ms": 0.09999999403953552
+      },
+      {
+        "at": 22303,
+        "sync": 0,
+        "ms": 0
+      },
+      {
+        "at": 27359.19999998808,
+        "sync": 0,
+        "ms": 0.09999999403953552
+      }
+    ],
+    "checkpointReceives": [],
+    "longTasks": []
+  },
+  {
+    "role": "guest",
+    "soldiers": 700,
+    "elapsed": 27.540400000810806,
+    "rafSamples": 1201,
+    "rafP95": 16.700000000000728,
+    "rafMax": 16.80000000000291,
+    "paintP95": 3.4000000059604645,
+    "paintMax": 7.199999988079071,
+    "stepP95": 0,
+    "positionSamples": 1192,
+    "positionChanges": 102,
+    "frameCount": 102,
+    "frameGapP50": 199,
+    "frameGapP95": 209.59999999403954,
+    "frameGapMax": 231,
+    "receiveP95": 5,
+    "checkpoints": [],
+    "checkpointReceives": [],
+    "longTasks": []
+  }
+]
