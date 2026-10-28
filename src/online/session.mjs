@@ -7,7 +7,7 @@ import {createBattleState,stepBattle} from './battle-state.mjs';
 import {applyBattleCommand} from './battle-commands.mjs';
 import {BattleFrames,applyBattleFrame} from './battle-wire.mjs';
 import {unpackMessage} from './wire-codec.mjs';
-import {packOffThread,validateOffThread,unpackOffThread,sealOffThread} from './checkpoint-processor.mjs';
+import {packOffThread,validateOffThread,unpackOffThread,sealOffThread,sealPackedOffThread,decodeCheckpointEnvelopeOffThread} from './checkpoint-processor.mjs';
 import {captureBattleState} from './battle-state.mjs';
 
 let socketScript;
@@ -68,7 +68,15 @@ export class OnlineSession extends EventTarget {
   }finally{if(this.syncJob===job)this.syncingEpoch=null;this.changed();}
  }
  async receive(message,epoch,background=false,packed=null){if(!this.room||!this.identity||this.room.epoch!==epoch)return;const identity=this.identity,code=this.room.roomCode,matchId=this.room.matchId,current=()=>this.identity===identity&&this.room?.epoch===epoch&&this.room?.roomCode===code&&this.room?.matchId===matchId;
-  if(message.kind==='compressed'){const decoded=message.byteLength>65536?await unpackOffThread(message):await unpackMessage(message);if(current())await this.receive(decoded,epoch,background,message);return;}
+  if(message.kind==='compressed'){
+   const processed=await decodeCheckpointEnvelopeOffThread(message);if(!current())return;
+   if(processed.kind==='verified-checkpoint'){
+    if(this.identity.role!=='guest'||processed.metadata.matchId!==matchId)throw new Error('INVALID_SNAPSHOT');
+    await this.backup.putPacked(code,processed.metadata,message);
+    if(current())await this.rpc('snapshot:stored',processed.metadata);return;
+   }
+   await this.receive(processed.value,epoch,background,message);return;
+  }
   if(!background&&message.kind==='checkpoint'&&!message.final&&this.identity.role==='guest'&&this.room.state==='PLAYING'){
    this.backgroundCheckpoints=this.backgroundCheckpoints.then(()=>this.receive(message,epoch,true,packed)).catch(e=>{if(current()){this.error(e.message);this.peer?.fail('RECOVERY_FAILED');}});
    return;
@@ -97,11 +105,21 @@ export class OnlineSession extends EventTarget {
  async sendPayload(value,bulk=false,packed=null){const peer=this.peer,epoch=this.room?.epoch,packet=packed??(this.peerCompression?await packOffThread(value):value),deadline=performance.now()+30000;const current=()=>this.peer===peer&&this.room?.epoch===epoch&&!peer?.closed;if(!current())return false;if(peer.send(packet))return true;if(!bulk)return false;while(peer.outgoing&&current()&&performance.now()<deadline)await new Promise(resolve=>setTimeout(resolve,10));if(!current())return false;return peer.sendLarge(packet);}
  async checkpoint(){if(this.publishing||!this.state||this.peer?.channel?.readyState!=='open')return;this.publishing=true;const epoch=this.room.epoch,code=this.room.roomCode,peer=this.peer,job=this.checkpointJob=Symbol(),current=()=>this.peer===peer&&this.room?.epoch===epoch&&this.room?.roomCode===code;try{
    const final=this.state.board?.match.phase==='finished',sequence=++this.sequence;
-   const snapshot=this.state.board?await sealOffThread(captureBattleState(this.state,sequence)):await saveMatchState(this.state,sequence);
-   if(!current())return;
-   const message={kind:'checkpoint',snapshot,final},packed=this.peerCompression?await packOffThread(message):null;
-   if(!current())return;await this.backup.put(code,snapshot,{verified:true,packed});if(!current())return;
-   await this.rpc('snapshot:publish',snapshotMetadata(snapshot));if(!current())return;const sent=await this.sendPayload(message,true,packed);if(!sent&&current())throw new Error('P2P_DISCONNECTED');
+   let metadata,packet;
+   if(this.state.board){
+    const sealed=await sealPackedOffThread({draft:captureBattleState(this.state,sequence),final});
+    if(!current())return;
+    metadata=sealed.metadata;packet=sealed.packet;
+    await this.backup.putPacked(code,metadata,sealed.payload);
+   }else{
+    const snapshot=await saveMatchState(this.state,sequence);
+    if(!current())return;
+    metadata=snapshotMetadata(snapshot);packet={kind:'checkpoint',snapshot,final};
+    await this.backup.put(code,snapshot,{verified:true});
+   }
+   if(!current())return;await this.rpc('snapshot:publish',metadata);if(!current())return;
+   const sent=await this.sendPayload(packet,true,this.state.board?packet:null);
+   if(!sent&&current())throw new Error('P2P_DISCONNECTED');
   }catch(e){if(current()){this.publishing=false;throw e;}}finally{if(this.checkpointJob===job&&!current())this.publishing=false;}
  }
  async start(){this.initializing=true;const generation=this.generation;try{const result=await this.rpc('match:start',{adapter:this.adapterId});if(this.disposed||this.generation!==generation||!this.identity)return;if(this.adapterId==='battle-v1'){const view=await battleViewReady();if(this.generation!==generation)return;this.state=createBattleState(result.room.matchId,{seed:crypto.getRandomValues(new Uint32Array(1))[0],...view.options()});await this.attachBattle(this.state);}else this.state=createFixture(result.room.matchId);this.frame=0;this.sequence=-1;await this.ensureSync();this.changed();}catch(e){if(this.generation===generation)this.initializing=false;throw e;}}

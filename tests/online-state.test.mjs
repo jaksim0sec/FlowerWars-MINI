@@ -64,3 +64,17 @@ test('a verified compressed checkpoint reuses wire bytes for IndexedDB storage',
   assert.equal(restored.hash,snapshot.hash);
  }finally{await backup.close();}
 });
+
+test('compact trusted checkpoint is persisted from metadata and wire bytes alone',async()=>{
+ const {createBattleState,saveBattleState}=await import('../src/online/battle-state.mjs');
+ const {packMessage}=await import('../src/online/wire-codec.mjs');
+ const b=new SnapshotBackup({indexedDB,name:'packed-only-'+Math.random()});
+ try{
+  const snapshot=await saveBattleState(createBattleState('metadata-only',{seed:77}),12);
+  const payload=await packMessage({kind:'checkpoint',snapshot});
+  assert.equal(payload.kind,'compressed');
+  await b.putPacked('ABCDEF',snapshotMetadata(snapshot),payload);
+  const restored=await b.get('ABCDEF','metadata-only',{sequence:12,hash:snapshot.hash});
+  assert.equal(restored.hash,snapshot.hash);
+ }finally{await b.close();}
+});

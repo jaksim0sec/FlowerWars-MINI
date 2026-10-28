@@ -1,4 +1,6 @@
 import {packMessage,unpackMessage} from './wire-codec.mjs';
+import {sealBattleState} from './battle-state.mjs';
+import {validateMatchState,snapshotMetadata} from './match-state.mjs';
 
 // Never pass the multi-megabyte object graph to IndexedDB. Store either a
 // compact compressed envelope or a JSON string, both produced in a Worker.
@@ -13,4 +15,18 @@ export async function decodeStoredCheckpoint(record){
  else throw new Error('INVALID_SNAPSHOT');
  if(packet?.kind!=='checkpoint'||!packet.snapshot||typeof packet.snapshot!=='object')throw new Error('INVALID_SNAPSHOT');
  return packet.snapshot;
+}
+
+export async function sealPackedCheckpoint({draft,final}){
+ const snapshot=await sealBattleState(draft),message={kind:'checkpoint',snapshot,final:!!final};
+ const packet=await packMessage(message);
+ return {metadata:snapshotMetadata(snapshot),packet,payload:packet.kind==='compressed'?packet:JSON.stringify(message)};
+}
+export async function decodeCheckpointEnvelope(packet){
+ const message=await unpackMessage(packet);
+ if(message.kind==='checkpoint'&&!message.final){
+  if(!await validateMatchState(message.snapshot))throw new Error('INVALID_SNAPSHOT');
+  return {kind:'verified-checkpoint',metadata:snapshotMetadata(message.snapshot)};
+ }
+ return {kind:'message',value:message};
 }
