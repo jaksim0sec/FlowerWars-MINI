@@ -9,7 +9,7 @@ BASE=os.environ.get('BASE_URL','http://127.0.0.1:10000');ROOT=Path(__file__).res
 INSTRUMENT=r'''(()=>{const d=window.diag={enabled:false,raf:[],paint:[],long:[],steps:[],frames:[],receives:[],checkpoints:[],positionChanges:0,samples:0,last:null};const raf=window.requestAnimationFrame;let prior=0;window.requestAnimationFrame=callback=>raf.call(window,time=>{const start=performance.now();callback(time);if(d.enabled){d.raf.push(prior?time-prior:0);d.paint.push(performance.now()-start);const s=window.ctx?.session,u=s?.state?.board?.units.find(u=>u.health.current>0&&u.state==='walk');if(u){const k=[u.id,u.visualX,u.visualY,u.elapsed].join();d.samples++;if(d.last!==k)d.positionChanges++;d.last=k;}prior=time;}});new PerformanceObserver(list=>{if(d.enabled)for(const e of list.getEntries())d.long.push({at:e.startTime,duration:e.duration});}).observe({type:'longtask',buffered:false});})();'''
 async def main():
  async with async_playwright() as p:
-  browser=await p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox'])
+  browser=await p.chromium.launch(executable_path=os.environ.get('CHROMIUM_EXECUTABLE') or None,args=['--no-sandbox'])
   pages={};contexts=[]
   async def wire(source,message):
    for page in pages.values():
