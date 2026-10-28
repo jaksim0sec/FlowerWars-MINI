@@ -56,3 +56,19 @@ test('a superseded remote order remains recoverable until navigation cancels its
 test('elapsed battle steps retain all wall time while integrating preparations in small slices',async()=>{
  const a=await adapter(),state=a.createBattleState('elapsed');a.stepBattle(state,1.25);assert.ok(Math.abs(state.board.time-1.25)<1e-9);assert.ok(Math.abs(state.board.match.elapsed-1.25)<1e-9);assert.ok(Math.abs(state.board.match.remaining-298.75)<1e-9);assert.equal(state.board.units.length,0);
 });
+
+test('captured battle checkpoint retains original state and deterministic hash',async()=>{
+ const a=await adapter(),state=a.createBattleState('capture-test',{seed:73}),b=state.board;open(b);
+ const u=spawn(b,20,40,'A');b.match.start();
+ const first=a.captureBattleState(state,5),snapshot=await a.sealBattleState(first);
+ assert.equal(await a.validateBattleState(snapshot),true);
+ const beforeHash=snapshot.hash;
+ b.unit(u.id).health.current=50;b.time+=.1;
+ const sealedAgain=await a.sealBattleState(first);
+ assert.equal(sealedAgain.hash,beforeHash,'later live-state mutations cannot affect captured checkpoint');
+ const reference=await a.saveBattleState(state,5);
+ assert.notEqual(reference.hash,beforeHash,'new captures must observe newer state');
+ const restored=await a.restoreBattleState(snapshot);
+ assert.equal(restored.board.unit(u.id).health.current,100);
+ assert.equal(restored.board.time,0);
+});

@@ -7,7 +7,8 @@ import {createBattleState,stepBattle} from './battle-state.mjs';
 import {applyBattleCommand} from './battle-commands.mjs';
 import {BattleFrames,applyBattleFrame} from './battle-wire.mjs';
 import {unpackMessage} from './wire-codec.mjs';
-import {packOffThread,validateOffThread,unpackOffThread} from './checkpoint-processor.mjs';
+import {packOffThread,validateOffThread,unpackOffThread,sealOffThread} from './checkpoint-processor.mjs';
+import {captureBattleState} from './battle-state.mjs';
 
 let socketScript;
 export async function loadSocketClient(){if(globalThis.io)return globalThis.io;if(!socketScript)socketScript=new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='/socket.io/socket.io.js';const timer=setTimeout(()=>{script.remove();socketScript=null;reject(new Error('SERVER_UNAVAILABLE'));},60000);script.onload=()=>{clearTimeout(timer);if(typeof globalThis.io!=='function'){script.remove();socketScript=null;reject(new Error('SERVER_UNAVAILABLE'));return;}resolve(globalThis.io);};script.onerror=()=>{clearTimeout(timer);socketScript=null;reject(new Error('SERVER_UNAVAILABLE'));};document.head.append(script);});return socketScript;}
@@ -95,7 +96,8 @@ export class OnlineSession extends EventTarget {
  async transmitFrame(epoch,bulk=false){const peer=this.peer,state=this.state;const job=(this.frameJob||Promise.resolve()).catch(()=>{}).then(async()=>{if(this.peer!==peer||this.state!==state||this.room?.epoch!==epoch)return;const packet={kind:'frame',epoch,frame:++this.frame,value:this.battleFrames.build(state)},sent=await this.sendPayload(packet,bulk);if(!sent&&this.peer===peer&&this.room?.epoch===epoch)this.battleFrames.reset();});this.frameJob=job;try{await job;}finally{if(this.frameJob===job)this.frameJob=null;}}
  async sendPayload(value,bulk=false){const peer=this.peer,epoch=this.room?.epoch,packet=this.peerCompression?await packOffThread(value):value,deadline=performance.now()+30000;const current=()=>this.peer===peer&&this.room?.epoch===epoch&&!peer?.closed;if(!current())return false;if(peer.send(packet))return true;if(!bulk)return false;while(peer.outgoing&&current()&&performance.now()<deadline)await new Promise(resolve=>setTimeout(resolve,10));if(!current())return false;return peer.sendLarge(packet);}
  async checkpoint(){if(this.publishing||!this.state||this.peer?.channel?.readyState!=='open')return;this.publishing=true;const epoch=this.room.epoch,code=this.room.roomCode,peer=this.peer,job=this.checkpointJob=Symbol(),current=()=>this.peer===peer&&this.room?.epoch===epoch&&this.room?.roomCode===code;try{
-   const final=this.state.board?.match.phase==='finished',snapshot=await saveMatchState(this.state,++this.sequence);if(!current())return;await this.backup.put(code,snapshot,{verified:true});if(!current())return;
+   const final=this.state.board?.match.phase==='finished',sequence=++this.sequence;
+   const snapshot=this.state.board?await sealOffThread(captureBattleState(this.state,sequence)):await saveMatchState(this.state,sequence);if(!current())return;await this.backup.put(code,snapshot,{verified:true});if(!current())return;
    await this.rpc('snapshot:publish',snapshotMetadata(snapshot));if(!current())return;const sent=await this.sendPayload({kind:'checkpoint',snapshot,final},true);if(!sent&&current())throw new Error('P2P_DISCONNECTED');
   }catch(e){if(current()){this.publishing=false;throw e;}}finally{if(this.checkpointJob===job&&!current())this.publishing=false;}
  }

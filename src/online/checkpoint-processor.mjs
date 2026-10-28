@@ -1,11 +1,12 @@
 import {packMessage,unpackMessage} from './wire-codec.mjs';
 import {validateMatchState} from './match-state.mjs';
+import {sealBattleState} from './battle-state.mjs';
 
 // Worker is optional in Node tests and unavailable browser environments.
 // A failure falls back to the original verified path; recovery never skips validation.
 let worker=null,sequence=0;
 const pending=new Map();
-const fallback=(kind,value)=>kind==='validate'?validateMatchState(value):kind==='unpack'?unpackMessage(value):packMessage(value);
+const fallback=(kind,value)=>kind==='validate'?validateMatchState(value):kind==='unpack'?unpackMessage(value):kind==='seal'?sealBattleState(value):packMessage(value);
 function stop(error){
  const current=worker;worker=null;current?.terminate();
  for(const job of pending.values()){clearTimeout(job.timer);job.reject(error);}
@@ -36,3 +37,4 @@ async function run(kind,value){
 export const packOffThread=value=>run('pack',value);
 export const validateOffThread=snapshot=>run('validate',snapshot);
 export const unpackOffThread=packet=>run('unpack',packet);
+export const sealOffThread=draft=>run('seal',draft);

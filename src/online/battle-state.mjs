@@ -43,7 +43,7 @@ function durable(state){
  for(const s of registry.squads.values()){projections.set(s,select(s,SQUAD_FIELDS));if(s.order)projections.set(s.order,select(s.order,ORDER_FIELDS));}
  const root={board:select(b,BOARD_FIELDS),match:select(m,MATCH_FIELDS),units:b.units,registry,cooperations:b.navigation.cooperations,navigation:{cursor:b.navigation.cursor,remaining:b.navigation.remaining}};
  for(const chain of b.navigation.cooperations)if(chain.remote?.order&&!projections.has(chain.remote.order))projections.set(chain.remote.order,select(chain.remote.order,ORDER_FIELDS));
- const graph=encodeStateGraph(root,projections);assertDurable(decodeStateGraph(graph));return {graph};
+ const graph=encodeStateGraph(root,projections);return {graph};
 }
 function assertDurable(root){
  if(!exact(root,['board','match','units','registry','cooperations','navigation']))fail();
@@ -76,10 +76,20 @@ function assertDurable(root){
  return root;
 }
 async function digest(body){const result=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(body)));return Array.from(new Uint8Array(result),n=>n.toString(16).padStart(2,'0')).join('');}
-export async function saveBattleState(state,sequence){
- if(!identifier(state?.matchId)||!integer(sequence))fail();let data;try{data=durable(state);}catch(cause){throw new Error('INVALID_STATE',{cause});}
- const snapshot={version:VERSION,adapter:ADAPTER,matchId:state.matchId,sequence,state:data};snapshot.hash=await digest(snapshot);if(new TextEncoder().encode(JSON.stringify(snapshot)).length>MAX_BATTLE_SNAPSHOT_BYTES)fail();return snapshot;
+// Capture one consistent simulation instant; heavy verification and hashing may run in a Worker.
+export function captureBattleState(state,sequence){
+ if(!identifier(state?.matchId)||!integer(sequence))fail();
+ let data;try{data=durable(state);}catch(cause){throw new Error('INVALID_STATE',{cause});}
+ return {version:VERSION,adapter:ADAPTER,matchId:state.matchId,sequence,state:data};
 }
+export async function sealBattleState(draft){
+ if(!exact(draft,['version','adapter','matchId','sequence','state'])||draft.version!==VERSION||draft.adapter!==ADAPTER||!identifier(draft.matchId)||!integer(draft.sequence)||!exact(draft.state,['graph']))fail();
+ try{assertDurable(decodeStateGraph(draft.state.graph));}catch(cause){throw new Error('INVALID_STATE',{cause});}
+ const snapshot={...draft};snapshot.hash=await digest(snapshot);
+ if(new TextEncoder().encode(JSON.stringify(snapshot)).length>MAX_BATTLE_SNAPSHOT_BYTES)fail();
+ return snapshot;
+}
+export async function saveBattleState(state,sequence){return sealBattleState(captureBattleState(state,sequence));}
 async function validated(snapshot){
  if(!exact(snapshot,['version','adapter','matchId','sequence','state','hash'])||snapshot.version!==VERSION||snapshot.adapter!==ADAPTER||!identifier(snapshot.matchId)||!integer(snapshot.sequence)||typeof snapshot.hash!=='string'||!/^[a-f0-9]{64}$/.test(snapshot.hash)||new TextEncoder().encode(JSON.stringify(snapshot)).length>MAX_BATTLE_SNAPSHOT_BYTES||!exact(snapshot.state,['graph']))throw new Error('INVALID_SNAPSHOT');
  const {hash,...body}=snapshot;if(hash!==await digest(body))throw new Error('INVALID_SNAPSHOT');return assertDurable(decodeStateGraph(snapshot.state.graph));
