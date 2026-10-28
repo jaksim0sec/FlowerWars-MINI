@@ -67,10 +67,10 @@ export class OnlineSession extends EventTarget {
    await this.rpc('participant:synced',{epoch,sequence:snapshot.sequence,hash:snapshot.hash});if(current()){this.peerStatus='직접 연결됨';this.status='';}
   }finally{if(this.syncJob===job)this.syncingEpoch=null;this.changed();}
  }
- async receive(message,epoch,background=false){if(!this.room||!this.identity||this.room.epoch!==epoch)return;const identity=this.identity,code=this.room.roomCode,matchId=this.room.matchId,current=()=>this.identity===identity&&this.room?.epoch===epoch&&this.room?.roomCode===code&&this.room?.matchId===matchId;
-  if(message.kind==='compressed'){const decoded=message.byteLength>65536?await unpackOffThread(message):await unpackMessage(message);if(current())await this.receive(decoded,epoch,background);return;}
+ async receive(message,epoch,background=false,packed=null){if(!this.room||!this.identity||this.room.epoch!==epoch)return;const identity=this.identity,code=this.room.roomCode,matchId=this.room.matchId,current=()=>this.identity===identity&&this.room?.epoch===epoch&&this.room?.roomCode===code&&this.room?.matchId===matchId;
+  if(message.kind==='compressed'){const decoded=message.byteLength>65536?await unpackOffThread(message):await unpackMessage(message);if(current())await this.receive(decoded,epoch,background,message);return;}
   if(!background&&message.kind==='checkpoint'&&!message.final&&this.identity.role==='guest'&&this.room.state==='PLAYING'){
-   this.backgroundCheckpoints=this.backgroundCheckpoints.then(()=>this.receive(message,epoch,true)).catch(e=>{if(current()){this.error(e.message);this.peer?.fail('RECOVERY_FAILED');}});
+   this.backgroundCheckpoints=this.backgroundCheckpoints.then(()=>this.receive(message,epoch,true,packed)).catch(e=>{if(current()){this.error(e.message);this.peer?.fail('RECOVERY_FAILED');}});
    return;
   }
   if(message.kind==='hello'){this.peerCompression=message.compression===true;await this.ensureSync();return;}
@@ -89,16 +89,19 @@ export class OnlineSession extends EventTarget {
     if(snapshot.hash!==this.room.checkpoint?.hash||snapshot.sequence!==this.room.checkpoint?.sequence)throw new Error('SNAPSHOT_MISMATCH');await this.backup.put(code,snapshot,{verified:true});if(current())await this.ensureSync();return;
    }
    if(this.identity.role!=='guest')throw new Error('HOST_ONLY');
-   if(message.kind==='checkpoint'){await this.backup.put(code,snapshot,{verified:true});if(message.final&&snapshot.adapter==='battle-v1'){const state=await restoreMatchState(snapshot);if(!current())return;if(state.board.match.phase!=='finished')throw new Error('INVALID_FINAL_STATE');this.state=state;await this.attachBattle(state);}if(current())await this.rpc('snapshot:stored',snapshotMetadata(snapshot));return;}
+   if(message.kind==='checkpoint'){await this.backup.put(code,snapshot,{verified:true,packed});if(message.final&&snapshot.adapter==='battle-v1'){const state=await restoreMatchState(snapshot);if(!current())return;if(state.board.match.phase!=='finished')throw new Error('INVALID_FINAL_STATE');this.state=state;await this.attachBattle(state);}if(current())await this.rpc('snapshot:stored',snapshotMetadata(snapshot));return;}
    if((this.room.state==='PLAYING'||this.room.state==='PAUSED'&&this.room.manualPause)&&message.epoch===epoch&&Number.isSafeInteger(message.frame)&&message.frame>this.lastFrame){this.lastFrame=message.frame;const state=await restoreMatchState(snapshot);if(current()){this.state=state;this.changed();}}return;
   }
  }
  async transmitFrame(epoch,bulk=false){const peer=this.peer,state=this.state;const job=(this.frameJob||Promise.resolve()).catch(()=>{}).then(async()=>{if(this.peer!==peer||this.state!==state||this.room?.epoch!==epoch)return;const packet={kind:'frame',epoch,frame:++this.frame,value:this.battleFrames.build(state)},sent=await this.sendPayload(packet,bulk);if(!sent&&this.peer===peer&&this.room?.epoch===epoch)this.battleFrames.reset();});this.frameJob=job;try{await job;}finally{if(this.frameJob===job)this.frameJob=null;}}
- async sendPayload(value,bulk=false){const peer=this.peer,epoch=this.room?.epoch,packet=this.peerCompression?await packOffThread(value):value,deadline=performance.now()+30000;const current=()=>this.peer===peer&&this.room?.epoch===epoch&&!peer?.closed;if(!current())return false;if(peer.send(packet))return true;if(!bulk)return false;while(peer.outgoing&&current()&&performance.now()<deadline)await new Promise(resolve=>setTimeout(resolve,10));if(!current())return false;return peer.sendLarge(packet);}
+ async sendPayload(value,bulk=false,packed=null){const peer=this.peer,epoch=this.room?.epoch,packet=packed??(this.peerCompression?await packOffThread(value):value),deadline=performance.now()+30000;const current=()=>this.peer===peer&&this.room?.epoch===epoch&&!peer?.closed;if(!current())return false;if(peer.send(packet))return true;if(!bulk)return false;while(peer.outgoing&&current()&&performance.now()<deadline)await new Promise(resolve=>setTimeout(resolve,10));if(!current())return false;return peer.sendLarge(packet);}
  async checkpoint(){if(this.publishing||!this.state||this.peer?.channel?.readyState!=='open')return;this.publishing=true;const epoch=this.room.epoch,code=this.room.roomCode,peer=this.peer,job=this.checkpointJob=Symbol(),current=()=>this.peer===peer&&this.room?.epoch===epoch&&this.room?.roomCode===code;try{
    const final=this.state.board?.match.phase==='finished',sequence=++this.sequence;
-   const snapshot=this.state.board?await sealOffThread(captureBattleState(this.state,sequence)):await saveMatchState(this.state,sequence);if(!current())return;await this.backup.put(code,snapshot,{verified:true});if(!current())return;
-   await this.rpc('snapshot:publish',snapshotMetadata(snapshot));if(!current())return;const sent=await this.sendPayload({kind:'checkpoint',snapshot,final},true);if(!sent&&current())throw new Error('P2P_DISCONNECTED');
+   const snapshot=this.state.board?await sealOffThread(captureBattleState(this.state,sequence)):await saveMatchState(this.state,sequence);
+   if(!current())return;
+   const message={kind:'checkpoint',snapshot,final},packed=this.peerCompression?await packOffThread(message):null;
+   if(!current())return;await this.backup.put(code,snapshot,{verified:true,packed});if(!current())return;
+   await this.rpc('snapshot:publish',snapshotMetadata(snapshot));if(!current())return;const sent=await this.sendPayload(message,true,packed);if(!sent&&current())throw new Error('P2P_DISCONNECTED');
   }catch(e){if(current()){this.publishing=false;throw e;}}finally{if(this.checkpointJob===job&&!current())this.publishing=false;}
  }
  async start(){this.initializing=true;const generation=this.generation;try{const result=await this.rpc('match:start',{adapter:this.adapterId});if(this.disposed||this.generation!==generation||!this.identity)return;if(this.adapterId==='battle-v1'){const view=await battleViewReady();if(this.generation!==generation)return;this.state=createBattleState(result.room.matchId,{seed:crypto.getRandomValues(new Uint32Array(1))[0],...view.options()});await this.attachBattle(this.state);}else this.state=createFixture(result.room.matchId);this.frame=0;this.sequence=-1;await this.ensureSync();this.changed();}catch(e){if(this.generation===generation)this.initializing=false;throw e;}}

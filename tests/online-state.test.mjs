@@ -47,3 +47,20 @@ test('IndexedDB stores a compact payload rather than a copied snapshot graph, wh
   assert.equal(restored.sequence,3);
  }finally{await backup.close();}
 });
+
+test('a verified compressed checkpoint reuses wire bytes for IndexedDB storage',async()=>{
+ const {createBattleState,saveBattleState}=await import('../src/online/battle-state.mjs');
+ const {packMessage}=await import('../src/online/wire-codec.mjs');
+ const snapshot=await saveBattleState(createBattleState('packed',{seed:31}),6);
+ const packed=await packMessage({kind:'checkpoint',snapshot});
+ assert.equal(packed.kind,'compressed');
+ const backup=new SnapshotBackup({indexedDB,name:'online-packed-'+Math.random()});
+ try{
+  await backup.put('ABCDEF',snapshot,{verified:true,packed});
+  const db=await backup.open();
+  const record=await new Promise((resolve,reject)=>{const req=db.transaction('snapshots').objectStore('snapshots').get('ABCDEF:packed:6');req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);});
+  assert.equal(record.payload.data,packed.data);
+  const restored=await backup.get('ABCDEF','packed',{sequence:6,hash:snapshot.hash});
+  assert.equal(restored.hash,snapshot.hash);
+ }finally{await backup.close();}
+});
