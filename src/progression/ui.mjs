@@ -1,5 +1,5 @@
 import {battleViewReady,pauseSinglePlayer} from '../online/game-gate.mjs';
-import {TYPES,FLAGS,CHESTS,QUESTS,getProfile,battleActive,beginExpedition,abandonExpedition,train,unlock,setPath,toggleLineup,buyFlag,equipFlag,buySupply,buyChest,openChest,beginBattle} from './core.mjs';
+import {TYPES,FLAGS,CHESTS,QUESTS,STAGE_GOALS,getProfile,battleActive,beginExpedition,abandonExpedition,train,unlock,setPath,toggleLineup,buyFlag,equipFlag,buySupply,buyChest,openChest,beginBattle} from './core.mjs';
 
 let ready=false,tab='army',message='',open=!pauseSinglePlayer();
 const button=document.createElement('button');
@@ -41,11 +41,12 @@ function shop(p){
 function expedition(p){
   const run=p.expedition;
   const header='<div class="camp-section-title"><div><h2>숲 되찾기</h2><p>깃발 공성전 세 번을 완수하는 원정입니다. 각 전투가 끝날 때 진행 상황이 저장됩니다.</p></div></div>';
-  const report=p.lastReport?'<div class="camp-feature"><div><strong>직전 전투 · '+(p.lastReport.outcome==='victory'?'승리':p.lastReport.outcome==='defeat'?'패배':'무승부')+'</strong><p>'+p.lastReport.stage+'차 전투 · 도토리 '+p.lastReport.acorns+'개 · 재료 '+p.lastReport.materials+'개 획득'+(p.lastReport.complete?' · 원정 완료 보상 포함':'')+'</p></div></div>':'';
+  const report=p.lastReport?'<div class="camp-feature"><div><strong>직전 전투 · '+(p.lastReport.outcome==='victory'?'승리':p.lastReport.outcome==='defeat'?'패배':'무승부')+'</strong><p>'+p.lastReport.stage+'차 전투 · 도토리 '+p.lastReport.acorns+'개 · 재료 '+p.lastReport.materials+'개 획득'+(p.lastReport.complete?' · 원정 완료 보상 포함':'')+(p.lastReport.objective?' · 추가 목표 달성':'')+'</p></div></div>':'';
   if(!run)return header+report+'<div class="camp-big-card"><small>NEW EXPEDITION</small><h3>첫 번째 숲길</h3><p>3번의 전투를 연달아 승리하세요. 원정을 실패해도 획득한 보상과 부대 성장 기록은 남습니다.</p>'+
     control('새 원정 시작','begin-expedition','',!ready||battleActive(),'primary')+'</div>';
-  const label=run.stage===1?'선봉 진격':run.stage===2?'중앙 공방':'최후의 깃발';
-  return header+report+'<div class="camp-big-card"><small>EXPEDITION · '+run.stage+' / 3</small><h3>'+label+'</h3><div class="camp-steps">'+[1,2,3].map(i=>'<span class="'+(i<run.stage?'done':i===run.stage?'current':'')+'">'+(i<run.stage?'✓':i)+'</span>').join('')+'</div><p>출전 가능: '+p.lineup.map(t=>TYPES[t].name).join(' · ')+'</p><p>이번 원정 보급 '+run.supply+'개'+(run.boost?' · 선택된 보급: '+(run.boost==='attack'?'공격 강화':'체력 강화'):'')+'</p>'+
+  const goal=STAGE_GOALS[run.stage];
+  const label=goal.name;
+  return header+report+'<div class="camp-big-card"><small>EXPEDITION · '+run.stage+' / 3</small><h3>'+label+'</h3><div class="camp-steps">'+[1,2,3].map(i=>'<span class="'+(i<run.stage?'done':i===run.stage?'current':'')+'">'+(i<run.stage?'✓':i)+'</span>').join('')+'</div><p class="camp-goal"><strong>추가 목표</strong> · '+goal.desc+' · '+goal.bonus+'</p><p>출전 가능: '+p.lineup.map(t=>TYPES[t].name).join(' · ')+'</p><p>이번 원정 보급 '+run.supply+'개'+(run.boost?' · 선택된 보급: '+(run.boost==='attack'?'공격 강화':'체력 강화'):'')+'</p>'+
     '<div class="camp-dual">'+control('공격 보급 · 35','supply','data-type="attack"',run.supply<35||!!run.boost||battleActive())+control('수비 보급 · 35','supply','data-type="health"',run.supply<35||!!run.boost||battleActive())+'</div>'+
     '<div class="camp-dual">'+control(battleActive()?'전투 진행 중':run.stage+'차 전투 출정','launch','',!ready||battleActive()||pauseSinglePlayer(),'primary')+control('원정 포기','abandon','',battleActive(),'secondary')+'</div></div>';
 }
