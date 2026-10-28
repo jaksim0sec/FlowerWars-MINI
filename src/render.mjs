@@ -67,7 +67,7 @@ export function render(ctx, art, board, view, camera, width, height, dpr, option
     ctx.setLineDash([3, 6]); ctx.strokeStyle = '#fff3b9'; ctx.lineWidth = 3; ctx.stroke(); ctx.restore();
   }
   let posedUnits=0;
-  const guestAgeMs=options.guestAgeMs,visualTime=board.time+(guestAgeMs==null?0:Math.min(200,Math.max(0,guestAgeMs))/1000),positions=new Map();
+  const guestAgeMs=options.guestAgeMs,visualTime=board.time+(guestAgeMs==null?0:Math.max(0,guestAgeMs)/1000),positions=new Map();
   const locate=u=>{let v=positions.get(u.id);if(!v){v=guestAgeMs==null?{x:u.visualX,y:u.visualY,elapsed:u.elapsed}:guestVisual(u,guestAgeMs);positions.set(u.id,v);}return v;};
   const units = board.units.filter(u=>{const v=locate(u),p=project(v.x,v.y);const visible=onScreen(p.x,p.y,u.character?characterRadius(art.catalog,u.character):250,camera,width,height);if(!visible&&u.character)releasePose(u.character);return visible;}).sort((a,b)=>{const x=locate(a),y=locate(b);return (x.x+x.y)-(y.x+y.y)||x.x-y.x;});
   for (const unit of units) {
