@@ -6,6 +6,7 @@ import {createBattlefield,BATTLEFIELD_WIDTH,BATTLEFIELD_HEIGHT} from './battlefi
 import {layoutDeployment} from './deployment-layout.mjs';
 import {createRecruitmentCatalog} from './bot-doctrines.mjs';
 import {BotCommand} from './bot-command.mjs';
+import {TacticalController} from './ai/controller.mjs';
 
 export const PREPARATION_SECONDS=300;
 export const ARMY_LIMIT=350;
@@ -14,7 +15,7 @@ export const FLAG_HEALTH=1200;
 /** Simulation-only match controller. Decisions are staggered across squads;
  * spatial buckets supply local enemies; capture and counters tick at 4 Hz. */
 export class FlagMatch{
- constructor(board,{count=ARMY_LIMIT,makeCharacter,optionsFor,seed=1,blueprints=availableSquadBlueprints(),unitProfiles={},scenario}={}){
+ constructor(board,{count=ARMY_LIMIT,makeCharacter,optionsFor,seed=1,blueprints=availableSquadBlueprints(),unitProfiles={},scenario,aiImplementation='legacy'}={}){
   this.board=board;board.width=BATTLEFIELD_WIDTH;board.height=BATTLEFIELD_HEIGHT;board.seed=seed;board.reset();
   this.epoch=board.byId;this.phase='preparation';this.remaining=PREPARATION_SECONDS;this.winner=null;
   this.flags={A:{x:5,y:Math.floor(board.height/2)},B:{x:board.width-6,y:board.height-1-Math.floor(board.height/2)}};this.counts={A:0,B:0};this.squadIds={A:[],B:[]};
@@ -28,7 +29,9 @@ export class FlagMatch{
   this.recruitment=createRecruitmentCatalog(blueprints,unitProfiles);
   this.squadSize=Math.max(...blueprints.map(bp=>bp.members.length));
   this.operationSize=Math.max(2,Math.min(4,Math.floor(48/this.squadSize)));
-  this.command=new BotCommand(this,scenario);
+  if(!['legacy','utility'].includes(aiImplementation))throw new Error('Unknown AI implementation');
+  this.aiImplementation=aiImplementation;
+  this.command=aiImplementation==='legacy'?new BotCommand(this,scenario):new TacticalController(this);
   this.limit=Math.max(1,Math.min(ARMY_LIMIT,Math.floor(Number(count)||ARMY_LIMIT)));
   this.reserve={A:this.limit,B:this.limit};this.makeCharacter=makeCharacter;this.optionsFor=optionsFor;
   board.match=this;
@@ -36,7 +39,7 @@ export class FlagMatch{
   const previousPolicy=board.movementPolicy;
   board.movementPolicy={matchOwner:this,previousPolicy,beforeStep:context=>{
    if(board.match===this&&this.phase==='preparation'&&!this.inTerritory(context.unit.team,context.to))return 'wait';
-   if(board.match===this&&this.command.isGuard(context.unit.squadId)){
+   if(board.match===this&&this.aiImplementation==='legacy'&&this.command.isGuard(context.unit.squadId)){
     const flag=this.flags.B,d=p=>Math.max(Math.abs(p.x-flag.x),Math.abs(p.y-flag.y));
     if(d(context.to)>16&&d(context.to)>=d(context.unit))return 'wait';
    }
@@ -78,8 +81,8 @@ export class FlagMatch{
   const index=this.squadIds.B.length,groupIndex=Math.floor(index/this.operationSize),slot=index%this.operationSize;
   let operation=this.botOperations.get(groupIndex);
   if(!operation){
-   const observation=survey(this.board,this.flags.B);this.command.chooseScenario(observation);
-   operation=planOperation(observation,groupIndex,Math.ceil(this.limit/this.squadSize),this.recruitment,this.command.scenario,[...this.botOperations.values()],this.operationSize);
+   const observation=this.aiImplementation==='legacy'?survey(this.board,this.flags.B):null;if(observation)this.command.chooseScenario(observation);
+   operation=this.aiImplementation==='utility'?this.command.recruit(groupIndex,this.operationSize):planOperation(observation,groupIndex,Math.ceil(this.limit/this.squadSize),this.recruitment,this.command.scenario,[...this.botOperations.values()],this.operationSize);
    if(!this.placeOperation(operation))return false;
    this.botOperations.set(groupIndex,operation);
   }
@@ -117,10 +120,10 @@ export class FlagMatch{
  }
  start(){
   if(this.phase!=='preparation')return false;
-  this.command.lastScenario=-Infinity;this.command.chooseScenario(survey(this.board,this.flags.B));
+  if(this.aiImplementation==='legacy'){this.command.lastScenario=-Infinity;this.command.chooseScenario(survey(this.board,this.flags.B));}
   // Finish the bot's direct placement before skipping the preparation clock.
   while(this.reserve.B>0)if(!this.deployBot())break;
-  this.strategy=survey(this.board,this.flags.B);
+  this.strategy=this.aiImplementation==='legacy'?survey(this.board,this.flags.B):this.command.observer.observe();
   this.phase='battle';this.remaining=0;this.statusRevision++;
   this.command.refresh();
   for(const u of this.board.units)if(u.health.current>0){u.combat.auto=true;u.retryAt=0;u.waitReason=null;}
@@ -131,8 +134,8 @@ export class FlagMatch{
   this.elapsed+=dt;
   if(this.phase==='preparation'){this.remaining=Math.max(0,this.remaining-dt);if(this.remaining<=1e-8)this.start();}
   if(this.elapsed>=this.nextStatus){this.nextStatus=this.elapsed+.25;this.refreshStatus();}
-  if(this.phase==='battle'&&this.elapsed>=this.command.nextRefresh)this.command.refresh();
-  else if(this.phase==='preparation'&&this.elapsed>=this.nextSurvey){this.strategy=survey(this.board,this.flags.B);this.nextSurvey=this.elapsed+3;}
+  if(this.phase==='battle'&&(this.elapsed>=this.command.nextRefresh||this.aiImplementation==='utility'&&this.command.observer.revision!==this.board.obstacleRevision))this.command.refresh();
+  else if(this.phase==='preparation'&&this.elapsed>=this.nextSurvey){this.strategy=this.aiImplementation==='legacy'?survey(this.board,this.flags.B):this.command.observer.observe();this.nextSurvey=this.elapsed+3;}
   if(this.phase!=='finished'&&this.elapsed>=this.nextDecision){
    // Three of at most 42 bot squads per slice; each squad thinks about once/s.
    this.nextDecision=this.elapsed+(this.phase==='preparation'?.25:.08);
@@ -169,7 +172,7 @@ export class FlagMatch{
   if(this.phase!=='battle')return;
   const s=squadsFor(this.board).get(id);if(!s)return;
   this.decisions++;
-  commandBotSquad(this,s);
+  if(this.aiImplementation==='utility')this.command.think(s);else commandBotSquad(this,s);
  }
  charge(){
   if(this.phase!=='battle')return;

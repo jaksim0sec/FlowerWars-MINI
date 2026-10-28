@@ -1,0 +1,1490 @@
+{
+  "baselineRevision": "1a31554",
+  "method": "Same legacy recruitment/placement for both; decision controller swapped before first simulation step. 350 per side. 60s movement samples, up to 180s objective samples. Mean of per-scenario p95 values.",
+  "summary60s": {
+    "legacy": {
+      "orders": 178.33333333333334,
+      "pathResets": 3715.3333333333335,
+      "moveReplaceRequests": 3715.3333333333335,
+      "staticRouteBuilds": 11796,
+      "stationaryUnitSeconds": 9652.5,
+      "distanceMoved": 10421.625717794359,
+      "reversals": 401.5,
+      "expansions": 1004531.3333333334,
+      "cpuP95ms": 5.52639900000014,
+      "reversalsPer1000Tiles": 38.52565913151732
+    },
+    "utility": {
+      "orders": 104.83333333333333,
+      "pathResets": 2709.8333333333335,
+      "moveReplaceRequests": 2709.8333333333335,
+      "staticRouteBuilds": 11496,
+      "stationaryUnitSeconds": 6196,
+      "distanceMoved": 15657.135561484678,
+      "reversals": 586.6666666666666,
+      "expansions": 980705.1666666666,
+      "cpuP95ms": 5.642907166666494,
+      "reversalsPer1000Tiles": 37.46960383416623
+    }
+  },
+  "objectiveWins180s": {
+    "legacy": 0,
+    "utility": 4
+  },
+  "baselineFailures": [
+    "350 soldier armies keep one commander per squad and compact defense ranks",
+    "a middle front advances when there is no wing army to wait for",
+    "a real ranged actor acquires an interpolating target across a bucket boundary",
+    "a vertical advance places the commander behind the front instead of beside it",
+    "an isolated long move follows a shortest route without a traffic lane detour",
+    "automatic armies obey the 200 cap and deploy on their own half",
+    "automatic attacks acquire enemy flags without counting flags as soldiers",
+    "clipped deployment A accepts half, retains a commander and charges only actual troops",
+    "distant soldiers resume budgeted reform searches across ticks",
+    "emergency guard destinations stay inside the flag leash",
+    "full bot operations pair frontline, firepower and healing in one lane",
+    "healers restore injured allies, respect cooldown and never damage enemies",
+    "home defense intercepts intruders without recalling a distant attack operation",
+    "injury changes neither movement duration nor attack damage",
+    "lost emergency guards are replaced with existing living squads",
+    "manual placement spends reserves atomically and rejects overlaps and enemy territory",
+    "mobile reserves exploit a gap, then react only to a serious home breach",
+    "partial troop previews exactly match actual soldiers, equipment and offsets",
+    "rear breach promotes existing squads to guard within the flag leash",
+    "reform finds a clear footprint beside X rather than circling across blocked seats",
+    "simultaneous killing impacts draw in the same combat batch, without waiting for the status poll",
+    "squad destinations on a large map start without serial full-map distance fields",
+    "step timing remains exact and simulation does not depend on a renderer",
+    "touching a flag does not win; soldiers must land real attacks and destroy its health",
+    "visible test classes have independent configured health, damage and attack speed"
+  ],
+  "finalSuite": {
+    "tests": 288,
+    "pass": 263,
+    "fail": 25,
+    "newFailingNames": [],
+    "focusedAiTests": 16
+  },
+  "browser": {
+    "results": [
+      {
+        "implementation": "legacy",
+        "count": 700,
+        "fps": 56.60590965696819,
+        "frameCpuP95ms": 12.5
+      },
+      {
+        "implementation": "utility",
+        "count": 700,
+        "fps": 60.00480038403072,
+        "frameCpuP95ms": 9.099999994039536
+      }
+    ],
+    "errors": []
+  },
+  "fixed60s": {
+    "legacy": [
+      {
+        "implementation": "legacy",
+        "seed": 17,
+        "count": 350,
+        "scenario": "central",
+        "initialRoster": "241e3b95ae9f46b7800d66a2998f0ff2a5984ded5fd03e4a81e20fc3a647b96e",
+        "seconds": 59.99999999999873,
+        "orders": 180,
+        "pathResets": 3565,
+        "moveReplaceRequests": 3565,
+        "staticRouteBuilds": 11205,
+        "stationaryUnitSeconds": 10098,
+        "distanceMoved": 10010.890089985882,
+        "reversals": 379,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 1008321,
+        "cpuP95ms": 6.068767999999977,
+        "aiSquadP95ms": 0.2603790000002846,
+        "counts": {
+          "A": 318,
+          "B": 318
+        },
+        "flagHealth": {
+          "A": 1200,
+          "B": 1200
+        },
+        "winner": null,
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": null
+      },
+      {
+        "implementation": "legacy",
+        "seed": 17,
+        "count": 350,
+        "scenario": "ranged",
+        "initialRoster": "7d5e3cb68236784330dfb4348a2765214acd7bfbabf454149bc5ae7e97b32a6d",
+        "seconds": 59.99999999999873,
+        "orders": 198,
+        "pathResets": 3883,
+        "moveReplaceRequests": 3883,
+        "staticRouteBuilds": 12648,
+        "stationaryUnitSeconds": 8440,
+        "distanceMoved": 12307.104835893768,
+        "reversals": 491,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 1003777,
+        "cpuP95ms": 5.692965999999615,
+        "aiSquadP95ms": 0.24167099999976926,
+        "counts": {
+          "A": 336,
+          "B": 311
+        },
+        "flagHealth": {
+          "A": 1200,
+          "B": 1200
+        },
+        "winner": null,
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": null
+      },
+      {
+        "implementation": "legacy",
+        "seed": 73,
+        "count": 350,
+        "scenario": "central",
+        "initialRoster": "0e5da984d7a14fae5a6ab696742b1763229c45e408b7bb4e4fbcaacd1bab33a3",
+        "seconds": 59.99999999999873,
+        "orders": 180,
+        "pathResets": 3622,
+        "moveReplaceRequests": 3622,
+        "staticRouteBuilds": 11339,
+        "stationaryUnitSeconds": 10027,
+        "distanceMoved": 10262.066755257512,
+        "reversals": 383,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 1005315,
+        "cpuP95ms": 5.178226999999424,
+        "aiSquadP95ms": 0.23037400000066555,
+        "counts": {
+          "A": 317,
+          "B": 326
+        },
+        "flagHealth": {
+          "A": 1200,
+          "B": 1200
+        },
+        "winner": null,
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": null
+      },
+      {
+        "implementation": "legacy",
+        "seed": 73,
+        "count": 350,
+        "scenario": "ranged",
+        "initialRoster": "e74174bba36f64aebe69b7b5e65f6c2e8352acbf4e59c1447eb61425c9b83361",
+        "seconds": 59.99999999999873,
+        "orders": 165,
+        "pathResets": 3841,
+        "moveReplaceRequests": 3841,
+        "staticRouteBuilds": 11954,
+        "stationaryUnitSeconds": 10285,
+        "distanceMoved": 8994.944461390149,
+        "reversals": 340,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 999268,
+        "cpuP95ms": 5.449061999999685,
+        "aiSquadP95ms": 0.19566200000008394,
+        "counts": {
+          "A": 335,
+          "B": 294
+        },
+        "flagHealth": {
+          "A": 1200,
+          "B": 1200
+        },
+        "winner": null,
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": null
+      },
+      {
+        "implementation": "legacy",
+        "seed": 191,
+        "count": 350,
+        "scenario": "central",
+        "initialRoster": "dd9af633b72650c4e2dcc8ff54a8dba3be3bc8fd9ea082bf008ad8565d0bf6b6",
+        "seconds": 59.99999999999873,
+        "orders": 152,
+        "pathResets": 3596,
+        "moveReplaceRequests": 3596,
+        "staticRouteBuilds": 12019,
+        "stationaryUnitSeconds": 10201,
+        "distanceMoved": 9646.309778089719,
+        "reversals": 364,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 1008068,
+        "cpuP95ms": 5.001733000000968,
+        "aiSquadP95ms": 0.17853700000159733,
+        "counts": {
+          "A": 318,
+          "B": 311
+        },
+        "flagHealth": {
+          "A": 1200,
+          "B": 1200
+        },
+        "winner": null,
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": null
+      },
+      {
+        "implementation": "legacy",
+        "seed": 191,
+        "count": 350,
+        "scenario": "ranged",
+        "initialRoster": "aa8a68f25edbd6a286135d4207700a934f5d3c706db40aa591e4ba228dc12391",
+        "seconds": 59.99999999999873,
+        "orders": 195,
+        "pathResets": 3785,
+        "moveReplaceRequests": 3785,
+        "staticRouteBuilds": 11611,
+        "stationaryUnitSeconds": 8864,
+        "distanceMoved": 11308.438386149128,
+        "reversals": 452,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 1002439,
+        "cpuP95ms": 5.76763800000117,
+        "aiSquadP95ms": 0.21894700000120793,
+        "counts": {
+          "A": 330,
+          "B": 297
+        },
+        "flagHealth": {
+          "A": 1200,
+          "B": 1200
+        },
+        "winner": null,
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": null
+      }
+    ],
+    "utility": [
+      {
+        "implementation": "utility",
+        "seed": 17,
+        "count": 350,
+        "scenario": "central",
+        "initialRoster": "241e3b95ae9f46b7800d66a2998f0ff2a5984ded5fd03e4a81e20fc3a647b96e",
+        "seconds": 59.99999999999873,
+        "orders": 90,
+        "pathResets": 3088,
+        "moveReplaceRequests": 3088,
+        "staticRouteBuilds": 13095,
+        "stationaryUnitSeconds": 7118,
+        "distanceMoved": 14448.277557833693,
+        "reversals": 576,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 1002205,
+        "cpuP95ms": 7.305414999999812,
+        "aiSquadP95ms": 0.135091999999986,
+        "counts": {
+          "A": 303,
+          "B": 285
+        },
+        "flagHealth": {
+          "A": 1200,
+          "B": 1200
+        },
+        "winner": null,
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": {
+          "orders": 90,
+          "replacements": 69,
+          "deduplicated": 1566,
+          "deferred": 100,
+          "invalid": 0,
+          "replans": 17,
+          "progress": 220,
+          "completed": 17,
+          "stalls": 4,
+          "observations": 78,
+          "refreshMs": 162.761180999999,
+          "maxRefreshMs": 17.291666000000006
+        }
+      },
+      {
+        "implementation": "utility",
+        "seed": 17,
+        "count": 350,
+        "scenario": "ranged",
+        "initialRoster": "7d5e3cb68236784330dfb4348a2765214acd7bfbabf454149bc5ae7e97b32a6d",
+        "seconds": 59.99999999999873,
+        "orders": 102,
+        "pathResets": 2308,
+        "moveReplaceRequests": 2308,
+        "staticRouteBuilds": 10703,
+        "stationaryUnitSeconds": 6114,
+        "distanceMoved": 15457.383374082217,
+        "reversals": 564,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 971847,
+        "cpuP95ms": 5.945353000000068,
+        "aiSquadP95ms": 0.1460480000005191,
+        "counts": {
+          "A": 327,
+          "B": 257
+        },
+        "flagHealth": {
+          "A": 1200,
+          "B": 1200
+        },
+        "winner": null,
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": {
+          "orders": 102,
+          "replacements": 81,
+          "deduplicated": 1563,
+          "deferred": 68,
+          "invalid": 0,
+          "replans": 14,
+          "progress": 234,
+          "completed": 17,
+          "stalls": 2,
+          "observations": 78,
+          "refreshMs": 123.00016000000278,
+          "maxRefreshMs": 6.683135999999649
+        }
+      },
+      {
+        "implementation": "utility",
+        "seed": 73,
+        "count": 350,
+        "scenario": "central",
+        "initialRoster": "0e5da984d7a14fae5a6ab696742b1763229c45e408b7bb4e4fbcaacd1bab33a3",
+        "seconds": 59.99999999999873,
+        "orders": 117,
+        "pathResets": 2537,
+        "moveReplaceRequests": 2537,
+        "staticRouteBuilds": 11266,
+        "stationaryUnitSeconds": 6388,
+        "distanceMoved": 15581.462536679468,
+        "reversals": 553,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 987046,
+        "cpuP95ms": 5.0977270000003045,
+        "aiSquadP95ms": 0.15195700000003853,
+        "counts": {
+          "A": 300,
+          "B": 285
+        },
+        "flagHealth": {
+          "A": 1200,
+          "B": 1200
+        },
+        "winner": null,
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": {
+          "orders": 117,
+          "replacements": 96,
+          "deduplicated": 1534,
+          "deferred": 76,
+          "invalid": 0,
+          "replans": 15,
+          "progress": 257,
+          "completed": 19,
+          "stalls": 1,
+          "observations": 78,
+          "refreshMs": 130.40985400000136,
+          "maxRefreshMs": 7.865512000000308
+        }
+      },
+      {
+        "implementation": "utility",
+        "seed": 73,
+        "count": 350,
+        "scenario": "ranged",
+        "initialRoster": "e74174bba36f64aebe69b7b5e65f6c2e8352acbf4e59c1447eb61425c9b83361",
+        "seconds": 59.99999999999873,
+        "orders": 111,
+        "pathResets": 2666,
+        "moveReplaceRequests": 2666,
+        "staticRouteBuilds": 10919,
+        "stationaryUnitSeconds": 5364,
+        "distanceMoved": 17004.341113057497,
+        "reversals": 644,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 969550,
+        "cpuP95ms": 5.292446999999811,
+        "aiSquadP95ms": 0.14802199999940058,
+        "counts": {
+          "A": 327,
+          "B": 270
+        },
+        "flagHealth": {
+          "A": 322,
+          "B": 1200
+        },
+        "winner": null,
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": {
+          "orders": 111,
+          "replacements": 90,
+          "deduplicated": 1503,
+          "deferred": 84,
+          "invalid": 0,
+          "replans": 18,
+          "progress": 273,
+          "completed": 18,
+          "stalls": 3,
+          "observations": 78,
+          "refreshMs": 116.89423600000646,
+          "maxRefreshMs": 6.494562999999289
+        }
+      },
+      {
+        "implementation": "utility",
+        "seed": 191,
+        "count": 350,
+        "scenario": "central",
+        "initialRoster": "dd9af633b72650c4e2dcc8ff54a8dba3be3bc8fd9ea082bf008ad8565d0bf6b6",
+        "seconds": 59.99999999999873,
+        "orders": 100,
+        "pathResets": 3186,
+        "moveReplaceRequests": 3186,
+        "staticRouteBuilds": 12311,
+        "stationaryUnitSeconds": 6618,
+        "distanceMoved": 15079.071993711661,
+        "reversals": 538,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 998290,
+        "cpuP95ms": 5.09599199999866,
+        "aiSquadP95ms": 0.11092599999938102,
+        "counts": {
+          "A": 294,
+          "B": 283
+        },
+        "flagHealth": {
+          "A": 1200,
+          "B": 1200
+        },
+        "winner": null,
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": {
+          "orders": 100,
+          "replacements": 79,
+          "deduplicated": 1496,
+          "deferred": 118,
+          "invalid": 0,
+          "replans": 16,
+          "progress": 226,
+          "completed": 19,
+          "stalls": 3,
+          "observations": 78,
+          "refreshMs": 131.26191000000108,
+          "maxRefreshMs": 15.354005000001052
+        }
+      },
+      {
+        "implementation": "utility",
+        "seed": 191,
+        "count": 350,
+        "scenario": "ranged",
+        "initialRoster": "aa8a68f25edbd6a286135d4207700a934f5d3c706db40aa591e4ba228dc12391",
+        "seconds": 59.99999999999873,
+        "orders": 109,
+        "pathResets": 2474,
+        "moveReplaceRequests": 2474,
+        "staticRouteBuilds": 10682,
+        "stationaryUnitSeconds": 5574,
+        "distanceMoved": 16372.276793543533,
+        "reversals": 645,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 955293,
+        "cpuP95ms": 5.120509000000311,
+        "aiSquadP95ms": 0.14313399999991816,
+        "counts": {
+          "A": 327,
+          "B": 271
+        },
+        "flagHealth": {
+          "A": 1200,
+          "B": 1200
+        },
+        "winner": null,
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": {
+          "orders": 109,
+          "replacements": 88,
+          "deduplicated": 1518,
+          "deferred": 89,
+          "invalid": 0,
+          "replans": 18,
+          "progress": 245,
+          "completed": 19,
+          "stalls": 4,
+          "observations": 78,
+          "refreshMs": 124.13652599999477,
+          "maxRefreshMs": 9.464749000000666
+        }
+      }
+    ]
+  },
+  "upTo180s": {
+    "legacy": [
+      {
+        "implementation": "legacy",
+        "seed": 17,
+        "count": 350,
+        "scenario": "central",
+        "initialRoster": "241e3b95ae9f46b7800d66a2998f0ff2a5984ded5fd03e4a81e20fc3a647b96e",
+        "seconds": 180.00000000000668,
+        "orders": 458,
+        "stationaryUnitSeconds": 22463,
+        "distanceMoved": 26678.72456803546,
+        "reversals": 921,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 2859659,
+        "cpuP95ms": 4.885300000000029,
+        "aiSquadP95ms": 0.2077510000001439,
+        "counts": {
+          "A": 226,
+          "B": 139
+        },
+        "flagHealth": {
+          "A": 1200,
+          "B": 724
+        },
+        "winner": null,
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": null,
+        "moveReplaceRequests": 8543
+      },
+      {
+        "implementation": "legacy",
+        "seed": 17,
+        "count": 350,
+        "scenario": "ranged",
+        "initialRoster": "7d5e3cb68236784330dfb4348a2765214acd7bfbabf454149bc5ae7e97b32a6d",
+        "seconds": 132.04999999999578,
+        "orders": 357,
+        "stationaryUnitSeconds": 17495,
+        "distanceMoved": 21464.34036819446,
+        "reversals": 796,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 2187243,
+        "cpuP95ms": 5.034950999999637,
+        "aiSquadP95ms": 0.2029789999996865,
+        "counts": {
+          "A": 308,
+          "B": 191
+        },
+        "flagHealth": {
+          "A": 1116,
+          "B": 0
+        },
+        "winner": "A",
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": null,
+        "moveReplaceRequests": 6323
+      },
+      {
+        "implementation": "legacy",
+        "seed": 73,
+        "count": 350,
+        "scenario": "central",
+        "initialRoster": "0e5da984d7a14fae5a6ab696742b1763229c45e408b7bb4e4fbcaacd1bab33a3",
+        "seconds": 180.00000000000668,
+        "orders": 432,
+        "stationaryUnitSeconds": 25863,
+        "distanceMoved": 24271.2314493291,
+        "reversals": 943,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 2857280,
+        "cpuP95ms": 4.168818000000101,
+        "aiSquadP95ms": 0.18112099999962084,
+        "counts": {
+          "A": 226,
+          "B": 169
+        },
+        "flagHealth": {
+          "A": 1200,
+          "B": 896
+        },
+        "winner": null,
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": null,
+        "moveReplaceRequests": 8721
+      },
+      {
+        "implementation": "legacy",
+        "seed": 73,
+        "count": 350,
+        "scenario": "ranged",
+        "initialRoster": "e74174bba36f64aebe69b7b5e65f6c2e8352acbf4e59c1447eb61425c9b83361",
+        "seconds": 148.99999999999963,
+        "orders": 387,
+        "stationaryUnitSeconds": 19429,
+        "distanceMoved": 20276.521058194186,
+        "reversals": 821,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 2412432,
+        "cpuP95ms": 4.634105000001,
+        "aiSquadP95ms": 0.17527200000040466,
+        "counts": {
+          "A": 310,
+          "B": 165
+        },
+        "flagHealth": {
+          "A": 1200,
+          "B": 0
+        },
+        "winner": "A",
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": null,
+        "moveReplaceRequests": 7501
+      },
+      {
+        "implementation": "legacy",
+        "seed": 191,
+        "count": 350,
+        "scenario": "central",
+        "initialRoster": "dd9af633b72650c4e2dcc8ff54a8dba3be3bc8fd9ea082bf008ad8565d0bf6b6",
+        "seconds": 180.00000000000668,
+        "orders": 466,
+        "stationaryUnitSeconds": 24194,
+        "distanceMoved": 24131.87229066045,
+        "reversals": 1005,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 2720936,
+        "cpuP95ms": 4.102844999997615,
+        "aiSquadP95ms": 0.14737999999852036,
+        "counts": {
+          "A": 228,
+          "B": 129
+        },
+        "flagHealth": {
+          "A": 1200,
+          "B": 1200
+        },
+        "winner": null,
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": null,
+        "moveReplaceRequests": 9532
+      },
+      {
+        "implementation": "legacy",
+        "seed": 191,
+        "count": 350,
+        "scenario": "ranged",
+        "initialRoster": "aa8a68f25edbd6a286135d4207700a934f5d3c706db40aa591e4ba228dc12391",
+        "seconds": 180.00000000000668,
+        "orders": 344,
+        "stationaryUnitSeconds": 26967,
+        "distanceMoved": 18987.839094203668,
+        "reversals": 756,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 2793796,
+        "cpuP95ms": 4.634733999999298,
+        "aiSquadP95ms": 0.11696400000073481,
+        "counts": {
+          "A": 305,
+          "B": 145
+        },
+        "flagHealth": {
+          "A": 1200,
+          "B": 1024
+        },
+        "winner": null,
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": null,
+        "moveReplaceRequests": 6623
+      }
+    ],
+    "utility": [
+      {
+        "implementation": "utility",
+        "seed": 17,
+        "count": 350,
+        "scenario": "central",
+        "initialRoster": "241e3b95ae9f46b7800d66a2998f0ff2a5984ded5fd03e4a81e20fc3a647b96e",
+        "seconds": 168.40000000000404,
+        "orders": 199,
+        "stationaryUnitSeconds": 14415,
+        "distanceMoved": 26958.139307298403,
+        "reversals": 1202,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 2219211,
+        "cpuP95ms": 4.592640000000074,
+        "aiSquadP95ms": 0.044866999999612744,
+        "counts": {
+          "A": 227,
+          "B": 116
+        },
+        "flagHealth": {
+          "A": 1146,
+          "B": 0
+        },
+        "winner": "A",
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": {
+          "orders": 199,
+          "replacements": 178,
+          "deduplicated": 3514,
+          "deferred": 260,
+          "invalid": 0,
+          "replans": 56,
+          "progress": 427,
+          "completed": 24,
+          "stalls": 11,
+          "observations": 277,
+          "refreshMs": 398.3592810000036,
+          "maxRefreshMs": 10.113687999999996
+        },
+        "moveReplaceRequests": 4782
+      },
+      {
+        "implementation": "utility",
+        "seed": 17,
+        "count": 350,
+        "scenario": "ranged",
+        "initialRoster": "7d5e3cb68236784330dfb4348a2765214acd7bfbabf454149bc5ae7e97b32a6d",
+        "seconds": 140.5499999999977,
+        "orders": 173,
+        "stationaryUnitSeconds": 10871,
+        "distanceMoved": 24641.844842497892,
+        "reversals": 1062,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 1987670,
+        "cpuP95ms": 4.542014000000563,
+        "aiSquadP95ms": 0.04180300000007264,
+        "counts": {
+          "A": 284,
+          "B": 95
+        },
+        "flagHealth": {
+          "A": 0,
+          "B": 1200
+        },
+        "winner": "B",
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": {
+          "orders": 173,
+          "replacements": 152,
+          "deduplicated": 2863,
+          "deferred": 218,
+          "invalid": 0,
+          "replans": 31,
+          "progress": 357,
+          "completed": 21,
+          "stalls": 7,
+          "observations": 179,
+          "refreshMs": 266.77952299999015,
+          "maxRefreshMs": 9.593568000000232
+        },
+        "moveReplaceRequests": 3654
+      },
+      {
+        "implementation": "utility",
+        "seed": 73,
+        "count": 350,
+        "scenario": "central",
+        "initialRoster": "0e5da984d7a14fae5a6ab696742b1763229c45e408b7bb4e4fbcaacd1bab33a3",
+        "seconds": 173.4500000000052,
+        "orders": 213,
+        "stationaryUnitSeconds": 15735,
+        "distanceMoved": 27881.348755691153,
+        "reversals": 1106,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 2201402,
+        "cpuP95ms": 4.071176999999807,
+        "aiSquadP95ms": 0.03649500000028638,
+        "counts": {
+          "A": 207,
+          "B": 133
+        },
+        "flagHealth": {
+          "A": 0,
+          "B": 1200
+        },
+        "winner": "B",
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": {
+          "orders": 213,
+          "replacements": 192,
+          "deduplicated": 3657,
+          "deferred": 276,
+          "invalid": 0,
+          "replans": 36,
+          "progress": 452,
+          "completed": 25,
+          "stalls": 9,
+          "observations": 223,
+          "refreshMs": 299.50841600001877,
+          "maxRefreshMs": 7.508338999999978
+        },
+        "moveReplaceRequests": 3888
+      },
+      {
+        "implementation": "utility",
+        "seed": 73,
+        "count": 350,
+        "scenario": "ranged",
+        "initialRoster": "e74174bba36f64aebe69b7b5e65f6c2e8352acbf4e59c1447eb61425c9b83361",
+        "seconds": 71.64999999999807,
+        "orders": 122,
+        "stationaryUnitSeconds": 6320,
+        "distanceMoved": 19555.8510711312,
+        "reversals": 739,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 1133526,
+        "cpuP95ms": 4.962709999999788,
+        "aiSquadP95ms": 0.0907550000010815,
+        "counts": {
+          "A": 317,
+          "B": 234
+        },
+        "flagHealth": {
+          "A": 0,
+          "B": 1200
+        },
+        "winner": "B",
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": {
+          "orders": 122,
+          "replacements": 101,
+          "deduplicated": 1742,
+          "deferred": 116,
+          "invalid": 0,
+          "replans": 22,
+          "progress": 298,
+          "completed": 18,
+          "stalls": 4,
+          "observations": 92,
+          "refreshMs": 130.9902240000083,
+          "maxRefreshMs": 6.506639000001087
+        },
+        "moveReplaceRequests": 2859
+      },
+      {
+        "implementation": "utility",
+        "seed": 191,
+        "count": 350,
+        "scenario": "central",
+        "initialRoster": "dd9af633b72650c4e2dcc8ff54a8dba3be3bc8fd9ea082bf008ad8565d0bf6b6",
+        "seconds": 174.25000000000537,
+        "orders": 195,
+        "stationaryUnitSeconds": 16063,
+        "distanceMoved": 28308.41444102485,
+        "reversals": 1143,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 2349801,
+        "cpuP95ms": 3.979429999999411,
+        "aiSquadP95ms": 0.03997000000163098,
+        "counts": {
+          "A": 205,
+          "B": 137
+        },
+        "flagHealth": {
+          "A": 1200,
+          "B": 0
+        },
+        "winner": "A",
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": {
+          "orders": 195,
+          "replacements": 174,
+          "deduplicated": 3536,
+          "deferred": 262,
+          "invalid": 0,
+          "replans": 52,
+          "progress": 399,
+          "completed": 22,
+          "stalls": 13,
+          "observations": 276,
+          "refreshMs": 358.0452359999981,
+          "maxRefreshMs": 6.660448000002361
+        },
+        "moveReplaceRequests": 4808
+      },
+      {
+        "implementation": "utility",
+        "seed": 191,
+        "count": 350,
+        "scenario": "ranged",
+        "initialRoster": "aa8a68f25edbd6a286135d4207700a934f5d3c706db40aa591e4ba228dc12391",
+        "seconds": 156.7500000000014,
+        "orders": 174,
+        "stationaryUnitSeconds": 11383,
+        "distanceMoved": 26126.168519034567,
+        "reversals": 1141,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 2016832,
+        "cpuP95ms": 4.647242999999435,
+        "aiSquadP95ms": 0.03359999999884167,
+        "counts": {
+          "A": 291,
+          "B": 66
+        },
+        "flagHealth": {
+          "A": 0,
+          "B": 1200
+        },
+        "winner": "B",
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": {
+          "orders": 174,
+          "replacements": 153,
+          "deduplicated": 3104,
+          "deferred": 246,
+          "invalid": 0,
+          "replans": 47,
+          "progress": 378,
+          "completed": 20,
+          "stalls": 14,
+          "observations": 201,
+          "refreshMs": 269.3977350000132,
+          "maxRefreshMs": 6.452530000002298
+        },
+        "moveReplaceRequests": 3840
+      }
+    ]
+  },
+  "scripted60s": {
+    "legacy": [
+      {
+        "implementation": "legacy",
+        "seed": 73,
+        "count": 350,
+        "scenario": "flank",
+        "initialRoster": "0e5da984d7a14fae5a6ab696742b1763229c45e408b7bb4e4fbcaacd1bab33a3",
+        "seconds": 59.99999999999873,
+        "orders": 154,
+        "stationaryUnitSeconds": 12214,
+        "distanceMoved": 7133.753552531122,
+        "reversals": 283,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 1000763,
+        "cpuP95ms": 7.357226000000026,
+        "aiSquadP95ms": 0.30759999999997945,
+        "counts": {
+          "A": 320,
+          "B": 325
+        },
+        "flagHealth": {
+          "A": 1200,
+          "B": 1200
+        },
+        "winner": null,
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": null,
+        "moveReplaceRequests": 3491
+      },
+      {
+        "implementation": "legacy",
+        "seed": 73,
+        "count": 350,
+        "scenario": "feint",
+        "initialRoster": "0e5da984d7a14fae5a6ab696742b1763229c45e408b7bb4e4fbcaacd1bab33a3",
+        "seconds": 59.99999999999873,
+        "orders": 237,
+        "stationaryUnitSeconds": 5578,
+        "distanceMoved": 18062.0558822256,
+        "reversals": 1288,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 771630,
+        "cpuP95ms": 4.080222999999933,
+        "aiSquadP95ms": 0.2813499999997475,
+        "counts": {
+          "A": 343,
+          "B": 347
+        },
+        "flagHealth": {
+          "A": 1200,
+          "B": 1200
+        },
+        "winner": null,
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": null,
+        "moveReplaceRequests": 3585
+      },
+      {
+        "implementation": "legacy",
+        "seed": 73,
+        "count": 350,
+        "scenario": "rear",
+        "initialRoster": "0e5da984d7a14fae5a6ab696742b1763229c45e408b7bb4e4fbcaacd1bab33a3",
+        "seconds": 59.99999999999873,
+        "orders": 159,
+        "stationaryUnitSeconds": 11294,
+        "distanceMoved": 8160.900780551231,
+        "reversals": 311,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 1005951,
+        "cpuP95ms": 4.645676000000094,
+        "aiSquadP95ms": 0.19876699999986158,
+        "counts": {
+          "A": 318,
+          "B": 318
+        },
+        "flagHealth": {
+          "A": 1200,
+          "B": 1200
+        },
+        "winner": null,
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": null,
+        "moveReplaceRequests": 4106
+      },
+      {
+        "implementation": "legacy",
+        "seed": 73,
+        "count": 350,
+        "scenario": "support-loss",
+        "initialRoster": "0e5da984d7a14fae5a6ab696742b1763229c45e408b7bb4e4fbcaacd1bab33a3",
+        "seconds": 59.99999999999873,
+        "orders": 213,
+        "stationaryUnitSeconds": 9915,
+        "distanceMoved": 9008.877212218213,
+        "reversals": 295,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 1003729,
+        "cpuP95ms": 4.8667560000003505,
+        "aiSquadP95ms": 0.20213199999943754,
+        "counts": {
+          "A": 308,
+          "B": 267
+        },
+        "flagHealth": {
+          "A": 1200,
+          "B": 1200
+        },
+        "winner": null,
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": null,
+        "moveReplaceRequests": 3889
+      },
+      {
+        "implementation": "legacy",
+        "seed": 73,
+        "count": 350,
+        "scenario": "target-changes",
+        "initialRoster": "0e5da984d7a14fae5a6ab696742b1763229c45e408b7bb4e4fbcaacd1bab33a3",
+        "seconds": 59.99999999999873,
+        "orders": 169,
+        "stationaryUnitSeconds": 10978,
+        "distanceMoved": 8677.296931886276,
+        "reversals": 386,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 1005431,
+        "cpuP95ms": 4.567992000000231,
+        "aiSquadP95ms": 0.18785100000059174,
+        "counts": {
+          "A": 326,
+          "B": 323
+        },
+        "flagHealth": {
+          "A": 1200,
+          "B": 1200
+        },
+        "winner": null,
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": null,
+        "moveReplaceRequests": 4176
+      },
+      {
+        "implementation": "legacy",
+        "seed": 73,
+        "count": 350,
+        "scenario": "topology",
+        "initialRoster": "0e5da984d7a14fae5a6ab696742b1763229c45e408b7bb4e4fbcaacd1bab33a3",
+        "seconds": 59.99999999999873,
+        "orders": 170,
+        "stationaryUnitSeconds": 10907,
+        "distanceMoved": 9143.258004499135,
+        "reversals": 351,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 1005315,
+        "cpuP95ms": 4.8594689999990806,
+        "aiSquadP95ms": 0.1867789999996603,
+        "counts": {
+          "A": 320,
+          "B": 330
+        },
+        "flagHealth": {
+          "A": 1200,
+          "B": 1200
+        },
+        "winner": null,
+        "topologyChanges": 12,
+        "topologyChangeMs": 0.6426900000005844,
+        "operations": null,
+        "moveReplaceRequests": 3404
+      }
+    ],
+    "utility": [
+      {
+        "implementation": "utility",
+        "seed": 73,
+        "count": 350,
+        "scenario": "flank",
+        "initialRoster": "0e5da984d7a14fae5a6ab696742b1763229c45e408b7bb4e4fbcaacd1bab33a3",
+        "seconds": 59.99999999999873,
+        "orders": 106,
+        "stationaryUnitSeconds": 4911,
+        "distanceMoved": 16859.025748656997,
+        "reversals": 747,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 930742,
+        "cpuP95ms": 5.71727999999996,
+        "aiSquadP95ms": 0.20595700000012584,
+        "counts": {
+          "A": 283,
+          "B": 244
+        },
+        "flagHealth": {
+          "A": 1200,
+          "B": 1200
+        },
+        "winner": null,
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": {
+          "orders": 106,
+          "replacements": 85,
+          "deduplicated": 1449,
+          "deferred": 109,
+          "invalid": 0,
+          "replans": 17,
+          "progress": 261,
+          "completed": 18,
+          "stalls": 2,
+          "observations": 78,
+          "refreshMs": 141.78956899999997,
+          "maxRefreshMs": 10.882235999999992
+        },
+        "moveReplaceRequests": 2394
+      },
+      {
+        "implementation": "utility",
+        "seed": 73,
+        "count": 350,
+        "scenario": "feint",
+        "initialRoster": "0e5da984d7a14fae5a6ab696742b1763229c45e408b7bb4e4fbcaacd1bab33a3",
+        "seconds": 59.99999999999873,
+        "orders": 103,
+        "stationaryUnitSeconds": 4704,
+        "distanceMoved": 20416.255257816825,
+        "reversals": 1183,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 612809,
+        "cpuP95ms": 3.8800559999999678,
+        "aiSquadP95ms": 0.18749000000025262,
+        "counts": {
+          "A": 343,
+          "B": 348
+        },
+        "flagHealth": {
+          "A": 1200,
+          "B": 1200
+        },
+        "winner": null,
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": {
+          "orders": 103,
+          "replacements": 82,
+          "deduplicated": 1665,
+          "deferred": 32,
+          "invalid": 0,
+          "replans": 16,
+          "progress": 296,
+          "completed": 21,
+          "stalls": 1,
+          "observations": 78,
+          "refreshMs": 113.78350299999738,
+          "maxRefreshMs": 6.3929189999998925
+        },
+        "moveReplaceRequests": 2327
+      },
+      {
+        "implementation": "utility",
+        "seed": 73,
+        "count": 350,
+        "scenario": "rear",
+        "initialRoster": "0e5da984d7a14fae5a6ab696742b1763229c45e408b7bb4e4fbcaacd1bab33a3",
+        "seconds": 59.99999999999873,
+        "orders": 107,
+        "stationaryUnitSeconds": 5781,
+        "distanceMoved": 16416.677396016603,
+        "reversals": 656,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 943337,
+        "cpuP95ms": 4.534670999999435,
+        "aiSquadP95ms": 0.14358399999946414,
+        "counts": {
+          "A": 300,
+          "B": 278
+        },
+        "flagHealth": {
+          "A": 1200,
+          "B": 1200
+        },
+        "winner": null,
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": {
+          "orders": 107,
+          "replacements": 86,
+          "deduplicated": 1520,
+          "deferred": 106,
+          "invalid": 0,
+          "replans": 19,
+          "progress": 254,
+          "completed": 19,
+          "stalls": 4,
+          "observations": 78,
+          "refreshMs": 108.98836599998958,
+          "maxRefreshMs": 5.8630459999994855
+        },
+        "moveReplaceRequests": 2585
+      },
+      {
+        "implementation": "utility",
+        "seed": 73,
+        "count": 350,
+        "scenario": "support-loss",
+        "initialRoster": "0e5da984d7a14fae5a6ab696742b1763229c45e408b7bb4e4fbcaacd1bab33a3",
+        "seconds": 59.99999999999873,
+        "orders": 122,
+        "stationaryUnitSeconds": 5419,
+        "distanceMoved": 14291.001351841074,
+        "reversals": 715,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 975877,
+        "cpuP95ms": 4.580709999998362,
+        "aiSquadP95ms": 0.13948900000013964,
+        "counts": {
+          "A": 299,
+          "B": 218
+        },
+        "flagHealth": {
+          "A": 1200,
+          "B": 1200
+        },
+        "winner": null,
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": {
+          "orders": 122,
+          "replacements": 101,
+          "deduplicated": 1517,
+          "deferred": 98,
+          "invalid": 0,
+          "replans": 24,
+          "progress": 162,
+          "completed": 13,
+          "stalls": 11,
+          "observations": 78,
+          "refreshMs": 122.18196400000124,
+          "maxRefreshMs": 7.546048999999584
+        },
+        "moveReplaceRequests": 2068
+      },
+      {
+        "implementation": "utility",
+        "seed": 73,
+        "count": 350,
+        "scenario": "target-changes",
+        "initialRoster": "0e5da984d7a14fae5a6ab696742b1763229c45e408b7bb4e4fbcaacd1bab33a3",
+        "seconds": 59.99999999999873,
+        "orders": 105,
+        "stationaryUnitSeconds": 5499,
+        "distanceMoved": 16572.549967616622,
+        "reversals": 656,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 975364,
+        "cpuP95ms": 4.4299060000012105,
+        "aiSquadP95ms": 0.13348899999982677,
+        "counts": {
+          "A": 292,
+          "B": 275
+        },
+        "flagHealth": {
+          "A": 1200,
+          "B": 1200
+        },
+        "winner": null,
+        "topologyChanges": 0,
+        "topologyChangeMs": 0,
+        "operations": {
+          "orders": 105,
+          "replacements": 84,
+          "deduplicated": 1506,
+          "deferred": 100,
+          "invalid": 0,
+          "replans": 18,
+          "progress": 240,
+          "completed": 17,
+          "stalls": 3,
+          "observations": 78,
+          "refreshMs": 113.4180499999984,
+          "maxRefreshMs": 6.053389999999126
+        },
+        "moveReplaceRequests": 2522
+      },
+      {
+        "implementation": "utility",
+        "seed": 73,
+        "count": 350,
+        "scenario": "topology",
+        "initialRoster": "0e5da984d7a14fae5a6ab696742b1763229c45e408b7bb4e4fbcaacd1bab33a3",
+        "seconds": 59.99999999999873,
+        "orders": 101,
+        "stationaryUnitSeconds": 5869,
+        "distanceMoved": 16546.55770102719,
+        "reversals": 673,
+        "collisions": 0,
+        "invalid": 0,
+        "maxExpansions": 2048,
+        "expansions": 962383,
+        "cpuP95ms": 4.963261999999304,
+        "aiSquadP95ms": 0.08982399999877089,
+        "counts": {
+          "A": 302,
+          "B": 286
+        },
+        "flagHealth": {
+          "A": 1200,
+          "B": 1200
+        },
+        "winner": null,
+        "topologyChanges": 12,
+        "topologyChangeMs": 0.704172000001563,
+        "operations": {
+          "orders": 101,
+          "replacements": 80,
+          "deduplicated": 1605,
+          "deferred": 45,
+          "invalid": 0,
+          "replans": 25,
+          "progress": 248,
+          "completed": 19,
+          "stalls": 0,
+          "observations": 78,
+          "refreshMs": 125.29005999999754,
+          "maxRefreshMs": 8.218813999999838
+        },
+        "moveReplaceRequests": 2539
+      }
+    ]
+  },
+  "counterNotes": "Long and scripted runs counted replacement requests before checking acceptance; moveReplaceRequests is named accordingly. Fixed60s additionally measures successful pathResets. Idle and collision samples are 1Hz; focused tests check collisions per simulation tick. Browser is a short host-dependent sample. Full opposing narrow-passage throughput remains unproven.",
+  "casualtyExchange180s": {
+    "legacy": {
+      "enemyKilled": 497,
+      "botLost": 1162,
+      "killsPerLoss": 0.42771084337349397
+    },
+    "utility": {
+      "enemyKilled": 569,
+      "botLost": 1319,
+      "killsPerLoss": 0.4313874147081122
+    }
+  }
+}
