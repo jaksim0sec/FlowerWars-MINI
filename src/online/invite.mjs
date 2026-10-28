@@ -1,0 +1,3 @@
+const valid=code=>typeof code==='string'&&/^[A-Z]{6}$/.test(code);
+export function inviteLink(code,base){if(!valid(code))throw new Error('INVALID_CODE');const url=new URL(base);if(!['http:','https:'].includes(url.protocol))throw new Error('INVALID_URL');url.username='';url.password='';url.search='';url.hash='join='+code;return url.href;}
+export function inviteCode(value){try{const url=new URL(value,'https://invite.local/');if(!['http:','https:'].includes(url.protocol))return null;const code=new URLSearchParams(url.hash.slice(1)).get('join')?.toUpperCase();return valid(code)?code:null;}catch{return null;}}

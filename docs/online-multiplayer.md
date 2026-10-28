@@ -6,6 +6,8 @@
 
 Node **22.x**. Build **`npm ci --omit=dev`**; start **`npm start`**. One HTTP server listens on `0.0.0.0`, `PORT` or `10000`. Health: **GET `/health`**. `render.yaml` configures one Free Web Service. No database, Redis, paid service, server disk state or server-side soldier simulation is required. Optional `PUBLIC_ORIGIN=https://your-service.onrender.com` pins browser origin; same-host HTTPS proxy validation works without it.
 
+Use **초대 링크 복사** to share a public `#join=ABCDEF` URL; opening it automatically joins that room. An existing authenticated session recovers first. Links omit credentials and query parameters, and code entry also accepts pasted invite links.
+
 Open the same server URL on both devices → **온라인** → create/join six-letter code → both **준비** → host **대전 시작**. The real battlefield opens in five-minute preparation. Choose a unit type and touch your side to deploy. Only the host can skip preparation using the battlefield's **전투 시작**; the preparation timer also starts combat automatically. The existing roster, gestures and command controls work for each player's own team. Open **온라인** for chat or pause/resume. On victory/defeat, **방 나가기** returns to the original single-player game.
 
 Serving the frontend statically still supports single-player; online features need this Node server at the same origin. No Render deployment was performed during development.
@@ -42,7 +44,7 @@ On reconnect both restore the exact mutually committed sequence/hash, from their
 
 ## Verification
 
-- **Node 22.23.4:** online tests **65 passed / 0 failed**. Full suite **365 tests: 335 passed / same 30 pre-existing failures**. No existing combat test assertions were changed. Exact names: [existing failures](online-existing-failures.md).
+- **Node 22.23.4:** online tests **67 passed / 0 failed**. Full suite **367 tests: 337 passed / same 30 pre-existing failures**. No existing combat test assertions were changed. Exact names: [existing failures](online-existing-failures.md).
 - `FIXTURE_TRANSPORT=1 BASE_URL=http://127.0.0.1:10000 python tests/online-battle-browser.py`: real battlefield, own-side UI deployment/selection/hold, real HP damage, pause/frozen clocks, host army recovery from guest backup, guest reload, durable final outcomes, mobile bounds and leaving. Zero page errors. `FILL_ARMIES=1` additionally fills and synchronizes the full 700-soldier roster through owned commands.
 - `scripts/benchmark_online_battle.mjs`: real current equipment/stats/blueprints, 176×128 seed73, 350/team and 20 simulated seconds. [Recorded measurements](measurements/online-battle-700.json): zero occupancy/reservation collisions, host step p95 **5.66ms**, frame encode/decode/apply p95 **14.07ms** (both sides combined). Application-frame bytes **633,914→90,335 bytes/s** using native gzip (−85.7%); checkpoints around **3.50MB→373KB**. Snapshot save ~79–116ms during the run, initial restore ~85ms. These are local CPU/encoding measurements, not browser FPS or measured Internet bandwidth; chunk overhead is additional.
 - Structural/security/recovery regressions cover duplicate slots, original grace deadlines, host/guest ownership, idempotent commands, chunk bounds/replay/timeout/backpressure, decompression bombs, malformed graphs/hashes, all 700 soldiers, movement reservations, ongoing strikes/heals, formations, courtesy identities, late asynchronous restore/start, final results and dropped tombstones.

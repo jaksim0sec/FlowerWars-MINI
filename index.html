@@ -23,20 +23,20 @@
   <aside id="ai-decision-log" aria-label="AI 판단·명령 로그" hidden></aside>
   <button id="online-entry" type="button" aria-controls="online-panel" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="7" r="3"/><circle cx="18" cy="17" r="3"/><path d="M6 10v5a2 2 0 0 0 2 2h7M9 7h7a2 2 0 0 1 2 2v5"/></svg><span>온라인</span></button>
   <section id="online-panel" role="dialog" aria-labelledby="online-title" hidden>
-    <header><strong id="online-title">온라인 · 1 대 1</strong><button id="online-close" type="button" aria-label="온라인 창 접기">×</button></header>
-    <p class="online-scope">호스트 A · 게스트 B · 연결이 끊기면 함께 일시 정지</p>
+    <header><div class="online-heading"><span class="online-eyebrow">FLOWERWARS</span><strong id="online-title">함께하는 전장</strong></div><button id="online-close" type="button" aria-label="온라인 창 접기">×</button></header>
+    <p class="online-scope">친구를 초대하고, 나만의 군대를 지휘하세요.</p>
     <p id="online-error" role="status" hidden></p>
     <div id="online-connect">
-      <button id="online-create" type="button" class="online-primary">방 만들기</button>
+      <button id="online-create" type="button" class="online-primary"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>새 전장 만들기</span><small>1 대 1 · 친구 초대</small></button>
       <button id="online-cancel-recovery" type="button" hidden>복구 취소 · 싱글 플레이</button>
-      <form id="online-join"><label for="online-code-input">초대 코드</label><div><input id="online-code-input" name="code" placeholder="ABCDEF" maxlength="6" pattern="[A-Za-z]{6}" autocomplete="off" autocapitalize="characters" spellcheck="false" required><button type="submit">참가</button></div></form>
+      <form id="online-join"><label for="online-code-input">초대받으셨나요?</label><div><input id="online-code-input" name="code" placeholder="6자리 코드" maxlength="6" pattern="[A-Za-z]{6}" autocomplete="off" autocapitalize="characters" spellcheck="false" required><button type="submit">참가</button></div></form>
     </div>
     <div id="online-room" hidden>
-      <div class="online-invite"><output id="online-code"></output><button id="online-copy" type="button">코드 복사</button></div>
+      <div class="online-invite"><div><small>초대 코드</small><output id="online-code"></output></div><button id="online-copy" type="button" aria-label="초대 코드 복사">코드 복사</button></div><button id="online-copy-link" type="button" class="online-link-button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 13 4-4M8 16l-1 1a4 4 0 0 1-6-6l4-4a4 4 0 0 1 6 0M16 8l1-1a4 4 0 0 1 6 6l-4 4a4 4 0 0 1-6 0" transform="translate(1 0) scale(.9)"/></svg><span>초대 링크 복사</span></button><input id="online-invite-link" aria-label="복사할 초대 링크" readonly hidden><p id="online-copy-status" role="status" hidden></p>
       <ul id="online-players" aria-label="참가자"></ul>
       <p id="online-status" aria-live="polite"></p>
       <p id="online-room-recovery" hidden>연결 복구 중 · <output id="online-room-countdown"></output></p>
-      <div class="online-buttons"><button id="online-ready" type="button" aria-pressed="false">준비</button><button id="online-start" type="button" class="online-primary" hidden>대전 시작</button><button id="online-pause" type="button" hidden>일시 정지</button><button id="online-resume" type="button" hidden>계속</button></div>
+      <div class="online-buttons"><button id="online-ready" type="button" aria-pressed="false">준비 완료</button><button id="online-start" type="button" class="online-primary" hidden>대전 시작</button><button id="online-pause" type="button" hidden>일시 정지</button><button id="online-resume" type="button" hidden>계속</button></div>
       <div id="online-fixture-wrap" hidden><canvas id="online-fixture" width="300" height="120" aria-label="연결 시험. 터치한 곳으로 내 팀의 점을 이동합니다."></canvas><output id="online-fixture-state"></output><small>전장에서 내 진영에 병력을 배치하고 부대를 지휘하세요.</small></div>
       <details id="online-chat" open><summary>대화</summary><div id="online-chat-log" role="log" aria-label="방 대화"></div><form id="online-chat-form"><input id="online-chat-input" aria-label="메시지" placeholder="메시지" maxlength="300" autocomplete="off" required><button type="submit">전송</button></form></details>
       <footer><button id="online-retry" type="button">연결 재시도</button><button id="online-leave" type="button">방 나가기</button></footer>

@@ -1,0 +1,4 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {inviteLink,inviteCode} from '../src/online/invite.mjs';
+test('shared links contain only public room code and preserve hosted path',()=>{assert.equal(inviteLink('ABCDEF','https://name:private@game.test/play/?token=secret#private'),'https://game.test/play/#join=ABCDEF');assert.throws(()=>inviteLink('BAD','https://game.test'),/INVALID_CODE/);});
+test('invites accept case insensitive six-letter codes and reject invalid or external protocols',()=>{assert.equal(inviteCode('https://game.test/#join=abcdef'),'ABCDEF');assert.equal(inviteCode('#join=ABCDEF'),'ABCDEF');for(const value of ['#join=ABC12F','#join=ABCDEFF','javascript:alert(1)#join=ABCDEF','https://game.test/#other=ABCDEF'])assert.equal(inviteCode(value),null);});
