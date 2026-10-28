@@ -7,7 +7,7 @@ test('guest independently renders between received movement frames without chang
  const before=structuredClone(unit);
  assert.equal(guestVisual(unit,100).x,.5+10);
  assert.deepEqual(unit,before);
- assert.equal(guestVisual(unit,300).x,10.75,'extrapolation is capped at 200ms');
+ assert.equal(guestVisual(unit,300).x,11,'movement continues to the reserved destination');
 });
 test('presentation never advances beyond the reserved single step or invents a next step',()=>{
  const u={x:10,y:20,visualX:10.8,visualY:20,state:'walk',elapsed:.2,step:{x:11,y:20,elapsed:.35,duration:.4}};
@@ -20,4 +20,11 @@ test('local elapsed animation advances while positions and combat stay authorita
  assert.equal(guestVisual(u,-40).elapsed,.12);
  assert.equal(guestVisual(u,Infinity).elapsed,.12);
  assert.equal(u.elapsed,.12);
+});
+
+test('death animations continue smoothly across slow 400ms network frames',()=>{
+ const unit={x:10,y:20,visualX:10,visualY:20,state:'death',elapsed:.15,step:null};
+ assert.ok(Math.abs(guestVisual(unit,410).elapsed-.56)<1e-9);
+ assert.ok(Math.abs(guestVisual(unit,1200).elapsed-1.35)<1e-9);
+ assert.equal(unit.elapsed,.15,'presentation must not mutate authoritative time');
 });
