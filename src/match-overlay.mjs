@@ -10,10 +10,11 @@ function drawFlagGlyph(ctx,team,{number=null,selected=false,image=null}={}){
  ctx.save();
  const color=TEAM_COLORS[team]||'#777';
  ctx.lineJoin='round';ctx.lineCap='round';
- ctx.save();ctx.fillStyle=color;ctx.globalAlpha*=.45;
- ctx.beginPath();ctx.ellipse(0,1,5,2,0,0,Math.PI*2);ctx.fill();ctx.restore();
  if(image){
-  ctx.drawImage(image,-7,-30,30*image.width/image.height,30);
+  // The supplied illustration includes its pole and foot: anchor that foot,
+  // rather than adding a separate platform underneath the image.
+  const height=30,width=height*image.width/image.height;
+  ctx.drawImage(image,-width*(team==='B'?.20:.25),-height*.94,width,height);
   if(number!==null){ctx.font=`800 ${number.length>2?5.5:7}px system-ui`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineWidth=1.4;ctx.strokeStyle='#513b28';ctx.strokeText(number,9,-20,13);ctx.fillStyle='#fff';ctx.fillText(number,9,-20,13);}
   ctx.restore();return;
  }

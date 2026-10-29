@@ -17,7 +17,6 @@ export function autumnScenery(board){
   const id=['compacted_soil','dry_grass_patch','olive_grass_patch','leaf_scatter_01','moss_patch'][Math.floor(random()*5)];
   patches.push({x:a,y:b,id,width:1200+random()*650,layer:0});
  }
- for(const flag of [{x:5,y:Math.floor(h/2)},{x:w-6,y:h-1-Math.floor(h/2)}])patches.push({x:flag.x,y:flag.y,id:'stone_paving',width:650,layer:0});
  // Separate clustered shore/rock families, with wide empty stretches in between.
  for(let y=4;y<h-4;y+=3)for(let x=4;x<w-4;x+=3){
   const a=x+Math.floor(random()*3)-1,b=y+Math.floor(random()*3)-1,t=board.terrain[b][a];
