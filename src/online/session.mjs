@@ -72,8 +72,12 @@ export class OnlineSession extends EventTarget {
    const processed=await decodeCheckpointEnvelopeOffThread(message);if(!current())return;
    if(processed.kind==='verified-checkpoint'){
     if(this.identity.role!=='guest'||processed.metadata.matchId!==matchId)throw new Error('INVALID_SNAPSHOT');
-    await this.backup.putPacked(code,processed.metadata,message);
-    if(current())await this.rpc('snapshot:stored',processed.metadata);return;
+    const store=async()=>{if(!current())return;await this.backup.putPacked(code,processed.metadata,message);if(current())await this.rpc('snapshot:stored',processed.metadata);};
+    if(!background&&this.room.state==='PLAYING'){
+     this.backgroundCheckpoints=this.backgroundCheckpoints.then(store).catch(e=>{if(current()){this.error(e.message);this.peer?.fail('RECOVERY_FAILED');}});
+     return;
+    }
+    await store();return;
    }
    await this.receive(processed.value,epoch,background,message);return;
   }
@@ -107,7 +111,7 @@ export class OnlineSession extends EventTarget {
    const final=this.state.board?.match.phase==='finished',sequence=++this.sequence;
    let metadata,packet;
    if(this.state.board){
-    const sealed=await sealPackedOffThread({draft:captureBattleState(this.state,sequence),final});
+    const sealed=await sealPackedOffThread({draft:captureBattleState(this.state,sequence),final,peerCompression:this.peerCompression});
     if(!current())return;
     metadata=sealed.metadata;packet=sealed.packet;
     await this.backup.putPacked(code,metadata,sealed.payload);
