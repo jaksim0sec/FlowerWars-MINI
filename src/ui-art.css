@@ -1,0 +1,7 @@
+/* Art accents only: preserve the existing command positions and target sizes. */
+#command-dock .quick-orders button>img.command-art{display:block;box-sizing:border-box;width:44px;height:44px;padding:4px;object-fit:contain;border-radius:12px;pointer-events:none;user-select:none}
+#command-dock .quick-orders .icon-label{font-size:11px}
+.squad-card{isolation:isolate}.squad-card::before{content:"";position:absolute;right:4px;bottom:0;width:30px;height:30px;background:url('../assets/ui/selected/flower-stamp.webp') center/contain no-repeat;opacity:.1;pointer-events:none;z-index:-1}
+#online-panel::after{content:"";position:absolute;right:8px;bottom:8px;width:64px;height:64px;background:url('../assets/ui/selected/botanical-corner.webp') center/contain no-repeat;opacity:.12;pointer-events:none}
+#match-result .result-caption::after{content:"";display:block;width:90px;height:24px;margin:5px auto 0;background:url('../assets/ui/selected/leaf-divider.webp') center/contain no-repeat;opacity:.65}
+@media(max-height:520px){#command-dock .quick-orders button>img.command-art{width:36px;height:36px;padding:2px}}

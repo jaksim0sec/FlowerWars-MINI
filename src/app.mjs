@@ -4,7 +4,7 @@ import {commanderPortrait} from './commander-portrait.mjs';
 import {squadTapIntent} from './gesture-commands.mjs';
 import {terrainNames} from './battlefield-terrain.mjs';
 import {FlagMatch} from './flag-match.mjs';
-import {icon,typeLabels} from './ui-icons.mjs';
+import {icon,commandIcon,typeLabels} from './ui-icons.mjs';
 import {createFormationGroup,placeGroup,groupsFor,squadOf,squadsFor} from './unit-groups.mjs';
 import {configureSquad,orderSquad,orderSquads,updateSquadOrders,squadSummary,SQUAD_ACTIONS} from './squad-orders.mjs';
 import {characterRadius,onScreen} from './character-render-cache.mjs';
@@ -681,7 +681,7 @@ function quickOrder(p){
 $('command-dock').addEventListener('click',event=>{
  const action=event.target.closest('[data-squad-action]');if(action&&!action.disabled)issueSquadAction(action.dataset.squadAction);
 });
-for(const button of document.querySelectorAll('[data-squad-action]')){const def=SQUAD_ACTIONS[button.dataset.squadAction];button.innerHTML=icon(button.dataset.squadAction)+'<span class="icon-label">'+def.label+'</span>';button.title=def.label+' · '+def.hint;button.setAttribute('aria-label',def.label);}
+for(const button of document.querySelectorAll('[data-squad-action]')){const def=SQUAD_ACTIONS[button.dataset.squadAction];button.innerHTML=commandIcon(button.dataset.squadAction)+'<span class="icon-label">'+def.label+'</span>';button.title=def.label+' · '+def.hint;button.setAttribute('aria-label',def.label);}
 for(const [attribute,prefix] of [['data-squad-stance',''],['data-squad-formation','']])for(const button of document.querySelectorAll('['+attribute+']')){const label=button.textContent.trim();button.innerHTML=icon(button.getAttribute(attribute))+'<span>'+label.replace(/^[^가-힣]+/,'')+'</span>';}
 for(const [id,name,label] of [['selection-add','plus','추가 선택'],['selection-platoon','platoon','소대 선택'],['selection-options','square','진형'],['orders-toggle','chevron','명령'],['selection-clear','close','선택 해제'],['squad-close','close','닫기'],['zoom-in','plus','확대'],['zoom-out','zoom','축소'],['fit','fit','전장 맞춤']]){const button=$(id);button.innerHTML=icon(name)+'<span class="control-label">'+label+'</span>';button.title=label;button.setAttribute('aria-label',label);}
 const debugSummary=$('debug-tools').querySelector(':scope > summary');debugSummary.innerHTML=icon('debug')+'<span>도구</span>';

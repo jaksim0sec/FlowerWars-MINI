@@ -1,0 +1,173 @@
+{
+  "source": "User supplied flowerwars-selected-assets (1).zip",
+  "assets": [
+    {
+      "file": "01-ornaments/flower-stamp.png",
+      "source_sheet": 1,
+      "source_crop_xyxy": [
+        0,
+        130,
+        425,
+        570
+      ],
+      "size": [
+        441,
+        456
+      ],
+      "transparent_padding_px": 8,
+      "sha256": "9d42c7186ecd650f9b5ada6fc8ac9e72756497aa36f167cca7172689985c3397",
+      "runtime": "flower-stamp.webp",
+      "runtime_size": [
+        124,
+        128
+      ]
+    },
+    {
+      "file": "01-ornaments/botanical-corner.png",
+      "source_sheet": 1,
+      "source_crop_xyxy": [
+        851,
+        130,
+        1238,
+        570
+      ],
+      "size": [
+        403,
+        456
+      ],
+      "transparent_padding_px": 8,
+      "sha256": "9d8d3437758fb40f209efb2ba552fc11548590f5e94426aab4fb8917dcad1f99",
+      "runtime": "botanical-corner.webp",
+      "runtime_size": [
+        113,
+        128
+      ]
+    },
+    {
+      "file": "01-ornaments/leaf-divider.png",
+      "source_sheet": 1,
+      "source_crop_xyxy": [
+        861,
+        820,
+        1238,
+        1040
+      ],
+      "size": [
+        393,
+        236
+      ],
+      "transparent_padding_px": 8,
+      "sha256": "63ae2ab6aae54a36239489bac319e217cfc906c493c17f0d68fb681c73b7f3fd",
+      "runtime": "leaf-divider.webp",
+      "runtime_size": [
+        128,
+        77
+      ]
+    },
+    {
+      "file": "04-commands/move.png",
+      "source_sheet": 4,
+      "source_crop_xyxy": [
+        0,
+        110,
+        391,
+        609
+      ],
+      "size": [
+        407,
+        515
+      ],
+      "transparent_padding_px": 8,
+      "sha256": "dbd5c59b380b470bd2ca284eb3f3f46584181b3a7777e4a1224c8c0aceace52a",
+      "runtime": "move.webp",
+      "runtime_size": [
+        101,
+        128
+      ]
+    },
+    {
+      "file": "04-commands/attack.png",
+      "source_sheet": 4,
+      "source_crop_xyxy": [
+        435,
+        111,
+        816,
+        610
+      ],
+      "size": [
+        397,
+        515
+      ],
+      "transparent_padding_px": 8,
+      "sha256": "15b6782bbcf593cbb6c28b8a9dc0ddcd13d471954e73da2c90e16df04927d13e",
+      "runtime": "attack.webp",
+      "runtime_size": [
+        99,
+        128
+      ]
+    },
+    {
+      "file": "04-commands/flank.png",
+      "source_sheet": 4,
+      "source_crop_xyxy": [
+        837,
+        110,
+        1228,
+        610
+      ],
+      "size": [
+        407,
+        516
+      ],
+      "transparent_padding_px": 8,
+      "sha256": "496642c6017c5828f27adf39c76cad135c95339ab05dccfc92b40108cf2f3aba",
+      "runtime": "flank.webp",
+      "runtime_size": [
+        101,
+        128
+      ]
+    },
+    {
+      "file": "04-commands/hold.png",
+      "source_sheet": 4,
+      "source_crop_xyxy": [
+        0,
+        630,
+        424,
+        1190
+      ],
+      "size": [
+        440,
+        576
+      ],
+      "transparent_padding_px": 8,
+      "sha256": "81f3910dac99e35f70df11a5e4d079940f6b95b73d0383f68427b15fc10dd93e",
+      "runtime": "hold.webp",
+      "runtime_size": [
+        98,
+        128
+      ]
+    },
+    {
+      "file": "04-commands/rally.png",
+      "source_sheet": 4,
+      "source_crop_xyxy": [
+        443,
+        620,
+        880,
+        1200
+      ],
+      "size": [
+        453,
+        596
+      ],
+      "transparent_padding_px": 8,
+      "sha256": "d71ea83a9a4fe8f34ba0763ec39bb0200660f29c939f98e415dce3b707d89da8",
+      "runtime": "rally.webp",
+      "runtime_size": [
+        97,
+        128
+      ]
+    }
+  ]
+}

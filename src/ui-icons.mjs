@@ -13,3 +13,7 @@ export function icon(name){
  return `<svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${content}</svg>`;
 }
 export const typeLabels={assault:'돌격',defense:'철벽',ranged:'궁병',mobile:'기동',support:'지원',mixed:'보병'};
+
+// Illustrated commands are UI-only; tiny map/roster indicators keep their SVGs.
+const commandPictures={advance:'move',move:'move',focus:'attack',flank:'flank',hold:'hold',rally:'rally'};
+export function commandIcon(name){const file=commandPictures[name];return file?`<img class="ui-icon command-art" src="${new URL('../assets/ui/selected/'+file+'.webp',import.meta.url).href}" alt="" aria-hidden="true" draggable="false" decoding="async">`:icon(name);}
