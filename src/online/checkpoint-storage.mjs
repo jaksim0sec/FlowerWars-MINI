@@ -17,10 +17,10 @@ export async function decodeStoredCheckpoint(record){
  return packet.snapshot;
 }
 
-export async function sealPackedCheckpoint({draft,final}){
+export async function sealPackedCheckpoint({draft,final,peerCompression=true}){
  const snapshot=await sealBattleState(draft),message={kind:'checkpoint',snapshot,final:!!final};
- const packet=await packMessage(message);
- return {metadata:snapshotMetadata(snapshot),packet,payload:packet.kind==='compressed'?packet:JSON.stringify(message)};
+ const stored=await packMessage(message);
+ return {metadata:snapshotMetadata(snapshot),packet:peerCompression?stored:message,payload:stored.kind==='compressed'?stored:JSON.stringify(message)};
 }
 export async function decodeCheckpointEnvelope(packet){
  const message=await unpackMessage(packet);
