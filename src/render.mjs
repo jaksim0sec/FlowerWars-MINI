@@ -37,8 +37,11 @@ export function drawWarrior(ctx, art, unit, time) {
 }
 
 export function render(ctx, art, board, view, camera, width, height, dpr, options={}) {
+  const profile=options.profile;let mark=profile?performance.now():0;
+  const markStage=name=>{if(profile){const now=performance.now();profile(name,now-mark);mark=now;}};
   ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,width,height);
   drawTerrain(ctx,art,board,camera,width,height,dpr,options.cameraMoving);
+  markStage('terrain');
   ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.translate(camera.x,camera.y);ctx.scale(camera.scale,camera.scale);
   drawMatchOverlay(ctx,board.match,camera.scale);
@@ -66,10 +69,12 @@ export function render(ctx, art, board, view, camera, width, height, dpr, option
     for (const step of selected.path) { const p = project(step.x, step.y); ctx.lineTo(p.x, p.y); }
     ctx.setLineDash([3, 6]); ctx.strokeStyle = '#fff3b9'; ctx.lineWidth = 3; ctx.stroke(); ctx.restore();
   }
+  markStage('overlay');
   let posedUnits=0;
   const guestAgeMs=options.guestAgeMs,visualTime=board.time+(guestAgeMs==null?0:Math.max(0,guestAgeMs)/1000),positions=new Map();
   const locate=u=>{let v=positions.get(u.id);if(!v){v=guestAgeMs==null?{x:u.visualX,y:u.visualY,elapsed:u.elapsed}:guestVisual(u,guestAgeMs);positions.set(u.id,v);}return v;};
   const units = board.units.filter(u=>{const v=locate(u),p=project(v.x,v.y);const visible=onScreen(p.x,p.y,u.character?characterRadius(art.catalog,u.character):250,camera,width,height);if(!visible&&u.character)releasePose(u.character);return visible;}).sort((a,b)=>{const x=locate(a),y=locate(b);return (x.x+x.y)-(y.x+y.y)||x.x-y.x;});
+  markStage('prepare');
   for (const unit of units) {
     const motion=locate(unit),p=project(motion.x,motion.y);
     ctx.save(); ctx.translate(p.x, p.y);
@@ -95,6 +100,7 @@ export function render(ctx, art, board, view, camera, width, height, dpr, option
     ctx.restore();
   }
   drawSquadTeamFlags(ctx,board,camera.scale,camera,width,height,view.selectedSquadIds||[]);
+  markStage('units');
   for (const effect of board.effects) {
     const p = project(effect.x, effect.y), t = effect.age / .55;
     if(!onScreen(p.x,p.y-54,50,camera,width,height))continue;
@@ -108,5 +114,6 @@ export function render(ctx, art, board, view, camera, width, height, dpr, option
     }
     ctx.restore();
   }
+  markStage('effects');
   return {visibleUnits:units.length,posedUnits};
 }
