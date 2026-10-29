@@ -36,3 +36,26 @@ test('sealed and compressed checkpoint is verified without returning a full grap
  const recovered=await decodeStoredCheckpoint(payload);
  assert.equal(recovered.hash,metadata.hash);
 });
+
+test('structured worker clone preserves squad handoffs and alias identity',async()=>{
+ const {checkpointMapProps,restoreCheckpointMapProps}=await import('../src/online/checkpoint-transfer.mjs');
+ const goals=new Map([[1,{x:2,y:3}]]);goals.handoffs=new Map([[1,2]]);
+ const order={goals},source={registry:{squads:new Map([['A',{order}]])},cooperations:new Set([{remote:{order}}])};
+ const value={draft:{state:{source}}};
+ const cloned=structuredClone({value,mapProps:checkpointMapProps(value)});
+ const restored=cloned.value.draft.state.source.registry.squads.get('A').order.goals;
+ assert.equal(restored.handoffs,undefined);
+ restoreCheckpointMapProps(cloned.mapProps);
+ assert.deepEqual([...restored.handoffs],[[1,2]]);
+ assert.equal([...cloned.value.draft.state.source.cooperations][0].remote.order.goals,restored);
+});
+
+test('checkpoint can send JSON to peers without compression while retaining compact storage',async()=>{
+ const {createBattleState,captureBattleState}=await import('../src/online/battle-state.mjs');
+ const {sealPackedCheckpoint,decodeStoredCheckpoint}=await import('../src/online/checkpoint-storage.mjs');
+ const state=createBattleState('uncompressed-peer',{seed:29});
+ const sealed=await sealPackedCheckpoint({draft:captureBattleState(state,2),final:false,peerCompression:false});
+ assert.equal(sealed.packet.kind,'checkpoint');
+ assert.equal(sealed.packet.snapshot.hash,sealed.metadata.hash);
+ assert.equal((await decodeStoredCheckpoint(sealed.payload)).hash,sealed.metadata.hash);
+});
