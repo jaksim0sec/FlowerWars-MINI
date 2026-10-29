@@ -7,7 +7,6 @@
   <title>도라가미 · 첫 번째 전장</title>
   <link rel="icon" type="image/png" href="./assets/units/shield-guard/head_deco_overlay.png">
   <link rel="stylesheet" href="./src/style.css">
-  <link rel="stylesheet" href="./src/tactical-ui.css">
 <link rel="manifest" href="./manifest.json"><link rel="apple-touch-icon" href="./assets/icons/icon-192.png"></head>
 <body>
   <header class="masthead" hidden>
@@ -26,7 +25,6 @@
   <section id="online-panel" role="dialog" aria-labelledby="online-title" hidden>
     <header><div class="online-heading"><span class="online-eyebrow">FLOWERWARS</span><strong id="online-title">함께하는 전장</strong></div><button id="online-close" type="button" aria-label="온라인 창 접기">×</button></header>
     <p id="online-scope" class="online-scope">친구를 초대하고, 나만의 군대를 지휘하세요.</p>
-    <p id="online-next" role="status"></p>
     <p id="online-error" role="status" hidden></p>
     <div id="online-connect">
       <button id="online-create" type="button" class="online-primary"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>새 전장 만들기</span><small>1 대 1 · 친구 초대</small></button>
@@ -51,7 +49,7 @@
     <div class="match-actions"><button id="match-skip">전투 시작</button><button id="match-charge" hidden>총공격</button><button hidden id="match-home">내 깃발</button><button hidden id="match-enemy">적 깃발</button></div>
   </section>
   <section id="deployment-tools" aria-label="예비 병력 배치" hidden>
-    <div class="deployment-head"><strong id="deployment-reserve">예비 350명</strong><span>병종 선택 → 내 진영 터치</span><button id="deployment-toggle">지휘 모드</button></div>
+    <div class="deployment-head"><strong hidden id="deployment-reserve">예비 350명</strong><span hidden>병종 선택 → 내 진영 터치</span><button id="deployment-toggle">지휘 모드</button></div>
     <div class="deployment-types"><button data-deploy-type="defense">방패</button><button data-deploy-type="assault">돌격</button><button data-deploy-type="ranged">궁병</button><button data-deploy-type="mobile">기동</button><button data-deploy-type="mixed">혼성</button><button data-deploy-type="support">지원</button></div>
   </section>
   <section id="match-result" aria-label="전투 결과" hidden><span id="match-result-emblem" aria-hidden="true"></span><small class="result-caption">전투 결과</small><strong id="match-result-title"></strong><p id="match-result-detail"></p><button id="match-restart">다시 준비</button></section>
@@ -106,9 +104,9 @@
     <small class="formation-help">횡대: 넓게 · 종대: 좁게 · 방진: 사방 · 산개: 간격</small>
   </section>
   <section id="command-dock" class="command-dock" aria-label="선택 부대 지휘" hidden>
-    <div class="command-selection-row"><div><strong id="command-selection"></strong><small id="command-state" aria-live="polite"></small><progress id="formation-progress" max="100" value="0" aria-label="진형 자리 일치율" hidden></progress></div><button id="orders-toggle" aria-controls="quick-orders" aria-expanded="true" aria-label="명령 펼치기">명령</button><button id="selection-clear" aria-label="부대 선택 해제">×</button></div>
-    <div class="selection-actions"><button id="selection-add" aria-pressed="false">＋ 추가 선택</button><button id="selection-platoon">소대 선택</button><button id="selection-locate">부대 보기</button><button id="selection-options" aria-expanded="false">진형</button></div>
-    <div id="quick-orders" class="quick-orders" role="group" aria-label="빠른 명령">
+    <div class="command-selection-row"><div><strong id="command-selection"></strong><small id="command-state" aria-live="polite"></small><progress id="formation-progress" max="100" value="0" aria-label="진형 자리 일치율" hidden></progress></div><button id="orders-toggle" aria-expanded="true" aria-label="명령 펼치기">명령</button><button id="selection-clear" aria-label="부대 선택 해제">×</button></div>
+    <div class="selection-actions"><button id="selection-add" aria-pressed="false">＋ 추가 선택</button><button id="selection-platoon">소대 선택</button><button id="selection-locate">부대 보기</button><button id="selection-options" aria-expanded="false">태세·진형</button></div>
+    <div class="quick-orders" role="group" aria-label="빠른 명령">
       <button data-squad-action="advance">이동</button>
       <button data-squad-action="focus">공격</button>
       <button data-squad-action="flank">우회</button>

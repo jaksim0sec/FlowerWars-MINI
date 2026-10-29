@@ -62,25 +62,11 @@ export function createBattlefield(board){
   const n=y*w+x,outside=y<upper[x]||y>lower[x]||x<1||x>w-2;
   const soil=!outside&&!water[n]&&soils.some(r=>((x-r.x)/r.rx)**2+((y-r.y)/r.ry)**2<1+Math.sin(x*.4+y*.3)*.12);
   const terrain=outside?'void':water[n]?'forest':soil?'soil':'grass';board.terrain[y][x]=terrain;
-  if(outside||water[n])board.obstacles.set(n,{kind:outside?'void':'forest',blocked:true});
+  if(outside||water[n])board.obstacles.set(n,{kind:outside?'void':'forest',blocked:true,...(!outside&&y<h/2?{visual:'rock'}:{})});
  }
  const outline=[];
  for(let x=1;x<w-1;x++)if(upper[x]<=lower[x])outline.push({x:x-.5,y:upper[x]-.5});
  for(let x=w-2;x>=1;x--)if(upper[x]<=lower[x])outline.push({x:x+.5,y:lower[x]+.5});
- const decorations=[];
- for(let gy=3;gy<h-3;gy+=4)for(let gx=3;gx<w-3;gx+=4){
-  const x=gx+Math.floor(random()*3)-1,y=gy+Math.floor(random()*3)-1,type=board.terrain[y][x];
-  if(type==='void'||random()>.45)continue;
-  let reserved=false,shore=false;
-  for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){
-   if(protectedCells[(y+dy)*w+x+dx])reserved=true;
-   if(board.terrain[y+dy]?.[x+dx]==='grass'||board.terrain[y+dy]?.[x+dx]==='soil')shore=true;
-  }
-  if(reserved)continue;
-  const options=type==='forest'?(shore?[5,6,7]:[4]):[0,1,2,3,8];
-  decorations.push({x,y,index:options[Math.floor(random()*options.length)],width:75+random()*30});
- }
- decorations.sort((a,b)=>(a.x+a.y)-(b.x+b.y)||a.y-b.y);
- board.battlefield={seed:board.seed,...plan,clearing:plan.rooms.find(r=>r.kind==='battle'),outline,upper,lower,protectedCells,decorations};
+ board.battlefield={seed:board.seed,...plan,visualVersion:'autumn-v1',clearing:plan.rooms.find(r=>r.kind==='battle'),outline,upper,lower,protectedCells,decorations:[]};
  board.terrainRevision++;board.obstacleRevision++;board.navigation.invalidate();
 }

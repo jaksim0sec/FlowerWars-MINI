@@ -1,0 +1,1751 @@
+[
+  {
+    "seed": 7,
+    "scenario": "main-350",
+    "groups": [
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 31,
+          "y": 63
+        },
+        "target": {
+          "x": 103,
+          "y": 63
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 26,
+          "y": 63
+        },
+        "target": {
+          "x": 97,
+          "y": 63
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 35,
+          "y": 66
+        },
+        "target": {
+          "x": 109,
+          "y": 63
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 35,
+          "y": 59
+        },
+        "target": {
+          "x": 103,
+          "y": 56
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 30,
+          "y": 57
+        },
+        "target": {
+          "x": 103,
+          "y": 70
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 30,
+          "y": 69
+        },
+        "target": {
+          "x": 97,
+          "y": 56
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 25,
+          "y": 57
+        },
+        "target": {
+          "x": 97,
+          "y": 70
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 25,
+          "y": 69
+        },
+        "target": {
+          "x": 109,
+          "y": 56
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 21,
+          "y": 63
+        },
+        "target": {
+          "x": 109,
+          "y": 70
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 34,
+          "y": 72
+        },
+        "target": {
+          "x": 91,
+          "y": 63
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 34,
+          "y": 53
+        },
+        "target": {
+          "x": 91,
+          "y": 56
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 29,
+          "y": 51
+        },
+        "target": {
+          "x": 91,
+          "y": 70
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 20,
+          "y": 57
+        },
+        "target": {
+          "x": 103,
+          "y": 49
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 29,
+          "y": 75
+        },
+        "target": {
+          "x": 103,
+          "y": 77
+        },
+        "pass": "main"
+      },
+      {
+        "size": 14,
+        "type": "mixed",
+        "start": {
+          "x": 20,
+          "y": 69
+        },
+        "target": {
+          "x": 108,
+          "y": 49
+        },
+        "pass": "main"
+      }
+    ]
+  },
+  {
+    "seed": 7,
+    "scenario": "flank-24",
+    "groups": [
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 55,
+          "y": 22
+        },
+        "target": {
+          "x": 119,
+          "y": 23
+        },
+        "pass": "east"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 54,
+          "y": 20
+        },
+        "target": {
+          "x": 118,
+          "y": 21
+        },
+        "pass": "east"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 56,
+          "y": 24
+        },
+        "target": {
+          "x": 120,
+          "y": 25
+        },
+        "pass": "east"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 58,
+          "y": 21
+        },
+        "target": {
+          "x": 116,
+          "y": 24
+        },
+        "pass": "east"
+      }
+    ]
+  },
+  {
+    "seed": 7,
+    "scenario": "opposing-48",
+    "groups": [
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 55,
+          "y": 22
+        },
+        "target": {
+          "x": 119,
+          "y": 23
+        },
+        "pass": "east"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 54,
+          "y": 20
+        },
+        "target": {
+          "x": 118,
+          "y": 21
+        },
+        "pass": "east"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 56,
+          "y": 24
+        },
+        "target": {
+          "x": 120,
+          "y": 25
+        },
+        "pass": "east"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 58,
+          "y": 21
+        },
+        "target": {
+          "x": 116,
+          "y": 24
+        },
+        "pass": "east"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 119,
+          "y": 23
+        },
+        "target": {
+          "x": 55,
+          "y": 22
+        },
+        "pass": "west"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 118,
+          "y": 21
+        },
+        "target": {
+          "x": 54,
+          "y": 20
+        },
+        "pass": "west"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 120,
+          "y": 25
+        },
+        "target": {
+          "x": 56,
+          "y": 24
+        },
+        "pass": "west"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 116,
+          "y": 24
+        },
+        "target": {
+          "x": 58,
+          "y": 21
+        },
+        "pass": "west"
+      }
+    ]
+  },
+  {
+    "seed": 7,
+    "scenario": "merge-96",
+    "groups": [
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 72,
+          "y": 23
+        },
+        "target": {
+          "x": 97,
+          "y": 58
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 71,
+          "y": 21
+        },
+        "target": {
+          "x": 99,
+          "y": 61
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 73,
+          "y": 25
+        },
+        "target": {
+          "x": 93,
+          "y": 58
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 75,
+          "y": 22
+        },
+        "target": {
+          "x": 95,
+          "y": 62
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 69,
+          "y": 24
+        },
+        "target": {
+          "x": 101,
+          "y": 57
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 74,
+          "y": 20
+        },
+        "target": {
+          "x": 95,
+          "y": 54
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 70,
+          "y": 26
+        },
+        "target": {
+          "x": 99,
+          "y": 54
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 76,
+          "y": 24
+        },
+        "target": {
+          "x": 103,
+          "y": 60
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 72,
+          "y": 104
+        },
+        "target": {
+          "x": 97,
+          "y": 71
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 73,
+          "y": 106
+        },
+        "target": {
+          "x": 95,
+          "y": 68
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 71,
+          "y": 102
+        },
+        "target": {
+          "x": 93,
+          "y": 72
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 75,
+          "y": 103
+        },
+        "target": {
+          "x": 99,
+          "y": 74
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 69,
+          "y": 105
+        },
+        "target": {
+          "x": 95,
+          "y": 75
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 74,
+          "y": 101
+        },
+        "target": {
+          "x": 101,
+          "y": 70
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 70,
+          "y": 107
+        },
+        "target": {
+          "x": 99,
+          "y": 67
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 76,
+          "y": 105
+        },
+        "target": {
+          "x": 91,
+          "y": 69
+        },
+        "pass": "merge"
+      }
+    ]
+  },
+  {
+    "seed": 29,
+    "scenario": "main-350",
+    "groups": [
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 31,
+          "y": 63
+        },
+        "target": {
+          "x": 103,
+          "y": 63
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 26,
+          "y": 63
+        },
+        "target": {
+          "x": 97,
+          "y": 63
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 35,
+          "y": 66
+        },
+        "target": {
+          "x": 109,
+          "y": 63
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 35,
+          "y": 59
+        },
+        "target": {
+          "x": 103,
+          "y": 56
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 30,
+          "y": 57
+        },
+        "target": {
+          "x": 103,
+          "y": 70
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 30,
+          "y": 69
+        },
+        "target": {
+          "x": 97,
+          "y": 56
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 25,
+          "y": 57
+        },
+        "target": {
+          "x": 97,
+          "y": 70
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 25,
+          "y": 69
+        },
+        "target": {
+          "x": 109,
+          "y": 56
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 21,
+          "y": 63
+        },
+        "target": {
+          "x": 109,
+          "y": 70
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 34,
+          "y": 72
+        },
+        "target": {
+          "x": 91,
+          "y": 63
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 34,
+          "y": 53
+        },
+        "target": {
+          "x": 91,
+          "y": 56
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 29,
+          "y": 51
+        },
+        "target": {
+          "x": 91,
+          "y": 70
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 20,
+          "y": 57
+        },
+        "target": {
+          "x": 103,
+          "y": 49
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 29,
+          "y": 75
+        },
+        "target": {
+          "x": 103,
+          "y": 77
+        },
+        "pass": "main"
+      },
+      {
+        "size": 14,
+        "type": "mixed",
+        "start": {
+          "x": 20,
+          "y": 69
+        },
+        "target": {
+          "x": 108,
+          "y": 49
+        },
+        "pass": "main"
+      }
+    ]
+  },
+  {
+    "seed": 29,
+    "scenario": "flank-24",
+    "groups": [
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 55,
+          "y": 22
+        },
+        "target": {
+          "x": 119,
+          "y": 23
+        },
+        "pass": "east"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 54,
+          "y": 20
+        },
+        "target": {
+          "x": 118,
+          "y": 21
+        },
+        "pass": "east"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 56,
+          "y": 24
+        },
+        "target": {
+          "x": 120,
+          "y": 25
+        },
+        "pass": "east"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 58,
+          "y": 21
+        },
+        "target": {
+          "x": 116,
+          "y": 24
+        },
+        "pass": "east"
+      }
+    ]
+  },
+  {
+    "seed": 29,
+    "scenario": "opposing-48",
+    "groups": [
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 55,
+          "y": 22
+        },
+        "target": {
+          "x": 119,
+          "y": 23
+        },
+        "pass": "east"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 54,
+          "y": 20
+        },
+        "target": {
+          "x": 118,
+          "y": 21
+        },
+        "pass": "east"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 56,
+          "y": 24
+        },
+        "target": {
+          "x": 120,
+          "y": 25
+        },
+        "pass": "east"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 58,
+          "y": 21
+        },
+        "target": {
+          "x": 116,
+          "y": 24
+        },
+        "pass": "east"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 119,
+          "y": 23
+        },
+        "target": {
+          "x": 55,
+          "y": 22
+        },
+        "pass": "west"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 118,
+          "y": 21
+        },
+        "target": {
+          "x": 54,
+          "y": 20
+        },
+        "pass": "west"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 120,
+          "y": 25
+        },
+        "target": {
+          "x": 56,
+          "y": 24
+        },
+        "pass": "west"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 116,
+          "y": 24
+        },
+        "target": {
+          "x": 58,
+          "y": 21
+        },
+        "pass": "west"
+      }
+    ]
+  },
+  {
+    "seed": 29,
+    "scenario": "merge-96",
+    "groups": [
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 72,
+          "y": 23
+        },
+        "target": {
+          "x": 97,
+          "y": 58
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 71,
+          "y": 21
+        },
+        "target": {
+          "x": 99,
+          "y": 61
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 73,
+          "y": 25
+        },
+        "target": {
+          "x": 93,
+          "y": 58
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 75,
+          "y": 22
+        },
+        "target": {
+          "x": 95,
+          "y": 62
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 69,
+          "y": 24
+        },
+        "target": {
+          "x": 101,
+          "y": 57
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 74,
+          "y": 20
+        },
+        "target": {
+          "x": 95,
+          "y": 54
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 70,
+          "y": 26
+        },
+        "target": {
+          "x": 99,
+          "y": 54
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 76,
+          "y": 24
+        },
+        "target": {
+          "x": 103,
+          "y": 60
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 72,
+          "y": 104
+        },
+        "target": {
+          "x": 97,
+          "y": 71
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 73,
+          "y": 106
+        },
+        "target": {
+          "x": 95,
+          "y": 68
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 71,
+          "y": 102
+        },
+        "target": {
+          "x": 93,
+          "y": 72
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 75,
+          "y": 103
+        },
+        "target": {
+          "x": 99,
+          "y": 74
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 69,
+          "y": 105
+        },
+        "target": {
+          "x": 95,
+          "y": 75
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 74,
+          "y": 101
+        },
+        "target": {
+          "x": 101,
+          "y": 70
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 70,
+          "y": 107
+        },
+        "target": {
+          "x": 99,
+          "y": 67
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 76,
+          "y": 105
+        },
+        "target": {
+          "x": 91,
+          "y": 69
+        },
+        "pass": "merge"
+      }
+    ]
+  },
+  {
+    "seed": 73,
+    "scenario": "main-350",
+    "groups": [
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 31,
+          "y": 63
+        },
+        "target": {
+          "x": 103,
+          "y": 63
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 26,
+          "y": 63
+        },
+        "target": {
+          "x": 97,
+          "y": 63
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 35,
+          "y": 66
+        },
+        "target": {
+          "x": 109,
+          "y": 63
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 35,
+          "y": 59
+        },
+        "target": {
+          "x": 103,
+          "y": 56
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 30,
+          "y": 57
+        },
+        "target": {
+          "x": 103,
+          "y": 70
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 30,
+          "y": 69
+        },
+        "target": {
+          "x": 97,
+          "y": 56
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 25,
+          "y": 57
+        },
+        "target": {
+          "x": 97,
+          "y": 70
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 25,
+          "y": 69
+        },
+        "target": {
+          "x": 109,
+          "y": 56
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 21,
+          "y": 63
+        },
+        "target": {
+          "x": 109,
+          "y": 70
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 34,
+          "y": 72
+        },
+        "target": {
+          "x": 91,
+          "y": 63
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 34,
+          "y": 53
+        },
+        "target": {
+          "x": 91,
+          "y": 56
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 29,
+          "y": 51
+        },
+        "target": {
+          "x": 91,
+          "y": 70
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 20,
+          "y": 57
+        },
+        "target": {
+          "x": 103,
+          "y": 49
+        },
+        "pass": "main"
+      },
+      {
+        "size": 24,
+        "type": "mixed",
+        "start": {
+          "x": 29,
+          "y": 75
+        },
+        "target": {
+          "x": 103,
+          "y": 77
+        },
+        "pass": "main"
+      },
+      {
+        "size": 14,
+        "type": "mixed",
+        "start": {
+          "x": 20,
+          "y": 69
+        },
+        "target": {
+          "x": 108,
+          "y": 49
+        },
+        "pass": "main"
+      }
+    ]
+  },
+  {
+    "seed": 73,
+    "scenario": "flank-24",
+    "groups": [
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 55,
+          "y": 22
+        },
+        "target": {
+          "x": 119,
+          "y": 23
+        },
+        "pass": "east"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 54,
+          "y": 20
+        },
+        "target": {
+          "x": 118,
+          "y": 21
+        },
+        "pass": "east"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 56,
+          "y": 24
+        },
+        "target": {
+          "x": 120,
+          "y": 25
+        },
+        "pass": "east"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 58,
+          "y": 21
+        },
+        "target": {
+          "x": 116,
+          "y": 24
+        },
+        "pass": "east"
+      }
+    ]
+  },
+  {
+    "seed": 73,
+    "scenario": "opposing-48",
+    "groups": [
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 55,
+          "y": 22
+        },
+        "target": {
+          "x": 119,
+          "y": 23
+        },
+        "pass": "east"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 54,
+          "y": 20
+        },
+        "target": {
+          "x": 118,
+          "y": 21
+        },
+        "pass": "east"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 56,
+          "y": 24
+        },
+        "target": {
+          "x": 120,
+          "y": 25
+        },
+        "pass": "east"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 58,
+          "y": 21
+        },
+        "target": {
+          "x": 116,
+          "y": 24
+        },
+        "pass": "east"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 119,
+          "y": 23
+        },
+        "target": {
+          "x": 55,
+          "y": 22
+        },
+        "pass": "west"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 118,
+          "y": 21
+        },
+        "target": {
+          "x": 54,
+          "y": 20
+        },
+        "pass": "west"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 120,
+          "y": 25
+        },
+        "target": {
+          "x": 56,
+          "y": 24
+        },
+        "pass": "west"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 116,
+          "y": 24
+        },
+        "target": {
+          "x": 58,
+          "y": 21
+        },
+        "pass": "west"
+      }
+    ]
+  },
+  {
+    "seed": 73,
+    "scenario": "merge-96",
+    "groups": [
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 72,
+          "y": 23
+        },
+        "target": {
+          "x": 97,
+          "y": 58
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 71,
+          "y": 21
+        },
+        "target": {
+          "x": 99,
+          "y": 61
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 73,
+          "y": 25
+        },
+        "target": {
+          "x": 93,
+          "y": 58
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 75,
+          "y": 22
+        },
+        "target": {
+          "x": 95,
+          "y": 62
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 69,
+          "y": 24
+        },
+        "target": {
+          "x": 101,
+          "y": 57
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 74,
+          "y": 20
+        },
+        "target": {
+          "x": 95,
+          "y": 54
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 70,
+          "y": 26
+        },
+        "target": {
+          "x": 99,
+          "y": 54
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 76,
+          "y": 24
+        },
+        "target": {
+          "x": 103,
+          "y": 60
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 72,
+          "y": 104
+        },
+        "target": {
+          "x": 97,
+          "y": 71
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 73,
+          "y": 106
+        },
+        "target": {
+          "x": 95,
+          "y": 68
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 75,
+          "y": 103
+        },
+        "target": {
+          "x": 93,
+          "y": 72
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 69,
+          "y": 104
+        },
+        "target": {
+          "x": 99,
+          "y": 74
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 74,
+          "y": 101
+        },
+        "target": {
+          "x": 95,
+          "y": 75
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 70,
+          "y": 107
+        },
+        "target": {
+          "x": 101,
+          "y": 70
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 76,
+          "y": 105
+        },
+        "target": {
+          "x": 99,
+          "y": 67
+        },
+        "pass": "merge"
+      },
+      {
+        "size": 6,
+        "type": "assault",
+        "start": {
+          "x": 74,
+          "y": 108
+        },
+        "target": {
+          "x": 91,
+          "y": 69
+        },
+        "pass": "merge"
+      }
+    ]
+  }
+]

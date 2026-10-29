@@ -72,7 +72,7 @@ function notify(message) { text('notice', message);$('notice').classList.add('vi
 
 function fit() {
   camera = fitBoardCamera(width, height, board.width, board.height);
-  if(board.match){let top=12,bottom=height-12;for(const id of ['match-hud','deployment-tools','squad-roster','command-dock','squad-tools']){const el=$(id);if(el.hidden)continue;const r=el.getBoundingClientRect();if(!r.width||!r.height)continue;if(r.top<height/3)top=Math.max(top,r.bottom+12);else bottom=Math.min(bottom,r.top-12);}const room=Math.max(height*.48,bottom-top);const center=project((board.width-1)/2,(board.height-1)/2);camera.scale=Math.max(.02,Math.min((width-32)/((width<=700?100:144)*(board.width+board.height)/2),room/(42*(board.width+board.height)),.5));camera.x=width/2-center.x*camera.scale;camera.y=(top+bottom)/2-center.y*camera.scale;}
+  if(board.match){const center=project((board.width-1)/2,(board.height-1)/2);camera.scale=Math.max(.02,Math.min((width-32)/((width<=700?100:144)*(board.width+board.height)/2),(height-220)/(42*(board.width+board.height)),.5));camera.x=width/2-center.x*camera.scale;camera.y=(height-20)/2-center.y*camera.scale;}
   fitted = true;
   refresh();
 }
@@ -122,7 +122,6 @@ function cancelSquadTarget(){
  if(view.mode==='squad-target'){view.mode='move';view.squadId=null;view.squadOrder=null;view.commandSquadIds=null;}
  $('squad-aim').hidden=true;refresh();
 }
-function orderFeedback(message){const s=onlineContext.session,pending=s?.room?.matchId&&s.identity?.role==='guest'&&s.pendingCommands.size;if(pending)document.dispatchEvent(new Event('online-command-pending'));notify(pending?'명령 전송 중 · 호스트의 수락을 기다립니다.':message);}
 function commitSquadTarget(squad,action,aim){
  if(board.match&&!board.match.canCommand(squad?.team,action,aim)){notify('준비 중에는 내 진영 안에 배치하세요.');return false;}
  const ids=view.commandSquadIds||[...selectedSquads];
@@ -130,8 +129,8 @@ function commitSquadTarget(squad,action,aim){
  const result=playerOrders(board,ids,action,aim);
  if(!result.accepted.length)return false;
  additiveSelection=false;
- cancelSquadTarget();commandPanelOpen=false;ordersExpanded=true;
- orderFeedback(`${result.accepted.length}개 분대 · ${squadActionLabels[action]} · ${aim.x!=null?`${aim.x+1}, ${aim.y+1}번 칸`:'대상 지정'}${result.rejected.length?' · '+result.rejected.length+'개 분대 지휘 불가':''}`);
+ cancelSquadTarget();commandPanelOpen=false;ordersExpanded=false;
+ notify(`${result.accepted.length}개 분대 · ${squadActionLabels[action]} · ${aim.x!=null?`${aim.x+1}, ${aim.y+1}번 칸`:'대상 지정'}${result.rejected.length?' · '+result.rejected.length+'개 분대 지휘 불가':''}`);
  refresh();syncSquadRoster();return true;
 }
 function issueSquadAction(action){
@@ -140,12 +139,12 @@ function issueSquadAction(action){
  if(!squads.some(s=>squadSummary(board,s.id)?.commanderAlive)){notify('생존 기수가 없어 명령할 수 없습니다.');return;}
  additiveSelection=false;
  if(targetedSquadActions.has(action)){
-  view.squadId=squad.id;view.commandSquadIds=squads.map(s=>s.id);view.squadOrder=action;view.mode='squad-target';commandPanelOpen=false;ordersExpanded=true;
+  view.squadId=squad.id;view.commandSquadIds=squads.map(s=>s.id);view.squadOrder=action;view.mode='squad-target';commandPanelOpen=false;ordersExpanded=false;
   text('squad-aim-label',action==='flank'?'적 선택: 우회 → 공격 · 빈 땅: 우회 이동':`${squads.length}개 분대 · ${squadActionLabels[action]} → ${action==='focus'?'공격할 적':action==='follow'?'따라갈 아군':'목표 위치'} 선택`);
  }else{
   const result=playerOrders(board,squads.map(s=>s.id),action);
-  cancelSquadTarget();commandPanelOpen=false;ordersExpanded=true;
-  orderFeedback(`${result.accepted.length}개 분대 · ${squadActionLabels[action]}${result.rejected.length?' · '+result.rejected.length+'개 분대 지휘 불가':''}`);
+  cancelSquadTarget();commandPanelOpen=false;ordersExpanded=false;
+  notify(`${result.accepted.length}개 분대 · ${squadActionLabels[action]}${result.rejected.length?' · '+result.rejected.length+'개 분대 지휘 불가':''}`);
  }
  refresh();syncSquadRoster();
 }
@@ -174,7 +173,6 @@ function selectSquad(id,trigger=null,additive=false){
  commandPanelOpen=false;ordersExpanded=true;squadQuickCommand=true;syncSelectionView();
  if(trigger){const rect=trigger.getBoundingClientRect();$('squad-tools').style.setProperty('--squad-anchor-x',Math.round(rect.left+rect.width/2)+'px');}
  $('debug-tools').open=false;refresh();syncSquadRoster();
- if(!trigger)rosterCards.get(id)?.scrollIntoView({block:'nearest',inline:'nearest',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
 }
 const portraitCache=new Map();
 function portraitFor(unit){
@@ -313,10 +311,9 @@ function updateMatchHud(){
  text('match-phase',m.phase==='preparation'?'준비':m.phase==='battle'?'깃발 공성전':'전투 종료');
  const seconds=Math.ceil(m.remaining);text('match-timer',m.phase==='preparation'?Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0'):'');
  text('match-armies',m.phase==='preparation'?`나 ${m.counts[own]}/${m.limit} · 적 ${m.counts[enemy]}/${m.limit}`:`나 ${m.counts[own]} · 적 ${m.counts[enemy]}`);
- const preview=m.deploymentPreview(own,view.deployType||'defense');
- text('deployment-reserve',`예비 ${m.reserve[own]}명 · ${typeLabels[view.deployType||'defense']} ${preview?.members.length||0}명`);
+ text('deployment-reserve',`예비 ${m.reserve[own]}명 · ${Math.min(m.squadSize,m.reserve[own])}명씩 배치`);
  $('deployment-tools').classList.toggle('is-deploying',view.mode==='deploy');
- text('deployment-toggle',view.mode==='deploy'?'배치 접기':'병력 배치');
+ text('deployment-toggle',view.mode==='deploy'?'완료':'배치');
  if(m.phase==='preparation')view.deployment=m.deploymentPreview(own,view.deployType||'defense');
  $('match-skip').disabled=!!m.multiplayer&&own!=='A';
  for(const button of document.querySelectorAll('[data-deploy-type]')){button.disabled=m.reserve[own]<=0;button.setAttribute('aria-pressed',String(button.dataset.deployType===view.deployType));}
@@ -381,12 +378,12 @@ function refresh(invalidate=true) {
   $('orders-toggle').setAttribute('aria-expanded',String(ordersExpanded));
   if(selection.length){
     const count=summaries.reduce((n,s)=>n+s.alive,0),team=selection[0].team;
-    text('command-selection',selection.length===1?`${selection[0].name} · ${typeLabels[selection[0].type]||'혼성'} · ${count}명`:`${selection.length}개 분대 · ${count}명`);
-    const names=[...new Set(selection.map(s=>squadActionLabels[s.order?.type]||'명령 없음'))],orderNames=names.length>1?'혼합 명령':names[0];
+    text('command-selection',`${team} · ${selection.length}분대 · ${count}명`);
+    const orderNames=[...new Set(selection.map(s=>squadActionLabels[s.order?.type]||'명령 없음'))].join(' / ');
     const phases=[...new Set(selection.map(s=>phaseLabels[s.order?.phase]).filter(Boolean))].join(' / ');
     const moving=summaries.reduce((n,s)=>n+s.moving,0),waiting=summaries.reduce((n,s)=>n+s.waiting,0);
     const queued=selection.some(s=>s.order?.after);
-    text('command-state',onlineContext.session?.pendingCommands.size?'명령 전송 중 · 수락 대기':view.mode==='squad-target'?`${squadActionLabels[view.squadOrder]} · 전장에서 목표를 선택하세요`:queued?'우회 진행 → 도착 후 집중 공격':`${orderNames}${phases?' · '+phases:''}${waiting?' · 경로 대기 '+waiting+'명':''}`);
+    text('command-state',queued?'우회 진행 → 도착 후 집중 공격':`${orderNames}${phases?' · '+phases:''}${waiting?' · 경로 대기 '+waiting+'명':''}`);
     if(selection.some(s=>s.order?.type==='rally')){
      const forming=summaries.filter(s=>s.order?.type==='rally'),formed=forming.reduce((n,s)=>n+s.formed,0),total=forming.reduce((n,s)=>n+s.formationTotal,0),percent=total?Math.round(formed/total*100):100;
      const labels={line:'횡대',column:'종대',square:'방진',spread:'산개',dense:'밀집'},names=[...new Set(forming.map(s=>labels[s.formation]))].join('·');
@@ -395,7 +392,7 @@ function refresh(invalidate=true) {
     }
     for(const button of $('command-dock').querySelectorAll('[data-squad-action]')){
       button.disabled=!summaries.some(s=>s.commanderAlive);
-      button.setAttribute('aria-pressed',String(view.mode==='squad-target'&&view.squadOrder===button.dataset.squadAction));
+      button.setAttribute('aria-pressed',String(selection.every(s=>s.order?.type===button.dataset.squadAction)));
     }
   }
   $('selection-options').setAttribute('aria-expanded',String(commandPanelOpen));
