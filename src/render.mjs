@@ -10,9 +10,9 @@ import {drawMatchOverlay,drawDistantSoldier,drawSquadTeamFlags,TEAM_COLORS,TEAM_
 
 const TERRAIN_ATLAS=new URL('../assets/world/terrain/atlas.webp',import.meta.url);
 export async function loadArtwork() {
-  const [catalog,atlas,decorations,autumn,autumnCatalog]=await Promise.all([loadCatalog(),loadImage(TERRAIN_ATLAS),loadImage(new URL('../assets/world/terrain/decorations.webp',import.meta.url)),loadImage(new URL('../assets/world/autumn/atlas.webp',import.meta.url)),fetch(new URL('../assets/world/autumn/catalog.json',import.meta.url)).then(r=>{if(!r.ok)throw Error('Autumn catalog unavailable');return r.json();})]);
+  const [catalog,atlas,decorations,autumn,autumnCatalog,blueFlag,redFlag]=await Promise.all([loadCatalog(),loadImage(TERRAIN_ATLAS),loadImage(new URL('../assets/world/terrain/decorations.webp',import.meta.url)),loadImage(new URL('../assets/world/autumn/atlas.webp',import.meta.url)),fetch(new URL('../assets/world/autumn/catalog.json',import.meta.url)).then(r=>{if(!r.ok)throw Error('Autumn catalog unavailable');return r.json();}),loadImage(new URL('../assets/ui/selected/flag-blue.webp',import.meta.url)),loadImage(new URL('../assets/ui/selected/flag-red.webp',import.meta.url))]);
   const warrior=catalog.characters['gynari-warrior'];
-  return {catalog,rig:warrior.rig,parts:warrior.images,tiles:{atlas,decorations,autumn,autumnCatalog}};
+  return {flags:{A:blueFlag,B:redFlag},catalog,rig:warrior.rig,parts:warrior.images,tiles:{atlas,decorations,autumn,autumnCatalog}};
 }
 
 function diamond(ctx, x, y, fill, stroke = null, inset = 3) {
@@ -44,7 +44,7 @@ export function render(ctx, art, board, view, camera, width, height, dpr, option
   markStage('terrain');
   ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.translate(camera.x,camera.y);ctx.scale(camera.scale,camera.scale);
-  drawMatchOverlay(ctx,board.match,camera.scale);
+  drawMatchOverlay(ctx,board.match,camera.scale,art.flags);
   drawCommandOverlay(ctx,board,view,camera.scale);
 
   if (view.hover) {
@@ -99,7 +99,7 @@ export function render(ctx, art, board, view, camera, width, height, dpr, option
     }
     ctx.restore();
   }
-  drawSquadTeamFlags(ctx,board,camera.scale,camera,width,height,view.selectedSquadIds||[]);
+  drawSquadTeamFlags(ctx,board,camera.scale,camera,width,height,view.selectedSquadIds||[],art.flags);
   markStage('units');
   for (const effect of board.effects) {
     const p = project(effect.x, effect.y), t = effect.age / .55;

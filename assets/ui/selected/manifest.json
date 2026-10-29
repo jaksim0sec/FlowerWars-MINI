@@ -168,6 +168,48 @@
         97,
         128
       ]
+    },
+    {
+      "file": "01-ornaments/flag-blue.png",
+      "source_sheet": 1,
+      "source_crop_xyxy": [
+        0,
+        610,
+        434,
+        1160
+      ],
+      "size": [
+        450,
+        566
+      ],
+      "transparent_padding_px": 8,
+      "sha256": "4458737856bbe1ebb2be8e675d86a7b74fc47298c9ab02580da8bd6a63e20b56",
+      "runtime": "flag-blue.webp",
+      "runtime_size": [
+        153,
+        192
+      ]
+    },
+    {
+      "file": "01-ornaments/flag-red.png",
+      "source_sheet": 1,
+      "source_crop_xyxy": [
+        439,
+        610,
+        858,
+        1158
+      ],
+      "size": [
+        435,
+        564
+      ],
+      "transparent_padding_px": 8,
+      "sha256": "52d2a6497cb2df68d27d177299c13e1e92e73f38502a4ef53629b29b1359e1ba",
+      "runtime": "flag-red.webp",
+      "runtime_size": [
+        148,
+        192
+      ]
     }
   ]
 }
