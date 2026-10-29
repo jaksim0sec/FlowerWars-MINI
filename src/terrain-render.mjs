@@ -33,7 +33,6 @@ export function terrainEdges(board,x,y){
 const materialRow={grass:0,soil:1,pond:2,rock:1};
 function paint(ctx,art,board,camera,width,height,dpr){
  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,width,height);
- if(art.tiles.distance&&board.battlefield?.visualVersion==='autumn-v1')ctx.drawImage(art.tiles.distance,0,0,width,height);
  ctx.translate(camera.x,camera.y);ctx.scale(camera.scale,camera.scale);
  ctx.save();ctx.beginPath();
  if(board.battlefield?.outline){
