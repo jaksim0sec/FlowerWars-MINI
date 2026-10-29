@@ -1,5 +1,5 @@
 import {combatAnimationElapsed} from './combat.mjs';
-import {guestVisual} from './online/game-gate.mjs';
+import {guestRenderTime,sampledGuestVisual} from './online/presentation.mjs';
 import {characterRadius,onScreen,cachedPose,releasePose} from './character-render-cache.mjs';
 import {drawTerrain} from './terrain-render.mjs';
 import {loadCatalog, loadImage} from './characters/catalog.mjs';
@@ -71,8 +71,8 @@ export function render(ctx, art, board, view, camera, width, height, dpr, option
   }
   markStage('overlay');
   let posedUnits=0;
-  const guestAgeMs=options.guestAgeMs,visualTime=board.time+(guestAgeMs==null?0:Math.max(0,guestAgeMs)/1000),positions=new Map();
-  const locate=u=>{let v=positions.get(u.id);if(!v){v=guestAgeMs==null?{x:u.visualX,y:u.visualY,elapsed:u.elapsed}:guestVisual(u,guestAgeMs);positions.set(u.id,v);}return v;};
+  const guestAgeMs=options.guestAgeMs,sampleTime=guestAgeMs==null?null:guestRenderTime(board,guestAgeMs),visualTime=sampleTime??board.time,positions=new Map();
+  const locate=u=>{let v=positions.get(u.id);if(!v){v=guestAgeMs==null?{x:u.visualX,y:u.visualY,elapsed:u.elapsed,state:u.state,facing:u.facing,strike:u.strike,attackVector:u.attackVector,deathDirection:u.deathDirection}:sampledGuestVisual(board,u,sampleTime,guestAgeMs);positions.set(u.id,v);}return v;};
   const units = board.units.filter(u=>{const v=locate(u),p=project(v.x,v.y);const visible=onScreen(p.x,p.y,u.character?characterRadius(art.catalog,u.character):250,camera,width,height);if(!visible&&u.character)releasePose(u.character);return visible;}).sort((a,b)=>{const x=locate(a),y=locate(b);return (x.x+x.y)-(y.x+y.y)||x.x-y.x;});
   markStage('prepare');
   for (const unit of units) {
@@ -89,7 +89,7 @@ export function render(ctx, art, board, view, camera, width, height, dpr, option
     if(unit.character&&board.match&&camera.scale<.28){
       drawDistantSoldier(ctx,art,unit,drawCharacter);
     }else if(unit.character) {
-      Object.assign(unit.character.animation,{state:unit.state,elapsed:guestAgeMs==null?combatAnimationElapsed(unit):combatAnimationElapsed({state:unit.state,strike:unit.strike,elapsed:motion.elapsed}),facing:unit.facing,phase:unit.id,attackVector:unit.attackVector,deathDirection:unit.deathDirection});
+      Object.assign(unit.character.animation,{state:motion.state,elapsed:combatAnimationElapsed({state:motion.state,strike:motion.strike,elapsed:motion.elapsed}),facing:motion.facing,phase:unit.id,attackVector:motion.attackVector,deathDirection:motion.deathDirection});
       const pose=cachedPose(art.catalog,unit.character,visualTime,camera.scale);if(pose.computed)posedUnits++;
       drawCharacter(ctx,art.catalog,unit.character,visualTime,{layout:pose.layout});
     } else drawWarrior(ctx, art, unit, board.time);

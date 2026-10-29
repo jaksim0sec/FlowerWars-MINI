@@ -6,33 +6,34 @@ import {encodeStoredCheckpoint,decodeStoredCheckpoint,sealPackedCheckpoint,decod
 
 // Worker is optional in Node tests and unavailable browser environments.
 // A failure falls back to the original verified path; recovery never skips validation.
-let worker=null,sequence=0;
+const workers=new Map();let sequence=0;
 const pending=new Map();
 const fallback=(kind,value)=>kind==='validate'?validateMatchState(value):kind==='unpack'?unpackMessage(value):kind==='seal'?sealBattleState(value):kind==='store'?encodeStoredCheckpoint(value):kind==='load'?decodeStoredCheckpoint(value):kind==='seal-packed'?sealPackedCheckpoint(value):kind==='checkpoint-envelope'?decodeCheckpointEnvelope(value):packMessage(value);
-function stop(error){
- const current=worker;worker=null;current?.terminate();
- for(const job of pending.values()){clearTimeout(job.timer);job.reject(error);}
- pending.clear();
+function stop(slot,error){
+ workers.get(slot)?.terminate();workers.delete(slot);
+ for(const [id,job]of pending)if(job.slot===slot){clearTimeout(job.timer);job.reject(error);pending.delete(id);}
 }
-function ensureWorker(){
+function ensureWorker(slot){
  if(typeof Worker!=='function')return null;
- if(worker)return worker;
+ if(workers.has(slot))return workers.get(slot);
  const created=new Worker(new URL('./checkpoint-worker.mjs',import.meta.url),{type:'module'});
  created.onmessage=({data})=>{
   const job=pending.get(data?.id);if(!job)return;
   pending.delete(data.id);clearTimeout(job.timer);
   if(data.ok)job.resolve(data.result);else job.reject(new Error('CHECKPOINT_WORKER_FAILED'));
  };
- created.onerror=()=>stop(new Error('CHECKPOINT_WORKER_FAILED'));
- created.onmessageerror=()=>stop(new Error('CHECKPOINT_WORKER_FAILED'));
- worker=created;return worker;
+ created.onerror=()=>{if(workers.get(slot)===created)stop(slot,new Error('CHECKPOINT_WORKER_FAILED'));};
+ created.onmessageerror=created.onerror;
+ workers.set(slot,created);return created;
 }
 async function run(kind,value){
- let active;try{active=ensureWorker();}catch{return fallback(kind,value);}
+ // Small live deltas must not queue behind multi-megabyte snapshot sealing.
+ const slot=kind==='pack'&&value?.kind==='frame'||kind==='checkpoint-envelope'&&value?.byteLength<=512000?'live':'checkpoint';
+ let active;try{active=ensureWorker(slot);}catch{return fallback(kind,value);}
  if(!active)return fallback(kind,value);
  try{return await new Promise((resolve,reject)=>{
-  const id=++sequence,timer=setTimeout(()=>{stop(new Error('CHECKPOINT_WORKER_TIMEOUT'));},15000);
-  pending.set(id,{resolve,reject,timer});
+  const id=++sequence,timer=setTimeout(()=>{stop(slot,new Error('CHECKPOINT_WORKER_TIMEOUT'));},15000);
+  pending.set(id,{resolve,reject,timer,slot});
   try{active.postMessage({id,kind,value,mapProps:(kind==='seal-packed'||kind==='seal')?checkpointMapProps(value):[]});}catch(error){pending.delete(id);clearTimeout(timer);reject(error);}
  });}catch{return fallback(kind,value);}
 }

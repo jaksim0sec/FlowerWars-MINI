@@ -3,6 +3,7 @@ export const MAX_LARGE_BYTES=8*1024*1024;
 export const MAX_CHUNK_PACKET_BYTES=16*1024;
 const CHUNK_BYTES=12000;
 const BUFFER_LIMIT=256*1024;
+const BULK_BUFFER_LIMIT=32*1024;
 const BYTE_RATE=2*1024*1024;
 const BYTE_BURST=MAX_LARGE_BYTES+MAX_WIRE_BYTES;
 const encoder=new TextEncoder();
@@ -99,6 +100,7 @@ export class PeerLink {
     const packet=JSON.stringify({kind:'transfer:chunk',id:transfer.id,index,total:bytes.length,count,data:encodeChunk(chunk)});
     if(encoder.encode(packet).length>MAX_CHUNK_PACKET_BYTES)throw Error();
     this.channel.send(packet);
+    if(index%4===3)await new Promise(resolve=>setTimeout(resolve,0));
    }
    return !this.closed;
   }catch{this.fail('P2P_ERROR');return false;}
@@ -107,7 +109,7 @@ export class PeerLink {
  async waitWritable(transfer,bytes){
   while(!this.closed&&this.channel?.readyState==='open'){
    if(Date.now()>=transfer.deadline){this.fail('P2P_TRANSFER_TIMEOUT');return false;}
-   if(this.channel.bufferedAmount<=BUFFER_LIMIT-MAX_CHUNK_PACKET_BYTES&&this.consumeBytes(this.sendBudget,bytes))return true;
+   if(this.channel.bufferedAmount<=BULK_BUFFER_LIMIT-MAX_CHUNK_PACKET_BYTES&&this.consumeBytes(this.sendBudget,bytes))return true;
    await new Promise(resolve=>{
     // A short poll also works with channels lacking bufferedamountlow events.
     const timer=setTimeout(()=>{transfer.wake=null;resolve();},Math.min(10,Math.max(1,transfer.deadline-Date.now())));

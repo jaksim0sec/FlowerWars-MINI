@@ -1,3 +1,4 @@
+import {recordGuestFrame} from './presentation.mjs';
 import {PeerLink} from './peer.mjs';
 import {SnapshotBackup} from './backup.mjs';
 import {createFixture,stepFixture,applyFixtureCommand,saveMatchState,restoreMatchState,snapshotMetadata} from './match-state.mjs';
@@ -92,7 +93,7 @@ export class OnlineSession extends EventTarget {
    else applyFixtureCommand(this.state,'guest',message.command);return;
   }
   if(message.kind==='command:result'){if(this.identity.role!=='guest'||!Number.isSafeInteger(message.sequence))return;const pending=this.pendingCommands.get(message.sequence);if(pending){this.pendingCommands.delete(message.sequence);if(!message.result?.ok)this.error('COMMAND_REJECTED');}return;}
-  if(message.kind==='frame'){if(this.identity.role!=='guest'||!this.state?.board||message.epoch!==epoch||this.appliedEpoch!==epoch)return;if(!['PLAYING','FINISHED'].includes(this.room.state)&&!(this.room.state==='PAUSED'&&this.room.manualPause))return;if(!Number.isSafeInteger(message.frame)||message.frame<=this.lastFrame)return;const appliedAt=performance.now();if(!applyBattleFrame(this.state,message.value))throw new Error('INVALID_FRAME');this.lastFrameApplyMs=performance.now()-appliedAt;this.lastFrame=message.frame;this.guestFrameAt=performance.now();this.changed();return;}
+  if(message.kind==='frame'){if(this.identity.role!=='guest'||!this.state?.board||message.epoch!==epoch||this.appliedEpoch!==epoch)return;if(!['PLAYING','FINISHED'].includes(this.room.state)&&!(this.room.state==='PAUSED'&&this.room.manualPause))return;if(!Number.isSafeInteger(message.frame)||message.frame<=this.lastFrame)return;const appliedAt=performance.now();if(!applyBattleFrame(this.state,message.value))throw new Error('INVALID_FRAME');this.lastFrame=message.frame;this.guestFrameAt=performance.now();recordGuestFrame(this.state.board,message.value,this.guestFrameAt);this.lastFrameApplyMs=performance.now()-appliedAt;this.changed();return;}
 
   if(message.kind==='recovery:request'){const meta=message.metadata;if(!meta||meta.matchId!==this.room.matchId||meta.hash!==this.room.checkpoint?.hash||meta.sequence!==this.room.checkpoint?.sequence)throw new Error('SNAPSHOT_MISMATCH');const snapshot=await this.backup.get(this.room.roomCode,this.room.matchId,meta);if(snapshot&&current())await this.sendPayload({kind:'recovery:state',snapshot},true);else this.error('NO_CHECKPOINT');return;}
   if(message.kind==='checkpoint'||message.kind==='recovery:state'||message.kind==='state'){
@@ -105,7 +106,14 @@ export class OnlineSession extends EventTarget {
    if((this.room.state==='PLAYING'||this.room.state==='PAUSED'&&this.room.manualPause)&&message.epoch===epoch&&Number.isSafeInteger(message.frame)&&message.frame>this.lastFrame){this.lastFrame=message.frame;const state=await restoreMatchState(snapshot);if(current()){this.state=state;this.changed();}}return;
   }
  }
- async transmitFrame(epoch,bulk=false){const peer=this.peer,state=this.state;const job=(this.frameJob||Promise.resolve()).catch(()=>{}).then(async()=>{if(this.peer!==peer||this.state!==state||this.room?.epoch!==epoch)return;const packet={kind:'frame',epoch,frame:++this.frame,value:this.battleFrames.build(state)},sent=await this.sendPayload(packet,bulk);if(sent)this.lastFrameSentAt=performance.now();else if(this.peer===peer&&this.room?.epoch===epoch)this.battleFrames.reset();});this.frameJob=job;try{await job;}finally{if(this.frameJob===job)this.frameJob=null;}}
+ async transmitFrame(epoch,bulk=false){const peer=this.peer,state=this.state;const job=(this.frameJob||Promise.resolve()).catch(()=>{}).then(async()=>{if(this.peer!==peer||this.state!==state||this.room?.epoch!==epoch)return;
+  // Commit delta history only after queuing the packet. A skipped frame must
+  // accumulate changes, not trigger a costly full-army retransmission.
+  const base=this.battleFrames,draft=Object.assign(Object.create(BattleFrames.prototype),base,{actors:new Map(base.actors),squads:new Map(base.squads),equipment:new Map(base.equipment),groups:new Set(base.groups)});
+  const packet={kind:'frame',epoch,frame:++this.frame,value:draft.build(state)},sent=await this.sendPayload(packet,bulk);
+  if(this.peer===peer&&this.state===state&&this.room?.epoch===epoch){if(sent){this.battleFrames=draft;this.lastFrameSentAt=performance.now();}else this.skippedFrames=(this.skippedFrames||0)+1;}
+ });this.frameJob=job;try{await job;}finally{if(this.frameJob===job)this.frameJob=null;}}
+
  async sendPayload(value,bulk=false,packed=null){const peer=this.peer,epoch=this.room?.epoch,packet=packed??(this.peerCompression?await packOffThread(value):value),deadline=performance.now()+30000;const current=()=>this.peer===peer&&this.room?.epoch===epoch&&!peer?.closed;if(!current())return false;if(peer.send(packet))return true;if(!bulk)return false;while(peer.outgoing&&current()&&performance.now()<deadline)await new Promise(resolve=>setTimeout(resolve,10));if(!current())return false;return peer.sendLarge(packet);}
  async checkpoint(){if(this.publishing||!this.state||this.peer?.channel?.readyState!=='open')return;this.publishing=true;const epoch=this.room.epoch,code=this.room.roomCode,peer=this.peer,job=this.checkpointJob=Symbol(),current=()=>this.peer===peer&&this.room?.epoch===epoch&&this.room?.roomCode===code;try{
    const final=this.state.board?.match.phase==='finished',sequence=++this.sequence;
@@ -132,7 +140,7 @@ export class OnlineSession extends EventTarget {
   if(!this.identity||!this.room||this.identity.role!=='host'||this.room.state!=='PLAYING'||!this.socket?.connected||this.peer?.channel?.readyState!=='open'||!this.state||this.appliedEpoch!==this.room.epoch)return;
   if(this.state.board)stepBattle(this.state,dt);else stepFixture(this.state,dt);if(!this.state.board||now-(this.lastUi||0)>=250){this.lastUi=now;this.changed();}if(this.writingFrame)return;
   if((now-this.lastCheckpoint>=5000||this.state.board?.match.phase==='finished')&&!this.publishing){if(this.state.board?.match.phase==='finished')this.finishSequence=this.sequence+1;this.checkpoint().catch(e=>this.peer?.fail(e.message));}
-  if(now-this.lastSent>=150){this.lastSent=now;this.writingFrame=true;const epoch=this.room.epoch;try{if(this.state.board){await this.transmitFrame(epoch,!this.publishing);}else{const snapshot=await saveMatchState(this.state,Math.max(0,this.sequence));if(this.room?.epoch===epoch&&this.room.state==='PLAYING')this.peer.send({kind:'state',epoch,frame:++this.frame,snapshot});}}catch(e){this.error(e.message);}finally{this.writingFrame=false;}}
+  if(now>=(this.nextFrameAt??0)){const due=this.nextFrameAt??now;this.nextFrameAt=due+(Math.floor(Math.max(0,now-due)/150)+1)*150;this.lastSent=now;this.writingFrame=true;const epoch=this.room.epoch;try{if(this.state.board){await this.transmitFrame(epoch,!this.publishing);}else{const snapshot=await saveMatchState(this.state,Math.max(0,this.sequence));if(this.room?.epoch===epoch&&this.room.state==='PLAYING')this.peer.send({kind:'state',epoch,frame:++this.frame,snapshot});}}catch(e){this.error(e.message);}finally{this.writingFrame=false;}}
   if(!this.state.board&&this.state.phase==='finished'&&!this.finishing){this.finishing=true;this.rpc('match:finish').catch(e=>this.error(e.message));}
  }
  async ready(ready){await this.rpc('participant:ready',{ready});}
